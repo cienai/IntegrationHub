@@ -4,70 +4,45 @@
 
 # **Step-by-step instructions:** 
 
-  
-
 **Step 1: GitHub Integration Hub**
 
 Download files from Cien.ai’s Integration Hub [(https://github.com/cienai/IntegrationHub/tree/main)](https://github.com/cienai/IntegrationHub/tree/main))
+to a Windows computer: 
 
-to a Windows computer:
+**/powerbi**
 
-  
+- GTM Suite - Automatic Data Enhancement Report.pbix
+- GTM Suite - Dataset - Automatic Enhancement .pbix
+- GTM Suite - Dataset - Sales Performance.pbix
+- GTM Suite - Management Report.pbix
+- GTM Suite - Strategy Report.pbix
+- GTM Suite - Tactical Report.pbix
+- GTM Suite - Utility Box Report.pbix
 
-/powerbi
-
-GTM Suite - Automatic Data Enhancement Report.pbix
-
-GTM Suite - Dataset - Automatic Enhancement .pbix
-
-GTM Suite - Dataset - Sales Performance.pbix
-
-GTM Suite - Management Report.pbix
-
-GTM Suite - Strategy Report.pbix
-
-GTM Suite - Tactical Report.pbix
-
-GTM Suite - Utility Box Report.pbix
-
-  
-
-/pbi\_deploy
-
-README.md
-
-Pbi\_cfg.json
-
-PBI\_deploy.ps1
-
-  
+**/scripts**
+/pbi_deploy
+- README.md
+- cfg.json
+- deploy.ps1
 
 **Step 2: Sign in to the Power BI Service**
 
 Open your web browser and go to the Power BI Service website (https://app.powerbi.com).
-
 Sign in with your Power BI account credentials.
 
-  
 
 **Step 3: Create or Select a “GTM Suite Staging” Workspace**
 
-In Power BI Service (online), Workspaces are used to organize datasets, reports, and dashboards. You can create a new workspace or select an existing one. You will need a Premium-per-User Power BI license to do this, and the workspace access level should be “Admin”.
+In Power BI Service (online), Workspaces are used to organize datasets, reports, and dashboards. You can create a new workspace or select an existing one.
+*Note: You will need a Premium-per-User Power BI license to do this, and the workspace access level should be “Admin”.*
+ 
+a/ To create a new “GTM Suite Staging” workspace, click on "Workspaces" in the left sidebar, then click "Create a workspace."
+or
+b/ To select an existing workspace, click on "Workspaces" and choose the workspace you want to use.
+
+*Note: The workspace settings need to be set as “Premium-Per-User” and “Large Data Set Storage Format”.* 
 
   
-
-1.  To create a new “GTM Suite Staging” workspace, click on "Workspaces" in the left sidebar, then click "Create a workspace."
-
-Or
-
-To select an existing workspace, click on "Workspaces" and choose the workspace you want to use.
-
-  
-
-Note: The workspace settings need to be set as “Premium-Per-User” and “Large Data Set Storage Format”. 
-
-  
-
 **Step 3: Datasets - settings and publishing to workspace**
 
 In Power BI Desktop (local):
@@ -77,10 +52,6 @@ In Power BI Desktop (local):
 3.  Refresh the dataset (this can take up to 20 minutes)
 4.  Publish the dataset to your online “Staging” Workspace
 5.  Repeat the process above for the second dataset - GTM Suite - Dataset - Sales Performance.pbix
-6.    
-    
-7.    
-    
 
 **Step 4: Reports - Connecting to Datasets and publishing to workspace**
 
@@ -91,17 +62,11 @@ In Power BI Desktop
 3.  For GTM Suite - Automatic Data Enhancement Report.pbix, connect it to **GTM Suite - Dataset - Automatic Enhancement.pbix**
 4.  For the **other reports**, connect them to **GTM Suite - Dataset - Sales Performance.pbix**
 
-  
-
 Now you should have a working report set in your “GTM Suite Staging” workspace. 
-
-  
 
 **Future releases:** 
 
 Cien is frequently improving its platform and reports. When a new build is available, it will be reflected in our Github Release Notes. For your staging workspace (and subsequently all your workspaces) to reflect the latest release, you will have to repeat steps 1 - 4 above. 
-
-  
 
 **Deploying Across your PBI organization:** 
 
