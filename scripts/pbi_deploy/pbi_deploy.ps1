@@ -205,7 +205,7 @@ function Main {
             $json_body['updateDetails'] = @($details)
             $json_body = $json_body | ConvertTo-Json
             $dataset_id = $dataset_id
-            Write-Host $json_body
+
             Write-Log "Updating dataset params" Yellow
             $updating_params = Invoke-PowerBIRestMethod -Url https://api.powerbi.com/v1.0/myorg/groups/$target_workspace_id/datasets/$dataset_id/Default.UpdateParameters -Method Post -Body $json_body
 
