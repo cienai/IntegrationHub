@@ -120,7 +120,8 @@ function Main {
         # $current_dir = (Get-Location).Path
         $coid = $company.coid.ToLower()
         $db_name = $company.db_name
-        $db_server = $company.db_server
+        $db_server_postgres = $company.db_server_postgres
+        $db_server_sql = $company.db_server_sql
         $db_type = $company.db_type
 
         $dataset_report_mapping = $config.dataset_report_mapping
@@ -189,8 +190,12 @@ function Main {
                     newValue = $db_name
                 },
                 @{
-                    name = 'db_server'
-                    newValue = $db_server
+                    name = 'db_server_postgres'
+                    newValue = $db_server_postgres
+                },
+                @{
+                    name = 'db_server_sql'
+                    newValue = $db_server_sql
                 },
                 @{
                     name = 'db_type'
@@ -200,6 +205,7 @@ function Main {
             $json_body['updateDetails'] = @($details)
             $json_body = $json_body | ConvertTo-Json
             $dataset_id = $dataset_id
+
             Write-Log "Updating dataset params" Yellow
             $updating_params = Invoke-PowerBIRestMethod -Url https://api.powerbi.com/v1.0/myorg/groups/$target_workspace_id/datasets/$dataset_id/Default.UpdateParameters -Method Post -Body $json_body
 
