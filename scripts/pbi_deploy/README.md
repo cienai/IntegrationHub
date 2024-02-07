@@ -20,7 +20,7 @@
 
     `"coid"` - Coid of the client
 
-2. For the selected db, the script expects two environment variables present on the machine before running the script:
+2. For the selected db, the script expects two environment variables present on the machine before running the script. To update Environment Variables, on your PC, click windows icon, Search for Environ, Choose "Edit the system environment variables" control panel, in "Advanced" tab, click "Environment Variables", "Edit" DBPASSWORD, DBUSER. 
 
     `DBUSER` - username of the database
     
