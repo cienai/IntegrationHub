@@ -1,0 +1,23 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/reportExtension/1.0.0/schema.json",
+  "name": "extension",
+  "entities": [
+    {
+      "name": "ssr_history",
+      "measures": [
+        {
+          "name": "meas.ytd_sales",
+          "dataType": "Double",
+          "expression": "\nvar curr_date = CALCULATE(MAX(cal_end_dates[Date]))\nvar start_date = date(Year(curr_date),1,1)\nvar res =  CALCULATE(SUM(ssr_history[opp_won_amount]), ssr_history[_sys_filter_end_date] >=  start_date) +0\nreturn res\n\n",
+          "formatString": "General Number"
+        },
+        {
+          "name": "meas.sply_ytd_sales",
+          "dataType": "Double",
+          "expression": "\nvar curr_date = CALCULATE(MAX(cal_end_dates[Date]))\nvar sply_date = date(Year(curr_date) -1,Month(curr_date),day(curr_date))\n\nvar start_date = date(Year(curr_date) -1,1,1)\nvar res =  CALCULATE(SUM(ssr_history[opp_won_amount]), ssr_history[_sys_filter_end_date] <  sply_date &&  ssr_history[_sys_filter_end_date] >=  start_date) +0\nreturn res\n\n",
+          "formatString": "General Number"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+table sales_process_ssr_sample
+	lineageTag: a8b58ede-c43c-4494-b826-df07844cd6e9
+
+	column _sys_docid
+		lineageTag: 03ef151b-4351-4068-b056-cff8be32b152
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_docid]
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_name
+		lineageTag: f2dcf4a6-6bbe-4802-8fc5-a93ca7ddf6d7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [crm_name]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition sales_process_ssr_sample-f0a53df0-49bf-4c7d-a017-4338df9a5c2b = calculated
+		mode: import
+		source = ```
+				UNION(
+				SELECTCOLUMNS(TOPN(2,FILTER(ssr ,ssr[trueai_tot_steps] =2 && ssr[_sys_filt_start_date] > date(2020,1,1)), rand()) ,"_sys_docid", ssr[_sys_doc_id], "crm_name", ssr[crm_name] & " (2 Steps)"), // untouched
+				SELECTCOLUMNS(TOPN(2,FILTER(ssr,ssr[trueai_tot_steps] =3 && ssr[_sys_filt_start_date] > date(2020,1,1)) , rand()),"_sys_docid", ssr[_sys_doc_id], "crm_name", ssr[crm_name] & " (3 Steps)") , // prospecting
+				SELECTCOLUMNS(TOPN(2,FILTER(ssr,ssr[trueai_tot_steps] =4 && ssr[_sys_filt_start_date] > date(2020,1,1)) , rand()),"_sys_docid", ssr[_sys_doc_id], "crm_name", ssr[crm_name] & " (4 Steps)"), // lost
+				SELECTCOLUMNS(TOPN(2,FILTER(ssr,ssr[trueai_tot_steps] =5 && ssr[_sys_filt_start_date] > date(2020,1,1)) , rand()),"_sys_docid", ssr[_sys_doc_id], "crm_name", ssr[crm_name] & " (5 Steps)"), // won
+				SELECTCOLUMNS(TOPN(2,FILTER(ssr,ssr[trueai_tot_steps] =6 && ssr[_sys_filt_start_date] > date(2020,1,1)) , rand()),"_sys_docid", ssr[_sys_doc_id], "crm_name", ssr[crm_name] & " (6 Steps)") // won
+				)
+				
+				
+				
+				```
+
+	annotation PBI_Id = 5e18f0482aa8461dbe029029befed3eb
+

@@ -1,0 +1,90 @@
+table booking_amount_display_mode
+	lineageTag: 3ab861f1-9bf9-4ef8-97cc-08576a1c6993
+
+	calculationGroup
+		precedence: 20
+
+		calculationItem 'Annual Bookings' = ```
+				VAR _value       = SELECTEDMEASURE()
+				VAR _measureName = SELECTEDMEASURENAME()
+				
+				var _min_date = [meas.context_date_min]         // get the minimum date
+				var _max_date = [meas.context_date_max]             // get the maximum date
+				var _total_month = 12 * (YEAR(_max_date) - YEAR(_min_date)) + (MONTH(_max_date) - MONTH(_min_date))+1
+				
+				RETURN
+				IF(
+				    CONTAINSSTRING(_measureName, "_mrr_"),
+				    _value * _total_month,   
+				    _value            
+				)
+				```
+
+			formatStringDefinition = SELECTEDMEASUREFORMATSTRING()
+
+		calculationItem 'MRR Bookings' = SELECTEDMEASURE()
+
+			formatStringDefinition = ```
+					VAR _measureName = SELECTEDMEASURENAME()
+					
+					VAR _fmt =
+					    COALESCE(SELECTEDMEASUREFORMATSTRING(), "$#,0;-$#,0;$0")
+					
+					RETURN
+					IF(
+					    CONTAINSSTRING(_measureName, "_mrr_"),
+					       "\M\R\R " & _fmt,
+					         _fmt
+					)
+					
+					```
+
+		calculationItem 'Apply Booking Mode' = ```
+				VAR _mode = SELECTEDVALUE(all_act_support[Booking Amount Display Mode], "Annual Bookings")
+				
+				VAR _value       = SELECTEDMEASURE()
+				VAR _measureName = SELECTEDMEASURENAME()
+				
+				var _min_date = [meas.context_date_min]         // get the minimum date
+				var _max_date = [meas.context_date_max]             // get the maximum date
+				var _total_month = 12 * (YEAR(_max_date) - YEAR(_min_date)) + (MONTH(_max_date) - MONTH(_min_date))+1
+				
+				RETURN
+				SWITCH(
+				    _mode,
+				    "Annual Bookings",IF(CONTAINSSTRING(_measureName, "_mrr_"),
+				                         _value * _total_month,   _value) ,
+				    "MRR",  SELECTEDMEASURE(),  
+				    SELECTEDMEASURE()
+				)
+				
+				```
+
+			formatStringDefinition = ```
+					VAR _measureName = SELECTEDMEASURENAME()
+					VAR _mode = SELECTEDVALUE(all_act_support[Booking Amount Display Mode], "Annual Bookings")
+					
+					VAR _fmt =
+					    COALESCE(SELECTEDMEASUREFORMATSTRING(), "$#,0;-$#,0;$0")
+					
+					RETURN
+					IF(
+					    CONTAINSSTRING(_measureName, "_mrr_") && _mode ="MRR",
+					       "\M\R\R " & _fmt,
+					         _fmt
+					)
+					
+					```
+
+	column amount_display_mode
+		dataType: string
+		lineageTag: ecb94eda-b127-41e5-89da-9b04c176148c
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 9047492e-fa78-48c2-bb08-f3044ffc6818
+		sourceColumn: Ordinal
+
