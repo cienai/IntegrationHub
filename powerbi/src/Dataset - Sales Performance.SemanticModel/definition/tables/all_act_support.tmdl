@@ -1,0 +1,60 @@
+table all_act_support
+	lineageTag: cbfb3d59-3251-48d9-af0c-ff62df8b9c53
+
+	column order
+		dataType: int64
+		formatString: 0
+		lineageTag: cc709bc2-d80d-4754-b944-a5835f1fc922
+		summarizeBy: sum
+		sourceColumn: order
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: string
+		lineageTag: b908e86f-88d2-4410-880d-8786c467d311
+		summarizeBy: none
+		sourceColumn: value
+		sortByColumn: order
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Booking Amount Display Mode'
+		dataType: string
+		lineageTag: 63056bcb-fa74-4824-980e-718eac1e65b5
+		summarizeBy: none
+		sourceColumn: Booking Amount Display Mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortMetric
+		dataType: string
+		lineageTag: 8d673610-03a7-45d3-af18-c8512111566a
+		summarizeBy: none
+		sourceColumn: SortMetric
+
+		annotation SummarizationSetBy = Automatic
+
+	partition all_act_support = m
+		mode: import
+		source = ```
+				let
+				    Source = "[#(lf)        {   ""order"":1,#(lf)            ""value"" : ""All Activities"",#(lf)            ""Booking Amount Display Mode"": ""Annual Bookings"",#(lf)            ""SortMetric"": ""User Name""#(lf)        },#(lf)        {   ""order"":2,#(lf)            ""value"" : ""Phone Calls"",#(lf)            ""Booking Amount Display Mode"": ""MRR"",#(lf)            ""SortMetric"": ""Metric 1""#(lf)        },#(lf)        {   ""order"":3,#(lf)            ""value"" : ""Emails"",#(lf)            ""Booking Amount Display Mode"": """",#(lf)            ""SortMetric"": ""Metric 2""#(lf)        },#(lf)        {   ""order"":4,#(lf)            ""value"" : ""Meetings"",#(lf)            ""Booking Amount Display Mode"": """",#(lf)            ""SortMetric"": """"#(lf)        },#(lf)        {   ""order"":5,#(lf)            ""value"" : ""Social Media"",#(lf)            ""Booking Amount Display Mode"": """",#(lf)            ""SortMetric"": """"#(lf)        }#(lf)    ]",
+				
+				    ParsedJson = Json.Document(Source),
+				    ToTable = Table.FromList(ParsedJson, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+				    Expanded = Table.ExpandRecordColumn(ToTable, "Column1", {
+				        "order", "value", "Booking Amount Display Mode", "SortMetric"
+				    }),
+				    ChangedType = Table.TransformColumnTypes(Expanded,{{"order", Int64.Type}, {"value", type text}, {"Booking Amount Display Mode", type text}})
+				    
+				in
+				    ChangedType
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

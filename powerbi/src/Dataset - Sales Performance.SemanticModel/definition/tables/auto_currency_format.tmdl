@@ -1,0 +1,39 @@
+table auto_currency_format
+	lineageTag: 1b540da5-c49c-4b9a-997f-0bf1b84a7541
+
+	calculationGroup
+
+		calculationItem auto = SELECTEDMEASURE() // pass// pass through the value
+
+			formatStringDefinition = ```
+					VAR curr = [meas.companies_history_currency] // Get currency code
+					VAR replace_str = SWITCH( curr, "USD", "$",  "EUR", "€",   "GBP", "£",   "CHF", "CHF",  "CAD", "C$",  "AUD", "A$",  "JPY", "¥",  "INR","₹","CNY", "¥", "BRL", "R$",  "$" )
+					VAR fmt_str = SELECTEDMEASUREFORMATSTRING() // Get the current format string
+					VAR res = SUBSTITUTE(fmt_str, "$", replace_str) // Replace "$" with actual currency symbol
+					
+					VAR _measureName = SELECTEDMEASURENAME()
+					
+					RETURN
+					res
+					
+					
+					```
+
+	column currency_convert
+		dataType: string
+		lineageTag: 8f33e2ff-9afc-4981-bcb9-595f0b6db1b1
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 9e22a7e5-3b4b-4611-b691-a5c57ef4dff7
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
