@@ -1,0 +1,131 @@
+# This GitHub Action workflow automates the conversion of Power BI Project files (.pbip)
+# into Power BI Desktop files (.pbix). It then uploads the .pbix files as build artifacts
+# and publishes them to GitHub Packages.
+
+name: Build and Publish PBIX
+
+on:
+  push:
+    branches: [ main, staging, feature/powerbi_github_integration ]
+    paths:
+      - '**.pbip/**'
+  pull_request:
+    branches: [ main, staging, feature/powerbi_github_integration ]
+    paths:
+      - '**.pbip/**'
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  build-pbix:
+    name: Build PBIX from PBIP
+    runs-on: ubuntu-latest # Switched to a Linux runner for efficiency
+    
+    # Define outputs that this job will produce, to be used by other jobs
+    outputs:
+      projects_found: ${{ steps.find-projects.outputs.projects_found }}
+      pbix_path: ${{ steps.find-projects.outputs.pbix_path }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache pbi-tools
+        id: cache-pbi-tools
+        uses: actions/cache@v4
+        with:
+          path: ./.tools/pbi-tools
+          # Updated cache key for Linux runner and new version
+          key: ${{ runner.os }}-pbi-tools-1.2.0
+
+      - name: Install pbi-tools
+        if: steps.cache-pbi-tools.outputs.cache-hit != 'true' # Run only if cache is not found
+        shell: bash
+        run: |
+          URL="https://github.com/pbi-tools/pbi-tools/releases/download/1.2.0/pbi-tools.core.1.2.0_linux-x64.zip"
+          OUTPUT_DIR="./.tools/pbi-tools"
+          ZIP_FILE="$OUTPUT_DIR/pbi-tools.zip"
+          
+          mkdir -p $OUTPUT_DIR
+          
+          echo "Downloading pbi-tools..."
+          curl -L -o $ZIP_FILE $URL
+          
+          echo "Extracting pbi-tools..."
+          unzip $ZIP_FILE -d $OUTPUT_DIR
+          rm $ZIP_FILE
+          
+          # Make the tool executable
+          chmod +x $OUTPUT_DIR/pbi-tools
+          
+      - name: Add pbi-tools to PATH
+        shell: bash
+        run: |
+          echo "$(realpath ./.tools/pbi-tools)" >> $GITHUB_PATH
+
+      - name: Find PBIP projects and Convert to PBIX
+        id: find-projects
+        shell: bash
+        run: |
+          # Use find to locate project definition files, then get the parent .pbip directory
+          PROJECT_FOLDERS=$(find . -type f -name "definition.pbidataset" | sed 's|/[^/]*$||' | sed 's|/[^/]*$||' | sort -u)
+          
+          if [ -z "$PROJECT_FOLDERS" ]; then
+            echo "No .pbip projects found."
+            echo "projects_found=false" >> $GITHUB_OUTPUT
+          else
+            echo "Found $(echo "$PROJECT_FOLDERS" | wc -l) PBIP project(s). Converting..."
+            echo "projects_found=true" >> $GITHUB_OUTPUT
+            
+            PBIX_OUTPUT_PATH="pbix_files"
+            mkdir -p $PBIX_OUTPUT_PATH
+            
+            for folder in $PROJECT_FOLDERS; do
+              PROJECT_NAME=$(basename "$folder")
+              PBIX_PATH="$PBIX_OUTPUT_PATH/$PROJECT_NAME.pbix"
+              
+              echo "Compiling '$PROJECT_NAME' to '$PBIX_PATH'"
+              
+              pbi-tools compile -folder "$folder" -outPath "$PBIX_PATH"
+              
+              if [ $? -ne 0 ]; then
+                echo "✗ Failed to convert: $PROJECT_NAME"
+                exit 1
+              else
+                echo "✓ Successfully converted: $PROJECT_NAME"
+              fi
+            done
+            
+            # Set the output path for the next job
+            echo "pbix_path=$PBIX_OUTPUT_PATH" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload PBIX Artifacts
+        if: steps.find-projects.outputs.projects_found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pbix-files
+          path: ${{ steps.find-projects.outputs.pbix_path }}
+          retention-days: 30
+
+  publish-pbix:
+    name: Publish PBIX to GitHub Packages
+    runs-on: ubuntu-latest
+    needs: build-pbix # This job runs only after 'build-pbix' is successful
+    if: needs.build-pbix.outputs.projects_found == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write # Required permission to publish packages
+
+    steps:
+      - name: Download PBIX Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pbix-files
+          path: ${{ needs.build-pbix.outputs.pbix_path }}
+
+      - name: Publish to GitHub Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}-${{ github.sha }}
+          path: ${{ needs.build-pbix.outputs.pbix_path }}
+

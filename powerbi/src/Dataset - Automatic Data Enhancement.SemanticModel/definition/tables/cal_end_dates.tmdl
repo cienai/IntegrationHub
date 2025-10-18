@@ -1,0 +1,271 @@
+table cal_end_dates
+	lineageTag: 0c87fa54-b3b7-47c2-9154-a95fcfb4b586
+
+	measure 'meas.filter_string' = ```
+			
+			
+			//var filter_start_table = topn(1, filter(cal_end_dates,[Date])) // "01/01/2010"
+			//var filter_start_val = ISFILTERED(cal_end_dates[Date]) //  min(filter_start_table[Date])
+			var max_filters =3
+			var date_str =  "Date: " & Min(cal_end_dates[Date])  & " - " &  Max(cal_end_dates[Date])
+			
+			var user_role_str = IF ( 
+			    ISFILTERED ( users[trueai_user_role]), 
+			    VAR ___f = FILTERS ( users[trueai_user_role] ) 
+			    VAR ___r = COUNTROWS ( ___f ) 
+			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_user_role] )
+			    VAR ___d = CONCATENATEX ( ___t, users[trueai_user_role], ", " )
+			    VAR ___x = "Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
+			    RETURN ___x , "Role: All"
+			)
+			
+			var group_str = IF ( 
+			    ISFILTERED ( users[trueai_group]), 
+			    VAR ___f = FILTERS ( users[trueai_group] ) 
+			    VAR ___r = COUNTROWS ( ___f ) 
+			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
+			    VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
+			    VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
+			    RETURN ___x , "Group: All"
+			)
+			
+			
+			
+			
+			var res =  date_str & "  |  " & user_role_str & " | "  &  group_str
+			return res
+			```
+		displayFolder: _filt_helpers
+		lineageTag: 203cf28c-7376-4634-a106-b86acd188d74
+
+	measure 'meas.data_asof' = //"Data last processed on: " & calculate(max(leads[_sys_as_of]))
+		formatString: 0
+		displayFolder: _filt_helpers
+		lineageTag: 45ef1e74-2032-4fab-8fcc-e9b422fa3e4c
+
+	measure 'meas.last_year_full' =
+			
+			var _current_year = YEAR(MAX(cal_end_dates[date]))
+			var _last_year = YEAR(MAX(cal_end_dates[date]))-1
+			
+			var res = _current_year - _last_year
+			var res1 = IF(
+			    res=1,
+			    _last_year,
+			    _current_year
+			)
+			
+			RETURN
+			res1
+		formatString: 0
+		displayFolder: _filt_helpers
+		lineageTag: a32c0d45-f0d4-4361-bb6b-0b48af7d7861
+
+	measure 'meas.context_min' =
+			
+			CALCULATE(MIN(cal_end_dates[date]))
+		formatString: General Date
+		displayFolder: _filt_helpers
+		lineageTag: 1148b606-5a63-49e5-b97e-960f5897841b
+
+	measure 'meas.context_max' =
+			
+			CALCULATE(MAX(cal_end_dates[date]))
+		formatString: General Date
+		displayFolder: _filt_helpers
+		lineageTag: 57062494-3508-4371-b498-92dfb39f703e
+
+	column date
+		formatString: Short Date
+		lineageTag: 86095ff3-619d-4c1f-ab71-5e768c8b7a14
+		summarizeBy: none
+		sourceColumn: [Date]
+
+		variation Variation
+			isDefault
+			relationship: c4fbd288-0f97-45fb-b981-7aaebbc0e657
+			defaultHierarchy: LocalDateTable_bab82619-28e3-41d4-97e7-0c4cc876d812.'Date Hierarchy'
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_as_integer
+		lineageTag: dc31e7db-2c2a-4c88-8eaf-3f9f25989f77
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [date_as_integer]
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: e4f6ada4-90ae-4609-b42c-d5f4ff0660ee
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [year]
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_number
+		lineageTag: 973279c9-f2cb-47e3-b904-eb2c55e05a94
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [month_number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column year_month_number
+		lineageTag: 36158ebe-806d-4b59-adf7-70acc7db9a47
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [year_month_number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column year_month_short
+		lineageTag: d564f460-3385-4216-a2e1-c9bb73347be9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [year_month_short]
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name_short
+		lineageTag: 026af4ac-4da3-4995-b9f5-fae59f8ec971
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [month_name_short]
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name_long
+		lineageTag: f22c6569-cb80-4917-b2de-e2aab35879c8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [month_name_long]
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_week_number
+		formatString: 0
+		lineageTag: 86142ac0-d7ba-433d-a4c0-4b3ea11830ae
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [day_of_week_number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_week
+		lineageTag: 687c0d7c-30a6-49fe-9057-642d2d0ba7bf
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [day_of_week]
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_week_short
+		lineageTag: 83ef68a1-52ef-4b07-812b-b7efdc56c457
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [day_of_week_short]
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		lineageTag: 6cb1305b-2d31-404c-87ed-5795b4692299
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [quarter]
+
+		annotation SummarizationSetBy = Automatic
+
+	column year_quarter
+		lineageTag: 0a907e53-7d54-4cd2-99a0-25cb602e0f15
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [year_quarter]
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscal_year
+		formatString: 0
+		lineageTag: 88a42754-1e5f-408c-930c-ad7e3ad239a8
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [fiscal_year]
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscal_month
+		formatString: 0
+		lineageTag: aef317a8-d813-4bd5-915b-332d1c792187
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [fiscal_month]
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscal_quarter
+		lineageTag: 50925519-158d-4468-9b31-ed81fdfdcb16
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [fiscal_quarter]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition cal_end_dates-c3d83cde-1612-440f-b017-358fa64b862d = calculated
+		mode: import
+		source =
+				
+				var min_date =  MAX(date(2000,01,01) ,  min(ssr[_sys_filt_start_date])) // get the first date that we have data for but never before 2000
+				var max_date = max(ssr[_sys_as_of]) // get the last date (as _of) that we have data for
+				var f_month = [meas.getFiscalYearOffset]        // get the fiscal_year offset
+				
+				var cal_tbl  =ADDCOLUMNS (
+				CALENDAR (min_date, max_date),
+				"date_as_integer", FORMAT ( [Date], "YYYYMMDD" ),
+				"year", YEAR ( [Date] ),
+				"month_number", FORMAT ( [Date], "MM" ),
+				"year_month_number", FORMAT ( [Date], "YYYY/MM" ),
+				"year_month_short", FORMAT ( [Date], "YYYY/mmm" ),
+				"month_name_short", FORMAT ( [Date], "mmm" ),
+				"month_name_long", FORMAT ( [Date], "mmmm" ),
+				"day_of_week_number", WEEKDAY ( [Date] ),
+				"day_of_week", FORMAT ( [Date], "dddd" ),
+				"day_of_week_short", FORMAT ( [Date], "ddd" ),
+				"quarter", "Q" & FORMAT ( [Date], "Q" ),
+				"year_quarter", FORMAT ( [Date], "YYYY" ) & "/Q" & FORMAT ( [Date], "Q" ),
+				"fiscal_year", IF(
+				                f_month = 0,
+				                YEAR([Date]),
+				                IF(
+				                    MONTH([Date]) >= f_month,
+				                    YEAR([Date]) + 1,
+				                    YEAR([Date])
+				                )
+				            ),
+				"fiscal_month",IF(
+				                    f_month = 0,
+				                    month([Date]),
+				                    IF(
+				                        MONTH([Date]) >= f_month,
+				                        MONTH([Date]) - f_month + 1,
+				                        MONTH([Date]) + (12 - f_month + 1)
+				                    )
+				                ),
+				"fiscal_quarter", "Q" & IF(
+				                    f_month = 0,
+				                    FORMAT([Date], "Q" ),
+				                    IF(
+				                        MONTH([Date]) >= f_month,
+				                        CEILING((MONTH([Date]) - f_month + 1) / 3, 1),
+				                        CEILING((MONTH([Date]) + (12 - f_month + 1)) / 3, 1)
+				                    )
+				                )
+				)
+				return cal_tbl
+
+	annotation PBI_Id = 47fdd5fe548045698e2980cebacd82ae
+

@@ -1,0 +1,69 @@
+table rep_overview_table
+	lineageTag: 35e01a1d-7633-4461-b688-1d08303368c3
+
+	measure 'meas.rep_overview_metric_name' =
+			
+			SWITCH(
+			    MAX(rep_overview_table[Source]),
+			    "Metric 1", SELECTEDVALUE(performance_metric_1[name]),
+			    "Metric 2", SELECTEDVALUE(performance_metric_2[name])
+			)
+		lineageTag: cc8f6dc6-af1e-4c2a-ac40-049130828c11
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.rep_overview_avg' =
+			
+			SWITCH(
+			    MAX(rep_overview_table[Source]),
+			    "Metric 1", [meas.rep_overview_metric_1_avg],
+			    "Metric 2", [meas.rep_overview_metric_2_avg]
+			)
+		lineageTag: fc5e1e7f-92c6-4c80-948d-46860b91f92d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.rep_overview_min' =
+			
+			SWITCH(
+			    MAX(rep_overview_table[Source]),
+			    "Metric 1", [meas.rep_overview_metric_1_min],
+			    "Metric 2", [meas.rep_overview_metric_2_min]
+			)
+		lineageTag: 1c5ec267-d7e0-4903-ade3-fdee4ab6ca15
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.rep_overview_max' =
+			
+			SWITCH(
+			    MAX(rep_overview_table[Source]),
+			    "Metric 1", [meas.rep_overview_metric_1_max],
+			    "Metric 2", [meas.rep_overview_metric_2_max]
+			)
+		lineageTag: 4b26cb9c-44ed-4058-a265-f284346d7524
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Source
+		lineageTag: a696aca9-d6c6-49ef-8e13-a73ce7d92761
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Source]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition rep_overview_table = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "Source", STRING,
+				    {
+				        {"Metric 1"},
+				        {"Metric 2"}
+				    }
+				)
+
+	annotation PBI_Id = 97463658ecb142d88472630d997aad5c
+

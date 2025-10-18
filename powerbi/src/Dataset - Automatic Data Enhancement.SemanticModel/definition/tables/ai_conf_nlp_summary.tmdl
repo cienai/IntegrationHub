@@ -1,0 +1,267 @@
+table ai_conf_nlp_summary
+	lineageTag: 80723354-1b4b-44cf-b991-6d16fde8862a
+
+	measure 'meas.nlp_avg_confidence' = ```
+			
+			var cnt = CALCULATE(AVERAGE('ai_conf_nlp_summary'[trueai_conf]), 'ai_conf_nlp_summary'[trueai_conf] > 0)
+			var res = if(isblank(cnt),0, cnt)
+			return res
+			
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _nlp_scores
+		lineageTag: 986b635c-6494-4d9f-bea0-fe20c5d9db7d
+
+		changedProperty = FormatString
+
+	measure 'meas.nlp_classfied_ratio' = ```
+			
+			var res = divide('ai_conf_nlp_summary'[meas.nlp_classified_records],'ai_conf_nlp_summary'[meas.nlp_total_records] )
+			return res 
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _nlp_scores
+		lineageTag: 9441cd56-3303-4734-a538-a2268b6e1efd
+
+		changedProperty = FormatString
+
+	measure 'meas.nlp_classified_records' = ```
+			
+			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]), 'ai_conf_nlp_summary'[trueai_value] <> "ND")
+			var res = cnt
+			return res
+			
+			```
+		formatString: 0
+		displayFolder: _nlp_scores
+		lineageTag: 4a5f7fd8-5d5d-40d3-97d1-85258fd8a4b1
+
+	measure 'meas.nlp_not_classified_due_to_ambiguity_ratio' = ```
+			
+			var res = divide('ai_conf_nlp_summary'[meas.nlp_not_classified_records_due_to_ambiguity],'ai_conf_nlp_summary'[meas.nlp_total_records] )
+			return res 
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _nlp_scores
+		lineageTag: b7b44f01-5bbe-40f3-8922-8c6b1ad05cd9
+
+		changedProperty = FormatString
+
+	measure 'meas.nlp_not_classified_due_to_missing_ratio' = ```
+			
+			var res = divide('ai_conf_nlp_summary'[meas.nlp_not_classified_records_due_to_missing],'ai_conf_nlp_summary'[meas.nlp_total_records] )
+			return res 
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _nlp_scores
+		lineageTag: f3334a93-084f-429c-9cc1-a27403334f71
+
+		changedProperty = FormatString
+
+	measure 'meas.nlp_not_classified_records_due_to_ambiguity' = ```
+			
+			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]), 'ai_conf_nlp_summary'[trueai_value] = "ND" && 'ai_conf_nlp_summary'[trueai_conf] > 0)
+			var res = if(isblank(cnt),0, cnt)
+			return res
+			
+			```
+		formatString: 0
+		displayFolder: _nlp_scores
+		lineageTag: fbaa1588-57a2-4faa-aa7e-892fee69ac89
+
+	measure 'meas.nlp_not_classified_records_due_to_missing' = ```
+			
+			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]), 'ai_conf_nlp_summary'[trueai_conf] = 0)
+			var res = if(isblank(cnt),0, cnt)
+			return res
+			
+			```
+		formatString: 0
+		displayFolder: _nlp_scores
+		lineageTag: 15b83134-0406-4e6d-bfae-8c6c1c69e21b
+
+	measure 'meas.nlp_score' =
+			
+			var res = 'ai_conf_nlp_summary'[meas.nlp_avg_confidence] * 100
+			return res
+		formatString: 0
+		displayFolder: _nlp_scores
+		lineageTag: 4ac48b7e-3c27-41ec-8bd6-608fa435e90d
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'meas.nlp_score_text' = ```
+			
+			var score = 'ai_conf_nlp_summary'[meas.nlp_score]
+			var res = If (score >= 95, "Excellent", if(score >= 85,  "Great",If(score >= 75, "Good",If(score >= 50, "Fair", "Limited" ))))
+			return  res 
+			```
+		displayFolder: _nlp_scores
+		lineageTag: ccb36d0b-16af-465e-835e-b9fcffed948c
+
+	measure 'meas.nlp_total_records' = ```
+			
+			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]))
+			var res = cnt
+			return res
+			
+			```
+		formatString: 0
+		displayFolder: _nlp_scores
+		lineageTag: fbeb6f9b-281b-489a-b65a-227188a13f88
+
+	column sort
+		formatString: 0
+		lineageTag: ae65e043-8c63-442d-914d-b48628efedb8
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	column field
+		lineageTag: 9151fc7a-42d5-4187-adef-e7fd1df0d7d4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [field]
+
+		annotation SummarizationSetBy = Automatic
+
+	column entity
+		lineageTag: 930b3b5c-2198-4ee7-9f62-f96266735bf1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [entity]
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_value
+		lineageTag: dd94f213-aea3-4ac1-bd88-6d426db8900a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [crm_value]
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_value
+		lineageTag: 3119ddf1-c1ab-4149-a7fb-554a1ddc53b6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [trueai_value]
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_rule
+		formatString: 0
+		lineageTag: b659351e-3f1f-45b9-887e-313a0807a778
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [trueai_rule]
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_conf
+		formatString: #,0.00
+		lineageTag: 09af1bff-2b97-4d3c-b66a-9db3343c2a78
+		summarizeBy: sum
+		sourceColumn: [trueai_conf]
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_docid
+		lineageTag: 40cdec56-1e17-46d8-8e70-a54594caf619
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_docid]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_user_id
+		lineageTag: fa215d22-e2c1-4162-a7f8-5e0e4070ba38
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_user_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_filter_start_date
+		formatString: Short Date
+		lineageTag: 921fd4c2-786b-4e33-bedc-7ee0125e36cd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_filter_start_date]
+
+		variation Variation
+			isDefault
+			relationship: 711f7dfa-44f4-4dde-baa0-adf8e74dc7ed
+			defaultHierarchy: LocalDateTable_f242b95c-b7ea-4a57-8aad-99193bfc89bc.'Date Hierarchy'
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ai_conf_nlp_summary-00774527-3479-49c8-ab94-5e68d381f29b = calculated
+		mode: import
+		source =
+				
+				UNION(
+				    SELECTCOLUMNS(
+				        FILTER(consistency_summary, consistency_summary[entity] IN {"leads","accounts","opps", "contacts"}),
+				        "sort", 1,
+				        "field", "Leadsource",
+				        "entity", consistency_summary[entity],
+				        "_sys_docid", consistency_summary[_sys_docid],
+				        "_sys_user_id", consistency_summary[_sys_user_id],
+				        "_sys_filter_start_date", consistency_summary[_sys_filter_start_date],
+				        "crm_value", consistency_summary[crm_leadsource],
+				        "trueai_value", consistency_summary[trueai_leadsource],
+				        "trueai_conf", POWER(consistency_summary[trueai_leadsource_conf], 0.4),
+				        "trueai_rule", consistency_summary[trueai_leadsource_rule]
+				    ),
+				    SELECTCOLUMNS(
+				        FILTER(consistency_summary, consistency_summary[entity] IN {"leads","accounts"}),
+				        "sort", 2,
+				        "field", "Industry",
+				        "entity", consistency_summary[entity],
+				        "_sys_docid", consistency_summary[_sys_docid],
+				        "_sys_user_id", consistency_summary[_sys_user_id],
+				        "_sys_filter_start_date", consistency_summary[_sys_filter_start_date],
+				        "crm_value", consistency_summary[crm_industry],
+				        "trueai_value", consistency_summary[trueai_industry],
+				        "trueai_conf", POWER(consistency_summary[trueai_industry_conf], 0.4),
+				        "trueai_rule", consistency_summary[trueai_industry_rule]
+				    ),
+				    SELECTCOLUMNS(
+				        FILTER(consistency_summary, consistency_summary[entity] IN {"leads", "contacts"}),
+				        "sort", 3,
+				        "field", "Title Seniority",
+				        "entity", consistency_summary[entity],
+				        "_sys_docid", consistency_summary[_sys_docid],
+				        "_sys_user_id", consistency_summary[_sys_user_id],
+				        "_sys_filter_start_date", consistency_summary[_sys_filter_start_date],
+				        "crm_value", consistency_summary[crm_title],
+				        "trueai_value", consistency_summary[trueai_title_seniority],
+				        "trueai_conf", POWER(consistency_summary[trueai_title_seniority_conf], 0.4),
+				        "trueai_rule", BLANK()
+				    ),
+				    SELECTCOLUMNS(
+				        FILTER(consistency_summary, consistency_summary[entity] IN {"leads", "contacts"}),
+				        "sort", 4,
+				        "field", "Title Dept",
+				        "entity", consistency_summary[entity],
+				        "_sys_docid", consistency_summary[_sys_docid],
+				        "_sys_user_id", consistency_summary[_sys_user_id],
+				        "_sys_filter_start_date", consistency_summary[_sys_filter_start_date],
+				        "crm_value", consistency_summary[crm_title],
+				        "trueai_value", consistency_summary[trueai_title_dept],
+				        "trueai_conf", POWER(consistency_summary[trueai_title_dept_conf], 0.4),
+				        "trueai_rule", BLANK()
+				    )
+				)
+
+	annotation PBI_Id = 5bf320cb20c343df9630b74a149b1bfb
+
