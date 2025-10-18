@@ -9,10 +9,12 @@ on:
     branches: [ main, staging ]
     paths:
       - '**.pbip/**'
+      - 'powerbi/src/**' # Added to ensure changes in the src folder trigger the action
   pull_request:
     branches: [ main, staging ]
     paths:
       - '**.pbip/**'
+      - 'powerbi/src/**' # Added to ensure changes in the src folder trigger the action
   workflow_dispatch: # Allows manual triggering
 
 jobs:
@@ -69,11 +71,11 @@ jobs:
         id: find-projects
         shell: bash
         run: |
-          # Use find to locate project definition files, then get the parent .pbip directory
-          PROJECT_FOLDERS=$(find . -type f -name "definition.pbidataset" | sed 's|/[^/]*$||' | sed 's|/[^/]*$||' | sort -u)
+          # More robustly find projects by looking for *.pbip files inside the powerbi/src directory
+          PROJECT_FOLDERS=$(find ./powerbi/src -type f -name "*.pbip" -exec dirname {} \; | sort -u)
           
           if [ -z "$PROJECT_FOLDERS" ]; then
-            echo "No .pbip projects found."
+            echo "No .pbip projects found in ./powerbi/src"
             echo "projects_found=false" >> $GITHUB_OUTPUT
           else
             echo "Found $(echo "$PROJECT_FOLDERS" | wc -l) PBIP project(s). Converting..."
@@ -86,7 +88,7 @@ jobs:
               PROJECT_NAME=$(basename "$folder")
               PBIX_PATH="$PBIX_OUTPUT_PATH/$PROJECT_NAME.pbix"
               
-              echo "Compiling '$PROJECT_NAME' to '$PBIX_PATH'"
+              echo "Compiling '$PROJECT_NAME' from '$folder' to '$PBIX_PATH'"
               
               pbi-tools compile -folder "$folder" -outPath "$PBIX_PATH"
               
