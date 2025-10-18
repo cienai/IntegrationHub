@@ -6,11 +6,11 @@ name: Build and Publish PBIX
 
 on:
   push:
-    branches: [ main, staging, feature/powerbi_github_integration ]
+    branches: [ main, staging ]
     paths:
       - '**.pbip/**'
   pull_request:
-    branches: [ main, staging, feature/powerbi_github_integration ]
+    branches: [ main, staging ]
     paths:
       - '**.pbip/**'
   workflow_dispatch: # Allows manual triggering
@@ -53,6 +53,9 @@ jobs:
           echo "Extracting pbi-tools..."
           unzip $ZIP_FILE -d $OUTPUT_DIR
           rm $ZIP_FILE
+          
+          # Rename the executable from 'pbi-tools.core' to 'pbi-tools' for consistency
+          mv $OUTPUT_DIR/pbi-tools.core $OUTPUT_DIR/pbi-tools
           
           # Make the tool executable
           chmod +x $OUTPUT_DIR/pbi-tools
