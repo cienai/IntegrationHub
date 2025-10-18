@@ -71,34 +71,50 @@ jobs:
         id: find-projects
         shell: bash
         run: |
-          # More robustly find projects by looking for *.pbip files inside the powerbi/src directory
-          PROJECT_FOLDERS=$(find ./powerbi/src -type f -name "*.pbip" -exec dirname {} \; | sort -u)
+          # Find unique project basenames from the .pbip files in the src directory
+          PROJECT_BASENAMES=$(find ./powerbi/src -maxdepth 1 -type f -name "*.pbip" -exec basename {} .pbip \;)
           
-          if [ -z "$PROJECT_FOLDERS" ]; then
+          if [ -z "$PROJECT_BASENAMES" ]; then
             echo "No .pbip projects found in ./powerbi/src"
             echo "projects_found=false" >> $GITHUB_OUTPUT
           else
-            echo "Found $(echo "$PROJECT_FOLDERS" | wc -l) PBIP project(s). Converting..."
+            echo "Found $(echo "$PROJECT_BASENAMES" | wc -l) PBIP project(s). Converting..."
             echo "projects_found=true" >> $GITHUB_OUTPUT
             
             PBIX_OUTPUT_PATH="pbix_files"
+            TEMP_WORKSPACE="temp_workspace"
             mkdir -p $PBIX_OUTPUT_PATH
+            mkdir -p $TEMP_WORKSPACE
             
-            for folder in $PROJECT_FOLDERS; do
-              PROJECT_NAME=$(basename "$folder")
+            # Use a while loop to correctly handle basenames with spaces
+            echo "$PROJECT_BASENAMES" | while IFS= read -r basename; do
+              PROJECT_TEMP_DIR="$TEMP_WORKSPACE/$basename"
+              mkdir -p "$PROJECT_TEMP_DIR"
+              
+              echo "Staging project: '$basename'"
+              # Copy all related project files (*.pbip, *.Report/, etc.) into the temp directory
+              cp -r "./powerbi/src/$basename."* "$PROJECT_TEMP_DIR/"
+              
+              PROJECT_NAME="$basename"
               PBIX_PATH="$PBIX_OUTPUT_PATH/$PROJECT_NAME.pbix"
               
-              echo "Compiling '$PROJECT_NAME' from '$folder' to '$PBIX_PATH'"
+              echo "Compiling '$PROJECT_NAME' from '$PROJECT_TEMP_DIR' to '$PBIX_PATH'"
               
-              pbi-tools compile -folder "$folder" -outPath "$PBIX_PATH"
+              # Run compile on the isolated temporary project directory
+              pbi-tools compile -folder "$PROJECT_TEMP_DIR" -outPath "$PBIX_PATH"
               
               if [ $? -ne 0 ]; then
                 echo "✗ Failed to convert: $PROJECT_NAME"
+                # List directory contents for debugging on failure
+                ls -la "$PROJECT_TEMP_DIR"
                 exit 1
               else
                 echo "✓ Successfully converted: $PROJECT_NAME"
               fi
             done
+            
+            # Clean up the temporary workspace
+            rm -rf $TEMP_WORKSPACE
             
             # Set the output path for the next job
             echo "pbix_path=$PBIX_OUTPUT_PATH" >> $GITHUB_OUTPUT
