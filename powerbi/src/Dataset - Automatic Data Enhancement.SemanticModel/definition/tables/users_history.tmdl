@@ -1,0 +1,2879 @@
+table users_history
+	lineageTag: 44776101-2806-4700-a1fe-2ddb9f44c42c
+
+	measure 'meas.users_history_duration_hrs' =
+			
+			var dur = CALCULATE(sum(users_history[ci_time_alloc_tot_dur]))
+			var res =  dur / 3600
+			return res
+			// act_tot_dur
+		formatString: ###,###,###  hrs
+		displayFolder: _users_history_analysis
+		lineageTag: c0955f41-6d5c-4dc1-a7af-02b99e36f0e7
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.users_history_duration_per_act_min' = ```
+			
+			var dur = CALCULATE(sum(users_history[ci_time_alloc_tot_dur]))		//get the allocated total duration
+			var act = CALCULATE(sum(users_history[ci_time_alloc_tot]))			// get the allocated total count
+			
+			var res =  divide(dur, act) / 60
+			return res
+			// act_tot_dur 
+			// act_tot_count --> ci_time_alloc_tot
+			```
+		formatString: ###  min
+		displayFolder: _users_history_analysis
+		lineageTag: 6a291487-586f-4a27-872b-622feaa62c57
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.users_history_duration_adjusted_hrs' =
+			
+			var dur = CALCULATE(sum(users_history[ci_time_alloc_tot_dur]))
+			var prep = CALCULATE(average(users_history[ci_time_alloc_prep_adjustment]))
+			var capture_level = CALCULATE(average(users_history[ci_time_alloc_act_capt_lvl_adjustment]))
+			var res =  dur *  prep * capture_level / 3600
+			return res
+			
+			//act_tot_dur -- > ci_time_alloc_tot_dur
+		formatString: ###,###,###  hrs
+		displayFolder: _users_history_analysis
+		lineageTag: e3babb0b-a347-4944-8356-1f921b214979
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.rep_count_avg' = ```
+			
+			var periods_tbl = SUMMARIZE(calculatetable(users_history), users_history[_sys_user_id], users_history[_sys_filt_start_date]) // get the total number of periods in the selection group by rep and month
+			var reps_tbl = SUMMARIZE(calculatetable(users_history), users_history[_sys_user_id]) // get just the unique reps
+			var periods =  divide(COUNTROWS(periods_tbl) , COUNTROWS( reps_tbl)) 
+			var reps =  divide(COUNTROWS(periods_tbl) , periods) // get the avg number of "active" reps per period
+			return  reps
+			```
+		formatString: 0.0
+		displayFolder: _users_history_analysis
+		lineageTag: ecb23497-da79-4ea3-89dd-235cfeda7437
+
+		changedProperty = FormatString
+
+	column _sys_user_id
+		dataType: string
+		lineageTag: c16b37d5-fde5-4ff3-9836-e2cd50095d15
+		summarizeBy: none
+		sourceColumn: _sys_user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column vi_value_created_leads_and_accounts
+		dataType: double
+		lineageTag: 702d2b57-5843-489a-8f3d-84892e508d53
+		summarizeBy: sum
+		sourceColumn: vi_value_created_leads_and_accounts
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_created_leads_and_accounts_repeat
+		dataType: double
+		lineageTag: ad338217-9bcb-4201-9768-8334417b4651
+		summarizeBy: sum
+		sourceColumn: vi_value_created_leads_and_accounts_repeat
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_created_preselling
+		dataType: double
+		lineageTag: 65003f27-8f1f-4791-bfb2-8a8c8e7f0fb2
+		summarizeBy: sum
+		sourceColumn: vi_value_created_preselling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_created_preselling_prospecting
+		dataType: double
+		lineageTag: e25bcce1-ecad-4dad-9335-3ab95298d1ca
+		summarizeBy: sum
+		sourceColumn: vi_value_created_preselling_prospecting
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_created_selling
+		dataType: double
+		lineageTag: 4f6db5b8-57fc-4b81-a5a3-7eb143bba964
+		summarizeBy: sum
+		sourceColumn: vi_value_created_selling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_created_selling_new_logo
+		dataType: double
+		lineageTag: 53f57de8-8a9e-48e8-a8d1-28375d1c8201
+		summarizeBy: sum
+		sourceColumn: vi_value_created_selling_new_logo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_created_selling_upselling
+		dataType: double
+		lineageTag: 8d2e3c65-abda-4483-ac8f-12b0d318ab61
+		summarizeBy: sum
+		sourceColumn: vi_value_created_selling_upselling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_leads_and_accounts
+		dataType: double
+		lineageTag: 9171d12d-1ca8-4a01-80a0-fb58c4a9b90f
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_leads_and_accounts
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_leads_and_accounts_repeat
+		dataType: double
+		lineageTag: fa2eb8f6-460c-401e-8f97-28904896a325
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_leads_and_accounts_repeat
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_potential
+		dataType: double
+		lineageTag: 6e3fd0e3-63bc-46c5-ac9f-c2da6913ecbb
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_potential
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_preselling
+		dataType: double
+		lineageTag: 8abbdd45-5af5-4b0f-93f5-ceba0b904f8c
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_preselling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_preselling_prospecting
+		dataType: double
+		lineageTag: 1dc9b81b-445f-4574-8e4e-ce67b8679f2b
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_preselling_prospecting
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_selling
+		dataType: double
+		lineageTag: afdd9eaf-4b7b-442f-b66b-c0981aa9af84
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_selling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_selling_new_logo
+		dataType: double
+		lineageTag: 99cb9351-2f5e-4e4f-9c1d-8d884041bbd4
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_selling_new_logo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_selling_upselling
+		dataType: double
+		lineageTag: 9fde330a-03ca-4ec6-b1c9-2c9401fc82f3
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_selling_upselling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_received_for_preselling
+		dataType: double
+		lineageTag: 063d8e25-8908-4391-8d1f-e48981ff0575
+		summarizeBy: sum
+		sourceColumn: vi_value_received_for_preselling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_received_for_preselling_prospecting
+		dataType: double
+		lineageTag: b83d0e3d-bac6-49c8-a951-9e5257bdeefe
+		summarizeBy: sum
+		sourceColumn: vi_value_received_for_preselling_prospecting
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_received_for_selling
+		dataType: double
+		lineageTag: 3141ccbe-8c10-4408-85e7-f0eda0214aaf
+		summarizeBy: sum
+		sourceColumn: vi_value_received_for_selling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_received_for_selling_new_logo
+		dataType: double
+		lineageTag: 99c40f8c-534a-4eb4-8b42-85c16754dc9a
+		summarizeBy: sum
+		sourceColumn: vi_value_received_for_selling_new_logo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_received_for_selling_upselling
+		dataType: double
+		lineageTag: 78192be0-c60f-44b4-bb3c-a64bd125b422
+		summarizeBy: sum
+		sourceColumn: vi_value_received_for_selling_upselling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_perf_qtly_avg_bookings_peers
+		dataType: decimal
+		lineageTag: cbb4d31c-6672-4a28-b2cd-8ffa4f61deda
+		summarizeBy: sum
+		sourceColumn: ci_perf_qtly_avg_bookings_peers
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_perf_qtly_avg_pipeline_peers
+		dataType: decimal
+		lineageTag: 918e2bcd-8e04-4025-aee5-a8ad560362bb
+		summarizeBy: sum
+		sourceColumn: ci_perf_qtly_avg_pipeline_peers
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_perf_qtly_bookings_user
+		dataType: decimal
+		lineageTag: 689cabe3-699c-4a41-beab-98b1e73b1514
+		summarizeBy: sum
+		sourceColumn: ci_perf_qtly_bookings_user
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_perf_qtly_pipeline_user
+		dataType: decimal
+		lineageTag: c4085f53-2e95-42b3-b010-266e16555d36
+		summarizeBy: sum
+		sourceColumn: ci_perf_qtly_pipeline_user
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_perf_ramping_status
+		dataType: string
+		lineageTag: 91f47d93-351f-450c-bb4f-38b70eaf39b6
+		summarizeBy: none
+		sourceColumn: ci_perf_ramping_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_co_id
+		dataType: string
+		lineageTag: 314eac44-5973-4ca3-a4f7-d380a0cc9d57
+		summarizeBy: none
+		sourceColumn: _sys_co_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_doc_id
+		dataType: string
+		lineageTag: 5722934e-452b-460b-b415-69b57f6c6d16
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_filt_end_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: ef6830d5-15fe-4f06-a179-e6038249a3a2
+		summarizeBy: none
+		sourceColumn: _sys_filt_end_date
+
+		variation Variation
+			isDefault
+			relationship: 018e1ada-7d5d-4184-aadc-5c3df98d9eda
+			defaultHierarchy: LocalDateTable_60e552db-bfc5-4819-b0b1-e522c77b3586.'Date Hierarchy'
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column _sys_filt_start_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 4118bcbe-2f3b-4563-b9e6-00051b6a9810
+		summarizeBy: none
+		sourceColumn: _sys_filt_start_date
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ci_act_capt_lvl
+		dataType: double
+		lineageTag: f85460a5-ae84-498c-abc7-d9834a2b3fa2
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_conf
+		dataType: double
+		lineageTag: ef7ef305-4422-44ad-8538-e4245a1cfac0
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_new_logo_owner_act
+		dataType: int64
+		formatString: 0
+		lineageTag: 62f96d6d-3c80-4bf6-84d1-c6b6c6bbff13
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_owner_act
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_new_logo_owner_act_closed_lost
+		dataType: int64
+		formatString: 0
+		lineageTag: 0aa52304-b58f-4351-af4b-f2750d25cbed
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_owner_act_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_new_logo_owner_act_closed_won
+		dataType: int64
+		formatString: 0
+		lineageTag: 3b4adc28-8f14-4ebb-8045-d30d60acc61d
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_owner_act_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_new_logo_owner_dur
+		dataType: double
+		lineageTag: d284c5a2-3759-4ba5-a202-04638e1eeac6
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_new_logo_owner_dur_closed_lost
+		dataType: double
+		lineageTag: 52ce925e-d9ba-4fb1-ae03-cab0bdb2fea5
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_owner_dur_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_new_logo_owner_dur_closed_won
+		dataType: double
+		lineageTag: 8b98fdec-d725-4384-97a4-7a1741f31128
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_owner_dur_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_new_logo_steps
+		dataType: int64
+		formatString: 0
+		lineageTag: 63a74506-5225-45d1-9689-d0e01e2467f7
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_steps
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_new_logo_steps_closed_lost
+		dataType: int64
+		formatString: 0
+		lineageTag: d5201dc6-7121-45a6-83e5-4ac29c6706f9
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_steps_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_new_logo_steps_closed_won
+		dataType: int64
+		formatString: 0
+		lineageTag: 5c459ad8-5deb-49ec-a66f-199643c35cf5
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_steps_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_post_sales_expect_owner_dur
+		dataType: double
+		lineageTag: 611cef01-95df-4082-af53-657eca34248f
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_expect_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_post_sales_expect_owner_dur_churned
+		dataType: double
+		lineageTag: e478d578-b72e-4738-8c3e-374659f04bff
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_expect_owner_dur_churned
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_post_sales_owner_act
+		dataType: int64
+		formatString: 0
+		lineageTag: d843b7e1-eb32-4c91-8f6d-e6989601c14e
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_owner_act
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_post_sales_owner_act_churned
+		dataType: int64
+		formatString: 0
+		lineageTag: 75fa7d4a-2719-4002-895e-e2357abb313e
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_owner_act_churned
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_post_sales_owner_dur
+		dataType: double
+		lineageTag: 6a4c9c69-ffaa-4eb2-a936-b912d34550b4
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_post_sales_owner_dur_churned
+		dataType: double
+		lineageTag: 4e785ce8-81b1-452e-90de-60699c9de6d6
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_owner_dur_churned
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_post_sales_steps
+		dataType: int64
+		formatString: 0
+		lineageTag: 0d05b8bf-d362-4afc-b059-c9c60a4a342b
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_steps
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_post_sales_steps_churned
+		dataType: int64
+		formatString: 0
+		lineageTag: c31518ff-1611-4129-9b64-cf3cc71a7401
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_steps_churned
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_prospecting_expect_owner_dur
+		dataType: double
+		lineageTag: f8c7585b-9a70-4a0f-9940-904e86daeb89
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_expect_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_prospecting_expect_owner_dur_abandoned
+		dataType: double
+		lineageTag: e18e4591-8bf0-403b-9797-8ab9d734dc23
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_expect_owner_dur_abandoned
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_prospecting_expect_owner_dur_converted
+		dataType: double
+		lineageTag: a95de87c-97a8-4410-8bfd-684ad5e999ae
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_expect_owner_dur_converted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_prospecting_owner_act
+		dataType: int64
+		formatString: 0
+		lineageTag: 3caaadcb-2e43-4e5b-80d2-883e04787a6e
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_owner_act
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_prospecting_owner_act_abandoned
+		dataType: int64
+		formatString: 0
+		lineageTag: 0fd19c92-96f8-4a53-971f-39a6dbc9c436
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_owner_act_abandoned
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_prospecting_owner_act_converted
+		dataType: int64
+		formatString: 0
+		lineageTag: 5b25853f-fc6c-4f2a-923c-12136802f182
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_owner_act_converted
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_prospecting_owner_dur
+		dataType: double
+		lineageTag: c572a7dd-f7d4-4329-bbb5-229da2b6e38d
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_prospecting_owner_dur_abandoned
+		dataType: double
+		lineageTag: af3237f7-497c-4b01-b3b6-1ec35b0e70cd
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_owner_dur_abandoned
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_prospecting_owner_dur_converted
+		dataType: double
+		lineageTag: 4b492231-33f9-486d-9668-4636fc969dd1
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_owner_dur_converted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_prospecting_steps
+		dataType: int64
+		formatString: 0
+		lineageTag: 5c3817c5-7752-40ce-a7d6-d362f6945d6c
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_steps
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_prospecting_steps_abandoned
+		dataType: int64
+		formatString: 0
+		lineageTag: 97b2cafe-7733-4f06-b934-7e3b66a7aa98
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_steps_abandoned
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_prospecting_steps_converted
+		dataType: int64
+		formatString: 0
+		lineageTag: 507579cc-4a37-4357-97fd-6b22975458f4
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_steps_converted
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_timeliness
+		dataType: double
+		lineageTag: 08d849af-e37f-4d35-92b7-d95bf93c2d0c
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_timeliness
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_tot_expect_owner_dur
+		dataType: double
+		lineageTag: f8424382-6c4b-4fa7-a7d6-6c1595478b41
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_tot_expect_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_tot_owner_act
+		dataType: int64
+		formatString: 0
+		lineageTag: 5b28f2d2-619d-43e4-be44-31c0cdb3d99d
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_tot_owner_act
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_tot_owner_dur
+		dataType: double
+		lineageTag: a32805de-2d34-4e90-b073-bf0c01207946
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_tot_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_tot_steps
+		dataType: int64
+		formatString: 0
+		lineageTag: 0068ddb8-6b74-4d77-87b0-8e2f06f078b8
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_tot_steps
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_upselling_expect_owner_dur
+		dataType: double
+		lineageTag: e3e7721c-3644-4540-9857-51363c5441a8
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_expect_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_upselling_expect_owner_dur_closed_lost
+		dataType: double
+		lineageTag: 1af961b7-a916-40bd-ab95-e7da1cf307a3
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_expect_owner_dur_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_upselling_expect_owner_dur_closed_won
+		dataType: double
+		lineageTag: e101007b-5a8f-40fd-8dec-2d9520cf5e0d
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_expect_owner_dur_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_upselling_owner_act
+		dataType: int64
+		formatString: 0
+		lineageTag: d2f5de09-ada7-4b7b-b869-afeb1767e6ab
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_owner_act
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_upselling_owner_act_closed_lost
+		dataType: int64
+		formatString: 0
+		lineageTag: 9893265a-113a-47b8-af55-decb50a780a4
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_owner_act_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_upselling_owner_act_closed_won
+		dataType: int64
+		formatString: 0
+		lineageTag: 79f05d8d-6d1a-4a27-8701-8ef67b4496bb
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_owner_act_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_upselling_owner_dur
+		dataType: double
+		lineageTag: 572d5da2-195c-4030-b6a9-958364d921e5
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_upselling_owner_dur_closed_lost
+		dataType: double
+		lineageTag: 8095e23e-4590-4e2f-b4d5-b3c2085771e6
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_owner_dur_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_upselling_owner_dur_closed_won
+		dataType: double
+		lineageTag: 07d2dcec-1945-4651-bf66-a7d01afb0a5a
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_owner_dur_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_upselling_steps
+		dataType: int64
+		formatString: 0
+		lineageTag: 7ea2773a-bb2b-4149-bde5-4714c901a90d
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_steps
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_upselling_steps_closed_lost
+		dataType: int64
+		formatString: 0
+		lineageTag: eabf369b-9377-4662-a896-e6a6e2bc0df2
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_steps_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_upselling_steps_closed_won
+		dataType: int64
+		formatString: 0
+		lineageTag: df7b93e0-9ecc-4dae-8152-b269fdecbee6
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_upselling_steps_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_raw
+		dataType: double
+		lineageTag: 989401de-1452-449a-9e0a-5f9f455d3ab1
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_raw
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_act_capt_lvl_adjustment
+		dataType: double
+		lineageTag: 65e00ff5-00de-4015-8943-42912fa1b72e
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_act_capt_lvl_adjustment
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_conf
+		dataType: double
+		lineageTag: dae890b6-ff9d-4907-a160-cb042c5e3388
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_internal
+		dataType: double
+		lineageTag: d3c4a321-0d49-4805-84b7-cf5ec3607084
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_internal
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_internal_dur
+		dataType: double
+		lineageTag: 007bfa46-62c1-4684-8381-e6b3ec252aa6
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_internal_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_internal_eng
+		dataType: double
+		lineageTag: 7c98cd0a-31d5-4a2c-9190-1777a772ba48
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_internal_eng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_internal_eng_dur
+		dataType: double
+		lineageTag: f3c1a093-a8c5-4a26-ba1d-5a22897fb26c
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_internal_eng_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_month_to_week_adjustment
+		dataType: double
+		lineageTag: aa3affb4-1ad9-4307-b695-a80dfd7a1bac
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_month_to_week_adjustment
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_new_logo
+		dataType: double
+		lineageTag: bcc46bf6-70d9-4b72-83c4-07378be563bf
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_new_logo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_new_logo_dur
+		dataType: double
+		lineageTag: df6aebb3-cf59-4fec-96aa-14f5f686527c
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_new_logo_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_new_logo_eng
+		dataType: double
+		lineageTag: 4e26dbcb-710e-41d6-9233-de9bc04dc851
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_new_logo_eng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_new_logo_eng_dur
+		dataType: double
+		lineageTag: 5098a4a2-f49e-4ef9-a8a1-272779bcde4e
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_new_logo_eng_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_post_sales
+		dataType: double
+		lineageTag: 4aef1953-b88b-4934-8ef3-87956771e0e4
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_post_sales
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_post_sales_dur
+		dataType: double
+		lineageTag: f2ea8af9-d917-4c07-931d-408bc22fc227
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_post_sales_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_post_sales_eng
+		dataType: double
+		lineageTag: e9bb5836-1c9d-4773-9bd9-6505c879cd9d
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_post_sales_eng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_post_sales_eng_dur
+		dataType: double
+		lineageTag: 66c68d91-8cff-4d74-8688-dd3756c010d8
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_post_sales_eng_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_prep_adjustment
+		dataType: double
+		lineageTag: 4c6b0b75-d305-41f5-ac2c-a67de391db81
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_prep_adjustment
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_prospecting
+		dataType: double
+		lineageTag: 6158c6f7-b5da-45ba-bf48-519c55decdbd
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_prospecting
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_prospecting_dur
+		dataType: double
+		lineageTag: e10b2556-5360-4840-b0b4-4f9ccb82c5cd
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_prospecting_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_prospecting_eng
+		dataType: double
+		lineageTag: 00d79857-d85e-4fff-9adb-b0c204a2be1a
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_prospecting_eng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_prospecting_eng_dur
+		dataType: double
+		lineageTag: 615d3314-94f4-49bb-8a34-01b11becbb9f
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_prospecting_eng_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_tot
+		dataType: double
+		lineageTag: 626b5240-7fda-49e8-b3ee-d8b59a6e9a6e
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_tot
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_tot_dur
+		dataType: double
+		lineageTag: 9e665165-5a8a-4d72-9802-1cca4c3ea94e
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_tot_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_tot_eng
+		dataType: double
+		lineageTag: f90a4921-9c10-460a-b6e2-d360fb872bd1
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_tot_eng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_tot_eng_dur
+		dataType: double
+		lineageTag: e2168d2d-5e39-4206-bb14-b94f36471aca
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_tot_eng_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_tot_selling
+		dataType: double
+		lineageTag: b1270359-5b0f-4d7b-b9e8-54a6342e1f96
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_tot_selling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_tot_selling_dur
+		dataType: double
+		lineageTag: e71b2ab9-a849-441b-913a-b307056ad8cf
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_tot_selling_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_tot_selling_eng
+		dataType: double
+		lineageTag: 4fe3ab45-58d7-4e02-96d8-144e6bcc28a1
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_tot_selling_eng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_tot_selling_eng_dur
+		dataType: double
+		lineageTag: 26f1de8c-42db-452f-9b04-5b1451067e57
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_tot_selling_eng_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_upselling
+		dataType: double
+		lineageTag: df4a144b-8ee6-4a34-b8d3-613953769dc0
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_upselling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_upselling_dur
+		dataType: double
+		lineageTag: b923bc32-b342-448e-80f1-5cf5bf405a5f
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_upselling_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_upselling_eng
+		dataType: double
+		lineageTag: 4d2aa170-3bd2-4416-825b-8d1b48368b7b
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_upselling_eng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_upselling_eng_dur
+		dataType: double
+		lineageTag: 7d4e0d03-2f3c-4051-960f-2568a05faa05
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_upselling_eng_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column crm_addr_city
+		dataType: string
+		lineageTag: 2f99208e-6e58-458c-9ef2-ba523bcbb760
+		summarizeBy: none
+		sourceColumn: crm_addr_city
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_addr_country
+		dataType: string
+		lineageTag: 3835268b-6cba-45ef-b3b0-4edebe00d8b0
+		summarizeBy: none
+		sourceColumn: crm_addr_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_addr_postal_code
+		dataType: string
+		lineageTag: 18e6be92-8986-4763-8bc4-3f5db518a031
+		summarizeBy: none
+		sourceColumn: crm_addr_postal_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_addr_state
+		dataType: string
+		lineageTag: 5469c10c-77a9-4394-8797-f2b25e1bc689
+		summarizeBy: none
+		sourceColumn: crm_addr_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_addr_street
+		dataType: string
+		lineageTag: 523354c6-1613-4b63-be93-8754a56cbd3d
+		summarizeBy: none
+		sourceColumn: crm_addr_street
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_creator_id
+		dataType: string
+		lineageTag: 10aca48b-dc04-4ef0-bfeb-4eabc5707493
+		summarizeBy: none
+		sourceColumn: crm_creator_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_division
+		dataType: string
+		lineageTag: c03c2cdf-9999-48e2-9398-841dccb6cc8a
+		summarizeBy: none
+		sourceColumn: crm_division
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_email
+		dataType: string
+		lineageTag: f65cd421-e39d-46c8-a5db-762c666c0cf3
+		summarizeBy: none
+		sourceColumn: crm_email
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_first_name
+		dataType: string
+		lineageTag: 0424bee8-3f56-4385-a2a0-91efeb66bcb3
+		summarizeBy: none
+		sourceColumn: crm_first_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_language_locale
+		dataType: string
+		lineageTag: 4dd46d77-73ed-48fe-8637-46c6d2859e47
+		summarizeBy: none
+		sourceColumn: crm_language_locale
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_last_login_time
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b7c0e460-951b-4ace-9267-e49e8eafb853
+		summarizeBy: none
+		sourceColumn: crm_last_login_time
+
+		variation Variation
+			isDefault
+			relationship: 164b5858-c119-4448-9088-5afc1bdfe182
+			defaultHierarchy: LocalDateTable_7f68921d-5ff5-4cc2-9dfd-29c0fda25b11.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_last_name
+		dataType: string
+		lineageTag: 95b605e5-d1af-4b4d-8229-f9ebb40d9ff0
+		summarizeBy: none
+		sourceColumn: crm_last_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_locale
+		dataType: string
+		lineageTag: e93e2315-da62-415b-a39a-06ea6ac051e5
+		summarizeBy: none
+		sourceColumn: crm_locale
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_profile_url
+		dataType: string
+		lineageTag: 3dc6e64f-69bf-4990-9f7a-5b27c77e2f1d
+		summarizeBy: none
+		sourceColumn: crm_profile_url
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_role
+		dataType: string
+		lineageTag: 970d9204-1a79-4e0c-a94c-509da798fcd6
+		summarizeBy: none
+		sourceColumn: crm_role
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_time_zone
+		dataType: string
+		lineageTag: 4c6b30bd-eed1-4dc9-aae0-bbc312852996
+		summarizeBy: none
+		sourceColumn: crm_time_zone
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_title
+		dataType: string
+		lineageTag: e058aef6-e46e-4be0-9c3f-d76745fa9e4e
+		summarizeBy: none
+		sourceColumn: crm_title
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_user_type
+		dataType: string
+		lineageTag: d7aabafa-6d5b-4d93-9722-5ff156ce78f5
+		summarizeBy: none
+		sourceColumn: crm_user_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_username
+		dataType: string
+		lineageTag: 9243fc76-4387-40f2-8ee3-4e6c5a82ac3a
+		summarizeBy: none
+		sourceColumn: crm_username
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_billable
+		dataType: string
+		lineageTag: 17b8388a-6461-4561-98be-5232d29bfbf2
+		summarizeBy: none
+		sourceColumn: trueai_billable
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_direct_reports
+		dataType: int64
+		formatString: 0
+		lineageTag: 540da3f2-ccd3-48d8-a356-5f8ed6dc3fcb
+		summarizeBy: sum
+		sourceColumn: trueai_direct_reports
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_group
+		dataType: string
+		lineageTag: 847c70c5-0216-49f4-aa55-246d9339e902
+		summarizeBy: none
+		sourceColumn: trueai_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_hire_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6e02a613-1804-4335-8f58-45a5d66d1fc3
+		summarizeBy: none
+		sourceColumn: trueai_hire_date
+
+		variation Variation
+			isDefault
+			relationship: 0fa81375-08f5-498a-96db-2c0b10374601
+			defaultHierarchy: LocalDateTable_61c69bf7-c5af-46e5-afa5-df22b332a707.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_role
+		dataType: string
+		lineageTag: 4257a008-4e6f-4e2d-bf36-bd7aa348f9cd
+		summarizeBy: none
+		sourceColumn: trueai_role
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_role_conf
+		dataType: double
+		lineageTag: 9600dfc5-86d7-4d5e-8606-a62900867699
+		summarizeBy: sum
+		sourceColumn: trueai_role_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_tenure
+		dataType: int64
+		formatString: 0
+		lineageTag: 6214be4b-0508-4fe6-b8c7-8eb00382499c
+		summarizeBy: sum
+		sourceColumn: trueai_tenure
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_termination_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 592e7254-d423-42ed-b9e8-29720d48f4d2
+		summarizeBy: none
+		sourceColumn: trueai_termination_date
+
+		variation Variation
+			isDefault
+			relationship: b24f94e7-ea09-45ab-ba67-e9ee9bbc1231
+			defaultHierarchy: LocalDateTable_eba552f3-5a42-4c7f-b8f4-183cc4a9c8a1.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_title
+		dataType: string
+		lineageTag: c6802466-31aa-4c27-919f-8a7213fc6b31
+		summarizeBy: none
+		sourceColumn: trueai_title
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_title_conf
+		dataType: double
+		lineageTag: 50cab2a0-e9ef-43ac-ab95-c65b6b4965f2
+		summarizeBy: sum
+		sourceColumn: trueai_title_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_tot_reports
+		dataType: int64
+		formatString: 0
+		lineageTag: 62e06563-a85e-421a-a247-849ff0a0b9fb
+		summarizeBy: sum
+		sourceColumn: trueai_tot_reports
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_user_behavior
+		dataType: string
+		lineageTag: dd054a3e-d322-4aeb-9e1a-e1f20ff1d480
+		summarizeBy: none
+		sourceColumn: trueai_user_behavior
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_user_behavior_conf
+		dataType: double
+		lineageTag: 16328d86-2128-4fdb-930a-58ef6d99d6e9
+		summarizeBy: sum
+		sourceColumn: trueai_user_behavior_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_user_role
+		dataType: string
+		lineageTag: 9736a032-8ebd-448f-8c36-5bf93a1fa193
+		summarizeBy: none
+		sourceColumn: trueai_user_role
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_user_role_dept
+		dataType: string
+		lineageTag: 87ece6a2-b677-441e-8dc8-21bf144d4fa6
+		summarizeBy: none
+		sourceColumn: trueai_user_role_dept
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_user_role_function
+		dataType: string
+		lineageTag: e3fbd7af-798b-475a-8909-223141fdc45d
+		summarizeBy: none
+		sourceColumn: trueai_user_role_function
+
+		annotation SummarizationSetBy = Automatic
+
+	column vi_value_created_preselling_post_sales
+		dataType: double
+		lineageTag: 0c82c850-2312-40ad-b0b7-23820edda5f1
+		summarizeBy: sum
+		sourceColumn: vi_value_created_preselling_post_sales
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_created_tot
+		dataType: double
+		lineageTag: 29b35162-71c6-4ba1-96b7-ae928b743692
+		summarizeBy: sum
+		sourceColumn: vi_value_created_tot
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_expect
+		dataType: double
+		lineageTag: a18df909-61be-4980-93a4-2c956a543372
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_expect
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_preselling_post_sales
+		dataType: double
+		lineageTag: 331c7169-4c5f-4d4a-9e1c-5d6cec41edcb
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_preselling_post_sales
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_tot
+		dataType: double
+		lineageTag: a0c527cb-e3bb-4ce3-889f-fbbaf09d9c9f
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_tot
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_received_for_preselling_post_sales
+		dataType: double
+		lineageTag: f215044d-6d01-418f-8987-43b4a7283446
+		summarizeBy: sum
+		sourceColumn: vi_value_received_for_preselling_post_sales
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_received_tot
+		dataType: double
+		lineageTag: c6c6fc1c-cadf-45d4-bf9b-bf764ea35957
+		summarizeBy: sum
+		sourceColumn: vi_value_received_tot
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'col.full_name' = ```
+			
+			var temp = If(ISBLANK(users_history[crm_last_name]), users_history[crm_username], users_history[crm_first_name] &  " " &  users_history[crm_last_name])
+			var res = If(ISBLANK(temp) , users_history[_sys_user_id], temp)
+			return res 
+			
+			```
+		lineageTag: 45671f7c-293b-4df2-ab8e-79285fe5231c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_perf_qtly_performance_tier
+		dataType: string
+		lineageTag: 63ba2ab9-0367-4d27-9527-863d1250bb7e
+		summarizeBy: none
+		sourceColumn: ci_perf_qtly_performance_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_perf_qtly_performance_tier_num
+		dataType: int64
+		formatString: 0
+		lineageTag: 95ec2f1a-938c-41b4-aa64-57ebd4003955
+		summarizeBy: sum
+		sourceColumn: ci_perf_qtly_performance_tier_num
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_group_conf
+		dataType: double
+		lineageTag: a4700ae5-834c-4a39-80c7-acb14b1e97ff
+		summarizeBy: sum
+		sourceColumn: trueai_group_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability
+		dataType: double
+		lineageTag: 7006d2ee-d4fb-4171-9e43-785b4c09b118
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability_actual_vs_predicted
+		dataType: double
+		lineageTag: 4be74fbc-1749-4a1a-affb-c79660476274
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_actual_vs_predicted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability_actual_vs_predicted_norm
+		dataType: double
+		lineageTag: 512e6197-b378-4eda-807c-880136eef23f
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_actual_vs_predicted_norm
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability_actual_vs_predicted_smooth
+		dataType: double
+		lineageTag: 3d0ab07e-41c2-4ff3-a73b-b25ef547dcd4
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_actual_vs_predicted_smooth
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability_conf
+		dataType: double
+		lineageTag: 75f56955-b52d-4789-b4d8-6e0df619d73a
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability_conf_expected_sample_count
+		dataType: int64
+		formatString: 0
+		lineageTag: aafbced6-9967-4cb3-8acb-b7e6dbc3326c
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_conf_expected_sample_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_closing_ability_opps_closed_count
+		dataType: int64
+		formatString: 0
+		lineageTag: eff97840-9508-4e8a-a6f8-ea633145a77d
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_opps_closed_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_closing_ability_opps_closed_prob_sum
+		dataType: double
+		lineageTag: d6d08ddc-5ff2-4f79-869a-59bde189c8a9
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_opps_closed_prob_sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability_opps_won_count
+		dataType: int64
+		formatString: 0
+		lineageTag: f6d1fc29-98db-4e58-8908-dc23b7c04339
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_opps_won_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_closing_ability_peer_actual_vs_predicted
+		dataType: double
+		lineageTag: 17b58608-52af-4d3f-80d9-6b6593e89d63
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_peer_actual_vs_predicted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability_peer_opps_closed_count
+		dataType: double
+		lineageTag: f47f5483-fdc4-4565-b294-f64f736a25e6
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_peer_opps_closed_count
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability_peer_opps_closed_prob
+		dataType: double
+		lineageTag: 2e1196b0-be07-44fb-bc42-2be109615da5
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_peer_opps_closed_prob
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability_peer_opps_won_count
+		dataType: double
+		lineageTag: 792ca3e7-564f-464f-8e71-b6f783f75605
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_peer_opps_won_count
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills
+		dataType: double
+		lineageTag: c646cace-51a9-46bc-815d-2829ed79b142
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_actual_vs_predicted
+		dataType: double
+		lineageTag: ab4ad593-f47d-4464-9c5c-b6cecdb602ed
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_actual_vs_predicted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_actual_vs_predicted_norm
+		dataType: double
+		lineageTag: b8a99460-ce29-40b5-8e8a-f26f0e47b5ea
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_actual_vs_predicted_norm
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_actual_vs_predicted_smooth
+		dataType: double
+		lineageTag: 63526670-c8f0-4911-871d-52193c547b22
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_actual_vs_predicted_smooth
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_conf
+		dataType: double
+		lineageTag: 92d686ea-def1-4f18-8654-a98c90130706
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_conf_expected_sample_count
+		dataType: double
+		lineageTag: 7b8e474a-a6da-4196-b6b1-f45334c8dc0c
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_conf_expected_sample_count
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_hatleads_closed_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 67ebdadb-735e-444d-850c-f9b1b9955f0c
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_hatleads_closed_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_discov_skills_hatleads_closed_prob_sum
+		dataType: double
+		lineageTag: ce65c949-f8c4-4db7-9592-f6b0eb9dc5a9
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_hatleads_closed_prob_sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_hatleads_converted_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 88345a84-1ee2-4aa7-b3b2-125191686966
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_hatleads_converted_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_discov_skills_peer_actual_vs_predicted
+		dataType: double
+		lineageTag: 7646f421-93a7-4a2d-90ee-a2caad6ac637
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_actual_vs_predicted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_actual_vs_predicted_ratio_max
+		dataType: double
+		lineageTag: a39459b5-fbeb-4339-a353-7d1353c9297d
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_actual_vs_predicted_ratio_max
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_actual_vs_predicted_ratio_min
+		dataType: double
+		lineageTag: 9b581b89-ffe9-40a6-888e-7ae125fffac7
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_actual_vs_predicted_ratio_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_hatleads_closed_count
+		dataType: double
+		lineageTag: 96d9448e-be8e-40e6-9369-5a95ceaa5e4d
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_hatleads_closed_count
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_hatleads_closed_prob_sum
+		dataType: double
+		lineageTag: d5a46b1a-7b57-4ee4-a73a-8afb0230cd53
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_hatleads_closed_prob_sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_hatleads_converted_count
+		dataType: double
+		lineageTag: 46ee497b-0dc4-41c6-aefa-1d3afc2a69e3
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_hatleads_converted_count
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_post_sales_expect_owner_dur_upsell_start
+		dataType: double
+		lineageTag: 39beb06a-c191-4d92-8225-55f88a0f512f
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_expect_owner_dur_upsell_start
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_post_sales_owner_act_upsell_start
+		dataType: int64
+		formatString: 0
+		lineageTag: 4ee8239a-aa09-4121-91c9-fbaeb7ff51fb
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_owner_act_upsell_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_post_sales_owner_dur_upsell_start
+		dataType: double
+		lineageTag: afcbccd9-9357-44c6-9df2-137469cdd3b6
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_owner_dur_upsell_start
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_post_sales_steps_upsell_start
+		dataType: int64
+		formatString: 0
+		lineageTag: 0b145010-a256-4f43-aef6-7151332bb683
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_steps_upsell_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_prospecting_expect_owner_dur_disqual
+		dataType: double
+		lineageTag: 13648a32-ce06-426c-af3e-bb29b98acf8d
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_expect_owner_dur_disqual
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_prospecting_owner_act_disqual
+		dataType: int64
+		formatString: 0
+		lineageTag: 41180962-40fb-46c5-acbc-0c3de57c62ba
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_owner_act_disqual
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_prospecting_owner_dur_disqual
+		dataType: double
+		lineageTag: bf848032-3c43-421d-a9a3-7454dcdeff76
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_owner_dur_disqual
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_prospecting_steps_disqual
+		dataType: int64
+		formatString: 0
+		lineageTag: 2ee8a17e-7c3d-43f4-990b-0982cccfc6a8
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_prospecting_steps_disqual
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_closing_ability_peer_actual_vs_pred_ratio_derived_max
+		dataType: double
+		lineageTag: 16d16c30-62b9-4fb3-b79d-a9c882ae471d
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_peer_actual_vs_pred_ratio_derived_max
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability_peer_actual_vs_pred_ratio_derived_min
+		dataType: double
+		lineageTag: cf04174f-6343-4fc7-8363-ae35fc9ba78c
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_peer_actual_vs_pred_ratio_derived_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_post_sales_steps
+		dataType: double
+		lineageTag: ba711e42-293c-4112-9ba5-34bde107dd59
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_post_sales_steps
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_post_sales_steps_prob
+		dataType: double
+		lineageTag: 568a82a3-b192-4d68-b1f7-6b90899f7c34
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_post_sales_steps_prob
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_post_sales_steps_upsell_start
+		dataType: double
+		lineageTag: 2a06ac62-9078-440c-8ab7-1434ba6729ae
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_post_sales_steps_upsell_start
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_recycled_steps
+		dataType: double
+		lineageTag: 98906d8c-eb65-48e3-9878-201348461cc1
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_recycled_steps
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_recycled_steps_converted
+		dataType: double
+		lineageTag: 9f62e77e-6869-4e35-a3b5-1e4f5b530ae2
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_recycled_steps_converted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_recycled_steps_prob
+		dataType: double
+		lineageTag: c9f8cb20-ab22-4d74-9438-f89c316d889d
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_recycled_steps_prob
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_post_sales_steps
+		dataType: int64
+		formatString: 0
+		lineageTag: eb4d5c61-a4ef-40a0-8d02-9acee6e8a564
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_post_sales_steps
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_discov_skills_post_sales_steps_prob
+		dataType: double
+		lineageTag: 2cbfbbcb-f693-424e-aab7-54aa76164b74
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_post_sales_steps_prob
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_post_sales_steps_upsell_start
+		dataType: int64
+		formatString: 0
+		lineageTag: af8a8bb6-1967-40cb-84ff-d7053c6f3cd6
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_post_sales_steps_upsell_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_discov_skills_recycled_steps
+		dataType: int64
+		formatString: 0
+		lineageTag: 438bf5a8-df76-4bff-ba97-238d0f6a8d63
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_recycled_steps
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_discov_skills_recycled_steps_converted
+		dataType: int64
+		formatString: 0
+		lineageTag: c16261d6-253d-4328-b93c-267e884ff47a
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_recycled_steps_converted
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_discov_skills_recycled_steps_prob
+		dataType: double
+		lineageTag: 87cab196-9596-4c77-9680-ff35d3eb51b3
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_recycled_steps_prob
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_close_ability
+		dataType: string
+		lineageTag: b8e0065c-ff24-48f8-889c-a77feccd1e83
+		summarizeBy: none
+		sourceColumn: ci_sb_close_ability
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_close_ability_conf
+		dataType: double
+		lineageTag: 2468d6ba-a772-4425-b7f9-caa3d69fb805
+		summarizeBy: sum
+		sourceColumn: ci_sb_close_ability_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_close_ability_num
+		dataType: double
+		lineageTag: 89dc0d0a-4556-4815-b353-1dee9e0e554a
+		summarizeBy: sum
+		sourceColumn: ci_sb_close_ability_num
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_deal_maxing
+		dataType: string
+		lineageTag: 1e7f5d2c-279a-4799-afcd-511e80cf9a2f
+		summarizeBy: none
+		sourceColumn: ci_sb_deal_maxing
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_deal_maxing_conf
+		dataType: double
+		lineageTag: 5bbf1d8c-2ad3-42b0-ae5a-df573ab2dd49
+		summarizeBy: sum
+		sourceColumn: ci_sb_deal_maxing_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_deal_maxing_num
+		dataType: double
+		lineageTag: de73914b-486f-48f7-816b-2e88ed422549
+		summarizeBy: sum
+		sourceColumn: ci_sb_deal_maxing_num
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_disc_skills
+		dataType: string
+		lineageTag: 55379e5d-86d2-4afe-b57e-258bc2393052
+		summarizeBy: none
+		sourceColumn: ci_sb_disc_skills
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_disc_skills_conf
+		dataType: double
+		lineageTag: 50d246d4-8052-46ae-b180-fd962ac0445f
+		summarizeBy: sum
+		sourceColumn: ci_sb_disc_skills_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_disc_skills_num
+		dataType: double
+		lineageTag: f629f482-0360-4e3c-8ad7-ccb5da003ceb
+		summarizeBy: sum
+		sourceColumn: ci_sb_disc_skills_num
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_engmt_ability
+		dataType: string
+		lineageTag: e5747fe8-2dc1-4982-b397-e44ef357ac98
+		summarizeBy: none
+		sourceColumn: ci_sb_engmt_ability
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_engmt_ability_conf
+		dataType: double
+		lineageTag: e671de42-8ff0-4695-aca8-0d66fb2b2189
+		summarizeBy: sum
+		sourceColumn: ci_sb_engmt_ability_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_engmt_ability_num
+		dataType: double
+		lineageTag: 2920261b-f644-4deb-a64b-7aa0b4aff223
+		summarizeBy: sum
+		sourceColumn: ci_sb_engmt_ability_num
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_time_mgmt
+		dataType: string
+		lineageTag: 7c315b51-b267-40a0-88e8-db9fd424027e
+		summarizeBy: none
+		sourceColumn: ci_sb_time_mgmt
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_time_mgmt_conf
+		dataType: double
+		lineageTag: 47ac374f-d092-4eff-8929-2f24aeb82bd8
+		summarizeBy: sum
+		sourceColumn: ci_sb_time_mgmt_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_time_mgmt_num
+		dataType: double
+		lineageTag: 960134a0-6871-4e0a-a38a-0b963b5a4c86
+		summarizeBy: sum
+		sourceColumn: ci_sb_time_mgmt_num
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_work_effort
+		dataType: string
+		lineageTag: 8909bf9a-fe4f-4fa0-b5de-3244a7e6d5e3
+		summarizeBy: none
+		sourceColumn: ci_sb_work_effort
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_work_effort_conf
+		dataType: double
+		lineageTag: c87f8857-291d-4af3-be73-91cfe2c9c1f9
+		summarizeBy: sum
+		sourceColumn: ci_sb_work_effort_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_work_effort_num
+		dataType: double
+		lineageTag: ec66a13f-d77d-4121-9cff-c544cbf2e762
+		summarizeBy: sum
+		sourceColumn: ci_sb_work_effort_num
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ed8fc91a-5470-4860-8bef-b20ea005f0c0
+		summarizeBy: none
+		sourceColumn: trueai_end_date
+
+		variation Variation
+			isDefault
+			relationship: 407e86a2-39a1-4127-b426-028cbaa0597c
+			defaultHierarchy: LocalDateTable_de4bb67b-79f3-4fda-9406-02a654175110.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_as_of
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c10eb0a3-cb38-4e76-b8b6-a9f3965e55fb
+		summarizeBy: none
+		sourceColumn: _sys_as_of
+
+		variation Variation
+			isDefault
+			relationship: b3c72d8f-529b-4009-b537-d279c3fdf6c6
+			defaultHierarchy: LocalDateTable_b49010bd-82d9-4a61-8169-e4a8a1a6fc33.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_is_active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 28400eeb-59e1-4038-90e8-72ad6dca1bde
+		summarizeBy: none
+		sourceColumn: _sys_is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_is_deleted
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: e03acb85-00cd-4496-a050-983ef37ba109
+		summarizeBy: none
+		sourceColumn: _sys_is_deleted
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_new_logo_expected_owner_dur
+		dataType: double
+		lineageTag: f4abd9f2-b8ab-4335-9582-ecba18cbf9bf
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_expected_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_new_logo_expected_owner_dur_closed_lost
+		dataType: double
+		lineageTag: 02ccd29e-4072-4128-98f7-53aeb6b24757
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_expected_owner_dur_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_new_logo_expected_owner_dur_closed_won
+		dataType: double
+		lineageTag: e37eff10-2f16-49b6-9be0-fa39717dbcc3
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_new_logo_expected_owner_dur_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column crm_created_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d5bb34ba-d8bd-4ab9-96f9-b09d97df284c
+		summarizeBy: none
+		sourceColumn: crm_created_on
+
+		variation Variation
+			isDefault
+			relationship: 6c0384bd-686d-4902-81bf-30bed28c526f
+			defaultHierarchy: LocalDateTable_e1258012-e661-456f-80d8-344da5bc236b.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_dept
+		dataType: string
+		lineageTag: 95f87bd3-b139-4ff5-aef9-e3127d892f9e
+		summarizeBy: none
+		sourceColumn: crm_dept
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_mgr_id
+		dataType: string
+		lineageTag: 338c82bd-c02b-4bd0-b74b-d6ec949be1e5
+		summarizeBy: none
+		sourceColumn: crm_mgr_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_is_mgr
+		dataType: string
+		lineageTag: ae540774-6e9c-41b2-866d-6fcd96d2186a
+		summarizeBy: none
+		sourceColumn: trueai_is_mgr
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_mgr_id
+		dataType: string
+		lineageTag: d5b8878a-4453-4ab7-aa26-19514fe53b57
+		summarizeBy: none
+		sourceColumn: trueai_mgr_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_mgr_id_conf
+		dataType: double
+		lineageTag: 9f00ab77-c8fa-45f5-98c0-be4d95fe28cb
+		summarizeBy: sum
+		sourceColumn: trueai_mgr_id_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_mgr_ids
+		dataType: string
+		lineageTag: bd748b45-96f1-48ed-8b73-1462cc95ba24
+		summarizeBy: none
+		sourceColumn: trueai_mgr_ids
+
+		annotation SummarizationSetBy = Automatic
+
+	column vi_value_created_leads_and_accounts_lead_gen
+		dataType: double
+		lineageTag: 1c8a677d-e94d-44e9-81c5-8981e4ac6f73
+		summarizeBy: sum
+		sourceColumn: vi_value_created_leads_and_accounts_lead_gen
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_leads_and_accounts_lead_gen
+		dataType: double
+		lineageTag: e8c091b0-2cb2-4d52-817a-b5261de890a4
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_leads_and_accounts_lead_gen
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'col.act_monthly_count' =
+			
+			//look up the counts from the users activities table so they can be used in aggs on user history
+			var userId = users_history[_sys_user_id]  // grab the user id
+			var startDate = users_history[_sys_filt_start_date]  // grab start/ end date of the period (1 month)
+			var endDate = users_history[_sys_filt_end_date]
+			 // sum hte accoutivity count for the period and the user
+			var res = CALCULATE(
+			        SUM(users_activities[trueai_count]),
+			        FILTER(
+			            ALL(users_activities),
+			            users_activities[_sys_user_id] = userId
+			            && users_activities[_sys_filt_start_date] >= startDate
+			            && users_activities[_sys_filt_end_date] <= endDate
+			        )
+			    )
+			return res
+		formatString: 0
+		lineageTag: f9302854-73ae-4912-9ea9-95d45fad3baa
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'col.act_monthly_duration' =
+			
+			//look up the counts from the users activities table so they can be used in aggs on user history
+			var userId = users_history[_sys_user_id]  // grab the user id
+			var startDate = users_history[_sys_filt_start_date]  // grab start/ end date of the period (1 month)
+			var endDate = users_history[_sys_filt_end_date]
+			 // sum hte accoutivity count for the period and the user
+			var res = CALCULATE(
+			        SUM(users_activities[trueai_dur]),
+			        FILTER(
+			            ALL(users_activities),
+			            users_activities[_sys_user_id] = userId
+			            && users_activities[_sys_filt_start_date] >= startDate
+			            && users_activities[_sys_filt_end_date] <= endDate
+			        )
+			    )
+			return res
+		formatString: 0
+		lineageTag: dbb6d065-31a0-483b-830a-77636d6f036c
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_post_sales_expect_owner_dur_sell_start
+		dataType: double
+		lineageTag: 0dcc6647-4f4a-4395-859f-14a10e08df4f
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_expect_owner_dur_sell_start
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_post_sales_owner_act_sell_start
+		dataType: int64
+		formatString: 0
+		lineageTag: 93d8658d-5e61-483a-892b-318b2772efcc
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_owner_act_sell_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_post_sales_owner_dur_sell_start
+		dataType: double
+		lineageTag: 5beec179-9206-432e-bb32-c226bf8e1da2
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_owner_dur_sell_start
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_post_sales_steps_sell_start
+		dataType: int64
+		formatString: 0
+		lineageTag: 6c7be8c5-4b2e-4ccc-a9a1-36af0e016aa2
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_post_sales_steps_sell_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_exist_cust_expect_owner_dur
+		dataType: double
+		lineageTag: 1838d7d9-1713-47c2-a08b-11c7c1f763d4
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_expect_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_exist_cust_expect_owner_dur_closed_lost
+		dataType: double
+		lineageTag: 0bd00f43-0eba-4ea3-b519-5fccbe59355c
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_expect_owner_dur_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_exist_cust_expect_owner_dur_closed_won
+		dataType: double
+		lineageTag: fbb6766d-81f4-46ee-bc10-14ae1f243ae3
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_expect_owner_dur_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_exist_cust_owner_act
+		dataType: int64
+		formatString: 0
+		lineageTag: 7abdbeec-9e9d-4f47-adfd-70a9fd23fef4
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_owner_act
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_exist_cust_owner_act_closed_lost
+		dataType: int64
+		formatString: 0
+		lineageTag: 5c4910cf-9de6-4f4d-8079-a9584a2200a3
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_owner_act_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_exist_cust_owner_act_closed_won
+		dataType: int64
+		formatString: 0
+		lineageTag: 100e740a-b891-4e36-a95b-0cec0b57d5b6
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_owner_act_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_exist_cust_owner_dur
+		dataType: double
+		lineageTag: 597fa759-7b62-430c-a538-d50ff6943f38
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_owner_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_exist_cust_owner_dur_closed_lost
+		dataType: double
+		lineageTag: 72f5f9b1-78d2-4df2-acd6-2f3fd992ca04
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_owner_dur_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_exist_cust_owner_dur_closed_won
+		dataType: double
+		lineageTag: e8e4a04e-1ba6-4f91-9e57-20e5deeac6d5
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_owner_dur_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_act_capt_lvl_pi_exist_cust_steps
+		dataType: int64
+		formatString: 0
+		lineageTag: c9ebd80b-ae60-4a74-bd3f-64bcc3a1a85c
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_steps
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_exist_cust_steps_closed_lost
+		dataType: int64
+		formatString: 0
+		lineageTag: 9f96d22a-490b-43ab-9900-478fbc82607f
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_steps_closed_lost
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_act_capt_lvl_pi_exist_cust_steps_closed_won
+		dataType: int64
+		formatString: 0
+		lineageTag: 6e43c60f-3708-4323-a9c9-71d5755dc1c4
+		summarizeBy: sum
+		sourceColumn: ci_act_capt_lvl_pi_exist_cust_steps_closed_won
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_discov_skills_peer_post_sales_steps_sell_start
+		dataType: double
+		lineageTag: 1379aa90-af15-437b-a91e-bca29b86dd2c
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_post_sales_steps_sell_start
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_post_sales_steps_sell_start
+		dataType: int64
+		formatString: 0
+		lineageTag: 5727b61f-f1aa-4eff-8b30-9ae55de36a59
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_post_sales_steps_sell_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_time_alloc_existing_customer_selling
+		dataType: double
+		lineageTag: 32909a2e-4903-4c9c-a8a8-989775fff42f
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_existing_customer_selling
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_existing_customer_selling_dur
+		dataType: double
+		lineageTag: 54e7419c-3d92-44c6-8041-339b070302e6
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_existing_customer_selling_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_existing_customer_selling_eng
+		dataType: double
+		lineageTag: 82e0f432-d2f4-461b-8aa8-0e64b1f0fed5
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_existing_customer_selling_eng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_time_alloc_existing_customer_selling_eng_dur
+		dataType: double
+		lineageTag: a1961fe8-c854-43f5-8362-4b325fde0ddc
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_existing_customer_selling_eng_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_created_selling_existing_customer
+		dataType: double
+		lineageTag: a9bcaee7-decf-4e1a-bf08-6a4f308134e9
+		summarizeBy: sum
+		sourceColumn: vi_value_created_selling_existing_customer
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_selling_existing_customer
+		dataType: double
+		lineageTag: c1db0c1a-6783-4e08-af08-e6167c253158
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_selling_existing_customer
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_received_for_selling_existing_customer
+		dataType: double
+		lineageTag: ee55eb71-072f-421a-a194-3b7af2c1ef8e
+		summarizeBy: sum
+		sourceColumn: vi_value_received_for_selling_existing_customer
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_user_role_alias
+		dataType: string
+		lineageTag: ba104943-7317-45d8-a647-eec85ebd3112
+		summarizeBy: none
+		sourceColumn: trueai_user_role_alias
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_perf_qtly_performance_tier_conf
+		dataType: double
+		lineageTag: d635a3ce-02be-4270-a064-24e7daee3f02
+		summarizeBy: sum
+		sourceColumn: ci_perf_qtly_performance_tier_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_perf_qtly_performance_peer_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 1245fa9e-bacd-455e-85b5-a8b80e403a84
+		summarizeBy: sum
+		sourceColumn: ci_perf_qtly_performance_peer_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column vi_value_created_leads_and_accounts_repeat_new_logo
+		dataType: double
+		lineageTag: 50f9bd4c-05aa-4a11-a1f5-b93a49024086
+		summarizeBy: sum
+		sourceColumn: vi_value_created_leads_and_accounts_repeat_new_logo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_created_leads_and_accounts_repeat_existing_customer
+		dataType: double
+		lineageTag: ecb73497-1d5a-4526-8394-31bf4a0ffe50
+		summarizeBy: sum
+		sourceColumn: vi_value_created_leads_and_accounts_repeat_existing_customer
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_leads_and_accounts_repeat_new_logo
+		dataType: double
+		lineageTag: 444709d8-cec3-4c0d-97a8-ff808f14939c
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_leads_and_accounts_repeat_new_logo
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vi_value_delivered_leads_and_accounts_repeat_existing_customer
+		dataType: double
+		lineageTag: d56640e6-be19-4857-a47f-aeda38a8e5d9
+		summarizeBy: sum
+		sourceColumn: vi_value_delivered_leads_and_accounts_repeat_existing_customer
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition users_history-ed435d05-4999-4c6f-9051-d88bab5a91ed = m
+		mode: import
+		source = ```
+				let
+				  
+				  dbTable = getDBTable("users_history"), // get the right table
+				
+				
+				  dbTableTyped = Table.TransformColumnTypes(dbTable,{ // change types to what we're expecting
+				  {"_sys_as_of", type datetime},
+				{"_sys_co_id", type text},
+				{"_sys_doc_id", type text},
+				{"_sys_filt_end_date", type date},
+				{"_sys_filt_start_date", type date},
+				{"_sys_is_active", type logical},
+				{"_sys_is_deleted", type logical},
+				{"_sys_user_id", type text},
+				{"ci_act_capt_lvl",  type number},
+				{"ci_act_capt_lvl_conf",  type number},
+				{"ci_act_capt_lvl_pi_exist_cust_expect_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_exist_cust_expect_owner_dur_closed_lost",  type number},
+				{"ci_act_capt_lvl_pi_exist_cust_expect_owner_dur_closed_won",  type number},
+				{"ci_act_capt_lvl_pi_exist_cust_owner_act", Int64.Type},
+				{"ci_act_capt_lvl_pi_exist_cust_owner_act_closed_lost", Int64.Type},
+				{"ci_act_capt_lvl_pi_exist_cust_owner_act_closed_won", Int64.Type},
+				{"ci_act_capt_lvl_pi_exist_cust_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_exist_cust_owner_dur_closed_lost",  type number},
+				{"ci_act_capt_lvl_pi_exist_cust_owner_dur_closed_won",  type number},
+				{"ci_act_capt_lvl_pi_exist_cust_steps", Int64.Type},
+				{"ci_act_capt_lvl_pi_exist_cust_steps_closed_lost", Int64.Type},
+				{"ci_act_capt_lvl_pi_exist_cust_steps_closed_won", Int64.Type},
+				{"ci_act_capt_lvl_pi_new_logo_expected_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_new_logo_expected_owner_dur_closed_lost",  type number},
+				{"ci_act_capt_lvl_pi_new_logo_expected_owner_dur_closed_won",  type number},
+				{"ci_act_capt_lvl_pi_new_logo_owner_act", Int64.Type},
+				{"ci_act_capt_lvl_pi_new_logo_owner_act_closed_lost", Int64.Type},
+				{"ci_act_capt_lvl_pi_new_logo_owner_act_closed_won", Int64.Type},
+				{"ci_act_capt_lvl_pi_new_logo_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_new_logo_owner_dur_closed_lost",  type number},
+				{"ci_act_capt_lvl_pi_new_logo_owner_dur_closed_won",  type number},
+				{"ci_act_capt_lvl_pi_new_logo_steps", Int64.Type},
+				{"ci_act_capt_lvl_pi_new_logo_steps_closed_lost", Int64.Type},
+				{"ci_act_capt_lvl_pi_new_logo_steps_closed_won", Int64.Type},
+				{"ci_act_capt_lvl_pi_post_sales_expect_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_post_sales_expect_owner_dur_churned",  type number},
+				{"ci_act_capt_lvl_pi_post_sales_expect_owner_dur_sell_start",  type number},
+				{"ci_act_capt_lvl_pi_post_sales_expect_owner_dur_upsell_start",  type number},
+				{"ci_act_capt_lvl_pi_post_sales_owner_act", Int64.Type},
+				{"ci_act_capt_lvl_pi_post_sales_owner_act_churned", Int64.Type},
+				{"ci_act_capt_lvl_pi_post_sales_owner_act_sell_start", Int64.Type},
+				{"ci_act_capt_lvl_pi_post_sales_owner_act_upsell_start", Int64.Type},
+				{"ci_act_capt_lvl_pi_post_sales_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_post_sales_owner_dur_churned",  type number},
+				{"ci_act_capt_lvl_pi_post_sales_owner_dur_sell_start",  type number},
+				{"ci_act_capt_lvl_pi_post_sales_owner_dur_upsell_start",  type number},
+				{"ci_act_capt_lvl_pi_post_sales_steps", Int64.Type},
+				{"ci_act_capt_lvl_pi_post_sales_steps_churned", Int64.Type},
+				{"ci_act_capt_lvl_pi_post_sales_steps_sell_start", Int64.Type},
+				{"ci_act_capt_lvl_pi_post_sales_steps_upsell_start", Int64.Type},
+				{"ci_act_capt_lvl_pi_prospecting_expect_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_prospecting_expect_owner_dur_abandoned",  type number},
+				{"ci_act_capt_lvl_pi_prospecting_expect_owner_dur_converted",  type number},
+				{"ci_act_capt_lvl_pi_prospecting_expect_owner_dur_disqual",  type number},
+				{"ci_act_capt_lvl_pi_prospecting_owner_act", Int64.Type},
+				{"ci_act_capt_lvl_pi_prospecting_owner_act_abandoned", Int64.Type},
+				{"ci_act_capt_lvl_pi_prospecting_owner_act_converted", Int64.Type},
+				{"ci_act_capt_lvl_pi_prospecting_owner_act_disqual", Int64.Type},
+				{"ci_act_capt_lvl_pi_prospecting_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_prospecting_owner_dur_abandoned",  type number},
+				{"ci_act_capt_lvl_pi_prospecting_owner_dur_converted",  type number},
+				{"ci_act_capt_lvl_pi_prospecting_owner_dur_disqual",  type number},
+				{"ci_act_capt_lvl_pi_prospecting_steps", Int64.Type},
+				{"ci_act_capt_lvl_pi_prospecting_steps_abandoned", Int64.Type},
+				{"ci_act_capt_lvl_pi_prospecting_steps_converted", Int64.Type},
+				{"ci_act_capt_lvl_pi_prospecting_steps_disqual", Int64.Type},
+				{"ci_act_capt_lvl_pi_timeliness",  type number},
+				{"ci_act_capt_lvl_pi_tot_expect_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_tot_owner_act", Int64.Type},
+				{"ci_act_capt_lvl_pi_tot_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_tot_steps", Int64.Type},
+				{"ci_act_capt_lvl_pi_upselling_expect_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_upselling_expect_owner_dur_closed_lost",  type number},
+				{"ci_act_capt_lvl_pi_upselling_expect_owner_dur_closed_won",  type number},
+				{"ci_act_capt_lvl_pi_upselling_owner_act", Int64.Type},
+				{"ci_act_capt_lvl_pi_upselling_owner_act_closed_lost", Int64.Type},
+				{"ci_act_capt_lvl_pi_upselling_owner_act_closed_won", Int64.Type},
+				{"ci_act_capt_lvl_pi_upselling_owner_dur",  type number},
+				{"ci_act_capt_lvl_pi_upselling_owner_dur_closed_lost",  type number},
+				{"ci_act_capt_lvl_pi_upselling_owner_dur_closed_won",  type number},
+				{"ci_act_capt_lvl_pi_upselling_steps", Int64.Type},
+				{"ci_act_capt_lvl_pi_upselling_steps_closed_lost", Int64.Type},
+				{"ci_act_capt_lvl_pi_upselling_steps_closed_won", Int64.Type},
+				{"ci_act_capt_lvl_raw",  type number},
+				{"ci_perf_qtly_avg_bookings_peers",   Currency.Type},
+				{"ci_perf_qtly_avg_pipeline_peers",   Currency.Type},
+				{"ci_perf_qtly_bookings_user",   Currency.Type},
+				{"ci_perf_qtly_performance_tier", type text},
+				{"ci_perf_qtly_performance_tier_num", Int64.Type},
+				{"ci_perf_qtly_pipeline_user",   Currency.Type},
+				{"ci_perf_ramping_status", type text},
+				{"ci_sb_close_ability", type text},
+				{"ci_sb_close_ability_conf",  type number},
+				{"ci_sb_close_ability_num",  type number},
+				{"ci_sb_closing_ability",  type number},
+				{"ci_sb_closing_ability_actual_vs_predicted",  type number},
+				{"ci_sb_closing_ability_actual_vs_predicted_norm",  type number},
+				{"ci_sb_closing_ability_actual_vs_predicted_smooth",  type number},
+				{"ci_sb_closing_ability_conf",  type number},
+				{"ci_sb_closing_ability_conf_expected_sample_count", Int64.Type},
+				{"ci_sb_closing_ability_opps_closed_count", Int64.Type},
+				{"ci_sb_closing_ability_opps_closed_prob_sum",  type number},
+				{"ci_sb_closing_ability_opps_won_count", Int64.Type},
+				{"ci_sb_closing_ability_peer_actual_vs_pred_ratio_derived_max",  type number},
+				{"ci_sb_closing_ability_peer_actual_vs_pred_ratio_derived_min",  type number},
+				{"ci_sb_closing_ability_peer_actual_vs_predicted",  type number},
+				{"ci_sb_closing_ability_peer_opps_closed_count",  type number},
+				{"ci_sb_closing_ability_peer_opps_closed_prob",  type number},
+				{"ci_sb_closing_ability_peer_opps_won_count",  type number},
+				{"ci_sb_deal_maxing", type text},
+				{"ci_sb_deal_maxing_conf",  type number},
+				{"ci_sb_deal_maxing_num",  type number},
+				{"ci_sb_disc_skills", type text},
+				{"ci_sb_disc_skills_conf",  type number},
+				{"ci_sb_disc_skills_num",  type number}
+				
+				
+				        
+				 
+				    })
+				in
+				    dbTableTyped
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

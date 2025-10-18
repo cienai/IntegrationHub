@@ -1,0 +1,45 @@
+table ssr_company_sizes
+	lineageTag: 2565960f-c84d-4fa0-b23e-0b62df0f581f
+
+	column trueai_company_size
+		lineageTag: 5c173858-3de0-46b8-8d1c-54065b46c2f4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: ssr[trueai_company_size]
+		sortByColumn: trueai_company_size_aprox_val
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_company_size_aprox_val
+		lineageTag: 210cce9f-a996-4da4-96b3-cb0f3ffd2717
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [trueai_company_size_aprox_val]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_co_size_group
+		lineageTag: 90d5d04e-4c10-4cf8-bcb1-1ca29122d76c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [trueai_co_size_group]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ssr_company_sizes = calculated
+		mode: import
+		source = ```
+				
+				SUMMARIZE(ssr,ssr[trueai_company_size],
+				 "trueai_company_size_aprox_val", AVERAGE(ssr[col.trueai_company_size_aprox_val]),  
+				 "trueai_co_size_group",IF(AVERAGE(ssr[col.trueai_company_size_aprox_val]) >=5000, "Enterprise", IF(AVERAGE(ssr[col.trueai_company_size_aprox_val]) >=500, "Mid-Market",IF(AVERAGE(ssr[col.trueai_company_size_aprox_val]) >=0, "SMB","ND")))
+				 
+				 )
+				
+				
+				```
+
+	annotation PBI_Id = bd04f178f3bd4d04a2e78e810ba3ef29
+
