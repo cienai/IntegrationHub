@@ -92,8 +92,11 @@ jobs:
               mkdir -p "$PROJECT_TEMP_DIR"
               
               echo "Staging project: '$basename'"
-              # Copy all related project files (*.pbip, *.Report/, etc.) into the temp directory
-              cp -r "./powerbi/src/$basename."* "$PROJECT_TEMP_DIR/"
+              # Be more specific about what to copy to avoid including extra files.
+              # 1. Copy the main .pbip file.
+              cp "./powerbi/src/$basename.pbip" "$PROJECT_TEMP_DIR/"
+              # 2. Find and copy all associated directories (e.g., .Report, .SemanticModel).
+              find ./powerbi/src -maxdepth 1 -type d -name "$basename.*" -exec cp -r {} "$PROJECT_TEMP_DIR/" \;
               
               PROJECT_NAME="$basename"
               PBIX_PATH="$PBIX_OUTPUT_PATH/$PROJECT_NAME.pbix"
@@ -149,4 +152,3 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-${{ github.sha }}
           path: ${{ needs.build-pbix.outputs.pbix_path }}
-
