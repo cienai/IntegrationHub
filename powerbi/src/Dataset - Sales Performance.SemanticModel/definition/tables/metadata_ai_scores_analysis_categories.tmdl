@@ -1,0 +1,109 @@
+table metadata_ai_scores_analysis_categories
+	lineageTag: 2a9487c6-d810-48ea-ac55-50ee75f3d4b8
+
+	measure 'meas.analysis_cat_weighted_avg' = ```
+			
+			var sum_prod = SUMX(
+			    metadata_ai_scores,
+			    [meas.ai_score] * [meas.metadata_score_weighting_pct]
+			) // get teh sum product of the weighting and the score
+			var sum_weights = SUMX(
+			    metadata_ai_scores,
+			     [meas.metadata_score_weighting_pct]
+			) // get the sum of weighting
+			var res = DIVIDE( sum_prod, sum_weights)
+			
+			return res
+			
+			
+			```
+		formatString: 0
+		lineageTag: 9c3ab88f-1120-4e1e-8193-01bbd2fc7a88
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _sys_doc_id
+		dataType: string
+		lineageTag: 5742a150-e24a-4953-909b-bc950f37c3a2
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_is_active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: e2eaa130-5b11-481d-b866-fbdd3c13d589
+		summarizeBy: none
+		sourceColumn: _sys_is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_modified_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 61f0b517-3109-4e17-b7b6-49f5c75bf372
+		summarizeBy: none
+		sourceColumn: _sys_modified_on
+
+		variation Variation
+			isDefault
+			relationship: 479f8ce4-5a2f-482e-9aef-4f5aad9df7bf
+			defaultHierarchy: LocalDateTable_848334f2-7363-498f-99e2-531cd4676b50.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_name
+		dataType: string
+		lineageTag: 9ec99825-cecd-48e6-a9e7-1a2b29bd08f1
+		summarizeBy: none
+		sourceColumn: category_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column description
+		dataType: string
+		lineageTag: 7b6718be-dd28-460a-b722-e5c0fe4461ea
+		summarizeBy: none
+		sourceColumn: description
+
+		annotation SummarizationSetBy = Automatic
+
+	column sort_order
+		dataType: int64
+		formatString: 0
+		lineageTag: 1d85e3c5-f341-4183-b510-a8e243d4793e
+		summarizeBy: sum
+		sourceColumn: sort_order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition metadata_ai_scores_analysis_categories = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(
+				        {
+				            {"SAM", true, #datetime(2025, 10, 15, 0, 0, 0), "Segmentation & SAM Analysis", "Determines if, after ADE we are able to confidently segment accounts and assess TAM.", 1},
+				            {"PROD", true, #datetime(2025, 10, 15, 0, 0, 0), "Product Mix Analysis", "Determines if, after ADE we are able to confidently assess product mix and portfolio strength.", 2},
+				            {"PIPE", true, #datetime(2025, 10, 15, 0, 0, 0), "Pipeline Analysis", "Determines if, after ADE we are able to confidently assess the quality and stage distribution of the pipeline.", 3},
+				            {"PERF", true, #datetime(2025, 10, 15, 0, 0, 0), "Rep Performance Analysis", "Determines if, after ADE we are able to confidently assess rep performance relative to benchmarks.", 4},
+				            {"SKILL", true, #datetime(2025, 10, 15, 0, 0, 0), "Rep Skills and Behaviors Analysis", "Determines if, after ADE we are able to confidently assess sales skills and behavioral patterns.", 5},
+				            {"CALIB", true, #datetime(2025, 10, 15, 0, 0, 0), "Calibration Level", "Determines how close the top line numbers and team organization is to the recevieved calibration information.", 0}
+				        },
+				        type table [
+				            _sys_doc_id = text,
+				            _sys_is_active = logical,
+				            _sys_modified_on = datetime,
+				            category_name = text,
+				            description = text,
+				            sort_order = Int64.Type
+				        ]
+				    )
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

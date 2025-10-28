@@ -1252,10 +1252,10 @@ table users_history
 			-- concats all the crm values for trueai value
 			
 			-- summarize the currect context and sort by count desc
-			var tbl_summarized = TOPN(10,SUMMARIZE(active_users_tbl, [trueai_user_role_function], [col.trueai_user_role_coid_aliased], "count", Count(users[_sys_doc_id]) ),[count], DESC)
+			var tbl_summarized = TOPN(10,SUMMARIZE(active_users_tbl, [trueai_user_role_function], [trueai_user_role_alias], "count", Count(users[_sys_doc_id]) ),[count], DESC)
 			
 			-- use the summarized data and concat
-			var str_crm_vals = CONCATENATEX(tbl_summarized, [trueai_user_role_function] & ": " & [col.trueai_user_role_coid_aliased] & " (" & [count]  & ")", ", ") 
+			var str_crm_vals = CONCATENATEX(tbl_summarized, [trueai_user_role_function] & ": " & [trueai_user_role_alias] & " (" & [count]  & ")", ", ") 
 			
 			var res = str_crm_vals -- output string
 			return res
@@ -1912,6 +1912,16 @@ table users_history
 		lineageTag: 7f890585-40c8-496c-8997-1a9984b5c8f5
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.min_user_role_alias' =
+			
+			MINX(
+			    VALUES(users_history[trueai_user_role_alias]),
+			    users_history[trueai_user_role_alias]
+			)
+		lineageTag: 4ebf3e77-dde2-4068-b567-e41f84e4e937
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column 'col.ci.perf_qtly_bookings_user' = ```
 			
@@ -3611,41 +3621,6 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column 'col.trueai_user_role_coid_aliased' = ```
-			
-			var co_id = users_history[_sys_co_id]
-			var user_role = users_history[trueai_user_role]
-			
-			VAR lookedup_alias =   CALCULATE(MAX(aliasing[alias]), aliasing[label] = user_role) // do lookup of alias - may be null
-			
-			var aliased_role = SWITCH(co_id, 
-			// tinituit aliasing 
-			"ghqgLmNf4y2t47DWk", SWITCH(user_role, "Account Executive", "Closer","Sales Development Rep", "BDR", "Account Manager","Client Growth"),
-			// L3 aliasing 
-			"n4R9DYujpj5p6bo2D", SWITCH(user_role, "Account Executive", "Business Development","Account Manager", "Sales / Account Management", "Sales Rep - Other","Bid and Proposal", "Sales Rep - Other 2","Sales Support", "Marketing Staff", "Strategic Marketing Services",  user_role),
-			// aceme aliasing 
-			"bw6XAoimgX7QTtqEt", SWITCH(user_role, "Account Executive", "Sales Person", user_role),
-			
-			// project field aliasing 
-			"jcdig7DbKTmeyGCAw", SWITCH(user_role, "Account Manager","CSM", "Account Executive","Sales Front Line","Sales Rep - Other","Inside Sales","Sales Rep - Other 4","Partnerships","Sales Rep - Other 2","CSM Leader","Sales Rep - Other 3","CS Advisory", user_role),
-			// LT aliasing
-			"zwcxZaQDt2itpzMsA", SWITCH(user_role, "Account Manager", "Sales Account Executive - School", "Account Executive","Sales Professional - School", "Sales Rep - Other", "Secondary Sales Professional - School",  "Sales Rep - Other 2", "Business Development Representative - School", "Sales Rep - Other 3", "Yearbook Sales Specialist - School", "Sales Rep - Other 4", "Sales Professional - Preschool", user_role),
-			//default aliasing 
-			lookedup_alias)
-			
-			var res = IF( ISBLANK( aliased_role ),user_role, aliased_role ) // use default name if not aliased
-			
-			return 
-			res
-			```
-		lineageTag: 7393f971-a326-4da8-aa22-c0215cfd5924
-		summarizeBy: none
-		sortByColumn: sort
-
-		changedProperty = SortByColumn
-
-		annotation SummarizationSetBy = Automatic
-
 	column 'col.ci_ta_potential_hours' = ```
 			
 			var hours_per_cal_day = (250 * 8)/365 // number of work days
@@ -4803,6 +4778,216 @@ table users_history
 		sourceColumn: ci_perf_qtly_performance_peer_count
 
 		annotation SummarizationSetBy = Automatic
+
+	column ci_time_alloc_potential
+		dataType: double
+		lineageTag: 97a8326a-5c34-41bd-bfc7-363ac8e3dff5
+		summarizeBy: sum
+		sourceColumn: ci_time_alloc_potential
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_closing_ability_tier
+		dataType: string
+		lineageTag: cee04b62-8105-4b27-8b01-e805cf3e3fdd
+		summarizeBy: none
+		sourceColumn: ci_sb_closing_ability_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_closing_ability_num
+		dataType: double
+		lineageTag: 8ae645ff-5945-469a-9798-be6e8bbdf546
+		summarizeBy: sum
+		sourceColumn: ci_sb_closing_ability_num
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_deal_maxing_tier
+		dataType: string
+		lineageTag: b467483f-bdc3-4217-8bcb-a4c8e547863b
+		summarizeBy: none
+		sourceColumn: ci_sb_deal_maxing_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_deal_maxing_actual_vs_predicted
+		dataType: double
+		lineageTag: 74373ae0-48ca-46f6-ae43-68a4bf90aec7
+		summarizeBy: sum
+		sourceColumn: ci_sb_deal_maxing_actual_vs_predicted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_deal_maxing_peer_actual_vs_pred_ratio_derived_max
+		dataType: double
+		lineageTag: 5462b376-1e86-4285-bb68-ce9957d62dbe
+		summarizeBy: sum
+		sourceColumn: ci_sb_deal_maxing_peer_actual_vs_pred_ratio_derived_max
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_deal_maxing_peer_actual_vs_pred_ratio_derived_min
+		dataType: double
+		lineageTag: 33826acf-38c2-4950-bca8-937ee9d7566b
+		summarizeBy: sum
+		sourceColumn: ci_sb_deal_maxing_peer_actual_vs_pred_ratio_derived_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_deal_maxing_peer_actual_vs_predicted
+		dataType: double
+		lineageTag: 5d25bd97-a20d-4630-9111-bcdcf42597dd
+		summarizeBy: sum
+		sourceColumn: ci_sb_deal_maxing_peer_actual_vs_predicted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_tier
+		dataType: string
+		lineageTag: 2fe6858b-f030-4a36-846d-0a0ee15d08d5
+		summarizeBy: none
+		sourceColumn: ci_sb_discov_skills_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_discov_skills_num
+		dataType: double
+		lineageTag: b37f90e8-7268-4131-9eb2-b981435c9c40
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_num
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_actual_vs_pred_ratio_derived_max
+		dataType: double
+		lineageTag: df281477-a8bc-4cd3-b54f-7288047d5bd0
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_actual_vs_pred_ratio_derived_max
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_discov_skills_peer_actual_vs_pred_ratio_derived_min
+		dataType: double
+		lineageTag: a31d2ce7-f839-4de6-bbea-1013dfdeaf3d
+		summarizeBy: sum
+		sourceColumn: ci_sb_discov_skills_peer_actual_vs_pred_ratio_derived_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_engmt_ability_tier
+		dataType: string
+		lineageTag: 13adc711-1164-4f63-b48b-f63dc6098cb1
+		summarizeBy: none
+		sourceColumn: ci_sb_engmt_ability_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_engmt_ability_actual_vs_predicted
+		dataType: double
+		lineageTag: d10358fa-989f-467a-90b9-1fc7899926ea
+		summarizeBy: sum
+		sourceColumn: ci_sb_engmt_ability_actual_vs_predicted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_engmt_ability_peer_actual_vs_pred_ratio_derived_max
+		dataType: double
+		lineageTag: bb9a5432-5a98-41ff-a3ed-930f05514a6a
+		summarizeBy: sum
+		sourceColumn: ci_sb_engmt_ability_peer_actual_vs_pred_ratio_derived_max
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_engmt_ability_peer_actual_vs_pred_ratio_derived_min
+		dataType: double
+		lineageTag: 2bbb99ab-5891-4ddb-8364-7a2549ae34f6
+		summarizeBy: sum
+		sourceColumn: ci_sb_engmt_ability_peer_actual_vs_pred_ratio_derived_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_engmt_ability_peer_actual_vs_predicted
+		dataType: double
+		lineageTag: 548d1855-29a8-49f4-9bfa-ba7598591fc3
+		summarizeBy: sum
+		sourceColumn: ci_sb_engmt_ability_peer_actual_vs_predicted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_work_effort_tier
+		dataType: string
+		lineageTag: ac6f1e6f-7215-4b94-9d98-4551b8c0bb8c
+		summarizeBy: none
+		sourceColumn: ci_sb_work_effort_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column ci_sb_work_effort_actual_vs_predicted
+		dataType: double
+		lineageTag: 73991f4d-aa28-4d57-8b41-24bd3ef12050
+		summarizeBy: sum
+		sourceColumn: ci_sb_work_effort_actual_vs_predicted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_work_effort_peer_actual_vs_pred_ratio_derived_max
+		dataType: double
+		lineageTag: bacb95de-ff97-4f29-886f-43dafa9f0ebe
+		summarizeBy: sum
+		sourceColumn: ci_sb_work_effort_peer_actual_vs_pred_ratio_derived_max
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_work_effort_peer_actual_vs_pred_ratio_derived_min
+		dataType: double
+		lineageTag: 0aefc028-978f-441c-ba3a-687aba96cb1d
+		summarizeBy: sum
+		sourceColumn: ci_sb_work_effort_peer_actual_vs_pred_ratio_derived_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ci_sb_work_effort_peer_actual_vs_predicted
+		dataType: double
+		lineageTag: d644117c-15c6-4f7b-af75-3c04f9f12af8
+		summarizeBy: sum
+		sourceColumn: ci_sb_work_effort_peer_actual_vs_predicted
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	partition users_history-64a55d24-c03e-4c6b-af52-03f70e2fc93d = m
 		mode: import

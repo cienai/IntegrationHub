@@ -22,10 +22,10 @@ table users
 			-- concats all the crm values for trueai value
 			
 			-- summarize the currect context and sort by count desc
-			var tbl_summarized = TOPN(10,SUMMARIZE(CALCULATETABLE(users), users[col.trueai_user_role_coid_aliased], "count", Count(users[_sys_doc_id]) ),[count], DESC)
+			var tbl_summarized = TOPN(10,SUMMARIZE(CALCULATETABLE(users), users[trueai_user_role_alias], "count", Count(users[_sys_doc_id]) ),[count], DESC)
 			
 			-- use the summarized data and concat
-			var str_crm_vals = CONCATENATEX(tbl_summarized,  users[col.trueai_user_role_coid_aliased] & " (" & [count]  & ")", ", ") 
+			var str_crm_vals = CONCATENATEX(tbl_summarized,  users[trueai_user_role_alias] & " (" & [count]  & ")", ", ") 
 			
 			var res = str_crm_vals -- output string
 			return res
@@ -40,10 +40,10 @@ table users
 			var applicable_rows_tbl = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
 			-- summarize the currect context and sort by count desc
 			
-			var tbl_summarized = TOPN(10,SUMMARIZE(CALCULATETABLE(users), users[col.trueai_user_role_coid_aliased], "count", Count(users[_sys_doc_id]) ),[count], DESC)
+			var tbl_summarized = TOPN(10,SUMMARIZE(CALCULATETABLE(users), users[trueai_user_role_alias], "count", Count(users[_sys_doc_id]) ),[count], DESC)
 			
 			-- use the summarized data and concat
-			var str_crm_vals = CONCATENATEX(tbl_summarized,  users[col.trueai_user_role_coid_aliased] & " (" & [count]  & ")", ", ") 
+			var str_crm_vals = CONCATENATEX(tbl_summarized,  users[trueai_user_role_alias] & " (" & [count]  & ")", ", ") 
 			
 			var res = str_crm_vals -- output string
 			return res
@@ -56,10 +56,10 @@ table users
 			-- concats all the crm values for trueai value
 			
 			-- summarize the currect context and sort by count desc
-			var tbl_summarized = TOPN(10,SUMMARIZE(CALCULATETABLE(users), users[trueai_user_role_function], users[col.trueai_user_role_coid_aliased], "count", Count(users[_sys_doc_id]) ),[count], DESC)
+			var tbl_summarized = TOPN(10,SUMMARIZE(CALCULATETABLE(users), users[trueai_user_role_function], users[trueai_user_role_alias], "count", Count(users[_sys_doc_id]) ),[count], DESC)
 			
 			-- use the summarized data and concat
-			var str_crm_vals = CONCATENATEX(tbl_summarized, users[trueai_user_role_function] & ": " & users[col.trueai_user_role_coid_aliased] & " (" & [count]  & ")", ", ") 
+			var str_crm_vals = CONCATENATEX(tbl_summarized, users[trueai_user_role_function] & ": " & users[trueai_user_role_alias] & " (" & [count]  & ")", ", ") 
 			
 			var res = str_crm_vals -- output string
 			return res
@@ -739,6 +739,13 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: b697679b-3c93-4420-86f1-f25eb146002f
 
+	measure 'meas.users_trueai_full_name' =
+			
+			SELECTEDVALUE(users[trueai_full_name])
+		lineageTag: 31d53d83-f813-4c59-a312-df48ed52ef39
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column crm_division
 		dataType: string
 		lineageTag: 33550b93-126b-487d-9e30-5ec88ff36709
@@ -902,52 +909,6 @@ table users
 		lineageTag: a596de3f-dc32-4c2d-849e-db481ba399df
 		summarizeBy: sum
 		sourceColumn: trueai_direct_reports
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.full_name' = if (ISBLANK(users[crm_first_name]) , users[crm_username] ,  users[crm_first_name] &  " " &  users[crm_last_name] )
-		lineageTag: 5284bfa4-c869-4767-84ab-9b6b570b3292
-		summarizeBy: none
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.user_role_dept' = ```
-			[trueai_user_role_dept]
-			--var res = [trueai_user_role_dept]
-			--return If(res = "OTHER", "OTHER DEPTS", res)
-			    
-			```
-		displayFolder: _col_passthrough_to_new_api_u
-		lineageTag: d08c6e04-f67d-47d7-8841-298dbfee7198
-		summarizeBy: none
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.user_role_function' = ```
-			
-			var res = [trueai_user_role_function]
-			return If(res = "OTHER", "OTHER ROLES", res)
-			
-			```
-		displayFolder: _col_passthrough_to_new_api_u
-		lineageTag: 13906c11-babb-458c-bc7e-d133b442b901
-		summarizeBy: none
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.trueai_perf_date_first_reached' =
-			
-			var res = users[trueai_performance_lvl_reached_on]
-			return res
-		formatString: General Date
-		displayFolder: _col_passthrough_to_new_api_u
-		lineageTag: b824fe6f-30e0-44c8-87cb-39e06356ed95
-		summarizeBy: none
-
-		variation Variation
-			isDefault
-			relationship: a8eea960-c20c-44a9-bd42-13df40fa4a7c
-			defaultHierarchy: LocalDateTable_0945e297-d01a-4362-8f99-903715200552.'Date Hierarchy'
 
 		annotation SummarizationSetBy = Automatic
 
@@ -1176,47 +1137,6 @@ table users
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column 'col.trueai_user_role_coid_aliased' = ```
-			
-			var co_id = users[_sys_co_id]
-			var user_role = users[trueai_user_role]
-			
-			VAR lookedup_alias =   CALCULATE(MAX(aliasing[alias]), aliasing[label] = user_role) // do lookup of alias - may be null
-			
-			// legacy hard coded aliaing
-			var aliased_role = SWITCH(co_id, 
-			// tinituit aliasing 
-			"ghqgLmNf4y2t47DWk", SWITCH(user_role, "Account Executive", "Closer","Sales Development Rep", "BDR", "Account Manager","Client Growth"),
-			// L3 aliasing 
-			"n4R9DYujpj5p6bo2D", SWITCH(user_role, "Account Executive", "Business Development","Account Manager", "Sales / Account Management", "Sales Rep - Other","Bid and Proposal", "Sales Rep - Other 2","Sales Support", "Marketing Staff", "Strategic Marketing Services",  user_role),
-			// aceme aliasing 
-			"bw6XAoimgX7QTtqEt", SWITCH(user_role, "Account Executive", "Sales Person", user_role),
-			
-			// project field aliasing 
-			"jcdig7DbKTmeyGCAw", SWITCH(user_role, "Account Manager","CSM", "Account Executive","Sales Front Line","Sales Rep - Other","Inside Sales","Sales Rep - Other 4","Partnerships","Sales Rep - Other 2","CSM Leader","Sales Rep - Other 3","CS Advisory", user_role),
-			// LT aliasing
-			"zwcxZaQDt2itpzMsA", SWITCH(user_role, "Account Manager", "Sales Account Executive - School", "Account Executive","Sales Professional - School", "Sales Rep - Other", "Secondary Sales Professional - School",  "Sales Rep - Other 2", "Business Development Representative - School", "Sales Rep - Other 3", "Yearbook Sales Specialist - School", "Sales Rep - Other 4", "Sales Professional - Preschool", user_role),
-			//default aliasing 
-			lookedup_alias)
-			
-			
-			var res = IF( ISBLANK( aliased_role ),user_role, aliased_role ) // use default name if not aliased
-			
-			return res
-			
-			
-			
-			
-			
-			```
-		lineageTag: 8e2b8222-68fa-4124-8623-883ccf7a7ead
-		summarizeBy: none
-		sortByColumn: trueai_user_role_sort
-
-		changedProperty = SortByColumn
-
-		annotation SummarizationSetBy = Automatic
-
 	column trueai_ext_match_rule
 		dataType: int64
 		formatString: 0
@@ -1405,23 +1325,7 @@ table users
 
 		annotation SummarizationSetBy = Automatic
 
-	column 'col.ramping_status' = ```
-			
-			var ramp_num = MAX(users_history[trueai_tenure])
-			var res = IF(
-			    ramp_num <=6, 
-			    "Ramping", 
-			    "Ramped"
-			)
-			RETURN
-			res
-			```
-		lineageTag: 359aac5d-920b-4522-8b22-752258143ad4
-		summarizeBy: none
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.full_name_title' = ```
+	column trueai_full_name_title = ```
 			IF(
 			    ISBLANK(users[crm_first_name]) , 
 			    users[crm_username] ,  
@@ -1446,25 +1350,6 @@ table users
 		formatString: 0
 		lineageTag: 54c56aac-2a6c-444e-8449-a065682002fb
 		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.trueai_ext_match_id' = ```
-			
-			var _id = CALCULATE(MAX(users[trueai_ext_match_id]))
-			
-			var res = IF(
-			    ISBLANK(_id),           // get the True/False if blank
-			    FALSE(),
-			    TRUE()
-			)
-			
-			RETURN 
-			res
-			```
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 5edc0039-7063-43ec-a2a8-374d05cafcd1
-		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 
@@ -1679,6 +1564,22 @@ table users
 		lineageTag: e281d443-35d9-4b72-bf57-35ff9ebc1b51
 		summarizeBy: none
 		sourceColumn: crm_deep_link
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_full_name
+		dataType: string
+		lineageTag: 61b18b35-2104-49b7-a370-02d270de24c8
+		summarizeBy: none
+		sourceColumn: trueai_full_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_ramping_status
+		dataType: string
+		lineageTag: d56d219f-f4bf-414f-9f17-f239c6262bd7
+		summarizeBy: none
+		sourceColumn: trueai_ramping_status
 
 		annotation SummarizationSetBy = Automatic
 

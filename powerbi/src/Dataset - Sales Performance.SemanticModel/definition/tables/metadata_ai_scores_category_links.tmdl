@@ -1,0 +1,137 @@
+table metadata_ai_scores_category_links
+	lineageTag: bfb0fc91-05e3-45e9-bdff-3b40f89bcf3f
+
+	measure 'meas.metadata_score_weighting_pct' = ```
+			
+			var curr_weight = CALCULATE(SUM(metadata_ai_scores_category_links[weighting]))
+			var all_weights = CALCULATE(SUM(metadata_ai_scores_category_links[weighting]), metadata_ai_scores[score_name] <> "" )
+			var res = DIVIDE(curr_weight, all_weights)
+			return res 
+			```
+		formatString: 0%;-0%;0%
+		lineageTag: a935c4b2-c445-4a96-9f7a-e650a735168b
+
+	column _sys_doc_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 0ece1910-f4fb-4fe2-a605-6e0f6df1f2be
+		summarizeBy: sum
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_is_active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: ac344033-67e1-44e5-809c-5b9e6026d641
+		summarizeBy: none
+		sourceColumn: _sys_is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_modified_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7052c511-4c34-4634-85b7-fe555e140486
+		summarizeBy: none
+		sourceColumn: _sys_modified_on
+
+		variation Variation
+			isDefault
+			relationship: 02348fc6-5c40-49f2-97dc-3f770860058a
+			defaultHierarchy: LocalDateTable_8b551090-ebee-4d90-9b8b-ef1838732e1b.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column score_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 8bcc2c1a-fbb2-4c61-9554-045ba36c9435
+		summarizeBy: none
+		sourceColumn: score_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column analysis_category_id
+		dataType: string
+		lineageTag: aa076781-8c5d-4913-bcbc-79df68d39d4c
+		summarizeBy: none
+		sourceColumn: analysis_category_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column weighting
+		dataType: int64
+		formatString: 0
+		lineageTag: 907a8a0b-f71f-4401-97f2-4a9d20f9d329
+		summarizeBy: sum
+		sourceColumn: weighting
+
+		annotation SummarizationSetBy = Automatic
+
+	column notes
+		dataType: string
+		lineageTag: 38057cfb-b926-4920-a702-03f01ed8f13e
+		summarizeBy: none
+		sourceColumn: notes
+
+		annotation SummarizationSetBy = Automatic
+
+	partition metadata_ai_scores_category_links = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(
+				        {
+				            {1, true, #datetime(2025, 10, 15, 0, 0, 0), 32, "CALIB", 1, "Rep Organization Calibration"},
+				            {2, true, #datetime(2025, 10, 15, 0, 0, 0), 33, "CALIB", 1, "Bookings Calibration"},
+				            {3, true, #datetime(2025, 10, 15, 0, 0, 0), 34, "CALIB", 1, "Revenue Calibration"},
+				            {4, true, #datetime(2025, 10, 15, 0, 0, 0), 28, "PERF", 1, "Performance Tiers"},
+				            {5, true, #datetime(2025, 10, 15, 0, 0, 0), 29, "PERF", 1, "Ramping Success"},
+				            {6, true, #datetime(2025, 10, 15, 0, 0, 0), 9, "PIPE", 1, "Opportunities History"},
+				            {32, true, #datetime(2025, 10, 15, 0, 0, 0), 1, "PIPE", 1, "Prospecting Success Predictions"},
+				            {31, true, #datetime(2025, 10, 15, 0, 0, 0), 2, "PIPE", 1, "New Logo Selling Success Predictions"},
+				            {34, true, #datetime(2025, 10, 15, 0, 0, 0), 3, "PIPE", 1, "Post-Sales Support Success Predictions"},
+				            {33, true, #datetime(2025, 10, 15, 0, 0, 0), 4, "PIPE", 1, "Existing Customer Selling Success Predictions"},
+				            {7, true, #datetime(2025, 10, 15, 0, 0, 0), 22, "PROD", 1, "Adjusted Duration"},
+				            {8, true, #datetime(2025, 10, 15, 0, 0, 0), 7, "PROD", 1, "List Price"},
+				            {9, true, #datetime(2025, 10, 15, 0, 0, 0), 8, "PROD", 1, "Line Item Products"},
+				            {10, true, #datetime(2025, 10, 15, 0, 0, 0), 16, "SAM", 1, "SSR Industry Consolidation"},
+				            {11, true, #datetime(2025, 10, 15, 0, 0, 0), 17, "SAM", 1, "SSR Lead Source Consolidation"},
+				            {12, true, #datetime(2025, 10, 15, 0, 0, 0), 18, "SAM", 1, "Leads & Accounts Completeness  Data Present"},
+				            {13, true, #datetime(2025, 10, 15, 0, 0, 0), 22, "SAM", 1, "Adjusted Duration"},
+				            {14, true, #datetime(2025, 10, 15, 0, 0, 0), 1, "SAM", 1, "Prospecting Success Predictions"},
+				            {15, true, #datetime(2025, 10, 15, 0, 0, 0), 2, "SAM", 1, "New Logo Selling Success Predictions"},
+				            {16, true, #datetime(2025, 10, 15, 0, 0, 0), 6, "SAM", 1, "Potential ACV"},
+				            {17, true, #datetime(2025, 10, 15, 0, 0, 0), 22, "SKILL", 1, "Adjusted Duration"},
+				            {18, true, #datetime(2025, 10, 15, 0, 0, 0), 23, "SKILL", 1, "Closing Ability"},
+				            {19, true, #datetime(2025, 10, 15, 0, 0, 0), 27, "SKILL", 1, "Deal Maximizing"},
+				            {20, true, #datetime(2025, 10, 15, 0, 0, 0), 24, "SKILL", 1, "Discovery Skill"},
+				            {21, true, #datetime(2025, 10, 15, 0, 0, 0), 25, "SKILL", 1, "Engagement Ability"},
+				            {22, true, #datetime(2025, 10, 15, 0, 0, 0), 30, "SKILL", 1, "Time Management"},
+				            {23, true, #datetime(2025, 10, 15, 0, 0, 0), 26, "SKILL", 1, "Work Effort"},
+				            {24, true, #datetime(2025, 10, 15, 0, 0, 0), 19, "SKILL", 1, "Activity Capture Level"},
+				            {25, true, #datetime(2025, 10, 15, 0, 0, 0), 20, "SKILL", 1, "Activity Capture Level Confidence"},
+				            {26, true, #datetime(2025, 10, 15, 0, 0, 0), 21, "SKILL", 1, "Time Allocation"},
+				            {27, true, #datetime(2025, 10, 15, 0, 0, 0), 4, "SKILL", 1, "Existing Customer Selling Success Predictions"},
+				            {28, true, #datetime(2025, 10, 15, 0, 0, 0), 3, "SKILL", 1, "Post-Sales Support Success Predictions"},
+				            {29, true, #datetime(2025, 10, 15, 0, 0, 0), 1, "SKILL", 1, "Prospecting Success Predictions"},
+				            {30, true, #datetime(2025, 10, 15, 0, 0, 0), 2, "SKILL", 1, "New Logo Selling Success Predictions"}
+				        },
+				        type table [
+				            _sys_doc_id = Int64.Type,
+				            _sys_is_active = logical,
+				            _sys_modified_on = datetime,
+				            score_id = Int64.Type,
+				            analysis_category_id = text,
+				            weighting = Int64.Type,
+				            notes = text
+				        ]
+				    )
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

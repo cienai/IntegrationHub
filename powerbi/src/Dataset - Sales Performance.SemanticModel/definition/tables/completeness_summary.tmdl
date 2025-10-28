@@ -146,35 +146,40 @@ table completeness_summary
 
 	partition completeness_summary = calculated
 		mode: import
-		source = ```
-				UNION(
+		source =
 				
-				 SELECTCOLUMNS(contacts, "entity", "Contacts",  "_sys_docid", contacts[_sys_doc_id], "_sys_user_id", contacts[trueai_owner_id],  "_sys_filter_start_date", contacts[_sys_filt_start_date],  "sort", 1,
-				"crm_completeness", contacts[crm_complt], 
-				"crm_completeness_geo", contacts[crm_complt_geo], "crm_completeness_marketing", contacts[crm_complt_marketing],"crm_completeness_contact", contacts[crm_complt_contact],  "crm_completeness_contact_method", contacts[crm_complt_contact_method], 
-				"trueai_completeness", contacts[trueai_complt],  
-				"trueai_completeness_geo", contacts[trueai_complt_geo], "trueai_completeness_marketing", contacts[trueai_complt_marketing], "trueai_completeness_contact", contacts[trueai_complt_contact], "trueai_completeness_contact_method", contacts[crm_complt_contact_method]) //contacts
-				,
-				/*SELECTCOLUMNS(accounts, "entity", "Accounts",  "_sys_docid", accounts[_sys_docid], "_sys_user_id", accounts[trueai_owner_id],  "_sys_filter_start_date", accounts[_sys_filt_start_date],   "sort", 2,
-				"crm_completeness", accounts[crm_complt], 
-				"crm_completeness_geo", accounts[crm_complt_geo], "crm_completeness_marketing", accounts[crm_complt_marketing],"crm_completeness_contact", accounts[crm_complt_contact],  "crm_completeness_contact_method", accounts[crm_complt_contact_method], 
-				"trueai_completeness", accounts[trueai_complt],  
-				"trueai_completeness_geo", accounts[trueai_complt_geo], "trueai_completeness_marketing", accounts[trueai_complt_marketing], "trueai_completeness_contact", accounts[trueai_complt_contact], "trueai_completeness_contact_method", accounts[crm_complt_contact_method]), */ // accounts
+				SELECTCOLUMNS(
+				    opps,
+				    "entity", "Opps",
+				    "_sys_docid", opps[_sys_doc_id],
+				    "_sys_user_id", opps[trueai_owner_id],
+				    "_sys_filter_start_date", opps[_sys_filt_start_date],
+				    "sort", 3,
 				
-				SELECTCOLUMNS(opps, "entity", "Opps",  "_sys_docid", opps[_sys_doc_id], "_sys_user_id", opps[trueai_owner_id],  "_sys_filter_start_date", opps[_sys_filt_start_date],   "sort", 3,
-				"crm_completeness", opps[crm_complt], 
-				"crm_completeness_geo", blank(), "crm_completeness_marketing", opps[crm_complt_marketing],"crm_completeness_contact", opps[crm_complt_contact],  "crm_completeness_contact_method", blank(), 
-				"trueai_completeness", opps[trueai_complt],  
-				"trueai_completeness_geo", blank(), "truea.i_completeness_marketing", opps[trueai_complt_marketing], "trueai_completeness_contact", opps[trueai_complt_contact], "trueai_completeness_contact_method", blank()) // opps
-				,
-				SELECTCOLUMNS(contacts, "entity", "Contacts",  "_sys_docid", contacts[_sys_doc_id],  "_sys_user_id", contacts[trueai_owner_id], "_sys_filter_start_date",DATEVALUE("" & contacts[crm_created_on]),   "sort", 4,
-				"crm_completeness", contacts[crm_complt], 
-				"crm_completeness_geo", contacts[crm_complt_geo], "crm_completeness_marketing", contacts[crm_complt_marketing],"crm_completeness_contact", contacts[crm_complt_contact],  "crm_completeness_contact_method", contacts[crm_complt_contact_method], 
-				"trueai_completeness", contacts[trueai_complt],  
-				"trueai_completeness_geo", contacts[trueai_complt_geo], "trueai_completeness_marketing", contacts[trueai_complt_marketing], "trueai_completeness_contact", contacts[trueai_complt_contact], "trueai_completeness_contact_method", contacts[crm_complt_contact_method]) // contacts
+				    // CRM completeness fields
+				    "crm_completeness", opps[crm_complt],
+				    "crm_completeness_geo", BLANK(),
+				    "crm_completeness_marketing", opps[crm_complt_marketing],
+				    "crm_completeness_contact", opps[crm_complt_contact],
+				    "crm_completeness_contact_method", BLANK(),
 				
+				    // TRUEAI completeness fields
+				    "trueai_completeness", opps[trueai_complt],
+				    "trueai_completeness_geo", BLANK(),
+				    "trueai_completeness_marketing", opps[trueai_complt_marketing],
+				    "trueai_completeness_contact", opps[trueai_complt_contact],
+				    "trueai_completeness_contact_method", BLANK()
 				)
-				```
+				
+				/*
+				To re-enable Contacts or Accounts later, wrap everything in UNION():
+				
+				UNION(
+				    SELECTCOLUMNS(contacts, ...),
+				    SELECTCOLUMNS(accounts, ...),
+				    SELECTCOLUMNS(opps, ...)
+				)
+				*/
 
 	annotation PBI_Id = 254fd6269d4445a0b3edfcf800cb24a5
 

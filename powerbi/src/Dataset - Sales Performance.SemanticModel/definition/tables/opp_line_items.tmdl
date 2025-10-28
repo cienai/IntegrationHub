@@ -81,10 +81,11 @@ table opp_line_items
 
 	measure 'meas.opps_average_discount_pct' =
 			
-			ABS(CALCULATE(AVERAGE(opps[col.discount_pct])))     // get the abs of avg discount pct
-		formatString: 0%;-0%;0%
+			ABS(CALCULATE(AVERAGE(opps[trueai_discount_pct])))     // get the abs of avg discount pct
 		displayFolder: discount opp
 		lineageTag: 4521bdd7-92e5-4444-a254-49f7cccf9560
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'meas.opps_avg_deals_amt' =
 			
@@ -146,7 +147,7 @@ table opp_line_items
 	measure 'meas.opp_line_items_avg_discount_pct' =
 			CALCULATE(
 			    AVERAGE(
-			        opps[col.discount_pct]      // get the average discount pct
+			        opps[trueai_discount_pct]      // get the average discount pct
 			    )
 			)
 		displayFolder: discount opp
@@ -387,13 +388,6 @@ table opp_line_items
 			isDefault
 			relationship: a122c0f9-0155-4eb5-be12-57d6f7f71f26
 			defaultHierarchy: LocalDateTable_42236937-b08e-45f5-99d6-61ddf2fcce75.'Date Hierarchy'
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.trueai_total_price' = opp_line_items[col.trueai_list_price] * opp_line_items[crm_qty]
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
-		lineageTag: 2ce26251-9816-4c17-a0a8-8860fb1e28b2
-		summarizeBy: sum
 
 		annotation SummarizationSetBy = Automatic
 

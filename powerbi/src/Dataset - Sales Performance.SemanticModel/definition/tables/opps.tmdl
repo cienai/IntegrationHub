@@ -518,14 +518,14 @@ table opps
 	measure 'meas.opps_booking_amt_reached_next_stage' = ```
 			
 			VAR curIdx =
-			    MAX ( open_pipeline[col.stage_sort_index] )
+			    MAX ( open_pipeline[trueai_sort_id] )
 			VAR nextIdx =
 			    CALCULATE (
 			        MINX (
-			            FILTER ( ALL ( open_pipeline[col.stage_sort_index] ),
-			                open_pipeline[col.stage_sort_index] > curIdx
+			            FILTER ( ALL ( open_pipeline[trueai_sort_id] ),
+			                open_pipeline[trueai_sort_id] > curIdx
 			            ),
-			            open_pipeline[col.stage_sort_index]
+			            open_pipeline[trueai_sort_id]
 			        )
 			    )
 			RETURN
@@ -535,14 +535,14 @@ table opps
 			    CALCULATE (
 			        [meas.opps_booking_amt],
 			        REMOVEFILTERS (
-			            open_pipeline[col.stage_sort_index],
+			            open_pipeline[trueai_sort_id],
 			            open_pipeline[trueai_stage],
 			            open_pipeline[trueai_stage_name],
 			            open_pipeline[trueai_stage_num]
 			        ),
 			        open_pipeline[trueai_stage_name] <> "Closed Lost",
 			         open_pipeline[trueai_stage_name] <> "Closed Won",
-			        TREATAS ( { nextIdx }, open_pipeline[col.stage_sort_index] )
+			        TREATAS ( { nextIdx }, open_pipeline[trueai_sort_id] )
 			    )
 			)
 			
@@ -550,6 +550,11 @@ table opps
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
 		lineageTag: aa23b27a-3667-4817-9d76-eca8052fa0b2
+
+	measure 'meas.opps_total_crm_booking_amt' = SUM(opps[crm_booking_amt])
+		lineageTag: 9f546c8e-a727-4045-b9a7-e88973fb9cd1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column _sys_doc_id
 		dataType: string
@@ -1340,18 +1345,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	column 'col.discount_pct' =
-			
-			VAR _opp_id = CALCULATE(MAX(opps[_sys_doc_id]))
-			var opp_id = CALCULATE(FIRSTNONBLANK(opps[_sys_doc_id], opps[_sys_doc_id]))
-			var res = ABS(CALCULATE([meas.opp_line_item_dis_pct], FILTER(opps, opps[_sys_doc_id]= _opp_id)))
-			return res
-		formatString: 0.00%;-0.00%;0.00%
-		lineageTag: 6dfab5ef-11ec-46d5-973a-fc72b4a1766b
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
 	column 'col.discount_tier' = ```
 			
 			
@@ -1776,6 +1769,23 @@ table opps
 		lineageTag: 9627b322-883d-45f4-8178-4b9ab26ce3d4
 		summarizeBy: none
 		sourceColumn: trueai_pipeline_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_age
+		dataType: int64
+		formatString: 0
+		lineageTag: cc25fbc2-deb6-42f0-9b30-3f4c6f7aa266
+		summarizeBy: sum
+		sourceColumn: trueai_age
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_discount_pct_tier
+		dataType: string
+		lineageTag: d5d56924-c4f6-4819-ab08-6cca48c59b9f
+		summarizeBy: none
+		sourceColumn: trueai_discount_pct_tier
 
 		annotation SummarizationSetBy = Automatic
 

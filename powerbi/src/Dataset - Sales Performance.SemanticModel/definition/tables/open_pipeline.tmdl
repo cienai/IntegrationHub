@@ -9,9 +9,9 @@ table open_pipeline
 			VAR filter_tbl = 
 			FILTER(
 			    temp_tbl,
-			    open_pipeline[col.sortable_step_id] = 
+			    open_pipeline[trueai_sort_id] = 
 			    CALCULATE(
-			        MAX(open_pipeline[col.sortable_step_id]),
+			        MAX(open_pipeline[trueai_sort_id]),
 			        FILTER(
 			            ALL(open_pipeline),         // get the most recent open opps items
 			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id])
@@ -37,9 +37,9 @@ table open_pipeline
 			VAR filter_tbl = 
 			FILTER(
 			    temp_tbl,
-			    open_pipeline[col.sortable_step_id] = 
+			    open_pipeline[trueai_sort_id] = 
 			    CALCULATE(
-			        MAX(open_pipeline[col.sortable_step_id]),
+			        MAX(open_pipeline[trueai_sort_id]),
 			        FILTER(
 			            ALL(open_pipeline),         // get the most recent open opps items
 			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id])
@@ -93,9 +93,9 @@ table open_pipeline
 			VAR filter_tbl = 
 			FILTER(
 			    temp_tbl,
-			    open_pipeline[col.sortable_step_id] = 
+			    open_pipeline[trueai_sort_id] = 
 			    CALCULATE(
-			        MAX(open_pipeline[col.sortable_step_id]),
+			        MAX(open_pipeline[trueai_sort_id]),
 			        FILTER(
 			            ALL(open_pipeline),         // get the most recent open opps items
 			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id]) 
@@ -127,14 +127,14 @@ table open_pipeline
 			var filter_tbl  =
 			FILTER (
 			    temp_tbl,
-			    open_pipeline[col.sortable_step_id] = 
+			    open_pipeline[trueai_sort_id] = 
 			    CALCULATE (
-			          MAX ( open_pipeline[col.sortable_step_id] ),
+			          MAX ( open_pipeline[trueai_sort_id] ),
 			        FILTER (
 			            all(open_pipeline),
 			            open_pipeline[crm_opp_id] = EARLIER ( open_pipeline[crm_opp_id] ) // this checks all the other values if it is the relevant one
 			            //&&  opps_histories[col._sys_filt_end_date] <= sel_date 
-			            &&  open_pipeline[col._sys_filt_end_date] <= sel_date  
+			            &&  open_pipeline[_sys_filt_end_date] <= sel_date  
 			            //&&  ssr_history[step_end_date] < sel_date &&  ssr_history[_sys_filt_start_date] < sel_date  // this ensures that we exclude anything after the selected date - important!  this measure is doing both step outcome and trueai added on date filtering 
 			        )
 			    )
@@ -151,7 +151,7 @@ table open_pipeline
 			
 			var sel_date = CALCULATE(MAX(cal_start_dates[Date]))
 			var res =  CALCULATE(
-			    MAX(open_pipeline[col.last_eng_act])
+			    MAX(open_pipeline[trueai_last_eng_act])
 			)
 			
 			RETURN
@@ -249,9 +249,9 @@ table open_pipeline
 			VAR filter_tbl = 
 			FILTER(
 			    temp_tbl,
-			    open_pipeline[col.sortable_step_id] = 
+			    open_pipeline[trueai_sort_id] = 
 			    CALCULATE(
-			        MAX(open_pipeline[col.sortable_step_id]),
+			        MAX(open_pipeline[trueai_sort_id]),
 			        FILTER(
 			            ALL(open_pipeline),         // get the most recent open opps items
 			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id]) 
@@ -260,7 +260,7 @@ table open_pipeline
 			    )
 			)
 			
-			var res =  CALCULATE(AVERAGEX(filter_tbl, [col.trueai_prob_of_win]))
+			var res =  CALCULATE(AVERAGEX(filter_tbl, [trueai_success_prob]))
 			
 			
 			RETURN
@@ -291,9 +291,9 @@ table open_pipeline
 			VAR filter_tbl = 
 			FILTER(
 			    temp_tbl,
-			    open_pipeline[col.sortable_step_id] = 
+			    open_pipeline[trueai_sort_id] = 
 			    CALCULATE(
-			        MAX(open_pipeline[col.sortable_step_id]),
+			        MAX(open_pipeline[trueai_sort_id]),
 			        FILTER(
 			            ALL(open_pipeline),         // get the most recent open opps items
 			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id]) 
@@ -379,9 +379,9 @@ table open_pipeline
 			VAR filter_tbl = 
 			FILTER(
 			    temp_tbl,
-			    open_pipeline[col.sortable_step_id] = 
+			    open_pipeline[trueai_sort_id] = 
 			    CALCULATE(
-			        MAX(open_pipeline[col.sortable_step_id]),
+			        MAX(open_pipeline[trueai_sort_id]),
 			        FILTER(
 			            ALL(open_pipeline),         // get the most recent open opps items
 			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id]) 
@@ -424,9 +424,9 @@ table open_pipeline
 			VAR filter_tbl = 
 			FILTER(
 			    temp_tbl,
-			    open_pipeline[col.sortable_step_id] = 
+			    open_pipeline[trueai_sort_id] = 
 			    CALCULATE(
-			        MAX(open_pipeline[col.sortable_step_id]),
+			        MAX(open_pipeline[trueai_sort_id]),
 			        FILTER(
 			            ALL(open_pipeline),         // get the most recent open opps items
 			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id]) 
@@ -435,7 +435,7 @@ table open_pipeline
 			    )
 			)
 			
-			Var res  = AVERAGEX(filter_tbl,[col.pushed_pulled_day] )
+			Var res  = AVERAGEX(filter_tbl,[trueai_days_pushed_pulled] )
 			RETURN res
 			
 			```
@@ -477,7 +477,7 @@ table open_pipeline
 
 	measure 'meas.open_opps_avg_pace_score' =
 			
-			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [col.trueai_pace_score] multply with 5
+			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
 			var _capped_avg = IF(_avg > 5, 5, _avg)  // Cap the value at 5
 			var res = SWITCH(
 			    _capped_avg,
@@ -585,9 +585,9 @@ table open_pipeline
 			VAR filter_tbl = 
 			FILTER(
 			    temp_tbl,
-			    open_pipeline[col.sortable_step_id] = 
+			    open_pipeline[trueai_sort_id] = 
 			    CALCULATE(
-			        MAX(open_pipeline[col.sortable_step_id]),
+			        MAX(open_pipeline[trueai_sort_id]),
 			        FILTER(
 			            ALL(open_pipeline),         // get the most recent open opps items
 			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id])
@@ -670,7 +670,7 @@ table open_pipeline
 
 	measure 'meas.open_opps_initial_close_date' =
 			
-			CALCULATE(MAX(open_pipeline[col.opp_initial_close_date]))
+			CALCULATE(MAX(open_pipeline[trueai_init_close_date]))
 		formatString: Short Date
 		displayFolder: _open_opps_pipeline
 		lineageTag: 666cb7ed-c316-4ced-91d8-b12470cd140d
@@ -952,7 +952,7 @@ table open_pipeline
 			VAR _age = [meas.open_opps_pushed_pulled_day]
 			var _step_outcome = CALCULATE(FIRSTNONBLANK(ssr_history[step_outcome],1))
 			var closed_opp = CALCULATE(
-			    MAX(ssr_history[col.days_pushed_pulled]),
+			    MAX(ssr_history[trueai_days_pushed_pulled]),
 			    ssr_history[step_outcome] in {"Closed Won", "Closed Lost"}
 			)
 			var _cond = IF(
@@ -979,7 +979,7 @@ table open_pipeline
 			RETURN
 			IF (
 			    MAX('open_pipeline'[crm_created_on]) <= MaxOppCreated &&
-			    MAX(open_pipeline[col.last_eng_act]) <= MaxOppCreated,
+			    MAX(open_pipeline[trueai_last_eng_act]) <= MaxOppCreated,
 			    1,
 			    0
 			)
@@ -991,8 +991,8 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.closed_opps_pushed_pulled_days' = CALCULATE(MAX(ssr_history[col.days_pushed_pulled]))
-		formatString: """+""#"" days"";""-""#"" days"";""-"""
+	measure 'meas.closed_opps_pushed_pulled_days' = CALCULATE(MAX(ssr_history[step_days_pushed_pulled]))
+		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: e493b4b2-b983-453f-b401-dcd092339cf5
 
@@ -1141,7 +1141,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.open_opps_trueai_booking_amt' = sum(open_pipeline[col.trueai_booking_amt])
+	measure 'meas.open_opps_trueai_booking_amt' = sum(open_pipeline[trueai_booking_amt])
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 95540529-8f00-4fa5-977f-e450852f352c
@@ -1170,7 +1170,7 @@ table open_pipeline
 
 	measure 'meas.trueai_pace_score' =
 			
-			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [col.trueai_pace_score] multply with 5
+			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
 			var _capped_avg = IF(_avg > 5, 5, _avg)  // Cap the value at 5
 			
 			RETURN
@@ -1216,7 +1216,7 @@ table open_pipeline
 	measure 'meas.trueai_pace_score_test' =
 			
 			
-			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [col.trueai_pace_score] multply with 5
+			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
 			var _capped_avg = IF(_avg > 5, 5, _avg)  // Cap the value at 5
 			var res = SWITCH(
 			    _capped_avg,
@@ -1247,26 +1247,37 @@ table open_pipeline
 
 	measure 'meas.open_pipeline_avg_days_in_stage' =
 			
-			var res = CALCULATE(AVERAGE(open_pipeline[col.trueai_days_in_stage]))
+			var res = CALCULATE(AVERAGE(open_pipeline[trueai_days_in_stage]))
 			return res
 		lineageTag: 8421c8c5-50f2-4b5d-96d9-77f070c95c08
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.open_pipeline_deals_reached_next_stage_count' = ```
+	measure 'meas.open_pipeline_deals_reached_next_stage_count' =
 			
-			VAR stage_num =     SELECTEDVALUE(open_pipeline[col.stage_sort_index]) +1   // add one because we want to look at the next stage 
-			var reached_stage_count = CALCULATE(DISTINCTCOUNT(open_pipeline[crm_opp_id]) , open_pipeline[col.stage_sort_index] >= stage_num && open_pipeline[trueai_is_closed] =false &&  open_pipeline[trueai_stage] <> "abc"  && open_pipeline[trueai_stage_name] <> "abc"  && open_pipeline[trueai_stage_num] <> -999) // do greater than to cathc skipped steps
-			return reached_stage_count + 0
-			```
+			VAR raw_stage = SELECTEDVALUE(open_pipeline[trueai_avg_step_sequence])
+			VAR stage_num = VALUE(raw_stage) + 1
+			
+			VAR reached_stage_count =
+			    CALCULATE(
+			        DISTINCTCOUNT(open_pipeline[crm_opp_id]),
+			        ISNUMBER(VALUE(open_pipeline[trueai_avg_step_sequence])) &&
+			        VALUE(open_pipeline[trueai_avg_step_sequence]) >= stage_num,
+			        open_pipeline[trueai_is_closed] = FALSE(),
+			        open_pipeline[trueai_stage] <> "abc",
+			        open_pipeline[trueai_stage_name] <> "abc",
+			        open_pipeline[trueai_stage_num] <> -999
+			    )
+			
+			RETURN reached_stage_count + 0
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 45f80dbb-99fb-49e4-a0ca-804b1a6dc6b0
 
 	measure 'meas.open_pipeline_deals_reached_stage_count' = ```
 			
-			VAR stage_num =     SELECTEDVALUE(open_pipeline[col.stage_sort_index])   // add one because we want to look at the next stage 
-			var reached_stage_count = CALCULATE(DISTINCTCOUNT(open_pipeline[crm_opp_id]) , open_pipeline[col.stage_sort_index] >= stage_num && open_pipeline[trueai_is_closed] =false &&  open_pipeline[trueai_stage] <> "abc"  && open_pipeline[trueai_stage_name] <> "abc"  && open_pipeline[trueai_stage_num] <> -999) // do greater than to cathc skipped steps
+			VAR stage_num =     SELECTEDVALUE(open_pipeline[trueai_avg_step_sequence])   // add one because we want to look at the next stage 
+			var reached_stage_count = CALCULATE(DISTINCTCOUNT(open_pipeline[crm_opp_id]) , open_pipeline[trueai_avg_step_sequence] >= stage_num && open_pipeline[trueai_is_closed] =false &&  open_pipeline[trueai_stage] <> "abc"  && open_pipeline[trueai_stage_name] <> "abc"  && open_pipeline[trueai_stage_num] <> -999) // do greater than to cathc skipped steps
 			return reached_stage_count + 0
 			
 			```
@@ -1291,9 +1302,16 @@ table open_pipeline
 
 	measure 'meas.open_pipeline_total_deals' =
 			
-			VAR stage_num =     SELECTEDVALUE(open_pipeline[col.stage_sort_index])
-			var res = CALCULATE(DISTINCTCOUNT(open_pipeline[crm_opp_id]) , open_pipeline[col.stage_sort_index] <> -999 && open_pipeline[trueai_stage_num] <> -999 && open_pipeline[trueai_stage] <> "abc"  && open_pipeline[trueai_stage_name] <> "abc") // override all teh groupings so we get the total
-			return res
+							VAR stage_num = SELECTEDVALUE(open_pipeline[trueai_avg_step_sequence])
+							VAR res =
+			    			CALCULATE(
+			        		DISTINCTCOUNT(open_pipeline[crm_opp_id]),
+			        		VALUE(open_pipeline[trueai_avg_step_sequence]) <> -999,
+			        		VALUE(open_pipeline[trueai_stage_num]) <> -999,
+			        		open_pipeline[trueai_stage] <> "abc",
+			        		open_pipeline[trueai_stage_name] <> "abc"
+			    			)
+							RETURN res
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 6edf0fca-e41a-4470-9a2e-7c396135f38b
@@ -1417,9 +1435,9 @@ table open_pipeline
 
 	measure 'meas.ssr_history_duration_hrs_deals_accumulated' = ```
 			
-			VAR CurIdx = MAX ( 'open_pipeline'[col.stage_sort_index] ) RETURN SUMX ( FILTER ( ALL ( 'open_pipeline'[col.stage_sort_index] ), 
+			VAR CurIdx = MAX ( 'open_pipeline'[trueai_avg_step_sequence] ) RETURN SUMX ( FILTER ( ALL ( 'open_pipeline'[trueai_avg_step_sequence] ), 
 			
-			'open_pipeline'[col.stage_sort_index] <= CurIdx ), CALCULATE ( [meas.ssr_history_duration_hrs_new_logo] + [meas.ssr_history_duration_hrs_existing_customer_selling] )
+			'open_pipeline'[trueai_avg_step_sequence] <= CurIdx ), CALCULATE ( [meas.ssr_history_duration_hrs_new_logo] + [meas.ssr_history_duration_hrs_existing_customer_selling] )
 			)
 			```
 		displayFolder: _open_pipeline
@@ -1442,6 +1460,29 @@ table open_pipeline
 			```
 		displayFolder: opps_histories_To_open_pipeline
 		lineageTag: f1f1de1f-d2b1-440d-9e81-9ec440e9d3d0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opps_details_screen_trueai_pushed_pulled' =
+			
+			VAR _age =
+			    AVERAGE ( open_pipeline[trueai_days_pushed_pulled] )
+			VAR _step_outcome =
+			    CALCULATE ( FIRSTNONBLANK ( ssr_history[step_outcome], 1 ) )
+			VAR closed_opp =
+			    CALCULATE (
+			        MAX ( ssr_history[trueai_days_pushed_pulled] ),
+			        ssr_history[step_outcome] IN { "Closed Won", "Closed Lost" }
+			    )
+			VAR _cond =
+			    IF (
+			        _step_outcome IN { "Closed Won", "Closed Lost" },
+			        closed_opp,
+			        _age
+			    )
+			RETURN
+			    _cond
+		lineageTag: c5ec0e68-cb24-4f7f-afa1-0d61eb1d2a5c
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -1592,71 +1633,6 @@ table open_pipeline
 		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
-
-	column 'col._sys_filt_end_date' = ```
-			
-			var opp_end_date =   calculate(MAX(opps[_sys_filt_end_date]))
-			var step_sequeince = [trueai_step_sequence] 
-			var opp_id = [crm_opp_id]
-			var filt_tbl = filter(ALL(open_pipeline), open_pipeline[crm_opp_id] = opp_id) 
-			var max_step_sequence =  maxx(filt_tbl, [trueai_step_sequence]) 
-			var res = if (opp_end_date = Date(2100,1,1) && step_sequeince= max_step_sequence ,  opp_end_date , [_sys_filt_end_date])
-			return res 
-			```
-		formatString: General Date
-		lineageTag: 0f9aa4a3-4140-416d-9860-e788e9a1bb3d
-		summarizeBy: none
-
-		variation Variation
-			isDefault
-			relationship: 4411c478-c343-4cff-ab79-501a83ba754a
-			defaultHierarchy: LocalDateTable_072d300a-27c6-4f7e-ad7b-9e03de99916b.'Date Hierarchy'
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.sortable_step_id' =
-			
-			var res =  ([crm_opp_id]) &  "-" & ([trueai_step_sequence])
-			return res
-		lineageTag: f59dc52c-fb8d-4dbc-af4a-e90f089331a5
-		summarizeBy: none
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.trueai_prob_of_win' =
-			
-			var _id = [crm_opp_id]          // open opps id
-			var _prob = CALCULATE(
-			                MAX(opps[trueai_prob_of_win]),
-			                opps[_sys_doc_id]=_id               // get the respecting opps prob
-			)
-			
-			
-			RETURN
-			_prob
-		lineageTag: 01bfcdcc-a57b-4eec-a576-3a12d124ee19
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 'col.pushed_pulled_day' =
-			
-			var _id = open_pipeline[crm_opp_id]               // get th opp id
-			var res = CALCULATE(
-			            sum(ssr_history[col.days_pushed_pulled]),           // get the pushed pulled days
-			            ssr_history[entity_opp_id]=_id
-			)
-			RETURN
-			res
-		formatString: """+""#"" days"";""-""#"" days"";""-"""
-		lineageTag: 4de641d7-dcee-4f7d-82ca-62fbfef52165
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isCustom":true}
 
 	column cust_text1
 		dataType: string
@@ -1840,26 +1816,6 @@ table open_pipeline
 		annotation SummarizationSetBy = Automatic
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 'col.opp_initial_close_date' =
-			
-			var _id = open_pipeline[crm_opp_id]               // get th opp id
-			var res = CALCULATE(
-			            MAX(ssr_history[opp_initial_close_date]),           // get the opp initial close date
-			            ssr_history[col.sales_steps_opp_id]=_id
-			)
-			RETURN
-			res
-		formatString: General Date
-		lineageTag: a02ccb68-a74e-4953-bdc5-dfaf636144eb
-		summarizeBy: none
-
-		variation Variation
-			isDefault
-			relationship: 6cca5647-5a20-4205-9ca9-4c24b8a9e48f
-			defaultHierarchy: LocalDateTable_e6ae02db-c99d-4b62-b0c9-f18e6ba134d7.'Date Hierarchy'
-
-		annotation SummarizationSetBy = Automatic
 
 	column trueai_stage_num
 		dataType: int64
@@ -2153,7 +2109,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
-	column 'col.last_eng_act' =
+	column trueai_last_eng_act =
 			
 			var _id = [crm_opp_id]
 			var res  = CALCULATE(
@@ -2173,99 +2129,6 @@ table open_pipeline
 			defaultHierarchy: LocalDateTable_20544d6b-282d-4183-b0d2-0483e6e844b6.'Date Hierarchy'
 
 		annotation SummarizationSetBy = Automatic
-
-	column 'col.trueai_days_in_stage' =
-			
-			var  end_date = if (year([_sys_filt_end_date]) = 2100 ,  [_sys_as_of] ,([_sys_filt_end_date]) ) // if still open (1/1/2100) use as of date instead
-			var res = DATEDIFF([_sys_filt_start_date], end_date, DAY) // check days in stage
-			return res
-		formatString: 0
-		lineageTag: c7ed35ce-ccf3-4750-bfac-b2a172851acf
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.trueai_days_in_opp' =
-			
-			var  start_date =MINX(RELATEDTABLE(opps),[_sys_filt_start_date])  // if still open (1/1/2100) use as of date instead
-			var  end_date = if (year([_sys_filt_end_date]) = 2100 ,  [_sys_as_of] ,([_sys_filt_end_date]) ) // if still open (1/1/2100) use as of date instead
-			var res = DATEDIFF(start_date, end_date, DAY) // check days in stage
-			return res
-		formatString: 0
-		lineageTag: ae2a39a3-6036-44c6-9576-ac21afd9a28d
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.trueai_pace_score_days_in_opp' = ```
-			
-			var  days = open_pipeline[col.trueai_days_in_opp] // get the current avg for a single or many deals 
-			var stage = open_pipeline[crm_stage_name] // get the current stage 
-			var tbl_opps_stage_info =FILTER ( opps_stages, opps_stages[crm_name] = stage) // filter the right row
-			var ref_days =  AVERAGEX(tbl_opps_stage_info,[col.open_pipeline_pace_ref_avg_days_in_opp] ) // get the ref avg
-			var ref_std_dev = AVERAGEX(tbl_opps_stage_info,[col.open_pipeline_pace_ref_std_dev_days_in_opp] )  // get the ref std dev
-			var max_val = IF (ref_days  <  (ref_std_dev * 2), 0, ref_days - (ref_std_dev * 2))  // if std dev is too big, make min 0 - we dont want this value to be negative, otherwise 2x std dev for 95% coverage 
-			var min_val = IF (ref_days  <  (ref_std_dev * 2)  , ref_days * 2 , ref_days + (ref_std_dev * 2))  // if std dev is too big, make max the double of avg,  otherwise 2x std dev for 95% coverage  
-			 var res = MAX( DIVIDE( days- min_val, max_val - min_val) , 0) // normalize between 0-1
-			return res
-			```
-		lineageTag: 4a2d8e5f-f86e-49ad-91d8-dd70b3183f59
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 'col.trueai_pace_score_days_in_stage' = ```
-			
-			var  days = open_pipeline[col.trueai_days_in_stage] // get the current avg for a single or many deals 
-			var stage = open_pipeline[trueai_stage_name] // get the current stage 
-			var tbl_opps_stage_info =FILTER ( opps_stages, opps_stages[crm_name] = stage) // filter the right row
-			var ref_days =  AVERAGEX(tbl_opps_stage_info,[col.open_pipeline_pace_ref_avg_days_in_stage] ) // get the ref avg
-			var ref_std_dev = AVERAGEX(tbl_opps_stage_info,[col.open_pipeline_pace_ref_std_dev_days_in_stage] )  // get the ref std dev
-			var max_val = IF (ref_days  <  (ref_std_dev * 2), 0, ref_days - (ref_std_dev * 2))  // if std dev is too big, make min 0 - we dont want this value to be negative, otherwise 2x std dev for 95% coverage 
-			var min_val = IF (ref_days  <  (ref_std_dev * 2)  , ref_days * 2 , ref_days + (ref_std_dev * 2))  // if std dev is too big, make max the double of avg,  otherwise 2x std dev for 95% coverage  
-			 var res = MAX( DIVIDE( days- min_val, max_val - min_val) , 0) // normalize between 0-1
-			return res
-			```
-		lineageTag: dd4f827b-d17c-46d6-811e-7b44df2c475e
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column 'col.trueai_booking_amt' =
-			
-			
-			var amt = open_pipeline[trueai_booking_amt] // get the amt
-			/*var opp_id = open_pipeline[_sys_doc_id] // get the amt
-			var res = if(amt = BLANK(), CALCULATE(MAX(opps[trueai_booking_amt]),opps[_sys_doc_id] = opp_id), amt)*/
-			return amt
-		formatString: \$#,0;(\$#,0);\$#,0
-		lineageTag: 321e65fb-d457-4260-8481-7bde2b832646
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'col.stage_sort_index' = ```
-			
-			var stage_name = open_pipeline[trueai_stage_name]
-			var close_boost = If(open_pipeline[trueai_is_closed] = true , 1000)
-			var tbl_all_of_this_stage =  FILTER(ALL(open_pipeline ) , open_pipeline[trueai_stage_name] = stage_name) 
-			var avg_seq = AVERAGEX(tbl_all_of_this_stage, [trueai_step_sequence] ) * 100
-			
-			var res  = ROUND(avg_seq  + close_boost, 0)
-			return res
-			
-			```
-		formatString: 0
-		lineageTag: 99f39c2a-efb6-4a15-a214-9a64c6d7edbe
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isDecimal":true}
 
 	column crm_stage_id
 		dataType: string
@@ -2379,6 +2242,114 @@ table open_pipeline
 		lineageTag: 10f9fe0e-a498-4239-bafd-d5c0c464a947
 		summarizeBy: sum
 		sourceColumn: trueai_pace_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_last_eng
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 811e5918-000e-4bb6-8441-f90c896d9696
+		summarizeBy: none
+		sourceColumn: trueai_act_last_eng
+
+		variation Variation
+			isDefault
+			relationship: a635b966-5289-417d-b87b-d365446ce68f
+			defaultHierarchy: LocalDateTable_25a95f19-ccbf-4c7d-9861-1dac5d493b19.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_init_close_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: cadd40c0-a914-40c0-ba2e-8962ac22da6c
+		summarizeBy: none
+		sourceColumn: trueai_init_close_date
+
+		variation Variation
+			isDefault
+			relationship: 5472189e-552d-4fac-aff4-82f7c834d86b
+			defaultHierarchy: LocalDateTable_09f77811-0a2c-422d-88d7-09bbcd68e6c8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_avg_step_sequence
+		dataType: int64
+		formatString: 0
+		lineageTag: 3337e4f5-5b5f-46f0-8e61-431dd3cb9932
+		summarizeBy: sum
+		sourceColumn: trueai_avg_step_sequence
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_pred_booking_amt
+		dataType: double
+		lineageTag: 90f0aa66-a06f-4b9f-be32-3214df6c30ca
+		summarizeBy: sum
+		sourceColumn: trueai_pred_booking_amt
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_pred_close_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1ab1f353-fe6a-4171-b1e9-0b4eefa801fe
+		summarizeBy: none
+		sourceColumn: trueai_pred_close_date
+
+		variation Variation
+			isDefault
+			relationship: c23e475a-e09d-4192-8550-2a40e6cb7cd4
+			defaultHierarchy: LocalDateTable_b4aa4367-5677-4901-844f-94529d18272e.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_attention_value_success_prob
+		dataType: double
+		lineageTag: 535d8d6c-b8ba-459f-8f5d-38ccc6546908
+		summarizeBy: sum
+		sourceColumn: trueai_attention_value_success_prob
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_attention_value_expected_success_prob
+		dataType: double
+		lineageTag: ce98edad-d7c6-419c-9a3f-b6cef978691c
+		summarizeBy: sum
+		sourceColumn: trueai_attention_value_expected_success_prob
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_attention_value_score
+		dataType: double
+		lineageTag: 043b4fb9-fc99-4d9c-8b4e-cdce1c5ed155
+		summarizeBy: sum
+		sourceColumn: trueai_attention_value_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_attention_value_text
+		dataType: string
+		lineageTag: ec0e3163-e5bd-4104-94f6-1f513d6485f7
+		summarizeBy: none
+		sourceColumn: trueai_attention_value_text
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_days_pushed_pulled
+		dataType: int64
+		formatString: 0
+		lineageTag: 3a282143-9d18-4108-9e30-5af76f854596
+		summarizeBy: sum
+		sourceColumn: trueai_days_pushed_pulled
 
 		annotation SummarizationSetBy = Automatic
 
