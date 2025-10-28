@@ -1,0 +1,1551 @@
+createOrReplace
+
+	table performance_metric_1
+		lineageTag: 44d81956-7d01-4020-9897-b0474ef2eb84
+
+		measure 'meas.rep_overview_metric_1' = ```
+				
+				VAR _selected_metric =
+				    CALCULATE (
+				        SELECTEDVALUE ( performance_metric_1[_sys_doc_id] ) 
+				    )
+				VAR _formatString = MAX ( companies_history[col.currency_format] )
+				VAR res =
+				    SWITCH (
+				        _selected_metric,
+				        "sal1", FORMAT ( [meas.ssr_history_won_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal2", FORMAT ( [meas.ssr_history_win_rate], "0.0%" ),
+				        "sal3", [meas.exp_rpts_all_won_deals],
+				        "sal4", FORMAT ( [meas.ssr_history_won_amt_new_logo] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal7", FORMAT ( [meas.ssr_history_won_amt_existing_customer_selling] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip1", FORMAT ( [meas.ssr_history_generated_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip2", FORMAT ( [meas.ssr_history_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K", 
+				        "pip4", FORMAT ( [meas.open_pipeline_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip5", FORMAT ( [meas.ssr_history_adj_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.ssr_history_open_pipeline_success_rate], "0.0%" ),
+				        "pip7", [meas.open_pipeline_count_id],
+				        "pip8", [meas.ssr_history_mgmt_leads_gen_count],
+				        "act1", FORMAT ( [meas.users_history_avg_ci_act_capt_lvl], "0.0%" ),
+				        "act2", [meas.stkhlds_all_act_count],
+				        "act3", FORMAT ( [meas.ssr_history_duration_hrs], "#,##0"" hrs""" ),
+				        "act4", FORMAT ( [meas.ssr_history_all_eng_duration_hrs], "#,##0"" hrs""" ),
+				        "act5", [meas.stkhlds_all_act_email_count],
+				        "act6", [meas.stkhlds_all_act_phone_calls],
+				        "act7", [meas.stkhlds_all_act_meeting_count],
+				         "act9", [meas.stkhlds_all_act_social_media_count],
+				        "act10", [meas.stkhlds_all_act_nd_count],
+				        "act11", [meas.users_activities_prospecting_count],
+				        "act12", [meas.users_activities_new_logo_count],
+				        "act13", [meas.users_activities_post_sales_count],
+				        "act14", [meas.users_activities_existing_customer_count],
+				        "act15", [meas.users_activities_internal_count],
+				        "act16", FORMAT ( [meas.ssr_history_duration_hrs_prospecting], "#,##0"" hrs""" ),
+				        "act17", FORMAT ( [meas.ssr_history_duration_hrs_new_logo], "#,##0"" hrs""" ),
+				        "act18", FORMAT ( [meas.ssr_history_duration_hrs_post_sales], "#,##0"" hrs""" ),
+				        "act19", FORMAT ( [meas.ssr_history_duration_hrs_existing_customer_selling], "#,##0"" hrs""" )
+				    )
+				RETURN
+				    res
+				```
+			lineageTag: e96ea275-ffef-45a9-ba43-89a6b054cba0
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.selected_metric_coef' = ```
+				
+				VAR Txy =
+				    ADDCOLUMNS(
+				        VALUES('users'[col.full_name]),     // Build a table of all reps (one row per user)
+				        "x", [meas.rep_overview_metric_1_value],  // Metric selected in slicer 1
+				        "y", [meas.rep_overview_metric_2_value]   // Metric selected in slicer 2
+				    )
+				VAR BaseTable =
+				    FILTER(
+				        Txy,
+				        NOT ( ISBLANK([x]) || ISBLANK([y]) )  // Exclude rows where either metric is BLANK (zeros are kept)
+				    )
+				VAR n      = COUNTROWS(BaseTable)                        // Number of valid reps
+				VAR AvgX   = AVERAGEX(BaseTable, [x])                    // Average of metric X
+				VAR AvgY   = AVERAGEX(BaseTable, [y])                    // Average of metric Y
+				VAR SumXY  = SUMX(BaseTable, ([x] - AvgX) * ([y] - AvgY))// Numerator: covariance
+				VAR SumX2  = SUMX(BaseTable, POWER([x] - AvgX, 2))       // Denominator part: variance of X
+				VAR SumY2  = SUMX(BaseTable, POWER([y] - AvgY, 2))       // Denominator part: variance of Y
+				VAR Denom  = SQRT(SumX2 * SumY2)                         // Denominator = stdev(X) * stdev(Y)
+				RETURN
+				    IF( n < 2 || Denom = 0, BLANK(), DIVIDE(SumXY, Denom) ) // Pearson correlation coefficient
+				
+				```
+			lineageTag: c2598b17-0b06-4330-841b-97443bc06242
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.rep_overview_metric_2' = ```
+				
+				VAR _selected_metric =
+				    CALCULATE (
+				        SELECTEDVALUE ( performance_metric_2[_sys_doc_id] ) 
+				    )
+				VAR _formatString = MAX ( companies_history[col.currency_format] )
+				VAR res =
+				    SWITCH (
+				        _selected_metric,
+				        "sal1", FORMAT ( [meas.ssr_history_won_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal2", FORMAT ( [meas.ssr_history_win_rate], "0.0%" ),
+				        "sal3", [meas.exp_rpts_all_won_deals],
+				        "sal4", FORMAT ( [meas.ssr_history_won_amt_new_logo] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal7", FORMAT ( [meas.ssr_history_won_amt_existing_customer_selling] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip1", FORMAT ( [meas.ssr_history_generated_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip2", FORMAT ( [meas.ssr_history_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K", 
+				        "pip4", FORMAT ( [meas.open_pipeline_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip5", FORMAT ( [meas.ssr_history_adj_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.ssr_history_open_pipeline_success_rate], "0.0%" ),
+				        "pip7", [meas.open_pipeline_count_id],
+				        "pip8", [meas.ssr_history_mgmt_leads_gen_count],
+				        "act1", FORMAT ( [meas.users_history_avg_ci_act_capt_lvl], "0.0%" ),
+				        "act2", [meas.stkhlds_all_act_count],
+				        "act3", FORMAT ( [meas.ssr_history_duration_hrs], "#,##0"" hrs""" ),
+				        "act4", FORMAT ( [meas.ssr_history_all_eng_duration_hrs], "#,##0"" hrs""" ),
+				        "act5", [meas.stkhlds_all_act_email_count],
+				        "act6", [meas.stkhlds_all_act_phone_calls],
+				        "act7", [meas.stkhlds_all_act_meeting_count],
+				         "act9", [meas.stkhlds_all_act_social_media_count],
+				        "act10", [meas.stkhlds_all_act_nd_count],
+				        "act11", [meas.users_activities_prospecting_count],
+				        "act12", [meas.users_activities_new_logo_count],
+				        "act13", [meas.users_activities_post_sales_count],
+				        "act14", [meas.users_activities_existing_customer_count],
+				        "act15", [meas.users_activities_internal_count],
+				        "act16", FORMAT ( [meas.ssr_history_duration_hrs_prospecting], "#,##0"" hrs""" ),
+				        "act17", FORMAT ( [meas.ssr_history_duration_hrs_new_logo], "#,##0"" hrs""" ),
+				        "act18", FORMAT ( [meas.ssr_history_duration_hrs_post_sales], "#,##0"" hrs""" ),
+				        "act19", FORMAT ( [meas.ssr_history_duration_hrs_existing_customer_selling], "#,##0"" hrs""" )
+				    )
+				RETURN
+				    res
+				```
+			lineageTag: 5066278a-ae01-4b00-acf8-f8e1ec345769
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.avg_opp_won_amt' =
+				
+				var _total = [meas.ssr_history_won_amt]         // get the won amt
+				var reps_count = [meas.data_logs_user_count_all]            // total rep count
+				var res = DIVIDE(_total, reps_count)            // GET THE avg by reps
+				RETURN
+				res
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _average
+			lineageTag: c170d19c-9d4d-45f2-ac5d-27a5f8e201d9
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.ssr_history_avg_generated_pipeline_amt' =
+				
+				
+				var _total_amt  = [meas.ssr_history_generated_pipeline_amt]             // get the generated pipeline amt
+				var reps_count = [meas.data_logs_user_count_all]        // get total reps count
+				var res = DIVIDE(
+				    _total_amt, reps_count,0
+				)
+				RETURN
+				res+0
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _average
+			lineageTag: 32b8a77c-670b-4481-a97f-2b4fad90f1f5
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.ssr_history_avg_open_pipeline_amount_eop' = ```
+				
+				
+				var _total_amt = [meas.ssr_history_asof_open_pipeline_amt]              // get the total open pipeline amount
+				
+				var reps_count = [meas.data_logs_user_count_all]        // get total reps count
+				var res = DIVIDE(
+				    _total_amt, reps_count,0
+				)
+				
+				return 
+				res+0
+				```
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _average
+			lineageTag: 30b14ac6-ecf4-402d-bdc9-9cedc642239d
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.ssr_history_avg_open_pipeline_win_rate' = ```
+				
+				var _win_rate = [meas.open_opps_avg_win_prob]           // get the win rate 
+				var reps_count = [meas.data_logs_user_count_all]        // get total reps count
+				var res = DIVIDE(
+				    _win_rate, reps_count,0
+				)
+				return _win_rate
+				```
+			formatString: 0.00%;-0.00%;0.00%
+			displayFolder: _average
+			lineageTag: 968f714e-580a-43b8-900d-c6de37d838c8
+
+		measure 'meas.rep_overview_metric_1_avg' = ```
+				
+				VAR _selected_metric =
+				    CALCULATE (
+				        SELECTEDVALUE ( performance_metric_1[_sys_doc_id]) 
+				    )
+				VAR _formatString = MAX ( companies_history[col.currency_format] )
+				VAR res =
+				    SWITCH (
+				        _selected_metric,
+				        "sal1", FORMAT ( [meas.avg_opp_won_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip1", FORMAT ( [meas.ssr_history_avg_generated_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip4", FORMAT ( [meas.ssr_history_avg_open_pipeline_amount_eop] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.ssr_history_avg_open_pipeline_win_rate], "0%" ),
+				        "sal4", FORMAT ( [meas.new_logo_avg_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal7", FORMAT ( [meas.existing_customer_selling_avg_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal3", [meas.reps_average_won_deals],
+				        "pip8", [meas.reps_avg_generated_leads],
+				        "pip2", FORMAT ( [meas.reps_average_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip5", FORMAT ( [meas.reps_average_adj_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.reps_average_open_pipeline_success_rate], "0.0%" ),
+				        "act1", FORMAT ( [meas.reps_avg_act_capt_lvl], "0.0%" ),
+				        "act2", FORMAT ( [meas.reps_avg_duration_hrs], "#,##0"" hrs""" ),
+				        "act3", FORMAT ( [meas.reps_avg_adj_duration_hrs], "#,##0"" hrs""" ),
+				        "act4", FORMAT ( [meas.reps_avg_eng_duration_hrs], "#,##0"" hrs""" ),
+				        "act5", [meas.reps_average_email_count],
+				        "act6", [meas.reps_average_phone_call_count],
+				        "act7", [meas.reps_average_meeting_count],
+				        "act9", [meas.reps_average_social_media_count],
+				        "act10", [meas.reps_average_nd_count],
+				        "act11", [meas.reps_avg_prospecting_act_count],
+				        "act12", [meas.reps_avg_new_logo_act_count],
+				        "act13", [meas.reps_avg_post_sales_act_count],
+				        "act14", [meas.reps_avg_existing_customer_selling_act_count],
+				        "act15", [meas.reps_avg_internal_act_count],
+				        "act16", FORMAT ( [meas.reps_avg_prospecting_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act17", FORMAT ( [meas.reps_avg_new_logo_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act18", FORMAT ( [meas.reps_avg_post_sales_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act19", FORMAT ( [meas.reps_avg_existing_customer_adj_dur_hrs], "#,##0"" hrs""" )
+				    )
+				RETURN
+				    COALESCE ( res, 0 )
+				```
+			lineageTag: bc34e389-ac83-455f-8ccb-60678220b909
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.rep_overview_metric_2_avg' = ```
+				
+				VAR _selected_metric =
+				    CALCULATE (
+				        SELECTEDVALUE ( performance_metric_2[_sys_doc_id]) 
+				    )
+				VAR _formatString = MAX ( companies_history[col.currency_format] )
+				VAR res =
+				    SWITCH (
+				        _selected_metric,
+				        "sal1", FORMAT ( [meas.avg_opp_won_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip1", FORMAT ( [meas.ssr_history_avg_generated_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip4", FORMAT ( [meas.ssr_history_avg_open_pipeline_amount_eop] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.ssr_history_avg_open_pipeline_win_rate], "0%" ),
+				        "sal4", FORMAT ( [meas.new_logo_avg_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal7", FORMAT ( [meas.existing_customer_selling_avg_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal3", [meas.reps_average_won_deals],
+				        "pip8", [meas.reps_avg_generated_leads],
+				        "pip2", FORMAT ( [meas.reps_average_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip5", FORMAT ( [meas.reps_average_adj_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.reps_average_open_pipeline_success_rate], "0.0%" ),
+				        "act1", FORMAT ( [meas.reps_avg_act_capt_lvl], "0.0%" ),
+				        "act2", FORMAT ( [meas.reps_avg_duration_hrs], "#,##0"" hrs""" ),
+				        "act3", FORMAT ( [meas.reps_avg_adj_duration_hrs], "#,##0"" hrs""" ),
+				        "act4", FORMAT ( [meas.reps_avg_eng_duration_hrs], "#,##0"" hrs""" ),
+				        "act5", [meas.reps_average_email_count],
+				        "act6", [meas.reps_average_phone_call_count],
+				        "act7", [meas.reps_average_meeting_count],
+				        "act9", [meas.reps_average_social_media_count],
+				        "act10", [meas.reps_average_nd_count],
+				        "act11", [meas.reps_avg_prospecting_act_count],
+				        "act12", [meas.reps_avg_new_logo_act_count],
+				        "act13", [meas.reps_avg_post_sales_act_count],
+				        "act14", [meas.reps_avg_existing_customer_selling_act_count],
+				        "act15", [meas.reps_avg_internal_act_count],
+				        "act16", FORMAT ( [meas.reps_avg_prospecting_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act17", FORMAT ( [meas.reps_avg_new_logo_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act18", FORMAT ( [meas.reps_avg_post_sales_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act19", FORMAT ( [meas.reps_avg_existing_customer_adj_dur_hrs], "#,##0"" hrs""" )
+				    )
+				RETURN
+				    COALESCE ( res, 0 )
+				```
+			lineageTag: 0db946e4-0df0-4baf-85b3-8acb32a8d0f9
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.companies_currency' =
+				
+				DISTINCT(companies_history[company_currency])
+			lineageTag: 7d3a8b73-b76b-4232-b89a-239c1a3c434d
+
+		measure 'meas.rep_min_won_amt' = ```
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep minimum amt
+				    [meas.ssr_history_won_amt]
+				)
+				
+				// MINX(
+				//     FILTER(
+				//         VALUES('users'[col.full_name]),
+				//         [meas.ssr_history_won_amt] <> 0         // get the min amount but 0 
+				//             && NOT(ISBLANK([meas.ssr_history_won_amt]))
+				//     ),
+				//     [meas.ssr_history_won_amt]
+				// )
+				```
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _min
+			lineageTag: 67223232-8b9b-416f-b5dc-7f620c62192b
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.rep_w_max_won_amt' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep minimum amt
+				    [meas.ssr_history_won_amt]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _max
+			lineageTag: 4785e5ad-07fa-4ff6-9404-c4165d667196
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.rep_min_generated_pipeline_amt' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep minimum amt
+				    [meas.ssr_history_generated_pipeline_amt]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _min
+			lineageTag: b244bba6-d58a-4215-a804-a2e3b726342c
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.reps_max_generated_pipeline_amt' = ```
+				
+				// MAXX(
+				//     VALUES('users'[col.full_name]),         /// get the rep minimum amt
+				//     [meas.ssr_history_generated_pipeline_amt]
+				// )
+				
+				MAXX(
+				    FILTER(
+				        VALUES('users'[col.full_name]),
+				        [meas.ssr_history_generated_pipeline_amt] <> 0         // get the min amount but 0 
+				            && NOT(ISBLANK([meas.ssr_history_generated_pipeline_amt]))
+				    ),
+				    [meas.ssr_history_generated_pipeline_amt]
+				)
+				```
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _max
+			lineageTag: 1efb7b13-f829-4cb6-bd29-964f53976c62
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.reps_min_open_pipeline_amt' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep minimum amt
+				    [meas.ssr_history_asof_open_pipeline_amt]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _min
+			lineageTag: 72231572-71e4-4c4d-be5e-28befd6de713
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.reps_max_open_pipeline_amt' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max amt
+				    [meas.ssr_history_asof_open_pipeline_amt]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _max
+			lineageTag: 34ad4508-9b9b-4715-9309-a19234c627b0
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.reps_min_open_pipeline_win_rate' = ```
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep win rate 
+				    [meas.open_opps_avg_win_prob]
+				)
+				```
+			formatString: 0.00%;-0.00%;0.00%
+			displayFolder: _min
+			lineageTag: 4b9498a0-7ca3-4289-b291-042e6b497618
+
+		measure 'meas.reps_max_open_pipeline_win_rate' = ```
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max win rate 
+				    [meas.open_opps_avg_win_prob]
+				)
+				```
+			formatString: 0%;-0%;0%
+			displayFolder: _max
+			lineageTag: 3aa54070-6bf1-4cd2-b1ef-745a46354bc2
+
+		measure 'meas.rep_overview_metric_1_min' =
+				
+				VAR _selected_metric =
+				    CALCULATE (
+				        SELECTEDVALUE (performance_metric_1[_sys_doc_id] )
+				    )
+				VAR _formatString = MAX ( companies_history[col.currency_format] )
+				VAR res =
+				    SWITCH (
+				        _selected_metric,
+				        "sal1", FORMAT ( [meas.rep_min_won_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip1", FORMAT ( [meas.rep_min_generated_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip4", FORMAT ( [meas.reps_min_open_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.reps_min_open_pipeline_win_rate], "0%" ),
+				        "sal4", FORMAT ( [meas.rep_w_min_new_logo_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal7", FORMAT ( [meas.rep_w_min_existing_customer_selling_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal3", [meas.reps_min_won_deals],
+				        "pip8", [meas.reps_min_generated_leads],
+				        "pip2", FORMAT ( [meas.reps_min_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip5", FORMAT ( [meas.reps_min_adj_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.reps_min_open_pipeline_success_rate], "0.0%" ),
+				        "act1", FORMAT ( [meas.reps_min_act_capt_lvl], "0.0%" ),
+				        "act2", FORMAT ( [meas.reps_min_duration_hrs], "#,##0"" hrs""" ),
+				        "act3", FORMAT ( [meas.reps_min_adj_duration_hrs], "#,##0"" hrs""" ),
+				        "act4", FORMAT ( [meas.reps_min_eng_duration_hrs], "#,##0"" hrs""" ),
+				        "act5", [meas.reps_min_email_count],
+				        "act6", [meas.reps_min_phone_call_count],
+				        "act7", [meas.reps_min_meeting_count],
+				        "act9", [meas.reps_min_social_media_count],
+				        "act10", [meas.reps_min_nd_count],
+				        "act11", [meas.reps_min_prospecting_act_count],
+				        "act12", [meas.reps_min_new_logo_act_count],
+				        "act13", [meas.reps_min_post_sales_act_count],
+				        "act14", [meas.reps_min_existing_customers_act_count],
+				        "act15", [meas.reps_min_internal_act_count],
+				        "act16", FORMAT ( [meas.reps_min_prospecting_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act17", FORMAT ( [meas.reps_min_new_logo_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act18", FORMAT ( [meas.reps_min_post_sales_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act19", FORMAT ( [meas.reps_min_existing_customer_adj_dur_hrs], "#,##0"" hrs""" )
+				    )
+				RETURN
+				    COALESCE ( res, 0 )
+			lineageTag: 0efe0fef-68d6-4de3-a3fa-6fa9e22b33c0
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.rep_overview_metric_2_min' =
+				
+				VAR _selected_metric =
+				    CALCULATE (
+				        SELECTEDVALUE (performance_metric_2[_sys_doc_id] )
+				    )
+				VAR _formatString = MAX ( companies_history[col.currency_format] )
+				VAR res =
+				    SWITCH (
+				        _selected_metric,
+				        "sal1", FORMAT ( [meas.rep_min_won_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip1", FORMAT ( [meas.rep_min_generated_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip4", FORMAT ( [meas.reps_min_open_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.reps_min_open_pipeline_win_rate], "0%" ),
+				        "sal4", FORMAT ( [meas.rep_w_min_new_logo_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal7", FORMAT ( [meas.rep_w_min_existing_customer_selling_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal3", [meas.reps_min_won_deals],
+				        "pip8", [meas.reps_min_generated_leads],
+				        "pip2", FORMAT ( [meas.reps_min_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip5", FORMAT ( [meas.reps_min_adj_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.reps_min_open_pipeline_success_rate], "0.0%" ),
+				        "act1", FORMAT ( [meas.reps_min_act_capt_lvl], "0.0%" ),
+				        "act2", FORMAT ( [meas.reps_min_duration_hrs], "#,##0"" hrs""" ),
+				        "act3", FORMAT ( [meas.reps_min_adj_duration_hrs], "#,##0"" hrs""" ),
+				        "act4", FORMAT ( [meas.reps_min_eng_duration_hrs], "#,##0"" hrs""" ),
+				        "act5", [meas.reps_min_email_count],
+				        "act6", [meas.reps_min_phone_call_count],
+				        "act7", [meas.reps_min_meeting_count],
+				        "act9", [meas.reps_min_social_media_count],
+				        "act10", [meas.reps_min_nd_count],
+				        "act11", [meas.reps_min_prospecting_act_count],
+				        "act12", [meas.reps_min_new_logo_act_count],
+				        "act13", [meas.reps_min_post_sales_act_count],
+				        "act14", [meas.reps_min_existing_customers_act_count],
+				        "act15", [meas.reps_min_internal_act_count],
+				        "act16", FORMAT ( [meas.reps_min_prospecting_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act17", FORMAT ( [meas.reps_min_new_logo_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act18", FORMAT ( [meas.reps_min_post_sales_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act19", FORMAT ( [meas.reps_min_existing_customer_adj_dur_hrs], "#,##0"" hrs""" )
+				    )
+				RETURN
+				    COALESCE ( res, 0 )
+			lineageTag: eb51cd65-d761-4bec-a452-6881e01a2805
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.rep_overview_metric_1_max' =
+				
+				VAR _selected_metric =
+				    CALCULATE (
+				        SELECTEDVALUE ( performance_metric_1[_sys_doc_id] )
+				    )
+				VAR _formatString = MAX ( companies_history[col.currency_format] )
+				VAR res =
+				    SWITCH (
+				        _selected_metric,
+				        "sal1", FORMAT ( [meas.rep_w_max_won_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip1", FORMAT ( [meas.reps_max_generated_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip4", FORMAT ( [meas.reps_max_open_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.reps_max_open_pipeline_win_rate], "0%" ),
+				        "sal4", FORMAT ( [meas.rep_w_max_new_logo_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal7", FORMAT ( [meas.rep_w_max_existing_customer_selling_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal3", [meas.reps_max_won_deals],
+				        "pip8", [meas.reps_max_generated_leads],
+				        "pip2", FORMAT ( [meas.reps_max_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip5", FORMAT ( [meas.reps_max_adj_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.reps_max_open_pipeline_success_rate], "0.0%" ),
+				        "act1", FORMAT ( [meas.reps_max_act_capt_lvl], "0.0%" ),
+				        "act2", FORMAT ( [meas.reps_max_duration_hrs], "#,##0"" hrs""" ),
+				        "act3", FORMAT ( [meas.reps_max_adj_duration_hrs], "#,##0"" hrs""" ),
+				        "act4", FORMAT ( [meas.reps_max_eng_duration_hrs], "#,##0"" hrs""" ),
+				        "act5", [meas.reps_max_email_count],
+				        "act6", [meas.reps_max_phone_call_count],
+				        "act7", [meas.reps_max_meeting_count],
+				        "act9", [meas.reps_max_social_media_count],
+				        "act10", [meas.reps_max_nd_count],
+				        "act11", [meas.reps_max_prospecting_act_count],
+				        "act12", [meas.reps_max_new_logo_act_count],
+				        "act13", [meas.reps_max_post_sales_act_count],
+				        "act14", [meas.reps_max_existing_customer_act_count],
+				        "act15", [meas.reps_max_internal_act_count],
+				        "act16", FORMAT ( [meas.reps_max_prospecting_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act17", FORMAT ( [meas.reps_max_new_logo_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act18", FORMAT ( [meas.reps_max_post_sales_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act19", FORMAT ( [meas.reps_max_existing_customer_adj_dur_hrs], "#,##0"" hrs""" )
+				    )
+				RETURN
+				    COALESCE ( res, 0 )
+			lineageTag: ab05edad-d6ea-4392-9d28-7267e529e85b
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.rep_overview_metric_2_max' =
+				
+				VAR _selected_metric =
+				    CALCULATE (
+				        SELECTEDVALUE ( performance_metric_2[_sys_doc_id] )
+				    )
+				VAR _formatString = MAX ( companies_history[col.currency_format] )
+				VAR res =
+				    SWITCH (
+				        _selected_metric,
+				        "sal1", FORMAT ( [meas.rep_w_max_won_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip1", FORMAT ( [meas.reps_max_generated_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip4", FORMAT ( [meas.reps_max_open_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.reps_max_open_pipeline_win_rate], "0%" ),
+				        "sal4", FORMAT ( [meas.rep_w_max_new_logo_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal7", FORMAT ( [meas.rep_w_max_existing_customer_selling_booking_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "sal3", [meas.reps_max_won_deals],
+				        "pip8", [meas.reps_max_generated_leads],
+				        "pip2", FORMAT ( [meas.reps_max_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip5", FORMAT ( [meas.reps_max_adj_pipeline_amt] / 1000, _formatString & "#,##0" ) & "K",
+				        "pip6", FORMAT ( [meas.reps_max_open_pipeline_success_rate], "0.0%" ),
+				        "act1", FORMAT ( [meas.reps_max_act_capt_lvl], "0.0%" ),
+				        "act2", FORMAT ( [meas.reps_max_duration_hrs], "#,##0"" hrs""" ),
+				        "act3", FORMAT ( [meas.reps_max_adj_duration_hrs], "#,##0"" hrs""" ),
+				        "act4", FORMAT ( [meas.reps_max_eng_duration_hrs], "#,##0"" hrs""" ),
+				        "act5", [meas.reps_max_email_count],
+				        "act6", [meas.reps_max_phone_call_count],
+				        "act7", [meas.reps_max_meeting_count],
+				        "act9", [meas.reps_max_social_media_count],
+				        "act10", [meas.reps_max_nd_count],
+				        "act11", [meas.reps_max_prospecting_act_count],
+				        "act12", [meas.reps_max_new_logo_act_count],
+				        "act13", [meas.reps_max_post_sales_act_count],
+				        "act14", [meas.reps_max_existing_customer_act_count],
+				        "act15", [meas.reps_max_internal_act_count],
+				        "act16", FORMAT ( [meas.reps_max_prospecting_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act17", FORMAT ( [meas.reps_max_new_logo_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act18", FORMAT ( [meas.reps_max_post_sales_adj_dur_hrs], "#,##0"" hrs""" ),
+				        "act19", FORMAT ( [meas.reps_max_existing_customer_adj_dur_hrs], "#,##0"" hrs""" )
+				    )
+				RETURN
+				    COALESCE ( res, 0 )
+			lineageTag: 948d700b-b11f-4645-a991-b02d85d4b8f0
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.rep_overview_metric_1_value' = ```
+				
+				VAR _selected_metric =
+				    CALCULATE (
+				        SELECTEDVALUE ( performance_metric_1[_sys_doc_id] ) 
+				    )
+				VAR _formatString = MAX ( companies_history[col.currency_format] )
+				VAR res =
+				    SWITCH (
+				        _selected_metric,
+				        "sal1", [meas.ssr_history_won_amt],
+				        "pip1", [meas.ssr_history_generated_pipeline_amt],
+				        "pip4", [meas.ssr_history_asof_open_pipeline_amt],
+				        "pip6", [meas.open_opps_avg_win_prob],
+				        "sal4", [meas.ssr_history_won_amt_new_logo],
+				        "sal7", [meas.ssr_history_won_amt_existing_customer_selling],
+				        "sal3", [meas.exp_rpts_all_won_deals],
+				        "pip8", [meas.ssr_history_mgmt_leads_gen_count],
+				        "pip2", [meas.ssr_history_pipeline_amt],
+				        "pip5", [meas.ssr_history_adj_pipeline_amt],
+				        "pip6", [meas.ssr_history_open_pipeline_success_rate],
+				        "act1", [meas.users_history_avg_ci_act_capt_lvl],
+				        "act2", [meas.ssr_history_all_duration_hrs],
+				        "act3", [meas.ssr_history_duration_hrs],
+				        "act4", [meas.ssr_history_all_eng_duration_hrs],
+				        "act5", [meas.stkhlds_all_act_email_count],
+				        "act6", [meas.stkhlds_all_act_phone_calls],
+				        "act7", [meas.stkhlds_all_act_meeting_count],
+				        "act9", [meas.stkhlds_all_act_social_media_count],
+				        "act10", [meas.stkhlds_all_act_nd_count],
+				        "act11", [meas.users_activities_prospecting_count],
+				        "act12", [meas.users_activities_new_logo_count],
+				        "act13", [meas.users_activities_post_sales_count],
+				        "act14", [meas.users_activities_existing_customer_count],
+				        "act15", [meas.users_activities_internal_count],
+				        "act16", [meas.ssr_history_duration_hrs_prospecting],
+				        "act17", [meas.ssr_history_duration_hrs_new_logo],
+				        "act18", [meas.ssr_history_duration_hrs_post_sales],
+				        "act19", [meas.ssr_history_duration_hrs_existing_customer_selling]
+				    )
+				RETURN
+				    COALESCE ( res, 0 )
+				```
+			lineageTag: 5690205b-3ed9-4e6a-8bff-b1dd313a789a
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.rep_overview_metric_2_value' = ```
+				
+				VAR _selected_metric =
+				    CALCULATE (
+				        SELECTEDVALUE ( performance_metric_2[_sys_doc_id] ) 
+				    )
+				VAR _formatString = MAX ( companies_history[col.currency_format] )
+				VAR res =
+				    SWITCH (
+				        _selected_metric,
+				        "sal1", [meas.ssr_history_won_amt],
+				        "pip1", [meas.ssr_history_generated_pipeline_amt],
+				        "pip4", [meas.ssr_history_asof_open_pipeline_amt],
+				        "pip6", [meas.open_opps_avg_win_prob],
+				        "sal4", [meas.ssr_history_won_amt_new_logo],
+				        "sal7", [meas.ssr_history_won_amt_existing_customer_selling],
+				        "sal3", [meas.exp_rpts_all_won_deals],
+				        "pip8", [meas.ssr_history_mgmt_leads_gen_count],
+				        "pip2", [meas.ssr_history_pipeline_amt],
+				        "pip5", [meas.ssr_history_adj_pipeline_amt],
+				        "pip6", [meas.ssr_history_open_pipeline_success_rate],
+				        "act1", [meas.users_history_avg_ci_act_capt_lvl],
+				        "act2", [meas.ssr_history_all_duration_hrs],
+				        "act3", [meas.ssr_history_duration_hrs],
+				        "act4", [meas.ssr_history_all_eng_duration_hrs],
+				        "act5", [meas.stkhlds_all_act_email_count],
+				        "act6", [meas.stkhlds_all_act_phone_calls],
+				        "act7", [meas.stkhlds_all_act_meeting_count],
+				        "act9", [meas.stkhlds_all_act_social_media_count],
+				        "act10", [meas.stkhlds_all_act_nd_count],
+				        "act11", [meas.users_activities_prospecting_count],
+				        "act12", [meas.users_activities_new_logo_count],
+				        "act13", [meas.users_activities_post_sales_count],
+				        "act14", [meas.users_activities_existing_customer_count],
+				        "act15", [meas.users_activities_internal_count],
+				        "act16", [meas.ssr_history_duration_hrs_prospecting],
+				        "act17", [meas.ssr_history_duration_hrs_new_logo],
+				        "act18", [meas.ssr_history_duration_hrs_post_sales],
+				        "act19", [meas.ssr_history_duration_hrs_existing_customer_selling]
+				    )
+				RETURN
+				    COALESCE ( res, 0 )
+				```
+			lineageTag: 43d9a438-2c36-40c3-82a9-38d6b8afe851
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.new_logo_avg_booking_amt' =
+				
+				var _total = [meas.ssr_history_won_amt_new_logo]         // get the new logo
+				var reps_count = [meas.data_logs_user_count_all]            // total rep count
+				var res = DIVIDE(_total, reps_count)            // GET THE avg by reps
+				RETURN
+				res
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _average
+			lineageTag: 8596af6e-bc83-430a-b1cf-4eb4e13fabf0
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.rep_w_max_new_logo_booking_amt' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max amt
+				    [meas.ssr_history_won_amt_new_logo]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _max
+			lineageTag: 58de050c-9593-425e-8266-6da480b2108b
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.rep_w_min_new_logo_booking_amt' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min amt
+				    [meas.ssr_history_won_amt_new_logo]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _min
+			lineageTag: 645d5833-5318-4580-9a99-b76d2df923fa
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.existing_customer_selling_avg_booking_amt' =
+				
+				var _total = [meas.ssr_history_won_amt_existing_customer_selling]         // get the new logo
+				var reps_count = [meas.data_logs_user_count_all]            // total rep count
+				var res = DIVIDE(_total, reps_count)            // GET THE avg by reps
+				RETURN
+				res
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _average
+			lineageTag: 1af03fdb-f2d1-4e43-8add-c3d281f77bc8
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.rep_w_max_existing_customer_selling_booking_amt' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max amt
+				    [meas.ssr_history_won_amt_existing_customer_selling]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _max
+			lineageTag: b7b67ae4-87f6-4e83-96ec-181ee325c6cd
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.rep_w_min_existing_customer_selling_booking_amt' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min amt
+				    [meas.ssr_history_won_amt_existing_customer_selling]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _min
+			lineageTag: 75f018a6-44d3-42dd-a9be-e8889a6023a2
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.reps_average_won_deals' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage won deals ccount
+				    [meas.exp_rpts_all_won_deals]
+				)
+			formatString: 0
+			displayFolder: _average
+			lineageTag: 6a507834-e91c-4f27-a154-ee80d9340bc2
+
+		measure 'meas.reps_max_won_deals' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max won deals ccount
+				    [meas.exp_rpts_all_won_deals]
+				)
+			formatString: 0
+			displayFolder: _max
+			lineageTag: b59f723a-dbb5-4a4c-bc8b-706fecdf7b1e
+
+		measure 'meas.reps_min_won_deals' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage won deals ccount
+				    [meas.exp_rpts_all_won_deals]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: f9d612ce-cff2-4b47-a4fb-4075bd974237
+
+		measure 'meas.reps_avg_generated_leads' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage generated leads ccount
+				    [meas.ssr_history_mgmt_leads_gen_count]
+				)
+			displayFolder: _average
+			lineageTag: 6c6a4928-757a-4e37-a57f-2fa9ec01d9e9
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_generated_leads' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max generated leads ccount
+				    [meas.ssr_history_mgmt_leads_gen_count]
+				)
+			formatString: 0
+			displayFolder: _max
+			lineageTag: 8fb53e69-1add-43bb-8e83-bde0b9096e54
+
+		measure 'meas.reps_min_generated_leads' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min generated leads ccount
+				    [meas.ssr_history_mgmt_leads_gen_count]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: 413ed11d-2855-43f4-9dde-b50f061a0cad
+
+		measure 'meas.reps_average_pipeline_amt' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage pipeline amount
+				    [meas.ssr_history_pipeline_amt]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _average
+			lineageTag: 222e2b9f-5739-4d4e-8243-00c7900f46ce
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.reps_max_pipeline_amt' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage pipeline amount
+				    [meas.ssr_history_pipeline_amt]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _max
+			lineageTag: 9932d53a-dc61-4f2a-a358-7cdf59d22319
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.reps_min_pipeline_amt' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage pipeline amount
+				    [meas.ssr_history_pipeline_amt]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _min
+			lineageTag: c773b4b2-7afb-43d0-8441-935de8da409a
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.reps_average_adj_pipeline_amt' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage adj pipeline amount
+				    [meas.ssr_history_adj_pipeline_amt]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _average
+			lineageTag: cafda325-f243-4f06-8386-a3dadbc9ae66
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.reps_max_adj_pipeline_amt' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max adj pipeline amount
+				    [meas.ssr_history_adj_pipeline_amt]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _max
+			lineageTag: fd5d2ffe-d139-4c5a-9831-51666eeb4f50
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.reps_min_adj_pipeline_amt' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min adj pipeline amount
+				    [meas.ssr_history_adj_pipeline_amt]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			displayFolder: _min
+			lineageTag: 399f7d03-3a56-482c-a4a5-002ca6ebdd5b
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'meas.reps_average_open_pipeline_success_rate' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage open pipeline success rate
+				    [meas.ssr_history_open_pipeline_success_rate]
+				)
+			displayFolder: _average
+			lineageTag: ac798b8b-4225-42cc-b62d-7f96d8f6c06d
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_open_pipeline_success_rate' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max open pipeline success rate
+				    [meas.ssr_history_open_pipeline_success_rate]
+				)
+			displayFolder: _max
+			lineageTag: 7408f5f4-090b-46ea-94f9-08c2a951ca7d
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_min_open_pipeline_success_rate' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min open pipeline success rate
+				    [meas.ssr_history_open_pipeline_success_rate]
+				)
+			displayFolder: _min
+			lineageTag: 8756f5b1-1b51-4ac5-ae8f-d0b93fa9d31c
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_avg_act_capt_lvl' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage act capt lvl
+				    [meas.users_history_avg_ci_act_capt_lvl]
+				)
+			displayFolder: _average
+			lineageTag: d15dba62-4cec-4fb4-b4a4-935567715ce6
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_act_capt_lvl' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max act capt lvl
+				    [meas.users_history_avg_ci_act_capt_lvl]
+				)
+			displayFolder: _max
+			lineageTag: f5be084e-d53c-4e7e-861b-5e1f666a00ea
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_min_act_capt_lvl' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min act capt lvl
+				    [meas.users_history_avg_ci_act_capt_lvl]
+				)
+			displayFolder: _min
+			lineageTag: cddd6cbb-b3a8-4262-94aa-488c592fdb24
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_avg_adj_duration_hrs' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage duration hrs
+				    [meas.ssr_history_duration_hrs]
+				)
+			displayFolder: _average
+			lineageTag: a6f86bcd-f875-4a56-ae72-7a214c261060
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_adj_duration_hrs' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max adj duration hrs
+				    [meas.ssr_history_duration_hrs]
+				)
+			displayFolder: _max
+			lineageTag: 6621575b-027c-40aa-b8c0-70e0e69023c5
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_min_adj_duration_hrs' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min adj duration hrs
+				    [meas.ssr_history_duration_hrs]
+				)
+			displayFolder: _min
+			lineageTag: cefccf31-0c5f-44d3-8137-9842d23ca74e
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_avg_duration_hrs' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage duration hrs
+				    [meas.ssr_history_all_duration_hrs]
+				)
+			displayFolder: _average
+			lineageTag: da6b9c0e-bdb9-41a7-87d9-20726390870a
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_duration_hrs' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max duration hrs
+				    [meas.ssr_history_all_duration_hrs]
+				)
+			displayFolder: _max
+			lineageTag: d58d32ca-5b7c-43d8-98a0-178ad5a5d60e
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_min_duration_hrs' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min duration hrs
+				    [meas.ssr_history_all_duration_hrs]
+				)
+			displayFolder: _min
+			lineageTag: 093bc6fb-0204-403e-8d69-e8e1d16045b3
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_avg_eng_duration_hrs' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage eng duration hrs
+				    [meas.ssr_history_all_eng_duration_hrs]
+				)
+			displayFolder: _average
+			lineageTag: 0cc9c620-bdfd-4bd7-a57e-2759ca9c58b1
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_eng_duration_hrs' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max eng duration hrs
+				    [meas.ssr_history_all_eng_duration_hrs]
+				)
+			displayFolder: _max
+			lineageTag: 8e9d4c3a-1b25-4bce-94e1-8f3e0c432a5c
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_min_eng_duration_hrs' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min eng duration hrs
+				    [meas.ssr_history_all_eng_duration_hrs]
+				)
+			displayFolder: _min
+			lineageTag: 3c747396-c542-4aeb-b159-c2d1598672f0
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_average_email_count' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage email count
+				    [meas.stkhlds_all_act_email_count]
+				)
+			displayFolder: _average
+			lineageTag: 6c1c9a51-1180-449a-ab34-19a57f9c1b3f
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_email_count' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max email count
+				    [meas.stkhlds_all_act_email_count]
+				)
+			formatString: 0
+			displayFolder: _max
+			lineageTag: 5649bda9-e6cd-4843-9b89-7756cc802112
+
+		measure 'meas.reps_min_email_count' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min email count
+				    [meas.stkhlds_all_act_email_count]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: 27384f84-a3aa-4a8a-a9de-d05d9fb449b7
+
+		measure 'meas.reps_average_phone_call_count' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage phone call count
+				    [meas.ssr_history_all_phone_call_count]
+				)
+			displayFolder: _average
+			lineageTag: 91cb718f-cfbf-451c-9da0-084144b94813
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_phone_call_count' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage phone call count
+				    [meas.ssr_history_all_phone_call_count]
+				)
+			displayFolder: _max
+			lineageTag: ac9570c0-3a15-48ee-91a5-a300a143c36c
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_min_phone_call_count' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min phone call count
+				    [meas.ssr_history_all_phone_call_count]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: a69ea3cc-fdcd-4aef-a9a5-ad6dc523a1f0
+
+		measure 'meas.reps_average_meeting_count' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage meeting count
+				    [meas.stkhlds_all_act_meeting_count]
+				)
+			displayFolder: _average
+			lineageTag: cc4ef2ae-ada0-485f-aefb-57e977a00272
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_meeting_count' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max meeting count
+				    [meas.stkhlds_all_act_meeting_count]
+				)
+			formatString: 0
+			displayFolder: _max
+			lineageTag: 4802efb5-6ff9-4cc4-8009-f9628ae18922
+
+		measure 'meas.reps_min_meeting_count' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min meeting count
+				    [meas.stkhlds_all_act_meeting_count]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: 771585cc-db1c-4b57-b1dd-07852bb6921c
+
+		measure 'meas.reps_average_social_media_count' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage social media count
+				    [meas.stkhlds_all_act_social_media_count]
+				)
+			displayFolder: _average
+			lineageTag: 5a88b490-d781-4618-b1ea-ef496a94fbcf
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_social_media_count' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max social media count
+				    [meas.stkhlds_all_act_social_media_count]
+				)
+			formatString: 0
+			displayFolder: _max
+			lineageTag: 93645c57-9579-4147-83ca-e29c820a7980
+
+		measure 'meas.reps_min_social_media_count' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min social media count
+				    [meas.stkhlds_all_act_social_media_count]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: 225b8d4a-c7d1-4542-aec7-67fbded3de0b
+
+		measure 'meas.reps_average_nd_count' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage nd count
+				    [meas.stkhlds_all_act_nd_count]
+				)
+			displayFolder: _average
+			lineageTag: 0272eec4-83f5-408d-8591-b9cd2e09d4a2
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_nd_count' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max nd count
+				    [meas.stkhlds_all_act_nd_count]
+				)
+			formatString: 0
+			displayFolder: _max
+			lineageTag: d3800605-3574-45e9-9f35-199aa79e817e
+
+		measure 'meas.reps_min_nd_count' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min nd count
+				    [meas.stkhlds_all_act_nd_count]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: 6dfdbb79-c8ff-4503-b728-2ce7feb58e6f
+
+		measure 'meas.reps_avg_prospecting_act_count' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage users prospecting activities
+				    [meas.users_activities_prospecting_count]
+				)
+			displayFolder: _average
+			lineageTag: 12c4a52b-c021-4217-bf0c-bbc307c95d24
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_avg_new_logo_act_count' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage users new logo activities
+				    [meas.users_activities_new_logo_count]
+				)
+			displayFolder: _average
+			lineageTag: 13e039a5-6aef-4275-899d-689a2577e929
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_avg_post_sales_act_count' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage users post sales  activities
+				    [meas.users_activities_post_sales_count]
+				)
+			displayFolder: _average
+			lineageTag: 7cfe8e6c-d501-42f9-8c6e-d957c5af6fa0
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_avg_existing_customer_selling_act_count' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage users existing customer activities
+				    [meas.users_activities_existing_customer_count]
+				)
+			displayFolder: _average
+			lineageTag: 40531b02-fcdc-4dde-a986-3da58037479d
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_avg_internal_act_count' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage users internal activities
+				    [meas.users_activities_internal_count]
+				)
+			displayFolder: _average
+			lineageTag: d59e055a-43ed-4512-9090-708c1592f688
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_post_sales_act_count' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max users post sales  activities
+				    [meas.users_activities_post_sales_count]
+				)
+			formatString: 0
+			displayFolder: _max
+			lineageTag: 1d874f98-d537-411d-8f1a-27da09c07f07
+
+		measure 'meas.reps_max_prospecting_act_count' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max users prospecting  activities
+				    [meas.users_activities_prospecting_count]
+				)
+			formatString: 0
+			displayFolder: _max
+			lineageTag: 25d99ee6-f1b2-4579-a7c6-4f3dffbde87d
+
+		measure 'meas.reps_max_new_logo_act_count' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max users new logo  activities
+				    [meas.users_activities_new_logo_count]
+				)
+			formatString: 0
+			displayFolder: _max
+			lineageTag: b2cb083d-110b-452f-80a7-93bd1d85e130
+
+		measure 'meas.reps_max_existing_customer_act_count' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max users existing customer  activities
+				    [meas.users_activities_existing_customer_count]
+				)
+			formatString: 0
+			displayFolder: _max
+			lineageTag: f3c28b07-ed62-49e6-8d9c-ae59f7dda86a
+
+		measure 'meas.reps_max_internal_act_count' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max users internal activities
+				    [meas.users_activities_internal_count]
+				)
+			formatString: 0
+			displayFolder: _max
+			lineageTag: 554db126-dc32-4087-827f-7dfa25851499
+
+		measure 'meas.reps_min_post_sales_act_count' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min users post sales  activities
+				    [meas.users_activities_post_sales_count]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: 800793f3-4774-4b1c-94db-a02f17693178
+
+		measure 'meas.reps_min_prospecting_act_count' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min users pprospecting  activities
+				    [meas.users_activities_prospecting_count]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: ef6eedad-a0e4-49b9-9d13-d2d294c530f8
+
+		measure 'meas.reps_min_new_logo_act_count' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min users new logo  activities
+				    [meas.users_activities_new_logo_count]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: 488ebf4d-2904-437c-9839-0c4eb373d2a9
+
+		measure 'meas.reps_min_existing_customers_act_count' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min users pprospecting  activities
+				    [meas.users_activities_existing_customer_count]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: 65069a21-c7c6-4772-8950-f233dd87962c
+
+		measure 'meas.reps_min_internal_act_count' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min users internal  activities
+				    [meas.users_activities_internal_count]
+				)
+			formatString: 0
+			displayFolder: _min
+			lineageTag: bce3081c-5a6a-429b-b5bc-1948621904ba
+
+		measure 'meas.reps_avg_prospecting_adj_dur_hrs' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage users prospecting dur
+				    [meas.ssr_history_duration_hrs_prospecting]
+				)
+			displayFolder: _average
+			lineageTag: 7a7221e4-2009-467a-9541-ef72c17dc754
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_avg_new_logo_adj_dur_hrs' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage users new logo dur
+				    [meas.ssr_history_duration_hrs_new_logo]
+				)
+			displayFolder: _average
+			lineageTag: 7f0857d0-7c1a-4f6e-9511-a044f42b29f5
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_avg_post_sales_adj_dur_hrs' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage users post-sales dur
+				    [meas.ssr_history_duration_hrs_post_sales]
+				)
+			displayFolder: _average
+			lineageTag: 7bb2cb6e-1a8c-47da-9bd8-65994093e7e2
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_avg_existing_customer_adj_dur_hrs' =
+				
+				AVERAGEX(
+				    VALUES('users'[col.full_name]),         /// get the rep avwerage users existing customer dur
+				    [meas.ssr_history_duration_hrs_existing_customer_selling]
+				)
+			displayFolder: _average
+			lineageTag: e83bb8e9-d691-4394-b26d-a93fefa260c1
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_existing_customer_adj_dur_hrs' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max users existing customer dur
+				    [meas.ssr_history_duration_hrs_existing_customer_selling]
+				)
+			displayFolder: _max
+			lineageTag: 60ca52c2-3fcc-47e8-b4a9-3a7e17a618da
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_prospecting_adj_dur_hrs' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max users prospecting dur
+				    [meas.ssr_history_duration_hrs_prospecting]
+				)
+			displayFolder: _max
+			lineageTag: 098c1074-1e44-46a0-9496-6e083a5a4177
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_new_logo_adj_dur_hrs' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max users new logo dur
+				    [meas.ssr_history_duration_hrs_new_logo]
+				)
+			displayFolder: _max
+			lineageTag: 10af138a-9ef9-45cf-b23a-437ceb51a1f8
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_max_post_sales_adj_dur_hrs' =
+				
+				MAXX(
+				    VALUES('users'[col.full_name]),         /// get the rep max users post sales dur
+				    [meas.ssr_history_duration_hrs_post_sales]
+				)
+			displayFolder: _max
+			lineageTag: 42643003-b6db-4b3b-b90f-50ff6e3fd3dc
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_min_prospecting_adj_dur_hrs' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min users prospecting dur
+				    [meas.ssr_history_duration_hrs_prospecting]
+				)
+			displayFolder: _min
+			lineageTag: 380186f3-685b-425c-b417-ece585f5c7e2
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_min_new_logo_adj_dur_hrs' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min users new logo dur
+				    [meas.ssr_history_duration_hrs_new_logo]
+				)
+			displayFolder: _min
+			lineageTag: 00d89075-6f35-4d9d-a290-1b6b6c252949
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_min_post_sales_adj_dur_hrs' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min users post sales dur
+				    [meas.ssr_history_duration_hrs_post_sales]
+				)
+			displayFolder: _min
+			lineageTag: 059b29c0-0b98-4335-853e-dd5690e215be
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'meas.reps_min_existing_customer_adj_dur_hrs' =
+				
+				MINX(
+				    VALUES('users'[col.full_name]),         /// get the rep min users existing customer dur
+				    [meas.ssr_history_duration_hrs_existing_customer_selling]
+				)
+			displayFolder: _min
+			lineageTag: aba601ca-5a0a-4efe-ad83-e5d213e9be75
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column _sys_doc_id
+			dataType: string
+			lineageTag: 2212fa67-8aad-4292-87f7-94f44117c755
+			summarizeBy: none
+			sourceColumn: _sys_doc_id
+
+			annotation SummarizationSetBy = Automatic
+
+		column metric_1
+			dataType: string
+			lineageTag: 3f8f3aec-3219-4caf-a4d2-75c4cfcf85ad
+			summarizeBy: none
+			sourceColumn: metric_1
+
+			annotation SummarizationSetBy = Automatic
+
+		column sort_order
+			dataType: string
+			lineageTag: 5ffc3fc7-36ba-4dbb-99fa-e8a8d838db99
+			summarizeBy: none
+			sourceColumn: sort_order
+
+			annotation SummarizationSetBy = Automatic
+
+		column pbi_measure
+			dataType: string
+			lineageTag: 957c88e8-149c-4c60-b79c-e19788f8bc40
+			summarizeBy: none
+			sourceColumn: pbi_measure
+
+			annotation SummarizationSetBy = Automatic
+
+		partition performance_metric_1 = m
+			mode: import
+			source =
+					let
+					    Source = "[#(cr)#(lf)  { ""_sys_doc_id"": ""sal1"",  ""name"": ""Won Booking Amt."",                ""sort_order"": ""SR2"",  ""pbi_measure"": ""meas.ssr_history_won_amt"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal2"",  ""name"": ""Won Bookings %"",                  ""sort_order"": ""SR3"",  ""pbi_measure"": ""meas.ssr_history_win_rate"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal3"",  ""name"": ""Won Deals"",                       ""sort_order"": ""SR4"",  ""pbi_measure"": ""meas.exp_rpts_all_won_deals"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal4"",  ""name"": ""New Logo Bookings Amt."",          ""sort_order"": ""SR5"",  ""pbi_measure"": ""meas.ssr_history_won_amt_new_logo"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal5"",  ""name"": ""New Logo Bookings %"",             ""sort_order"": ""SR6"",  ""pbi_measure"": ""meas.ssr_history_amt_new_logo_win_rate"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal6"",  ""name"": ""Won New Logo Deals Amt."",         ""sort_order"": ""SR7"",  ""pbi_measure"": ""meas.opps_won_deals_new_logo_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal7"",  ""name"": ""Won Existing Customer Deals"",     ""sort_order"": ""SR8"",  ""pbi_measure"": ""meas.ssr_history_won_amt_existing_customer_selling"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal8"",  ""name"": ""Won Existing Customer %"",         ""sort_order"": ""SR9"",  ""pbi_measure"": ""meas.ssr_history_win_rate_existing_customer"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal9"",  ""name"": ""Won Existing Customer Deals"",     ""sort_order"": ""SR10"", ""pbi_measure"": ""meas.opps_won_deals_existing_customer_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal10"", ""name"": ""Performance Tier (1=UP, 2=P, 3=OP)"", ""sort_order"": ""SR11"", ""pbi_measure"": ""meas.performance_metric_rep"" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb1"",  ""name"": ""Discovery Skill"",                 ""sort_order"": ""SR13"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb2"",  ""name"": ""Engagement Ability"",              ""sort_order"": ""SR14"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb3"",  ""name"": ""Closing Ability"",                 ""sort_order"": ""SR15"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb4"",  ""name"": ""Deal Maximizing"",                 ""sort_order"": ""SR16"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb5"",  ""name"": ""Work Effort"",                     ""sort_order"": ""SR17"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb6"",  ""name"": ""Time Management"",                 ""sort_order"": ""SR18"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb7"",  ""name"": ""Value Received Score"",            ""sort_order"": ""SR19"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip1"",  ""name"": ""Pipeline Gen. Amt"",               ""sort_order"": ""SR21"", ""pbi_measure"": ""[meas.ssr_history_generated_pipeline_amt]/1000"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip2"",  ""name"": ""Pipeline Amt."",                   ""sort_order"": ""SR22"", ""pbi_measure"": ""meas.ssr_history_pipeline_amt"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip3"",  ""name"": ""Pipeline Amt.Avg"",                ""sort_order"": ""SR23"", ""pbi_measure"": ""meas.ssr_history_pipeline_amt_avg"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip4"",  ""name"": ""Open Pipeline Amt"",               ""sort_order"": ""SR24"", ""pbi_measure"": ""meas.open_pipeline_booking_amt"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip5"",  ""name"": ""Adjusted Open Pipeline"",          ""sort_order"": ""SR25"", ""pbi_measure"": ""meas.ssr_history_adj_pipeline_amt"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip6"",  ""name"": ""Avg. Expected Win rate"",          ""sort_order"": ""SR26"", ""pbi_measure"": ""meas.ssr_history_open_pipeline_success_rate"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip7"",  ""name"": ""Open Pipeline"",                   ""sort_order"": ""SR27"", ""pbi_measure"": ""meas.open_pipeline_count_id"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip8"",  ""name"": ""Generated Leads"",                 ""sort_order"": ""SR28"", ""pbi_measure"": ""meas.ssr_history_mgmt_leads_gen_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars1"",  ""name"": ""Territory Account"",               ""sort_order"": ""SR30"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars2"",  ""name"": ""Leads Received"",                  ""sort_order"": ""SR31"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars3"",  ""name"": ""Accounts Received"",               ""sort_order"": ""SR32"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars4"",  ""name"": ""Opps Received"",                   ""sort_order"": ""SR33"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars5"",  ""name"": ""Open Pipeline"",                   ""sort_order"": ""SR34"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars6"",  ""name"": ""Quality Adjusted Pipeline"",       ""sort_order"": ""SR35"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""act1"",  ""name"": ""Activity Capture Level (ACL)"",    ""sort_order"": ""SR37"", ""pbi_measure"": ""meas.users_history_avg_ci_act_capt_lvl"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act2"",  ""name"": ""Activity Count"",                  ""sort_order"": ""SR38"", ""pbi_measure"": ""meas.stkhlds_all_act_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act3"",  ""name"": ""Adj. Duration"",                   ""sort_order"": ""SR39"", ""pbi_measure"": ""meas.ssr_history_duration_hrs"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act4"",  ""name"": ""Engaged Duration"",                ""sort_order"": ""SR40"", ""pbi_measure"": ""meas.ssr_history_all_eng_duration_hrs"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act5"",  ""name"": ""# of Emails"",                     ""sort_order"": ""SR41"", ""pbi_measure"": ""meas.stkhlds_all_act_email_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act6"",  ""name"": ""# of Phone Calls"",                ""sort_order"": ""SR42"", ""pbi_measure"": ""meas.stkhlds_all_act_phone_calls"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act7"",  ""name"": ""# of Meetings"",                   ""sort_order"": ""SR43"", ""pbi_measure"": ""meas.stkhlds_all_act_meeting_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act8"",  ""name"": ""# of Other"",                      ""sort_order"": ""SR44"", ""pbi_measure"": ""meas.stkhlds_all_act_other_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act9"",  ""name"": ""# of Social Media"",               ""sort_order"": ""SR45"", ""pbi_measure"": ""meas.stkhlds_all_act_social_media_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act10"", ""name"": ""# of ND"",                         ""sort_order"": ""SR46"", ""pbi_measure"": ""meas.stkhlds_all_act_nd_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act11"", ""name"": ""# of Prospecting Act."",           ""sort_order"": ""SR47"", ""pbi_measure"": ""meas.users_activities_prospecting_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act12"", ""name"": ""# of New Logo Selling Act."",      ""sort_order"": ""SR48"", ""pbi_measure"": ""meas.users_activities_new_logo_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act13"", ""name"": ""# of Post-Sales Support Act."",    ""sort_order"": ""SR49"", ""pbi_measure"": ""meas.users_activities_post_sales_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act14"", ""name"": ""# of Existing Customer Selling Act."", ""sort_order"": ""SR50"", ""pbi_measure"": ""meas.users_activities_existing_customer_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act15"", ""name"": ""# of Internal Act."",              ""sort_order"": ""SR51"", ""pbi_measure"": ""meas.users_activities_internal_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act16"", ""name"": ""Adj. Duration Prospecting"",       ""sort_order"": ""SR52"", ""pbi_measure"": ""meas.ssr_history_duration_hrs_prospecting"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act17"", ""name"": ""Adj. Duration New Logo"",          ""sort_order"": ""SR53"", ""pbi_measure"": ""meas.ssr_history_duration_hrs_new_logo"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act18"", ""name"": ""Adj. Duration Post-Sales"",        ""sort_order"": ""SR54"", ""pbi_measure"": ""meas.ssr_history_duration_hrs_post_sales"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act19"", ""name"": ""Adj. Duration Existing Customers"",""sort_order"": ""SR55"", ""pbi_measure"": ""meas.ssr_history_duration_hrs_existing_customer_selling"" },#(cr)#(lf)  { ""_sys_doc_id"": ""val1"",  ""name"": ""Value Received"",                  ""sort_order"": ""SR57"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""val2"",  ""name"": ""Value Created"",                   ""sort_order"": ""SR58"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""val3"",  ""name"": ""Value Delivered"",                 ""sort_order"": ""SR59"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""com1"",  ""name"": ""Avg Skills & Behavior Score"",     ""sort_order"": ""SR61"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""com2"",  ""name"": ""Geometric Mean – S&B Scores"",     ""sort_order"": ""SR62"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""com3"",  ""name"": ""Geometric Score"",                 ""sort_order"": ""SR63"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""msc1"",  ""name"": ""Tenure in Months"",                ""sort_order"": ""SR65"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""msc2"",  ""name"": ""User’s Favorite Number"",          ""sort_order"": ""SR66"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""msc3"",  ""name"": ""Length of Name"",                  ""sort_order"": ""SR67"", ""pbi_measure"": """" }#(cr)#(lf)]#(cr)#(lf)",
+					    ParsedJson = Json.Document(Source),
+					    ParsedJson1 = Table.FromList(ParsedJson, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+					    Column1 = Table.ExpandRecordColumn(ParsedJson1, "Column1", {
+					        "_sys_doc_id", "name", "sort_order", "pbi_measure"
+					    }),
+					    #"Tipo cambiado" = Table.TransformColumnTypes(Column1, {
+					    {"_sys_doc_id", type text},
+					    {"name", type text},
+					    {"sort_order", type text},
+					    {"pbi_measure", type text}
+					})
+					in
+					    #"Tipo cambiado"
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table
+

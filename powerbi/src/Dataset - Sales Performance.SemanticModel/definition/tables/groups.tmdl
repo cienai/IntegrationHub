@@ -1,0 +1,48 @@
+table groups
+	lineageTag: 6575302f-eebb-4ceb-8526-d6c50ea7c56c
+
+	column compare_within_group
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c719fe05-76bb-40bb-9257-b9720aa4a773
+		summarizeBy: none
+		sourceColumn: compare_within_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: db65fe5b-ea27-45ba-a768-f95bd8d6cc6d
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_doc_id
+		dataType: string
+		lineageTag: 396031a9-2616-489b-8687-a8116efb6299
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition groups-06a3b01d-9630-43b9-83a4-93b982bbfb36 = m
+		mode: import
+		source =
+				let
+				  dbTable = getDBTable("groups"), // get the right table
+				
+				
+				  dbTableTyped = Table.TransformColumnTypes(dbTable,{ // change types to what we're expecting
+				    {"_sys_doc_id", type text},
+				{"compare_within_group", type logical},
+				{"name", type text}
+				
+				   })
+				in
+				  dbTableTyped
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

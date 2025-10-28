@@ -1,0 +1,180 @@
+table completeness_summary
+	lineageTag: d2335d94-1b51-4ae1-b5a5-a94bd0bf7e50
+
+	column entity
+		lineageTag: 9deb698c-bcb1-4bce-b248-b7a639df7089
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [entity]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_docid
+		lineageTag: f0382cae-9cd9-46dd-8455-ba91bfa204f0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_docid]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_user_id
+		lineageTag: 5008adf0-d245-433a-ac5a-2b68b716aa79
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_user_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_filter_start_date
+		formatString: General Date
+		lineageTag: 975cb6f0-ff51-4c90-b1df-37b297aacf14
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_filter_start_date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column sort
+		formatString: 0
+		lineageTag: 9da5fcab-f24f-449e-b3d4-0a58f0c0ebcc
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_completeness
+		dataType: double
+		lineageTag: 04717ae8-3383-41f8-8cef-21224e72f8a1
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [crm_completeness]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column crm_completeness_geo
+		lineageTag: 27baeeb1-81d7-4a32-883e-32f1e95d13ee
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [crm_completeness_geo]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column crm_completeness_marketing
+		lineageTag: a0e7e876-1ed9-4e9a-b263-060ef03e6a69
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [crm_completeness_marketing]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column crm_completeness_contact
+		lineageTag: f5846edf-a498-4cbe-a190-877c6d6cc10e
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [crm_completeness_contact]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column crm_completeness_contact_method
+		lineageTag: 66e5dc6a-b3b5-48b2-b072-d776c3e52442
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [crm_completeness_contact_method]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_completeness
+		lineageTag: 11495058-455d-4be1-9683-8e450ee48c53
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [trueai_completeness]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_completeness_geo
+		lineageTag: 766777dc-a897-4a80-8e90-e9950db7bfbf
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [trueai_completeness_geo]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_completeness_marketing
+		lineageTag: 0cc9a595-15ef-48f0-acf7-730843a82320
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [trueai_completeness_marketing]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_completeness_contact
+		lineageTag: 9f92c5a2-00b8-4404-97e7-7187f3755c3e
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [trueai_completeness_contact]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_completeness_contact_method
+		lineageTag: 19a72fd4-0349-4dc8-9a35-afa36f4eaac1
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [trueai_completeness_contact_method]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition completeness_summary = calculated
+		mode: import
+		source = ```
+				UNION(
+				
+				 SELECTCOLUMNS(contacts, "entity", "Contacts",  "_sys_docid", contacts[_sys_doc_id], "_sys_user_id", contacts[trueai_owner_id],  "_sys_filter_start_date", contacts[_sys_filt_start_date],  "sort", 1,
+				"crm_completeness", contacts[crm_complt], 
+				"crm_completeness_geo", contacts[crm_complt_geo], "crm_completeness_marketing", contacts[crm_complt_marketing],"crm_completeness_contact", contacts[crm_complt_contact],  "crm_completeness_contact_method", contacts[crm_complt_contact_method], 
+				"trueai_completeness", contacts[trueai_complt],  
+				"trueai_completeness_geo", contacts[trueai_complt_geo], "trueai_completeness_marketing", contacts[trueai_complt_marketing], "trueai_completeness_contact", contacts[trueai_complt_contact], "trueai_completeness_contact_method", contacts[crm_complt_contact_method]) //contacts
+				,
+				/*SELECTCOLUMNS(accounts, "entity", "Accounts",  "_sys_docid", accounts[_sys_docid], "_sys_user_id", accounts[trueai_owner_id],  "_sys_filter_start_date", accounts[_sys_filt_start_date],   "sort", 2,
+				"crm_completeness", accounts[crm_complt], 
+				"crm_completeness_geo", accounts[crm_complt_geo], "crm_completeness_marketing", accounts[crm_complt_marketing],"crm_completeness_contact", accounts[crm_complt_contact],  "crm_completeness_contact_method", accounts[crm_complt_contact_method], 
+				"trueai_completeness", accounts[trueai_complt],  
+				"trueai_completeness_geo", accounts[trueai_complt_geo], "trueai_completeness_marketing", accounts[trueai_complt_marketing], "trueai_completeness_contact", accounts[trueai_complt_contact], "trueai_completeness_contact_method", accounts[crm_complt_contact_method]), */ // accounts
+				
+				SELECTCOLUMNS(opps, "entity", "Opps",  "_sys_docid", opps[_sys_doc_id], "_sys_user_id", opps[trueai_owner_id],  "_sys_filter_start_date", opps[_sys_filt_start_date],   "sort", 3,
+				"crm_completeness", opps[crm_complt], 
+				"crm_completeness_geo", blank(), "crm_completeness_marketing", opps[crm_complt_marketing],"crm_completeness_contact", opps[crm_complt_contact],  "crm_completeness_contact_method", blank(), 
+				"trueai_completeness", opps[trueai_complt],  
+				"trueai_completeness_geo", blank(), "truea.i_completeness_marketing", opps[trueai_complt_marketing], "trueai_completeness_contact", opps[trueai_complt_contact], "trueai_completeness_contact_method", blank()) // opps
+				,
+				SELECTCOLUMNS(contacts, "entity", "Contacts",  "_sys_docid", contacts[_sys_doc_id],  "_sys_user_id", contacts[trueai_owner_id], "_sys_filter_start_date",DATEVALUE("" & contacts[crm_created_on]),   "sort", 4,
+				"crm_completeness", contacts[crm_complt], 
+				"crm_completeness_geo", contacts[crm_complt_geo], "crm_completeness_marketing", contacts[crm_complt_marketing],"crm_completeness_contact", contacts[crm_complt_contact],  "crm_completeness_contact_method", contacts[crm_complt_contact_method], 
+				"trueai_completeness", contacts[trueai_complt],  
+				"trueai_completeness_geo", contacts[trueai_complt_geo], "trueai_completeness_marketing", contacts[trueai_complt_marketing], "trueai_completeness_contact", contacts[trueai_complt_contact], "trueai_completeness_contact_method", contacts[crm_complt_contact_method]) // contacts
+				
+				)
+				```
+
+	annotation PBI_Id = 254fd6269d4445a0b3edfcf800cb24a5
+

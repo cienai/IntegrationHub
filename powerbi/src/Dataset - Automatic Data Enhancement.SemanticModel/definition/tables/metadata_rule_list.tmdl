@@ -1,0 +1,163 @@
+table metadata_rule_list
+	lineageTag: c0d8a31c-9321-47dd-a2f2-ba06726687cf
+
+	measure 'meas.rules_list_std_crm_owner_rule_applied_count' = ```
+			
+			var res = calculate(count(ssr_history[_sys_doc_id]), metadata_rule_list[col.rule_is_std_crm]=true) // determine how many standard 
+			return if(isblank(res), 0, res)
+			```
+		formatString: 0
+		isHidden
+		lineageTag: b974d205-5b39-410b-bea5-1072b77e3c64
+
+		changedProperty = IsHidden
+
+	measure 'meas.rules_list_non_crm_owner_rule_applied_count' = ```
+			
+			var res = calculate(count(ssr_history[_sys_doc_id]), metadata_rule_list[col.rule_is_std_crm]=false) // determine how many non standard 
+			return if(isblank(res), 0, res)
+			```
+		formatString: 0
+		lineageTag: 2d35dfde-a3bc-486d-b406-74966c6eef53
+
+	measure 'meas.rules_list_total_crm_owner_rule_applied_count' =
+			
+			var res = calculate(count(ssr_history[_sys_doc_id])) // determine how many total
+			return if(isblank(res), 0, res)
+		formatString: 0
+		lineageTag: a70a9129-28a1-4fb2-81c7-e111212684eb
+
+	column model
+		dataType: string
+		lineageTag: 0d8ae1f8-45ad-4f77-a4fb-4757760ef4b5
+		summarizeBy: none
+		sourceColumn: model
+
+		annotation SummarizationSetBy = Automatic
+
+	column description
+		dataType: string
+		isHidden
+		lineageTag: b2c912d3-0265-4f0c-af8b-d60c4a66e7bc
+		summarizeBy: none
+		sourceColumn: description
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'col.rule_is_std_crm' = ```
+			
+			var rule_name = metadata_rule_list[rule_name] & "" // get the rele id
+			var res =  If (rule_name in {
+			    "OWNERSHIP_ACCOUNTS_CRM_OWNER",
+			    "OWNERSHIP_ACCOUNTS_CRM_CREATOR",
+			    "OWNERSHIP_LEADS_CRM_CREATOR",
+			    "OWNERSHIP_OPPS_CRM_OWNER",
+			    "OWNERSHIP_ACCOUNTS_CRM_OWNER",
+			    "OWNERSHIP_LEADS_CRM_OWNER",
+			    "OUTCOME_CRM_ISWON_FLAG_SET_FALSE",
+			    "OUTCOME_CRM_ISWON_FLAG_SET_TRUE",
+			    "OUTCOME_LEAD_CONVERTED",
+			    "OUTCOME_NEW_ACCOUNT_CREATED",
+			    "OUTCOME_NEW_LEAD_CREATED",
+			    "END_LEADS_CRM_CONVERTED",    
+			    "END_OPPS_CRM_CREATEDON",    
+			    "END_ACCOUNTS_CRM_CREATEDON", 
+			    "END_LEADS_CRM_CREATEDON",
+			    "END_OPPS_CRM_CLOSED",
+			    "END_OPPS_NO_HANDOFF_RETURNING_ML_CREATEDON", // tbd
+			    "OUTCOME_POSTSELLING_UPSELLING_STARTED", // tbd
+			    "OUTCOME_LEAD_CONVERTED", // tbd
+			    "OUTCOME_PROSPECTING_ACTIVITY_RECORDED", // tbd
+			    "END_LEADS_FIRST_ACTIVITY_RECORDED", // tbd
+			
+			    
+			    "dd"
+			    }
+			, true,false) // get the crm ones
+			return res
+			
+			
+			
+			```
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 5c378c3e-61f6-4f2a-aa28-fbf23e7d9b78
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column rule_name
+		dataType: string
+		lineageTag: 14dbd987-8d15-4ef2-aa62-d555800a7a8f
+		summarizeBy: none
+		sourceColumn: rule_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'col.rule_type' = ```
+			
+			var reg_case = SWITCH([model],
+			 "LeadsOwnerid", "CRM Entity Ownership",  "AccountsOwnerid", "CRM Entity Ownership","OppsOwnerid", "CRM Entity Ownership", "OppsCreatorid", "CRM Entity Ownership",   // owner ship models
+			 "LeadsCreatedon", "SSR History Step End Date",  "AccountsCreatedon", "SSR History Step End Date","OppsCreatedon", "SSR History Step End Date",  "OppsCreatedon", "SSR History Step End Date",  "LeadsCloseDate", "SSR History Step End Date", "AccountsCloseDate", "CRM Entity End Date",  "OppsCloseDate","CRM Entity End Date",   "OppsCreatedon", "CRM Entity End Date" ,  "LeadsFirstTouch", "CRM Entity End Date",  "AccountsFirstTouch", "CRM Entity End Date",  "LeadsLastTouch", "CRM Entity End Date", "AccountsLastTouch", "CRM Entity End Date", "LeadsConvertedDate", "CRM Entity End Date", "OppsAeDate", "CRM Entity End Date",   // end date models
+			 "SsrSsrHistory", "SSR History Step Outcome", // ssr outcome rules
+			 "OppsPredBookingAmt", "Opp Predicted Amount", // prediected amount
+			 "ActivitiesInteractionPurpose", "Activity Purpose", // "activity purpose" 
+			 "Lookup", "Completeness Lookup", // "activity purpose" 
+			 "Other") // everything else
+			
+			var ssr_ownership_case = if(metadata_rule_list[rule_name] in {"OWNERSHIP_ACCOUNTS_CRM_OWNER_OVERRIDDEN_BY_ACT_COUNT", "OWNERSHIP_ACCOUNTS_CRM_OPP_CREATOR_SELLING_STARTED_AT_OR_AFTER_OPP_CREATION",
+			"OWNERSHIP_ACCOUNTS_CRM_OWNER", "OWNERSHIP_ACCOUNTS_CRM_CREATOR", "OWNERSHIP_LEADS_CRM_CREATOR"} ,  "SSR History Step Ownership", blank())
+			
+			var ssr_end_case = if(metadata_rule_list[rule_name] in {"END_RECYCLED_PROSPECTING_LAST_LOST_NEW_LOGO_PLUS_FULL_YEARS", "END_POSTSELLING_CHURNED_LAST_WON_OPP_PLUS_FULL_YEARS"} ,  "SSR History Step End Date", blank())
+			
+			var ssr_case  =  if(isblank(ssr_ownership_case) = false, ssr_ownership_case, if(isblank(ssr_end_case) = false,  ssr_end_case, blank()))
+			
+			var res = If (isblank(ssr_case), reg_case, ssr_case)
+			return res
+			```
+		lineageTag: d2aab1cd-684f-49d0-a1be-aec6a054522e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_doc_id
+		dataType: string
+		lineageTag: 8f3c1e2f-d4a1-437e-8a1e-6ff8b461cf24
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_default_rule
+		dataType: string
+		lineageTag: c3067d53-6efe-4727-921b-7ba8dd77ea76
+		summarizeBy: none
+		sourceColumn: is_default_rule
+
+		annotation SummarizationSetBy = Automatic
+
+	partition metadata_rule_list-b7fe8df6-ac91-4d1c-b68e-eff56e49fea7 = m
+		mode: import
+		source = ```
+				let
+				  dbTable = getDBTable("metadata_rule_list"), // get the right table
+				
+				
+				  dbTableTyped = Table.TransformColumnTypes(dbTable,{ // change types to what we're expecting
+				   {"rule_name", type text}, 
+				   {"_sys_doc_id", type text}, 
+				   {"model", type text}, 
+				   {"description", type text}
+				
+				
+				
+				  })
+				in
+				    dbTableTyped
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
