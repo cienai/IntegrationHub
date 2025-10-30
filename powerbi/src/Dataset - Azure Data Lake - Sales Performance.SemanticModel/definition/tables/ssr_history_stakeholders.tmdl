@@ -1,0 +1,830 @@
+table ssr_history_stakeholders
+	lineageTag: 7d90e819-db99-4cda-845c-11c2533dfe69
+
+	measure 'meas.stkhlds_first_act' = CALCULATE(MAX(ssr_history_stakeholders[trueai_first_act]))
+		formatString: mm/dd/yyyy
+		displayFolder: champion_stkhld
+		lineageTag: 52375268-1df9-41d8-8002-d9706502f99e
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.stkhlds_last_act' = CALCULATE(MAX(ssr_history_stakeholders[trueai_last_act]))
+		formatString: mm/dd/yyyy
+		displayFolder: champion_stkhld
+		lineageTag: dea32a2b-9dec-4915-b320-9ad17843053b
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.stkhlds_first_eng' = CALCULATE(MAX(ssr_history_stakeholders[trueai_first_eng]))
+		formatString: mm/dd/yyyy
+		displayFolder: champion_stkhld
+		lineageTag: c3c2b8f5-d350-453c-a581-9efdfcdef7fd
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.stkhlds_last_eng' = CALCULATE(MAX(ssr_history_stakeholders[trueai_last_eng]))
+		formatString: mm/dd/yyyy
+		displayFolder: champion_stkhld
+		lineageTag: 0096cee2-f0d7-40ca-9e02-304b984aa30f
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.stkhlds_seniority' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_seniority]))
+		displayFolder: champion_stkhld
+		lineageTag: 137d542d-667c-4931-b89c-d7a8afbe6a78
+
+	measure 'meas.stkhlds_title_dept' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_dept]))
+		displayFolder: champion_stkhld
+		lineageTag: 742263c3-150e-4a72-9d14-0bec256467be
+
+	measure 'meas.stkhlds_name_and_title' = ```
+			
+			// make a concat name title
+			var fullname = CALCULATE(MAX(ssr_history_stakeholders[crm_first_name]) & " " & MAX(ssr_history_stakeholders[crm_last_name]) ) // full name
+			var title =CALCULATE(MAX(ssr_history_stakeholders[crm_title])) // title
+			var res = IF(len(fullname) > 30 , lEFT(fullname, 27) & "...", fullname)  & ", " & title // cut the name if too long
+			return res 
+			```
+		displayFolder: champion_stkhld
+		lineageTag: 8f971e63-ce5a-4267-9229-0e84eadf1781
+
+	measure 'meas.stkhlds_name_and_title_most_senior' = ```
+			
+			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
+			
+			var res= CALCULATE( [meas.stkhlds_name_and_title], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the title 
+			
+			return res 
+			
+			
+			```
+		displayFolder: champion_stkhld
+		lineageTag: b63f829b-aaa0-40ee-8119-b6334c809800
+
+	measure 'meas.stkhlds_most_senior_title_dept' = ```
+			
+			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
+			
+			var res= CALCULATE( [meas.stkhlds_title_dept], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the most senior title dept
+			
+			return res 
+			```
+		displayFolder: champion_stkhld
+		lineageTag: 4ad56e5e-839b-457c-bf56-f90f07d6b6a2
+
+	measure 'meas.stkhlds_most_senior_first_act' = ```
+			
+			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
+			
+			var res= CALCULATE( [meas.stkhlds_first_act], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the first activity
+			
+			return res 
+			```
+		formatString: mm/dd/yyyy
+		displayFolder: champion_stkhld
+		lineageTag: 86c7341e-e7ff-47a7-b418-e86e353faa45
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.stkhlds_most_senior_last_act' = ```
+			
+			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
+			
+			var res= CALCULATE( [meas.stkhlds_last_act], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the last activity
+			
+			return res 
+			```
+		formatString: mm/dd/yyyy
+		displayFolder: champion_stkhld
+		lineageTag: 15da1c81-f0ba-479b-b851-93e66ae0db8a
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.stkhlds_most_senior_last_eng' = ```
+			
+			 
+			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
+			
+			var res= CALCULATE( [meas.stkhlds_last_eng], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the last engagement
+			
+			return res 
+			```
+		formatString: mm/dd/yyyy
+		displayFolder: champion_stkhld
+		lineageTag: 7f2bd415-c5f1-4fdc-8251-faa716cf9bae
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.stkhlds_most_senior_seniority' = ```
+			
+			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
+			
+			var res= CALCULATE( [meas.stkhlds_seniority], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the seniority
+			
+			return res 
+			```
+		displayFolder: champion_stkhld
+		lineageTag: 30eb9278-7c18-4d89-837d-b415ecec64cf
+
+	measure 'meas.stkhlds_primary_dur_involvement' =
+			
+			var PrimDur = CALCULATE(SUM(ssr_history[stkhlds_primary_contact_dur])) // getting the secondary contact act duration
+			var allDur = CALCULATE(SUM(ssr_history[stkhlds_all_dur])) // getting all contact duration
+			var res = DIVIDE(PrimDur, allDur,0)
+			RETURN res
+		formatString: 0%;-0%;0%
+		displayFolder: champion_stkhld
+		lineageTag: f3b8a9d2-e05e-485e-8783-3422f1f289e0
+
+	measure 'meas.stkhlds_secondary_dur_involvement' =
+			
+			var SecDur = CALCULATE(SUM(ssr_history[stkhlds_secondary_contact_dur])) // getting the secondary contact act duration
+			var allDur = CALCULATE(SUM(ssr_history[stkhlds_all_dur])) // getting all contact duration
+			var res = DIVIDE(SecDur, allDur,0)
+			RETURN
+			res
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: champion_stkhld
+		lineageTag: 04f85556-5551-4042-b1e9-10981fd157e9
+
+	measure 'meas.stkhlds_most_senior_dur_involvement' = ```
+			
+			
+			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority]))  // find the most senior seniority
+			var dept = [meas.stkhlds_most_senior_title_dept]
+			var senior_dur = CALCULATE(
+			    MAX(
+			        ssr_history_stakeholders[trueai_act_dur]
+			    ), 
+			    ssr_history_stakeholders[trueai_title_seniority]=seniority,
+			    ssr_history_stakeholders[trueai_title_dept]= dept
+			) 
+			
+			var total_dur = CALCULATE(SUM(ssr_history_stakeholders[trueai_act_dur]), ALLSELECTED())  // get the total duration
+			
+			var res = DIVIDE(senior_dur, total_dur, 0)
+			
+			RETURN res
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: champion_stkhld
+		lineageTag: 7b81a3c1-2f06-40e2-81d0-ea82cf4df10d
+
+	measure 'meas.other_stkhlds_involv_dur' =
+			
+			var _dur = CALCULATE(Max(ssr_history_stakeholders[trueai_act_dur]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1, 2}))
+			
+			var total_dur = CALCULATE(SUM(ssr_history_stakeholders[trueai_act_dur]), ALLSELECTED())
+			var res = DIVIDE(_dur, total_dur, 0)
+			RETURN res
+		formatString: 0%;-0%;0%
+		displayFolder: champion_stkhld
+		lineageTag: 0d1e49d5-8ac4-446e-ac00-84bc0eedcaf3
+
+	measure 'meas.stkhlds_full_name' = ```
+			
+			
+			var full_name = CALCULATE(
+			    MAX(ssr_history_stakeholders[col.full_name]), 
+			    NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2})
+			)
+			
+			return full_name
+			```
+		displayFolder: champion_stkhld
+		lineageTag: aace1864-dfc9-414b-ac89-fa076f7b9612
+
+	measure 'meas.other_stkhlds_title_dept' =
+			
+			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_dept]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}) )  // get the  title dept filtering primary and secondary stakeholder
+		displayFolder: champion_stkhld
+		lineageTag: 1f3c8d3c-eced-4f0f-b24b-2fdba44b5453
+
+	measure 'meas.other_stkhlds_seniority' =
+			
+			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_seniority]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}))
+		displayFolder: champion_stkhld
+		lineageTag: bc7d75a2-edff-4a7b-a366-b6b65d2fe8c9
+
+	measure 'meas.other_stkhlds_last_eng' =
+			
+			CALCULATE(MAX(ssr_history_stakeholders[trueai_last_eng]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}))  // filter out the primary and secondary stkhlds
+		formatString: General Date
+		displayFolder: champion_stkhld
+		lineageTag: 173cf6a6-5668-4c8c-ab60-3ca3fc4b7d6a
+
+	measure 'meas.prim_stkhlds_dur_involvement' =
+			
+			var _dur = CALCULATE(sum(ssr_history_stakeholders[trueai_act_dur]), ssr_history_stakeholders[trueai_stkhld_ranking] in {1})
+			
+			var total_dur = CALCULATE(SUM(ssr_history_stakeholders[trueai_act_dur]), ALLSELECTED())
+			var res = DIVIDE(_dur, total_dur, 0)
+			RETURN res
+		formatString: 0%;-0%;0%
+		displayFolder: champion_stkhld
+		lineageTag: 0cc030f4-fe8f-4343-851b-b7f959145666
+
+	measure 'meas.sec_stkhlds_dur_involvement' =
+			
+			var _dur = CALCULATE(sum(ssr_history_stakeholders[trueai_act_dur]), ssr_history_stakeholders[trueai_stkhld_ranking] in {2})
+			
+			var total_dur = CALCULATE(SUM(ssr_history_stakeholders[trueai_act_dur]), ALLSELECTED())
+			var res = DIVIDE(_dur, total_dur, 0)
+			RETURN res
+		formatString: 0%;-0%;0%
+		displayFolder: champion_stkhld
+		lineageTag: a8feef57-bffd-4dc2-89b1-966bcb2c913e
+
+	column _sys_doc_id
+		dataType: string
+		lineageTag: 8d39f120-d62a-4708-95bf-1fdf91b782b3
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_filt_end_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a5c34138-8cea-49c0-8b7e-42b45e122779
+		summarizeBy: none
+		sourceColumn: _sys_filt_end_date
+
+		variation Variation
+			isDefault
+			relationship: 3302e96f-f5da-46d5-a086-98427bb85f49
+			defaultHierarchy: LocalDateTable_1d7cb91c-15c5-4c86-8226-bc81011ae637.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column _sys_filt_start_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0d6583ac-c2f0-4ccc-94a4-cde987462e71
+		summarizeBy: none
+		sourceColumn: _sys_filt_start_date
+
+		variation Variation
+			isDefault
+			relationship: e2b76f21-8790-41f5-af06-5306bb353310
+			defaultHierarchy: LocalDateTable_289ea6e6-c2ff-4557-bf95-a3d15381bf26.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column _sys_ssr_id
+		dataType: string
+		lineageTag: ad4e0070-f753-4d04-a204-162fe8f3220c
+		summarizeBy: none
+		sourceColumn: _sys_ssr_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_ssr_history_id
+		dataType: string
+		lineageTag: 8c53afb7-2f87-4e43-aa77-269388904504
+		summarizeBy: none
+		sourceColumn: _sys_ssr_history_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_complt
+		dataType: double
+		lineageTag: 1794993a-5702-4def-a521-c0ca897a9374
+		summarizeBy: sum
+		sourceColumn: crm_complt
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column crm_title
+		dataType: string
+		lineageTag: 1b167110-fa12-4350-a3cf-7fea3f30b19c
+		summarizeBy: none
+		sourceColumn: crm_title
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_first_name
+		dataType: string
+		lineageTag: f832e7f5-e0d8-4ad3-a3ea-6b416c34a8ac
+		summarizeBy: none
+		sourceColumn: crm_first_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_last_name
+		dataType: string
+		lineageTag: c5a2648b-c17c-4e6c-b3dc-02ac25b957fe
+		summarizeBy: none
+		sourceColumn: crm_last_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_complt
+		dataType: double
+		lineageTag: 0aedd4ec-bb2e-4406-a0c7-eae1e925780b
+		summarizeBy: sum
+		sourceColumn: trueai_complt
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_creator_id
+		dataType: string
+		lineageTag: f5adc431-0eed-4127-99a6-b8cf1cdafa03
+		summarizeBy: none
+		sourceColumn: trueai_creator_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_created_by_step_owner
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 749058ff-d804-45cd-8906-ca991216c445
+		summarizeBy: none
+		sourceColumn: trueai_created_by_step_owner
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_leadsource
+		dataType: string
+		lineageTag: b838a00d-339b-426d-b60d-ccd462e3c1fb
+		summarizeBy: none
+		sourceColumn: trueai_leadsource
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_leadsource_conf
+		dataType: double
+		lineageTag: 16960eb2-a057-4517-a8e8-b0e4e662e49b
+		summarizeBy: sum
+		sourceColumn: trueai_leadsource_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_owner_id
+		dataType: string
+		lineageTag: 92dc3e3c-45d3-4f7f-8ac5-850927a31549
+		summarizeBy: none
+		sourceColumn: trueai_owner_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_title_dept
+		dataType: string
+		lineageTag: 59adad1e-3994-4d75-be15-6b58ee40505e
+		summarizeBy: none
+		sourceColumn: trueai_title_dept
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_title_dept_conf
+		dataType: double
+		lineageTag: aa2feabe-45f6-4376-b825-84f0a96e6e8b
+		summarizeBy: sum
+		sourceColumn: trueai_title_dept_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_title_seniority
+		dataType: string
+		lineageTag: b06c6e30-774b-43f2-b1ff-cc918ca46e0e
+		summarizeBy: none
+		sourceColumn: trueai_title_seniority
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_title_seniority_conf
+		dataType: double
+		lineageTag: fe136f8c-8006-4ef6-9d6c-003e12524418
+		summarizeBy: sum
+		sourceColumn: trueai_title_seniority_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_act_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 16b5e058-63b4-41c3-a832-c47a07e21046
+		summarizeBy: sum
+		sourceColumn: trueai_act_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 10817e7b-765b-412e-bfc0-810bad9190dc
+		summarizeBy: sum
+		sourceColumn: trueai_act_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_first_act
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7a0fdc23-a53e-48f1-8a0a-cc738536db7a
+		summarizeBy: none
+		sourceColumn: trueai_first_act
+
+		variation Variation
+			isDefault
+			relationship: 372a0a1e-1799-427c-828d-167f30759d74
+			defaultHierarchy: LocalDateTable_7b9cfb6b-4709-4c4d-8483-918721c83bcc.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_last_act
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b8e5e518-c692-435e-bc64-5bec371871ff
+		summarizeBy: none
+		sourceColumn: trueai_last_act
+
+		variation Variation
+			isDefault
+			relationship: aa92c0a7-8f82-4eb7-90c6-0596d4605b37
+			defaultHierarchy: LocalDateTable_9393fa54-6a39-493e-bd51-a8352ffdb132.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_primary_entity_id
+		dataType: string
+		lineageTag: 08b83651-d2d2-4b83-98cb-6783542e9fab
+		summarizeBy: none
+		sourceColumn: trueai_primary_entity_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_primary_entity_type
+		dataType: string
+		lineageTag: a619cece-2b1d-4f1c-b25a-dc0621d75f8c
+		summarizeBy: none
+		sourceColumn: trueai_primary_entity_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_as_of
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ab6e23c6-9869-4e53-9ca0-b91fb5ac57cd
+		summarizeBy: none
+		sourceColumn: _sys_as_of
+
+		variation Variation
+			isDefault
+			relationship: 2580a050-1a4e-470b-a7a6-4f69ce898a14
+			defaultHierarchy: LocalDateTable_9a938adc-259d-40b6-9b85-2a187b4cab6c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_last_modified_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 569aaccf-b549-4085-acbd-6168e2a035c3
+		summarizeBy: none
+		sourceColumn: _sys_last_modified_on
+
+		variation Variation
+			isDefault
+			relationship: be15f9b8-3899-4647-8edc-cf149aa35afa
+			defaultHierarchy: LocalDateTable_5fb3f5fb-cb81-44b1-81eb-21c96dec3a67.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_stkhld_ranking
+		dataType: int64
+		formatString: 0
+		lineageTag: 298cc735-43d5-4251-970d-9f209d5dbd34
+		summarizeBy: sum
+		sourceColumn: trueai_stkhld_ranking
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_created_on
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c6a5b67a-ee02-4f47-a0b3-9b03655cfb37
+		summarizeBy: none
+		sourceColumn: trueai_created_on
+
+		variation Variation
+			isDefault
+			relationship: 34084574-7739-4a91-bcdd-d2df3ddc9cf8
+			defaultHierarchy: LocalDateTable_bb35e89c-e108-411c-800f-6ef8d01658ff.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column trueai_act_adj_dur
+		dataType: double
+		lineageTag: d1c1547c-d720-4d2c-ae9c-90e8c5364afd
+		summarizeBy: sum
+		sourceColumn: trueai_act_adj_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_act_adj_dur_rule
+		dataType: int64
+		formatString: 0
+		lineageTag: 503da8e7-64ed-410c-8e5b-6f6f33ee31b1
+		summarizeBy: sum
+		sourceColumn: trueai_act_adj_dur_rule
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_auto_email_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 241d616e-4b83-41d1-875e-9f496f939a47
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_auto_email_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_auto_email_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 9728baf7-219d-4751-a8f9-3adf46e0d8c4
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_auto_email_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_dur
+		dataType: double
+		lineageTag: 35b5a4cb-bd23-4d11-98a3-8e1f55891c53
+		summarizeBy: sum
+		sourceColumn: trueai_act_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_act_dur_eng
+		dataType: double
+		lineageTag: 63396017-f6d9-4d4d-a698-8008146417c4
+		summarizeBy: sum
+		sourceColumn: trueai_act_dur_eng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_act_type_email_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 4432c86f-9a78-4fd4-8274-cd11145b6e06
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_email_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_email_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 2819da0f-c4bd-4ec6-a983-cebc16f4cafe
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_email_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_first_eng
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8d386488-4655-4918-8eb2-63c3c50ea365
+		summarizeBy: none
+		sourceColumn: trueai_first_eng
+
+		variation Variation
+			isDefault
+			relationship: 2c5e2c03-4069-42a2-8b04-7b648b8cff3d
+			defaultHierarchy: LocalDateTable_c6f48b09-8e03-4113-8748-c878181360b6.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_last_eng
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 5c66dc26-572d-4f1c-aead-0e97bb0461db
+		summarizeBy: none
+		sourceColumn: trueai_last_eng
+
+		variation Variation
+			isDefault
+			relationship: 8ee83ca2-f535-46c7-aff4-bc3f5c28e3f1
+			defaultHierarchy: LocalDateTable_97bf139c-c850-41fe-a8e2-6c12f8820ca8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_meeting_count
+		dataType: int64
+		formatString: 0
+		lineageTag: c6eb5fba-3473-4d15-81d9-43c1dc3ef9c1
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_meeting_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_meeting_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: f8e767d8-031a-4814-a1bd-aa833d2a8ce2
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_meeting_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_nd_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 87eb1b57-f043-4cc5-b05b-977074c5f710
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_nd_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_nd_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 52aaeedf-b941-4095-9449-72f84aa1292c
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_nd_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_no_interaction_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 11c6022f-bd5b-4b90-b681-95c02eac5a71
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_no_interaction_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_no_interaction_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: d45af955-3ce1-450f-86fa-b6458461c45e
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_no_interaction_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_call_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 1dcb396b-66ee-4de3-b2aa-5e5ebad7e265
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_call_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_call_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 722f60b0-cbbd-4139-946e-eb001b7905fa
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_call_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_social_count
+		dataType: int64
+		formatString: 0
+		lineageTag: b4d9543b-0f1a-4e14-8d0a-7c4750183739
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_social_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_type_social_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 453e1da8-a8d0-4325-a447-89b2c8b86e9b
+		summarizeBy: sum
+		sourceColumn: trueai_act_type_social_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_owner_prep_factor
+		dataType: double
+		lineageTag: 0bafef8b-1a9c-4356-bbe0-035004cf4a66
+		summarizeBy: sum
+		sourceColumn: trueai_owner_prep_factor
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_owner_act_capt_lvl
+		dataType: double
+		lineageTag: 202bc141-8bd3-44a9-ad40-4555e33a2312
+		summarizeBy: sum
+		sourceColumn: trueai_owner_act_capt_lvl
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'col.full_name' = ssr_history_stakeholders[crm_first_name] & " " & ssr_history_stakeholders[crm_last_name]
+		lineageTag: f9570ba1-8c68-4ee0-a9dc-401538e0a268
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_adj_eng_dur
+		dataType: double
+		lineageTag: a75a96b3-5337-4550-8839-ec9f6433e6a2
+		summarizeBy: sum
+		sourceColumn: trueai_act_adj_eng_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition ssr_history_stakeholders = m
+		mode: import
+		source = ```
+				let
+				  
+				  dbTable = getDBTable("ssr_history_stakeholders"), // get the right table
+				
+				
+				  dbTableTyped = Table.TransformColumnTypes(dbTable,{
+				{"_sys_as_of", type datetime},
+				{"_sys_doc_id", type text},
+				{"_sys_filt_end_date", type date},
+				{"_sys_filt_start_date", type date},
+				{"_sys_last_modified_on", type datetime},
+				{"_sys_ssr_history_id", type text},
+				{"_sys_ssr_id", type text},
+				{"crm_complt", type number},
+				{"crm_first_name", type text},
+				{"crm_last_name", type text},
+				{"crm_title", type text},
+				{"trueai_act_adj_dur", type number},
+				{"trueai_act_adj_dur_rule", Int64.Type},
+				{"trueai_act_adj_eng_dur", type number},
+				{"trueai_act_count", Int64.Type},
+				{"trueai_act_dur", type number},
+				{"trueai_act_dur_eng", type number},
+				{"trueai_act_eng_count", Int64.Type},
+				{"trueai_act_type_auto_email_count", Int64.Type},
+				{"trueai_act_type_auto_email_eng_count", Int64.Type},
+				{"trueai_act_type_call_count", Int64.Type},
+				{"trueai_act_type_call_eng_count", Int64.Type},
+				{"trueai_act_type_email_count", Int64.Type},
+				{"trueai_act_type_email_eng_count", Int64.Type},
+				{"trueai_act_type_meeting_count", Int64.Type},
+				{"trueai_act_type_meeting_eng_count", Int64.Type},
+				{"trueai_act_type_nd_count", Int64.Type},
+				{"trueai_act_type_nd_eng_count", Int64.Type},
+				{"trueai_act_type_no_interaction_count", Int64.Type},
+				{"trueai_act_type_no_interaction_eng_count", Int64.Type},
+				{"trueai_act_type_social_count", Int64.Type},
+				{"trueai_act_type_social_eng_count", Int64.Type},
+				{"trueai_complt", type number},
+				{"trueai_created_by_step_owner", type logical},
+				{"trueai_created_on", type date},
+				{"trueai_creator_id", type text},
+				{"trueai_first_act", type datetime},
+				{"trueai_first_eng", type datetime},
+				{"trueai_last_act", type datetime},
+				{"trueai_last_eng", type datetime},
+				{"trueai_leadsource", type text},
+				{"trueai_leadsource_conf", type number},
+				{"trueai_owner_act_capt_lvl", type number},
+				{"trueai_owner_id", type text},
+				{"trueai_owner_prep_factor", type number},
+				{"trueai_primary_entity_id", type text},
+				{"trueai_primary_entity_type", type text},
+				{"trueai_stkhld_ranking", Int64.Type},
+				{"trueai_title_dept", type text},
+				{"trueai_title_dept_conf", type number},
+				{"trueai_title_seniority", type text},
+				{"trueai_title_seniority_conf", type number}
+				})
+				in
+				    dbTableTyped
+				```
+
+	annotation PBI_ResultType = Exception
+
+	annotation PBI_NavigationStepName = Navigation
+

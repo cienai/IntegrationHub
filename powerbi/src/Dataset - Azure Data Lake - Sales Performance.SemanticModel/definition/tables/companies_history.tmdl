@@ -1,0 +1,3166 @@
+table companies_history
+	lineageTag: 89cc1c9a-fb50-4d65-a2fb-e604245270ae
+
+	measure 'meas.companies_history_reference_date' =
+			
+			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
+			var ref_date = MAXX(latest_row, companies_history[_sys_reference_date])
+			var res =ref_date
+			return res
+		formatString: mm/dd/yyyy
+		displayFolder: _co_info
+		lineageTag: 1804747f-7596-4fb3-ab00-76675e51864a
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.companies_history_currency' =
+			
+			
+			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
+			var ref_currency = MAXX(latest_row, companies_history[company_currency])    // get the currency
+			RETURN
+			ref_currency
+		displayFolder: _co_info
+		lineageTag: b62f739e-44fe-4fb0-8c7b-afd83ef3ee90
+
+	measure 'meas.companies_history_partner_name' =
+			
+			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
+			var ref_date = MAXX(latest_row, companies_history[partner_name])
+			var res =ref_date
+			return res
+		displayFolder: _co_info
+		lineageTag: e479ee03-95cf-4c84-9790-b679aaf58337
+
+	measure 'meas.companies_history_partner_co_id' =
+			
+			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))
+			var ref_date = MAXX(latest_row, companies_history[partner_co_id])
+			var res =ref_date
+			return res
+		displayFolder: _co_info
+		lineageTag: 199139be-d867-43a0-a572-f725456999a2
+
+	measure 'meas.companies_history_partner_product_name' =
+			
+			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))
+			var ref_date = MAXX(latest_row, companies_history[partner_product_name])
+			var res =ref_date
+			return res
+		displayFolder: _co_info
+		lineageTag: 9587a7db-294d-48b2-a57f-d35719b62b0d
+
+	measure 'meas.companies_history_partner_base64_logo' =
+			
+			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))
+			var ref_date = MAXX(latest_row, companies_history[partner_base64_logo])
+			var res =ref_date
+			return res
+		displayFolder: _co_info
+		lineageTag: 8383a8ef-e489-41a3-9d4f-3ac1e1175c9e
+		dataCategory: ImageUrl
+
+	measure 'meas.companies_history_copyright_msg' =
+			
+			var copyright_msg = "Copyright © " &  year(Now()) & " Cien, Inc."
+			
+			var partner_msg = [meas.companies_history_partner_product_name]  & " is provided for " & [meas.companies_history_company_name]  & " by " & [meas.companies_history_partner_name] & " in partnership with Cien.ai."  & "  -  "
+			var cien_msg = [meas.companies_history_partner_product_name]  & " is provided for " &[meas.companies_history_company_name] & " by " & [meas.companies_history_partner_name]  & ".  -  "
+			var res = if([meas.companies_history_partner_co_id] = "1", cien_msg, partner_msg)  // pick a special msg if Cien.
+			return res & copyright_msg
+		displayFolder: _co_info
+		lineageTag: 738e41cb-5c3f-445a-b733-361a0cc25703
+
+	measure 'meas.companies_history_not_init' = ```
+			
+			var co_id = Max(companies_history[_sys_co_id])
+			var default_co_id = {"dGhYzcWxDPTrMPQQT", "cmirThHGuABxXs2RT", "zadfwcjid24030145"}
+			var res = If(co_id  in default_co_id, "This report has not yet been initalized." , "")
+			return res
+			
+			```
+		displayFolder: _co_info
+		lineageTag: bd6fc5d2-5d80-40e6-9058-7c0581230d3c
+
+	measure 'meas.company_history_trueai_platform_version' = ```
+			
+			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
+			var ref_version = MAXX(latest_row, companies_history[_sys_version])
+			RETURN ref_version
+			
+			
+			
+			```
+		displayFolder: _co_info
+		lineageTag: 1fc590a7-65a7-48f2-8638-b9e4c8fb1c20
+
+	measure 'meas.companies_history_company_name' =
+			
+			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
+			var res = MAXX(latest_row, companies_history[company_name])     // get the latest company name
+			
+			RETURN
+			res
+		displayFolder: _co_info
+		lineageTag: de39890b-8502-4c34-80a6-a5a7ff560f1c
+
+	measure 'meas.company_history_company_name' = ```
+			
+			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
+			var ref_name = MAXX(latest_row, companies_history[company_name])
+			var  res = ref_name
+			RETURN res 
+			```
+		displayFolder: _co_info
+		lineageTag: 8b997354-a8c7-4d28-9eae-e242191f0b38
+
+	measure 'meas.company_history_partnerLogo'
+		displayFolder: _co_info
+		lineageTag: 56c28232-e882-474c-9bbd-50e7294d2299
+
+	measure 'meas.company_history_as_of' = CALCULATE(MAX(companies_history[_sys_as_of]))
+		formatString: General Date
+		displayFolder: _co_info
+		lineageTag: 053ea514-80e2-4aea-a04f-00c76ad799b6
+
+	measure 'meas.companies_history_processed_asof' =
+			
+			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))
+			var ref_date = MAXX(latest_row, companies_history[_sys_processed_as_of])
+			var res =ref_date
+			return res
+		formatString: General Date
+		displayFolder: _co_info
+		lineageTag: 7d4ead4a-f44a-470b-94a2-131e7638b4c0
+
+	measure 'meas.metadata_config_reset_new_logo' = ```
+			
+			// VAR _reset_new = 100
+			// RETURN
+			// _reset_new
+			
+			VAR reset_new_logo = VALUE(LOOKUPVALUE(metadata_config[value], metadata_config[key], "reset_new_logo")) // get the reset new logo value
+			
+			var reset_value  = DIVIDE(reset_new_logo, 365, 0)   // divide the reset_new_logo value with year (365)
+			
+			var res = ROUND(reset_value,0)      // get the rounded value with 0 decimal points
+			
+			RETURN 
+			res
+			```
+		formatString: #" Yrs."
+		displayFolder: _co_info
+		lineageTag: f5fd1ec5-e367-4dd4-8ea6-0aa9a08e2a99
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.metadata_config_ramp_months' =
+			
+			var res = LOOKUPVALUE(metadata_config[value], metadata_config[key], "ramping_months")
+			RETURN
+			res & " Mos."
+		formatString: #" Mos."
+		displayFolder: _co_info
+		lineageTag: e8b30541-df42-4801-9a88-23c2b94f1f70
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.metadata_config_churned_years' =
+			
+			var res  = LOOKUPVALUE(metadata_config[value], metadata_config[key], "churn_years")
+			RETURN res & " Yrs."
+		displayFolder: _co_info
+		lineageTag: 82695c81-43d0-4d66-bc4f-573bdef0e569
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	measure 'meas.metadata_config_new_logo_selling_def' = ```
+			
+			VAR reset_new_logo = INT(LOOKUPVALUE(metadata_config[value], metadata_config[key], "reset_new_logo")) // get the reset new logo value
+			VAR sale_type_as_new_logo = LOOKUPVALUE(metadata_config[value], metadata_config[key], "sale_type_as_new_logo")   // get the sale_type_as_new_logo values
+			
+			// Return the appropriate result based on the conditions
+			// VAR res = SWITCH(
+			//     TRUE(),
+			//     sale_type_as_new_logo ="True" && NOT(ISBLANK(reset_new_logo)), "New Logo Selling",
+			//     sale_type_as_new_logo ="False" && NOT(ISBLANK(reset_new_logo)), "New Logo Selling",
+			//     "Existing Customer Selling"
+			// )
+			
+			var res = SWITCH(
+			    TRUE(),
+			    sale_type_as_new_logo="False" && reset_new_logo=36500,"Any customer that has not bought anything before.",
+			    sale_type_as_new_logo="False" && reset_new_logo=700, "Any customer that has not bought anything in the last 2 years.",
+			    sale_type_as_new_logo="True" && NOT(ISBLANK(reset_new_logo)), "The customer’s own opportunity type determines if New Logo or not.",
+			    "Existing Customer Selling"
+			)
+			    
+			
+			RETURN 
+			res
+			```
+		displayFolder: _co_info
+		lineageTag: aa504597-52d8-4f4a-9055-fe8f8efe6346
+
+	measure 'meas.metadata_config_lead_abandonment_cycle' =
+			
+			var res  = LOOKUPVALUE(metadata_config[value], metadata_config[key], "lead_abandonment_cycle")
+			RETURN res & " Days"
+		displayFolder: _co_info
+		lineageTag: 839f92c3-669a-41ad-a26d-8ab328fb94e9
+
+	measure 'meas.getFiscalYearOffset' =
+			
+			var _offset = LOOKUPVALUE(metadata_config[value], metadata_config[key], "fiscal_year_offset")
+			var res = MOD(12 - ABS(_offset),12)+1
+			RETURN
+			res
+		formatString: 0
+		displayFolder: _co_info
+		lineageTag: b1a38ac3-626b-43d8-92bd-c169f37d7bee
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'meas.fiscal_year_conditional_text' =
+			
+			VAR txt = ABS(LOOKUPVALUE(metadata_config[value], metadata_config[key], "fiscal_year_offset"))             // get the offset
+			
+			var res  = IF(
+			    txt = 0,        // condition to get the Year or Fiscal Year
+			    "Year",
+			    "Fiscal Year"
+			)
+			RETURN
+			res
+		displayFolder: _peek_inside
+		lineageTag: 192cd837-13a7-436e-9640-8d563a959657
+
+	measure 'meas.pi_score_getFiscal_text' = ```
+			
+			var _offset = ABS(LOOKUPVALUE(metadata_config[value], metadata_config[key], "fiscal_year_offset"))      // get the fiscal offset
+			var _month = MOD(12 - ABS(_offset),12)+1            // get the offset month ref
+			VAR _monthName = FORMAT(DATE(2000, _month, 1), "MMMM")          // calculat the start month of the fiscal 
+			
+			var _fiscal_string = "Fiscal Year: Starting on " & _monthName & " 1"
+			var res = IF(
+			    _offset = 0,                        // get the condiotion
+			    "Calendar Year",
+			    _fiscal_string
+			)
+			
+			RETURN
+			res
+			```
+		displayFolder: _peek_inside
+		lineageTag: d0579711-27f2-4aec-993d-22a6aeae5677
+
+	measure 'meas.pi_ae_am_average_annual_booking' =
+			
+			CALCULATE(
+			    [meas.data_logs_ci_perf_annual_avg_bookings],           // get the annual average booking amount filtering with account manager and account executive
+			    users[trueai_user_role] in {"Account Executive", "Account Manager"}
+			)
+		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
+		displayFolder: _peek_inside
+		lineageTag: 95cb2565-b689-43be-9f21-8bb66d428f09
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.pi_sdr_annual_avg_pipeline_created' =
+			
+			CALCULATE(
+			    [meas.data_logs_ci_perf_annual_avg_pipeline_created],    // get the annual average pipline amount filtering with account manager and account executive
+			    users[trueai_user_role] = "Sales Development Rep"
+			)
+		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
+		displayFolder: _peek_inside
+		lineageTag: 532b1495-0b90-4222-a2c1-771538af0d43
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.pi_ae_average_annual_booking' =
+			
+			CALCULATE(
+			    [meas.data_logs_ci_perf_annual_avg_bookings],           // get the annual average booking amount filtering with account manager and account executive
+			    users[trueai_user_role] = "Account Executive"
+			)
+		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
+		displayFolder: _peek_inside
+		lineageTag: 35d15cb9-3001-4ce7-bc3a-d667758a63b7
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.pi_am_average_annual_booking' =
+			
+			CALCULATE(
+			    [meas.data_logs_ci_perf_annual_avg_bookings],           // get the annual average booking amount filtering with account manager and account executive
+			    users[trueai_user_role] = "Account Manager"
+			)
+		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
+		displayFolder: _peek_inside
+		lineageTag: a5785f1a-b570-4e1c-8f51-00edec533e70
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.pi_ci_annual_avg_bookings' =
+			
+			var end_date =   [meas.companies_history_reference_date]
+			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
+			var res =  CALCULATE(AVERAGE(users_history[ci_perf_qtly_avg_bookings_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date) // qtly number
+			return res * 4 // annual number
+		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
+		displayFolder: _peek_inside
+		lineageTag: 60fb0c7e-3a8a-4f24-89c4-14a479ccb0a8
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.pi_ci_annual_avg_pipeline_created' =
+			
+			var end_date =   [meas.companies_history_reference_date]
+			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
+			var res =  CALCULATE(AVERAGE(users_history[col.ci.perf_qtly_avg_pipeline_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date) // qtly number
+			return res * 4 // annual number
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: _peek_inside
+		lineageTag: 8ecb892f-db30-44fd-80de-20b28288f472
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.pi_reset_new_logo' = ```
+			
+			
+			VAR reset_new_logo = VALUE(LOOKUPVALUE(metadata_config[value], metadata_config[key], "reset_new_logo")) // get the reset new logo value
+			
+			var reset_value  = DIVIDE(reset_new_logo, 365, 0)   // divide the reset_new_logo value with year (365)
+			
+			var res = ROUND(reset_value,0)      // get the rounded value with 0 decimal points
+			
+			RETURN 
+			res
+			```
+		formatString: #" Yrs."
+		displayFolder: _peek_inside
+		lineageTag: 0a59b05d-6e5a-4748-aba5-0617fb770d6f
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.ssr_history_adj_pipeline_amt' =
+			
+			var _pipeline_amt = CALCULATE(
+			    SUMX(
+			        ssr_history,        // get the multply as adj pipeline amt
+			        ssr_history[opp_pipeline_amt] * ssr_history[step_next_success_prob]  // formula for gettig thr adj pipleine amt is prob * amt
+			    )
+			)
+			RETURN
+			_pipeline_amt
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: fcdd3762-84f2-4543-8adb-c3a62dd05df5
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_vi_value_created_amt' =
+			CALCULATE(
+			    SUM(
+			        ssr_history[vi_value_created]           // sum up the vi value created
+			    )
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: cf93ec05-faac-43dd-80e8-a2433ba6942e
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_vi_value_repeat_amt' =
+			CALCULATE(
+			    SUM(
+			        ssr_history[vi_value_repeat]           // sum up the vi value repeated
+			    ),
+			    ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 4e351a94-6f88-4bdd-97fb-89f46e3aef9c
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_new_logo_lead_vi_value_amt' =
+			
+			CALCULATE(
+			    SUM(
+			        ssr_history[vi_value_created]       // get the new logo vi_value_created amt filtering by Lead Gen sales step
+			    ),
+			    ssr_history[step_name] in {"Lead Gen"}
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 540f1db9-f937-4c93-8b5c-b9f6bea518dd
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_existing_customer_lead_vi_value_amt' =
+			CALCULATE(
+			    SUM(
+			        ssr_history[vi_value_repeat]           // sum up the vi value repeated by new logo selling and existing customer selling
+			    ),
+			    ssr_history[step_name] in  {"New Logo Selling", "Existing Customer Selling"}
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 86bc93ec-037f-401a-899e-97d0d0560d94
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_new_logo_pre_vi_value_amt' = ```
+			
+			CALCULATE(
+			    SUM(
+			        ssr_history[vi_value_created]       // get the new logo vi_value_created amt filtred with prospecting and untouched
+			    ),
+			    ssr_history[step_name] in {"Untouched", "Prospecting"}
+			)
+			
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 56823877-6ee2-4e8f-a299-fc7273bfe81e
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_existing_customer_pre_vi_value_amt' =
+			
+			CALCULATE(
+			    SUM(
+			        ssr_history[vi_value_created]       // get the new logo vi_value_created amt by filtering post sales support sales step
+			    ),
+			    ssr_history[step_name] ="Post-Sales Support"
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 5ba39a98-1e85-400f-9a01-0679c34f9056
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_new_logo_sell_vi_value_amt' =
+			
+			CALCULATE(
+			    SUM(
+			        ssr_history[vi_value_created]       // get the new logo vi_value_created amt
+			    ),
+			    ssr_history[step_name] ="New Logo Selling"
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 605648c5-6031-4958-b011-79114d5664ca
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_existing_customer_sell_vi_value_amt' = ```
+			
+			CALCULATE(
+			    SUM(
+			        ssr_history[vi_value_created]       // get the Existing Customer Selling vi_value_created amt 
+			    ),
+			    ssr_history[step_name] ="Existing Customer Selling"
+			)
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 3224a22f-b884-4a18-8f27-3cdad4a88fe8
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_vi_value_lead_amt' = ```
+			
+			var _new_logo_amt = [meas.ssr_history_new_logo_lead_vi_value_amt]     // get the new logo vi_value lead amount
+			var _existing_cust_amt = [meas.ssr_history_existing_customer_lead_vi_value_amt]     // get the existing customer vi_value lead amount
+			var res = _new_logo_amt + _existing_cust_amt        // sum the two 
+			return
+			res
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: e38f9be6-2984-4a94-9cb6-99bf29558eb5
+
+	measure 'meas.ssr_history_vi_value_pre_amt' = ```
+			
+			var _new_logo_amt = [meas.ssr_history_new_logo_pre_vi_value_amt]     // get the new logo vi_value pre amount
+			var _existing_cust_amt = [meas.ssr_history_existing_customer_pre_vi_value_amt]     // get the existing customer vi_value pre amount
+			var res = _new_logo_amt + _existing_cust_amt        // sum the two 
+			return
+			res
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 97840986-9fc5-400e-b874-cffa6f60db1c
+
+	measure 'meas.ssr_history_vi_value_sell_amt' = ```
+			
+			var _new_logo_amt = [meas.ssr_history_new_logo_sell_vi_value_amt]     // get the new logo vi_value sell amount
+			var _existing_cust_amt = [meas.ssr_history_existing_customer_sell_vi_value_amt]     // get the existing customer vi_value sell amount
+			var res = _new_logo_amt + _existing_cust_amt        // sum the two 
+			return
+			res
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: a779e6fe-b91a-4171-be94-5bfef63ea30e
+
+	measure 'meas.ssr_history_new_logo_lead_pre_sell_vi_value_amt' =
+			
+			var _lead_amt = [meas.ssr_history_new_logo_lead_vi_value_amt]           // get new logo lead vi value amt
+			var _pre_amt = [meas.ssr_history_new_logo_pre_vi_value_amt]             // get the new logo pre vi value amt
+			var _sell_amt = [meas.ssr_history_new_logo_sell_vi_value_amt]           // get the new logo sell vi value amt
+			
+			var res  = _lead_amt+_pre_amt+_sell_amt         // sum the lead, pre and sell vi vLUW amt
+			
+			return
+			res
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 729f710b-6334-4e3a-8feb-4a4d6a9d4608
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_existing_customer_lead_pre_sell_vi_value_amt' =
+			
+			var _lead_amt = [meas.ssr_history_existing_customer_lead_vi_value_amt]           // get the existing customer lead vi value amt
+			var _pre_amt = [meas.ssr_history_existing_customer_pre_vi_value_amt]             // get the existing customer pre vi value amt
+			var _sell_amt = [meas.ssr_history_existing_customer_sell_vi_value_amt]           // get the existing customer sell vi value amt
+			
+			var res  = _lead_amt+_pre_amt+_sell_amt         // sum the lead, pre and sell vi vLUW amt
+			
+			return
+			res
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 636c0369-4a0c-489f-b79e-814200370fcf
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_total_vi_value_amt' = ```
+			
+			var _new_logo_amt = [meas.ssr_history_new_logo_lead_pre_sell_vi_value_amt]          // get the total new logo vi value amt
+			var _existing_amt = [meas.ssr_history_existing_customer_lead_pre_sell_vi_value_amt]         // get the total existng custmer vi value 
+			
+			var res  = _new_logo_amt+_existing_amt      // get the toal
+			return
+			res
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 50f58453-a08c-4d4e-8591-f5498640ef77
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_vi_value_lead_actual_ratio' =
+			
+			var _lead_amt = [meas.ssr_history_vi_value_lead_amt]        // get the total vi value lead amt
+			var _total_amt = [meas.ssr_history_total_vi_value_amt]      // get the total vi value amt
+			var res = DIVIDE(_lead_amt, _total_amt,0)           // get the ratio
+			
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 3fe11145-4376-485d-a8a3-d0747ca1d63e
+
+	measure 'meas.ssr_history_vi_value_pre_actual_ratio' =
+			
+			var _pre_amt = [meas.ssr_history_vi_value_pre_amt]        // get the total vi value pre amt
+			var _total_amt = [meas.ssr_history_total_vi_value_amt]      // get the total vi value amt
+			var res = DIVIDE(_pre_amt, _total_amt,0)           // get the ratio
+			
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 93248076-ca86-4b00-b9c2-8d1c2e61f80c
+
+	measure 'meas.ssr_history_vi_value_sell_actual_ratio' =
+			
+			var _sell_amt = [meas.ssr_history_vi_value_sell_amt]        // get the total vi value sell amt
+			var _total_amt = [meas.ssr_history_total_vi_value_amt]      // get the total vi value amt
+			var res = DIVIDE(_sell_amt, _total_amt,0)           // get the ratio
+			
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 335e9d47-cbd4-48f9-8c17-ed6768bfb70a
+
+	measure 'meas.ssr_history_vi_value_new_logo_actual_ratio' =
+			
+			var _new_logo_amt = [meas.ssr_history_new_logo_lead_pre_sell_vi_value_amt]      // get the total amt vi value new logo
+			var _total_amt = [meas.ssr_history_total_vi_value_amt]              // get the total vi value
+			
+			var res = DIVIDE(_new_logo_amt, _total_amt,0)
+			
+			RETURN
+			res
+		formatString: #,0%;-#,0%;#,0%
+		displayFolder: _vi_score
+		lineageTag: ca2147ac-d74b-430b-9e2b-b52563e1329c
+
+	measure 'meas.ssr_history_vi_value_existing_customer_actual_ratio' = ```
+			
+			var _existing_amt = [meas.ssr_history_existing_customer_lead_pre_sell_vi_value_amt]      // get the total amt vi value existing customer 
+			var _total_amt = [meas.ssr_history_total_vi_value_amt]              // get the total vi value
+			
+			var res = DIVIDE(_existing_amt, _total_amt,0)
+			
+			RETURN
+			res
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 15ec82e9-38e9-4014-a314-47c9d0d685c5
+
+	measure 'meas.ssr_history_vi_new_logo_expected_ratio' =
+			
+			var _new_logo_amt = [meas.ssr_history_won_amt_new_logo]     // get the  new logo won amt
+			var _total_won_amt = [meas.ssr_history_won_amt]             // get the total won amt
+			
+			var res = DIVIDE(_new_logo_amt, _total_won_amt, 0)      // get the ratio
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: fbeab2a0-fe5a-4992-8b09-70060daa67ec
+
+	measure 'meas.ssr_history_vi_new_logo_diff_ratio' =
+			
+			var _actual_ratio = [meas.ssr_history_vi_value_new_logo_actual_ratio]           // get the new logo actual ratio
+			var _expected_ratio = [meas.ssr_history_vi_new_logo_expected_ratio]             // get the new logo expected  ratio
+			
+			var res  = (_actual_ratio - _expected_ratio)            // get the diff
+			RETURN
+			res
+		formatString: +0%;-0%;"-"
+		displayFolder: _vi_score
+		lineageTag: cbc1e60e-ca0c-4d28-9898-08f364e2ebad
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.ssr_history_vi_existing_customer_expected_ratio' =
+			
+			var _new_logo_ratio = [meas.ssr_history_vi_new_logo_expected_ratio]         // get the new logo expected ratio
+			var res = (1 - _new_logo_ratio)       // from 1 removing the new logo expected ratio and remains should be the existing customer sellling
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 83daa3d4-8802-4e4d-8f9e-e64cf2e27359
+
+	measure 'meas.ssr_history_vi_existing_customer_diff_ratio' =
+			
+			var _actual_ratio = [meas.ssr_history_vi_value_existing_customer_actual_ratio]      // get the existing customer actual ratio
+			var _expected_ratio = [meas.ssr_history_vi_existing_customer_expected_ratio]        // get the existing customer expected ratio
+			var _res = (_actual_ratio-_expected_ratio)      // get the diff
+			
+			RETURN
+			_res
+		formatString: +0%;-0%;"-"
+		displayFolder: _vi_score
+		lineageTag: dc2a1664-20f9-429b-9751-eac231030277
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.vi_value_Lead_expected_ratio' = ```
+			
+			// VAR _shares = VALUE(LOOKUPVALUE(metadata_config[value], metadata_config[key], "vi_tuning_shares")) // get the vi shares
+			var _shares = CALCULATE(
+			    MAX(metadata_config[value]),
+			    metadata_config[key] = "vi_tuning_shares"
+			)
+			
+			VAR _cleanShares = SUBSTITUTE(SUBSTITUTE(_shares, "[", ""), "]", "") 
+			VAR _values = SUBSTITUTE(_cleanShares, ",", "|") -- Replace commas with a separator
+			
+			-- Extract first value
+			VAR _firstValue = TRIM(LEFT(_values, FIND("|", _values) - 1)) 
+			
+			-- Extract middle value
+			VAR _remainingValues = MID(_values, FIND("|", _values) + 1, LEN(_values))
+			VAR _midValue = TRIM(LEFT(_remainingValues, FIND("|", _remainingValues) - 1))
+			
+			-- Extract last value
+			VAR _lastValue = TRIM(RIGHT(_values, LEN(_values) - FIND("|", _remainingValues)))
+			
+			-- Convert to numbers
+			VAR _firstNum = VALUE(_firstValue)
+			VAR _midNum = VALUE(_midValue)
+			VAR _lastNum = VALUE(_lastValue)
+			
+			RETURN 
+			_firstNum
+			
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 1b059077-3cd9-48e5-9e0f-e7d6fc046929
+
+	measure 'meas.vi_value_pre_expected_ratio' = ```
+			
+			// VAR _shares = VALUE(LOOKUPVALUE(metadata_config[value], metadata_config[key], "vi_tuning_shares")) // get the vi shares
+			var _shares = CALCULATE(
+			    MAX(metadata_config[value]),
+			    metadata_config[key] = "vi_tuning_shares"
+			)
+			
+			VAR _cleanShares = SUBSTITUTE(SUBSTITUTE(_shares, "[", ""), "]", "") 
+			VAR _values = SUBSTITUTE(_cleanShares, ",", "|") -- Replace commas with a separator
+			
+			-- Extract first value
+			VAR _firstValue = TRIM(LEFT(_values, FIND("|", _values) - 1)) 
+			
+			-- Extract middle value
+			VAR _remainingValues = MID(_values, FIND("|", _values) + 1, LEN(_values))
+			VAR _midValue = TRIM(LEFT(_remainingValues, FIND("|", _remainingValues) - 1))
+			
+			-- Extract last value
+			VAR _lastValue = TRIM(RIGHT(_values, LEN(_values) - FIND("|", _remainingValues)))
+			
+			-- Convert to numbers
+			VAR _firstNum = VALUE(_firstValue)
+			VAR _midNum = VALUE(_midValue)
+			VAR _lastNum = VALUE(_lastValue)
+			
+			RETURN 
+			_midNum
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: b0e86e0f-535d-476c-81f1-7c3ebff56acb
+
+	measure 'meas.vi_value_sell_expected_ratio' = ```
+			
+			// VAR _shares = VALUE(LOOKUPVALUE(metadata_config[value], metadata_config[key], "vi_tuning_shares")) // get the vi shares
+			var _shares = CALCULATE(
+			    MAX(metadata_config[value]),
+			    metadata_config[key] = "vi_tuning_shares"
+			)
+			
+			// var res = VALUE(RIGHT(LEFT(_shares,5),4))
+			// var res = VALUE(LEFT(RIGHT(_shares, 5),4))
+			
+			VAR _cleanShares = SUBSTITUTE(SUBSTITUTE(_shares, "[", ""), "]", "") 
+			VAR _values = SUBSTITUTE(_cleanShares, ",", "|") -- Replace commas with a separator
+			
+			-- Extract first value
+			VAR _firstValue = TRIM(LEFT(_values, FIND("|", _values) - 1)) 
+			
+			-- Extract middle value
+			VAR _remainingValues = MID(_values, FIND("|", _values) + 1, LEN(_values))
+			VAR _midValue = TRIM(LEFT(_remainingValues, FIND("|", _remainingValues) - 1))
+			
+			-- Extract last value
+			VAR _lastValue = TRIM(RIGHT(_remainingValues, LEN(_remainingValues) - FIND("|", _remainingValues)))
+			
+			-- Convert to numbers
+			VAR _firstNum = VALUE(_firstValue)
+			VAR _midNum = VALUE(_midValue)
+			VAR _lastNum = VALUE(_lastValue)
+			
+			RETURN 
+			_lastNum
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 8c0d8ad7-c445-4a3d-9f44-c607b260a28e
+
+	measure 'meas.ssr_history_vi_lead_diff_ratio' =
+			
+			var _actual = [meas.ssr_history_vi_value_lead_actual_ratio]     // get lead actual ratio
+			var _expected = [meas.vi_value_Lead_expected_ratio]     // get the expected ratio
+			
+			var res = (_actual - _expected)         // get tghe diff
+			
+			RETURN
+			res
+		formatString: +0%;-0%;"-"
+		displayFolder: _vi_score
+		lineageTag: fdf162e0-acd2-44b5-a4d7-a91eefd6cbe5
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.ssr_history_vi_pre_diff_ratio' =
+			
+			var _actual = [meas.ssr_history_vi_value_pre_actual_ratio]     // get pre actual ratio
+			var _expected = [meas.vi_value_pre_expected_ratio]     // get the expected ratio
+			
+			var res = (_actual - _expected)         // get tghe diff
+			
+			RETURN
+			res
+		formatString: +0%;-0%;"-"
+		displayFolder: _vi_score
+		lineageTag: 70a8b7d8-c09d-43b2-8e21-6b65993fc209
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.ssr_history_vi_sell_diff_ratio' =
+			
+			var _actual = [meas.ssr_history_vi_value_sell_actual_ratio]     // get sell actual ratio
+			var _expected = [meas.vi_value_pre_expected_ratio]     // get the expected ratio
+			
+			var res = (_actual - _expected)         // get tghe diff
+			
+			RETURN
+			res
+		formatString: +0%;-0%;"-"
+		displayFolder: _vi_score
+		lineageTag: 702932eb-7355-410f-8c4b-d3224d5ef94c
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.ssr_history_step_diff' =
+			
+			var _new_logo = ABS([meas.ssr_history_vi_new_logo_diff_ratio])           // get the new logo diff
+			var _existing = abs([meas.ssr_history_vi_existing_customer_diff_ratio])      // get the existing cust diff
+			
+			var res = (_new_logo+_existing)
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 71d0d6df-817f-49a5-92b7-51b8816aef41
+
+	measure 'meas.ssr_history_vi_tuning_shares_diff' = ```
+			
+			var _lead = ABS([meas.ssr_history_vi_lead_diff_ratio])           // get the lead diff
+			var _pre = ABS([meas.ssr_history_vi_pre_diff_ratio])     // get the epre diff
+			var _sell = ABS([meas.ssr_history_vi_sell_diff_ratio])       // get the sell diff
+			
+			var res = (_lead+_pre+_sell)            // sum 
+			RETURN
+			res
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: e49610c0-90a4-495c-a74d-4d2bd69ac068
+
+	measure 'meas.ssr_history_vi_score' =
+			
+			var diff1 = [meas.ssr_history_step_diff]        // diff 1
+			var diff2 = [meas.ssr_history_vi_tuning_shares_diff]        // diff 2
+			var res = (1 - (diff1+diff2)/2)
+			
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 699bf57b-b8a5-4419-864f-e42a7d962253
+
+	measure 'meas.pi_reps_w_ta' =
+			
+			
+			var _selected_roles = SELECTEDVALUE(users[trueai_user_role])       // get the filtered user role
+			var reps_count = CALCULATE(
+			    [meas.reps_w_time_allocation_count],        // get the reps count with TA
+			    users[trueai_user_role]=_selected_roles
+			)
+			var res  = "Time Allocation for " & reps_count & " " &_selected_roles & " Users"
+			RETURN
+			res
+		displayFolder: _peek_inside
+		lineageTag: 7f6062ba-8f86-4325-b101-c45c7f17ccc2
+
+	measure 'meas.pi_reps_count_w_ta' = ```
+			
+			
+			var res =  CALCULATE(
+			    [meas.data_logs_user_count_eop],
+			    users_history[ci_time_alloc_tot]>0      // get the end of period reps having TA 
+			    )
+			
+			RETURN
+			res
+			```
+		formatString: 0
+		displayFolder: _peek_inside
+		lineageTag: fb805278-1d85-4217-a272-1873521d3396
+
+	measure 'meas.vi_lead_combined_matrix_amt' = ```
+			
+			VAR _min_date = [meas.context_date_min]     // context min date
+			VAR _max_date = [meas.context_date_max]     // context max date
+			
+			VAR _selected_step = MAX(ssr_history[step_name])
+			
+			VAR _new_amt = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] = "Lead Gen" &&       // get the lead gen vi value created amt as New Logo Selling
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),
+			        ssr_history[vi_value_created]
+			    )
+			)
+			VAR _exist_amt = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] IN { "New Logo Selling", "Existing Customer Selling" } &&
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),           // get the vi value repeated amt as Existing customer selling 
+			        ssr_history[vi_value_repeat]
+			    )
+			)
+			
+			VAR _new_lead_amt = IF(
+			    _selected_step = "New Logo Selling", _new_amt,
+			    IF(
+			        _selected_step = "Existing Customer Selling",
+			        _exist_amt, 0
+			    )
+			)
+			
+			VAR _total_amt = _new_amt + _exist_amt
+			
+			RETURN
+			IF(
+			    ISINSCOPE(ssr_history[step_name]),
+			    _new_lead_amt,
+			    _total_amt
+			)
+			
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _peek_inside
+		lineageTag: d1e161b6-7b08-4003-8905-98f465c5a1e9
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.vi_pre_combined_matrix_amt' = ```
+			
+			var _min_date = [meas.context_date_min]     // context min date
+			var _max_date = [meas.context_date_max]     // context max date
+			
+			var _selected_step = MAX(ssr_history[step_name])
+			
+			var _new_amt = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] in { "Untouched", "Prospecting"} &&       // get the lead gen vi value created amt as New Logo Selling
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),
+			        ssr_history[vi_value_created]
+			    )
+			)
+			var _exist_amt = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] in { "Post-Sales Support"} &&
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),           // get the  vi value created  amt as Existing customer selling 
+			        ssr_history[vi_value_created]
+			    )
+			)
+			
+			
+			var _new_lead_amt = IF(
+			    _selected_step="New Logo Selling", _new_amt,
+			    IF(
+			        _selected_step= "Existing Customer Selling",
+			        _exist_amt,0
+			    )
+			)
+			
+			VAR _total_amt = _new_amt + _exist_amt
+			
+			RETURN
+			IF(
+			    ISINSCOPE(ssr_history[step_name]),
+			    _new_lead_amt,
+			    _total_amt
+			)
+			
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _peek_inside
+		lineageTag: e54252c8-1638-4d7a-968a-c28eb9216ac5
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.vi_sell_combined_matrix_amt' = ```
+			
+			var _min_date = [meas.context_date_min]     // context min date
+			var _max_date = [meas.context_date_max]     // context max date
+			
+			var _selected_step = MAX(ssr_history[step_name])
+			
+			var _new_amt = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] in { "New Logo Selling"} &&       // get the New Logo vi value created amt as New Logo Selling
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),
+			        ssr_history[vi_value_created]
+			    )
+			)
+			var _exist_amt = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] in { "Existing Customer Selling"} &&
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),           // get the  vi value created  amt as Existing customer selling 
+			        ssr_history[vi_value_created]
+			    )
+			)
+			
+			
+			var _new_lead_amt = IF(
+			    _selected_step="New Logo Selling", _new_amt,
+			    IF(
+			        _selected_step= "Existing Customer Selling",
+			        _exist_amt,0
+			    )
+			)
+			
+			VAR _total_amt = _new_amt + _exist_amt
+			
+			RETURN
+			IF(
+			    ISINSCOPE(ssr_history[step_name]),
+			    _new_lead_amt,
+			    _total_amt
+			)
+			
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _peek_inside
+		lineageTag: ae08c391-d689-493b-885d-5b9e6df5fb58
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.vi_lead_pre_sell_combined_matrix_amt' = ```
+			
+			var _min_date = [meas.context_date_min]     // context min date
+			var _max_date = [meas.context_date_max]     // context max date
+			
+			var _selected_step = MAX(ssr_history[step_name])
+			
+			var _new_sell = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] in { "New Logo Selling"} &&       // get the New Logo vi value created amt as New Logo Selling
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),
+			        ssr_history[vi_value_created]
+			    )
+			)
+			
+			var _new_pre = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] in { "Untouched", "Prospecting"} &&       // get the pre  vi value created amt as New Logo Selling
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),
+			        ssr_history[vi_value_created]
+			    )
+			)
+			
+			VAR _new_lead = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] = "Lead Gen" &&       // get the lead gen vi value created amt as New Logo Selling
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),
+			        ssr_history[vi_value_created]
+			    )
+			)
+			
+			VAR _exist_lead = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] IN { "New Logo Selling", "Existing Customer Selling" } &&
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),           // get the vi value repeated amt as Existing customer selling 
+			        ssr_history[vi_value_repeat]
+			    )
+			)
+			
+			var _exist_pre = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] in { "Post-Sales Support"} &&
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),           // get the pre vi value created  amt as Existing customer selling 
+			        ssr_history[vi_value_created]
+			    )
+			)
+			
+			var _exist_sell = CALCULATE(
+			    SUMX(
+			        FILTER(
+			            ALL(ssr_history),
+			            ssr_history[step_name] in { "Existing Customer Selling"} &&
+			            ssr_history[_sys_filt_end_date] >= _min_date && ssr_history[_sys_filt_end_date] <= _max_date
+			        ),           // get the  vi value created  amt as Existing customer selling 
+			        ssr_history[vi_value_created]
+			    )
+			)
+			
+			var _new_amt = _new_lead+_new_pre+_new_sell     // total of new logo
+			var _exist_amt = _exist_lead+_exist_pre+_exist_sell
+			
+			
+			var _new_lead_amt = IF(
+			    _selected_step="New Logo Selling", _new_amt,
+			    IF(
+			        _selected_step= "Existing Customer Selling",
+			        _exist_amt,0
+			    )
+			)
+			
+			VAR _total_amt = _new_amt + _exist_amt
+			
+			RETURN
+			IF(
+			    ISINSCOPE(ssr_history[step_name]),
+			    _new_lead_amt,
+			    _total_amt
+			)
+			
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _peek_inside
+		lineageTag: 54f1d62b-976c-424e-8a01-1212c7b57afa
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.sh_explicit_pre_vi_amt' = ```
+			
+			VAR _step_name = SELECTEDVALUE(ssr_history[step_name])
+			VAR _new_amt = CALCULATE(SUM(users_history[vi_value_created_preselling_prospecting]))
+			VAR _existing_amt = CALCULATE(SUM(users_history[vi_value_created_preselling_post_sales]))
+			
+			VAR res = 
+			    SWITCH(
+			        TRUE(),
+			        _step_name = "New Logo Selling", _new_amt,
+			        _step_name = "Existing Customer Selling", _existing_amt,
+			        ISBLANK(_step_name), _new_amt + _existing_amt,
+			        BLANK()
+			    )
+			
+			RETURN
+			res
+			
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _vi_score
+		lineageTag: 6339e467-29ad-4d16-823d-80a6200877c2
+
+	measure 'meas.untouched_prospecting_pred_vi_amt' =
+			
+			CALCULATE(
+			        SUM(ssr_history[vi_value_created]),
+			        REMOVEFILTERS(ssr_history[step_name]),
+			        ssr_history[step_name] IN {"Untouched", "Prospecting"}
+			    )
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: _vi_score
+		lineageTag: 7f719e40-386a-4577-b3a6-ba4efc9c277e
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.post_sales_pred_amount_vi_amt' =
+			
+			CALCULATE(
+			        SUM(ssr_history[vi_value_created]),
+			        REMOVEFILTERS(ssr_history[step_name]),
+			        KEEPFILTERS(ssr_history[step_name]="Post-Sales Support")
+			    )
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: _vi_score
+		lineageTag: 2fb62a26-500c-4b69-98c4-80f985987e97
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.sh_actual_combined_ratio' = ```
+			
+			VAR _step_name = SELECTEDVALUE(ssr_history[step_name])
+			VAR _new_ratio = [meas.ssr_history_vi_value_new_logo_actual_ratio]              // get the new logo actual ratio
+			VAR _existing_ratio = [meas.ssr_history_vi_value_existing_customer_actual_ratio]                    // get the existing customer actual ratio
+			
+			VAR res = 
+			    SWITCH(
+			        TRUE(),
+			        _step_name = "New Logo Selling", _new_ratio,
+			        _step_name = "Existing Customer Selling", _existing_ratio,              // condition
+			        BLANK()
+			    )
+			
+			RETURN
+			res
+			
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: db0407c0-4181-4113-b714-b4344409e4c3
+
+	measure 'meas.sh_expected_combined_ratio' = ```
+			
+			VAR _step_name = SELECTEDVALUE(ssr_history[step_name])
+			VAR _new_ratio = [meas.ssr_history_vi_new_logo_expected_ratio]                      // get the new logo expected ratio
+			VAR _existing_ratio = [meas.ssr_history_vi_existing_customer_expected_ratio]            // get the existing customer ratio
+			
+			VAR res = 
+			    SWITCH(
+			        TRUE(),
+			        _step_name = "New Logo Selling", _new_ratio,
+			        _step_name = "Existing Customer Selling", _existing_ratio,                    // get the conditio
+			        BLANK()
+			    )
+			
+			RETURN
+			res
+			
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 8f1cf203-eaa7-403c-8580-5aab9852041c
+
+	measure 'meas.sh_diff_combined_ratio' = ```
+			
+			VAR _step_name = SELECTEDVALUE(ssr_history[step_name])
+			VAR _new_ratio = [meas.ssr_history_vi_new_logo_diff_ratio]              // get the new logo diff ratio
+			VAR _existing_ratio = [meas.ssr_history_vi_existing_customer_diff_ratio]                    // get the existing customer diff ratio
+			
+			VAR res = 
+			    SWITCH(
+			        TRUE(),
+			        _step_name = "New Logo Selling", _new_ratio,
+			        _step_name = "Existing Customer Selling", _existing_ratio,                    // put the condition
+			        BLANK()             
+			    )
+			
+			RETURN
+			res
+			
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: fb57f6ae-471e-4fcc-bdf5-4f9193cbef12
+
+	measure 'meas.sh_explicit_pre_vi_amt_1' = ```
+			
+			VAR _step_name = SELECTEDVALUE(ssr_history[step_name])
+			VAR _new_amt = [meas.ssr_history_new_logo_pre_vi_value_amt_1]
+			VAR _existing_amt = [meas.ssr_history_existing_customer_pre_vi_value_amt_1]
+			
+			VAR res = 
+			    SWITCH(
+			        TRUE(),
+			        _step_name = "New Logo Selling", _new_amt,
+			        _step_name = "Existing Customer Selling", _existing_amt,
+			        ISBLANK(_step_name), _new_amt + _existing_amt,
+			        BLANK()
+			    )
+			
+			RETURN
+			res
+			
+			```
+		displayFolder: _vi_score
+		lineageTag: c21e123e-4fc5-45e0-b375-5b93af8e296c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.ssr_history_new_logo_pre_vi_value_amt_1' = ```
+			
+			CALCULATE(
+			    SUM(
+			        ssr_history[vi_value_created]       // get the new logo vi_value_created amt filtred with prospecting and untouched
+			    ),
+			    ssr_history[step_name] in {"Untouched", "Prospecting"}
+			)
+			
+			```
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: _vi_score
+		lineageTag: 5407e5b0-e245-42ec-a901-4bc7d2e1663c
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.ssr_history_existing_customer_pre_vi_value_amt_1' = ```
+			
+			CALCULATE(
+			    SUM(
+			        ssr_history[vi_value_created]       // get the new logo vi_value_created amt by filtering post sales support sales step
+			    ),
+			    ssr_history[step_name] ="Post-Sales Support"
+			)
+			
+			```
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: _vi_score
+		lineageTag: 6659ff8c-db31-4f0b-bc2c-2ac8a062d279
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.sh_total_actual_ratio' =
+			
+			var _new_ratio = [meas.ssr_history_vi_value_new_logo_actual_ratio]                  // get the new ratio actual
+			var _existing_ratio = [meas.ssr_history_vi_value_existing_customer_actual_ratio]                // get the existing ratio
+			
+			var res = _new_ratio+_existing_ratio
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 87e2e241-74cc-4fc1-b2cd-2084f9f4a2ae
+
+	measure 'meas.sh_total_expected_ratio' =
+			
+			var _new_ratio = [meas.ssr_history_vi_new_logo_expected_ratio]                  // get the new ratio actual
+			var _existing_ratio = [meas.ssr_history_vi_existing_customer_expected_ratio]                // get the existing ratio
+			
+			var res = _new_ratio+_existing_ratio
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: 5a75c550-224e-4476-ac31-4830b9fd9b3c
+
+	measure 'meas.sh_total_diff_ratio' =
+			
+			var _new_ratio = [meas.ssr_history_vi_new_logo_diff_ratio]                  // get the new ratio actual
+			var _existing_ratio = [meas.ssr_history_vi_existing_customer_diff_ratio]                // get the existing ratio
+			
+			var res = _new_ratio+_existing_ratio
+			RETURN
+			res
+		formatString: +0%;-0%;"-"
+		displayFolder: _vi_score
+		lineageTag: b376e725-eb47-4b4a-9b30-ab84efedcea1
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.vi_lead_pre_sell_total_actual_ratio' =
+			
+			var lead_ratio = [meas.ssr_history_vi_value_lead_actual_ratio]              // get the actual ratio
+			var _pre_ratio = [meas.ssr_history_vi_value_pre_actual_ratio]               // get the pre selling ratio
+			var _sell_ratio = [meas.ssr_history_vi_value_sell_actual_ratio]             // get the sell ratio
+			
+			var res = (lead_ratio+_pre_ratio+_sell_ratio)
+			
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: e37f60e6-7236-47cf-9d75-be0192f91445
+
+	measure 'meas.vi_lead_pre_sell_total_expected_ratio' =
+			
+			var lead_ratio = [meas.vi_value_Lead_expected_ratio]              // get the actual ratio
+			var _pre_ratio = [meas.vi_value_pre_expected_ratio]               // get the pre selling ratio
+			var _sell_ratio = [meas.vi_value_sell_expected_ratio]             // get the sell ratio
+			
+			var res = (lead_ratio+_pre_ratio+_sell_ratio)
+			
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: _vi_score
+		lineageTag: fecbf128-cf6e-45ad-8c03-5853fbc05486
+
+	measure 'meas.vi_lead_pre_sell_total_diff_ratio' =
+			
+			var lead_ratio = [meas.ssr_history_vi_lead_diff_ratio]              // get the actual ratio
+			var _pre_ratio = [meas.ssr_history_vi_pre_diff_ratio]               // get the pre selling ratio
+			var _sell_ratio = [meas.ssr_history_vi_sell_diff_ratio]             // get the sell ratio
+			
+			var res = (lead_ratio+_pre_ratio+_sell_ratio)
+			
+			RETURN
+			res
+		formatString: +0%;-0%;"-"
+		displayFolder: _vi_score
+		lineageTag: 143be81d-c600-44cc-af66-ef6719e14fa0
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.in_last_12m_from_reference_date' =
+			
+			VAR _refDate =
+			    MAX('companies_history'[_sys_reference_date])        // use each company's config date
+			VAR _startDate =
+			    EDATE(_refDate, -12)                                 // go back 12 months
+			RETURN
+			    IF(
+			        MAX('companies_history'[_sys_filt_end_date]) >= _startDate &&
+			        MAX('companies_history'[_sys_filt_end_date]) <= _refDate,
+			        1,
+			        0
+			    )
+		lineageTag: d4395789-04f8-40d3-9d0b-ff62ca2c45cb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _sys_as_of
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: bb2b6732-b5be-40aa-945d-10562f2dfd60
+		summarizeBy: none
+		sourceColumn: _sys_as_of
+
+		variation Variation
+			isDefault
+			relationship: d8087f13-03e8-4fda-a396-3de3a699d27e
+			defaultHierarchy: LocalDateTable_453f9a55-6d2c-4a3a-aed5-c88d1d988ac9.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_co_id
+		dataType: string
+		lineageTag: 4bd57827-856d-4cde-a0c1-c177558f4558
+		summarizeBy: none
+		sourceColumn: _sys_co_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_doc_id
+		dataType: string
+		lineageTag: c6e1bafe-6258-4749-a760-02404ee60542
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_filt_end_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5e433655-bd26-45a3-853f-7c3ae4139013
+		summarizeBy: none
+		sourceColumn: _sys_filt_end_date
+
+		variation Variation
+			isDefault
+			relationship: ffca7695-5bbf-457f-bad2-df9ba39926e6
+			defaultHierarchy: LocalDateTable_98bd9f6a-b25a-4213-9dc4-832bf6d50574.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column _sys_filt_start_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: e2fd8455-a974-40af-97cf-8a160b1cf333
+		summarizeBy: none
+		sourceColumn: _sys_filt_start_date
+
+		variation Variation
+			isDefault
+			relationship: 9e3e13f4-423c-4d11-b26c-cf0a4bca8a2f
+			defaultHierarchy: LocalDateTable_648389c1-a1c5-462a-a7c7-266a1c517540.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column _sys_last_modified_on
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 80c9f7f1-1491-45ac-8890-7cb14dea5754
+		summarizeBy: none
+		sourceColumn: _sys_last_modified_on
+
+		variation Variation
+			isDefault
+			relationship: 4b3b34b3-b62a-49e4-8524-18f2aa9b74a2
+			defaultHierarchy: LocalDateTable_91382215-9109-4075-bf03-b3036daa2743.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_processed_as_of
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 370421e0-58be-4cbc-835d-9574a7a50ac8
+		summarizeBy: none
+		sourceColumn: _sys_processed_as_of
+
+		variation Variation
+			isDefault
+			relationship: 8dd9562a-8fb8-4d8a-bfee-56e1add92487
+			defaultHierarchy: LocalDateTable_ded4ece7-1439-4c84-ab37-0bb006b8527e.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_currency
+		dataType: string
+		lineageTag: 0cee561d-0952-4add-b500-7308145949b3
+		summarizeBy: none
+		sourceColumn: company_currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_logo
+		dataType: string
+		lineageTag: a82c140f-e1f4-4963-bed1-7378a26dd485
+		summarizeBy: none
+		sourceColumn: company_logo
+
+		annotation SummarizationSetBy = Automatic
+
+	column company_name
+		dataType: string
+		lineageTag: 8c7c3b88-3dcf-4f8d-a252-a2a81a1be186
+		summarizeBy: none
+		sourceColumn: company_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_acv_company_size_factors
+		dataType: string
+		lineageTag: af2745a8-e7b0-48d2-8640-1e7946bde4c6
+		summarizeBy: none
+		sourceColumn: di_acv_company_size_factors
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_acv_country_factors
+		dataType: string
+		lineageTag: cd57a65c-567f-4b3e-9b6b-7ec32f20f82f
+		summarizeBy: none
+		sourceColumn: di_acv_country_factors
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_acv_industry_factors
+		dataType: string
+		lineageTag: 9f4be908-25a7-4651-96a8-73dd7dae9937
+		summarizeBy: none
+		sourceColumn: di_acv_industry_factors
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_amt_won_last12months
+		dataType: double
+		lineageTag: 90bebe13-0452-4011-a0da-5c2d1c0b737e
+		summarizeBy: sum
+		sourceColumn: di_amt_won_last12months
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_new_logo_attempts
+		dataType: int64
+		formatString: 0
+		lineageTag: 89969c7b-4a1a-4473-8891-9926a2e00d12
+		summarizeBy: sum
+		sourceColumn: di_pred_new_logo_attempts
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_new_logo_auc
+		dataType: double
+		lineageTag: 9fd81794-8663-4390-96d0-1bfe31edc0c8
+		summarizeBy: average
+		sourceColumn: di_pred_new_logo_auc
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_new_logo_avg_p_val
+		dataType: double
+		lineageTag: 814f0a2e-61d4-411d-b607-406644a0eb37
+		summarizeBy: sum
+		sourceColumn: di_pred_new_logo_avg_p_val
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_new_logo_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 53e6bff6-fc4d-4769-a4b9-9b5777908338
+		summarizeBy: none
+		sourceColumn: di_pred_new_logo_end_date
+
+		variation Variation
+			isDefault
+			relationship: b95eb612-8bbb-4d8f-8ff6-a0afb2709e60
+			defaultHierarchy: LocalDateTable_d880f7ff-513a-4a72-b0fd-0b00f734a00c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_new_logo_r2
+		dataType: double
+		lineageTag: 1d51cae8-27a0-447a-a12e-37b704ea1e3b
+		summarizeBy: average
+		sourceColumn: di_pred_new_logo_r2
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_new_logo_r2_data
+		dataType: string
+		lineageTag: 910f1abf-c81c-45b3-b7fd-7c6acfc2c27a
+		summarizeBy: none
+		sourceColumn: di_pred_new_logo_r2_data
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_new_logo_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: af1901d4-f240-4d74-a301-f239142e1286
+		summarizeBy: none
+		sourceColumn: di_pred_new_logo_start_date
+
+		variation Variation
+			isDefault
+			relationship: 30aee3a5-4275-44f8-8291-92eab142d313
+			defaultHierarchy: LocalDateTable_249aecd0-c0de-46dc-86bd-e065003c5272.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_new_logo_successes
+		dataType: int64
+		formatString: 0
+		lineageTag: f13c6653-bc5c-45b9-bcea-85c35a610709
+		summarizeBy: sum
+		sourceColumn: di_pred_new_logo_successes
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_post_sales_attempts
+		dataType: int64
+		formatString: 0
+		lineageTag: 58a7414a-2525-42f5-9c36-af1289791e8e
+		summarizeBy: sum
+		sourceColumn: di_pred_post_sales_attempts
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_post_sales_auc
+		dataType: double
+		formatString: 0.00
+		lineageTag: 12f6c76d-c922-4680-bc85-cb0cfabd3ee3
+		summarizeBy: average
+		sourceColumn: di_pred_post_sales_auc
+
+		annotation SummarizationSetBy = User
+
+	column di_pred_post_sales_avg_p_val
+		dataType: double
+		lineageTag: 185a902d-bea1-4359-a1fb-7115a05ecbe9
+		summarizeBy: sum
+		sourceColumn: di_pred_post_sales_avg_p_val
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_post_sales_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0df77124-6358-4319-9ef0-cfb02fcc185a
+		summarizeBy: none
+		sourceColumn: di_pred_post_sales_end_date
+
+		variation Variation
+			isDefault
+			relationship: 1115c693-8ea7-4b03-a1e3-f26ce13bd56f
+			defaultHierarchy: LocalDateTable_396314b0-c7bb-479f-a1b1-445b824fad5b.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_post_sales_qual_bucket_tiers
+		dataType: string
+		lineageTag: 1c0e4c2c-d7ae-4f01-acdb-a928b2bb8e51
+		summarizeBy: none
+		sourceColumn: di_pred_post_sales_qual_bucket_tiers
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_post_sales_r2
+		dataType: double
+		formatString: 0.00
+		lineageTag: e5f64981-169b-41e5-8df0-bbc9f8705f3b
+		summarizeBy: average
+		sourceColumn: di_pred_post_sales_r2
+
+		annotation SummarizationSetBy = User
+
+	column di_pred_post_sales_r2_data
+		dataType: string
+		lineageTag: 9f66fea8-8dc3-4ed6-b49e-81c0680eed30
+		summarizeBy: none
+		sourceColumn: di_pred_post_sales_r2_data
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_post_sales_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 5f54d0fe-2ba0-4160-a030-de6569084eb6
+		summarizeBy: none
+		sourceColumn: di_pred_post_sales_start_date
+
+		variation Variation
+			isDefault
+			relationship: cf5516cf-fdf5-4c2d-8162-c77f97c3ade6
+			defaultHierarchy: LocalDateTable_2e0b345a-1a0c-4e87-a81e-f929c78bc3a2.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_post_sales_successes
+		dataType: int64
+		formatString: 0
+		lineageTag: e87dcab6-7456-4c6b-ae76-92ed286918bc
+		summarizeBy: sum
+		sourceColumn: di_pred_post_sales_successes
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_prospecting_attempts
+		dataType: int64
+		formatString: 0
+		lineageTag: 934321de-44db-4671-b1ec-34a1710e019d
+		summarizeBy: sum
+		sourceColumn: di_pred_prospecting_attempts
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_prospecting_auc
+		dataType: double
+		lineageTag: 76bdbd23-5067-42d0-9e87-8b75595487c7
+		summarizeBy: average
+		sourceColumn: di_pred_prospecting_auc
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_prospecting_avg_p_val
+		dataType: double
+		lineageTag: 8cf31217-9f12-4205-a665-8d3cd3b828e8
+		summarizeBy: sum
+		sourceColumn: di_pred_prospecting_avg_p_val
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_prospecting_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 895a8118-69d5-444e-a2b7-997c84951335
+		summarizeBy: none
+		sourceColumn: di_pred_prospecting_end_date
+
+		variation Variation
+			isDefault
+			relationship: 06c35aee-82d8-4331-b724-1386af4002c0
+			defaultHierarchy: LocalDateTable_1ed19a9c-d736-41ec-bd49-e86ac0ab6638.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_prospecting_model_reset_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 923a1b4f-26b6-42f0-8cc9-a67263ee6baf
+		summarizeBy: none
+		sourceColumn: di_pred_prospecting_model_reset_on
+
+		variation Variation
+			isDefault
+			relationship: c2717731-0db3-4401-a247-6fb1f3a67000
+			defaultHierarchy: LocalDateTable_2b77dee5-fe2b-4b1e-8a2d-fda2454bed05.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_prospecting_qual_bucket_tiers
+		dataType: string
+		lineageTag: 6584a779-fb63-44ae-b66d-39c9560b0818
+		summarizeBy: none
+		sourceColumn: di_pred_prospecting_qual_bucket_tiers
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_prospecting_r2
+		dataType: double
+		lineageTag: ebe87503-8962-4914-a4c7-3522e09ebc54
+		summarizeBy: average
+		sourceColumn: di_pred_prospecting_r2
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_prospecting_r2_data
+		dataType: string
+		lineageTag: 5f26c383-b316-42f8-951b-4b4691f29b51
+		summarizeBy: none
+		sourceColumn: di_pred_prospecting_r2_data
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_prospecting_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 993aa057-0ece-406c-a25c-1054cb5b3aa0
+		summarizeBy: none
+		sourceColumn: di_pred_prospecting_start_date
+
+		variation Variation
+			isDefault
+			relationship: 6c05060c-3c13-45df-82f2-28971b1af47b
+			defaultHierarchy: LocalDateTable_c5d12d69-e707-4d3e-a039-51591d49169a.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_prospecting_successes
+		dataType: int64
+		formatString: 0
+		lineageTag: b1dbff75-f7a0-442f-83b9-430b98c25009
+		summarizeBy: sum
+		sourceColumn: di_pred_prospecting_successes
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_selling_new_logo_qual_bucket_tiers
+		dataType: string
+		lineageTag: 5d6bd6e0-0b3f-42aa-b3a4-de37b2993903
+		summarizeBy: none
+		sourceColumn: di_pred_selling_new_logo_qual_bucket_tiers
+
+		annotation SummarizationSetBy = Automatic
+
+	column partner_base64_logo
+		dataType: string
+		lineageTag: b2294df3-dd0e-48cc-b02c-f3f0be4514ef
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: partner_base64_logo
+
+		annotation SummarizationSetBy = Automatic
+
+	column partner_co_id
+		dataType: string
+		lineageTag: b180a878-35e0-4306-aaae-bc93e64cea84
+		summarizeBy: none
+		sourceColumn: partner_co_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column partner_name
+		dataType: string
+		lineageTag: 399be482-12d9-4ff0-bfc6-6aa1c6f06f78
+		summarizeBy: none
+		sourceColumn: partner_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column partner_product_name
+		dataType: string
+		lineageTag: 98bd37c1-5715-40ac-9244-a7810271b053
+		summarizeBy: none
+		sourceColumn: partner_product_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_all_last_attempt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e39a5627-c251-4d7c-8829-5fa7ec796691
+		summarizeBy: none
+		sourceColumn: processing_all_last_attempt
+
+		variation Variation
+			isDefault
+			relationship: bb21b255-5bdf-489e-8716-81eb76f76bb0
+			defaultHierarchy: LocalDateTable_995ff945-6872-46e1-b943-ede9d0e6a9cb.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_all_last_success
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4de8cda7-ebc8-4704-bac3-734a4d7660d1
+		summarizeBy: none
+		sourceColumn: processing_all_last_success
+
+		variation Variation
+			isDefault
+			relationship: 2382c996-e8d6-4cfe-8685-b3a90462ec2a
+			defaultHierarchy: LocalDateTable_8127ab82-e7dc-4af8-b410-1c0e859e77ad.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_all_last_success_time_sec
+		dataType: double
+		lineageTag: d7e78439-3e69-4667-9ef6-f58cc86ceb0f
+		summarizeBy: sum
+		sourceColumn: processing_all_last_success_time_sec
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column processing_api_export_last_attempt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1e53800d-2200-40f1-a752-d154c5f25953
+		summarizeBy: none
+		sourceColumn: processing_api_export_last_attempt
+
+		variation Variation
+			isDefault
+			relationship: 1331aaf7-bbc0-4f1e-89f5-085131ed7633
+			defaultHierarchy: LocalDateTable_97024d0d-e943-4ba7-ae94-a393b9fd234a.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_api_export_last_success
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 263164df-dfeb-4a52-ae6f-5af81fca55ed
+		summarizeBy: none
+		sourceColumn: processing_api_export_last_success
+
+		variation Variation
+			isDefault
+			relationship: b842b985-7467-4545-9f54-55566f6a6696
+			defaultHierarchy: LocalDateTable_93d45a5e-99e8-4a2f-8562-e5c0f4f4f39d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_api_export_last_success_time_sec
+		dataType: double
+		lineageTag: f487863c-0d66-4b5e-af93-6fa429b9dbca
+		summarizeBy: sum
+		sourceColumn: processing_api_export_last_success_time_sec
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column processing_max_last_modified_on_act
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8ccd0cff-11b8-484b-b895-27cd51a5274d
+		summarizeBy: none
+		sourceColumn: processing_max_last_modified_on_act
+
+		variation Variation
+			isDefault
+			relationship: 0d9a0534-63b6-486d-a2c9-e58a20946e1f
+			defaultHierarchy: LocalDateTable_02207aa1-5929-4872-86b3-60ace1acd3c9.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_max_last_modified_on_opp_histories
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7e399514-508b-4766-8aae-413074f10fdc
+		summarizeBy: none
+		sourceColumn: processing_max_last_modified_on_opp_histories
+
+		variation Variation
+			isDefault
+			relationship: 99c114ba-0a31-47e5-b576-612f2110b3f3
+			defaultHierarchy: LocalDateTable_6c251f3d-30d4-4bda-8ff2-c2b021eaf2a6.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_max_last_modified_on_opps
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e80ac017-5a20-4826-86fd-811afb9784b2
+		summarizeBy: none
+		sourceColumn: processing_max_last_modified_on_opps
+
+		variation Variation
+			isDefault
+			relationship: e7caa9ae-6cad-421a-b96e-e1d00297f0eb
+			defaultHierarchy: LocalDateTable_bcf3df37-ac64-4d60-9de2-aa90782c5b34.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_max_last_modified_on_users
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d34d3c3c-f98b-4600-94d9-476dbaee2a12
+		summarizeBy: none
+		sourceColumn: processing_max_last_modified_on_users
+
+		variation Variation
+			isDefault
+			relationship: 8bf44e26-dbdf-4fae-8ae5-dba3b1015755
+			defaultHierarchy: LocalDateTable_705f362c-05e5-4969-a961-edba265e78b0.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_sync_last_attempt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 5fd71e15-6865-44c5-8e28-e917ed9893d8
+		summarizeBy: none
+		sourceColumn: processing_sync_last_attempt
+
+		variation Variation
+			isDefault
+			relationship: 43dbdd5d-2e5c-4a6e-8898-9b5a836ccb2b
+			defaultHierarchy: LocalDateTable_cd4eca78-e564-409a-ab88-1bd7007744c2.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_sync_last_success
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 36fd785d-eaf1-4a22-aa9f-78aae09acadb
+		summarizeBy: none
+		sourceColumn: processing_sync_last_success
+
+		variation Variation
+			isDefault
+			relationship: 571b5a2e-07a0-4e65-a508-9bd5a582aa2f
+			defaultHierarchy: LocalDateTable_e20718e3-6e2e-4668-9ef3-f88a8976dc2d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_sync_last_success_time_sec
+		dataType: double
+		lineageTag: 26ea7f89-96d9-4278-927a-09bce31e085c
+		summarizeBy: sum
+		sourceColumn: processing_sync_last_success_time_sec
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column processing_transform_last_attempt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0dde759c-d2aa-4e29-b131-7a90b6cc7f0a
+		summarizeBy: none
+		sourceColumn: processing_transform_last_attempt
+
+		variation Variation
+			isDefault
+			relationship: cb562ab9-38fb-4957-9c51-ffe45b20abbf
+			defaultHierarchy: LocalDateTable_49a6c191-c3cb-48df-a591-4233189b47f7.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_transform_last_success
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0e2325f8-ffbc-41bf-ae45-5fa7c62c65f7
+		summarizeBy: none
+		sourceColumn: processing_transform_last_success
+
+		variation Variation
+			isDefault
+			relationship: cd560ab0-b96c-4205-b3dc-c8921ae6a455
+			defaultHierarchy: LocalDateTable_507f3238-b6af-427e-a15d-5fc3797ca082.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_transform_last_success_time_sec
+		dataType: double
+		lineageTag: fd433b92-f858-44e0-bd3b-aa3180e92c30
+		summarizeBy: sum
+		sourceColumn: processing_transform_last_success_time_sec
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column users
+		dataType: int64
+		formatString: 0
+		lineageTag: ea95b0fe-b4f7-422a-966f-5a037497281c
+		summarizeBy: sum
+		sourceColumn: users
+
+		annotation SummarizationSetBy = Automatic
+
+	column users_active
+		dataType: int64
+		formatString: 0
+		lineageTag: 0f5cf7fa-a7a8-4ec6-a8a5-726656a19392
+		summarizeBy: sum
+		sourceColumn: users_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column users_sales
+		dataType: int64
+		formatString: 0
+		lineageTag: 6c5d7bf4-6f69-4046-8162-6eada4801a6b
+		summarizeBy: sum
+		sourceColumn: users_sales
+
+		annotation SummarizationSetBy = Automatic
+
+	column dev_tracked
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 67864588-d641-4aca-835f-3ade2e8ea7a3
+		summarizeBy: none
+		sourceColumn: dev_tracked
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_mode
+		dataType: string
+		lineageTag: 3f37848e-d098-4a61-b62e-f1dbd3137c7f
+		summarizeBy: none
+		sourceColumn: processing_mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_image_size
+		dataType: string
+		lineageTag: be11cefa-8a16-48af-a6fd-b36f407f3a94
+		summarizeBy: none
+		sourceColumn: _sys_image_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_version
+		dataType: string
+		lineageTag: ff0eea27-8f5f-4bfb-8c40-2e084bdcce8e
+		summarizeBy: none
+		sourceColumn: _sys_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_reference_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0d9e28a6-119a-423a-80be-5a538c775b9e
+		summarizeBy: none
+		sourceColumn: _sys_reference_date
+
+		variation Variation
+			isDefault
+			relationship: be53254a-bb5c-48ce-8f71-0af0a214d070
+			defaultHierarchy: LocalDateTable_946076f8-85fb-48d2-b200-27d2e6252f0c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_scheduled_daily
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a84535c7-a64c-47f1-beab-aaef83f15045
+		summarizeBy: none
+		sourceColumn: _sys_scheduled_daily
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_scheduled_weekly
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d0560362-616c-4e44-866d-ea377c4ffd91
+		summarizeBy: none
+		sourceColumn: _sys_scheduled_weekly
+
+		annotation SummarizationSetBy = Automatic
+
+	column pbi_workspace_name
+		dataType: string
+		lineageTag: f078f032-6e6e-4c85-bb01-5dbb7c278aa8
+		summarizeBy: none
+		sourceColumn: pbi_workspace_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column pbi_workspace_url
+		dataType: string
+		lineageTag: 949e82ee-6d96-4563-86fb-affe81395a13
+		summarizeBy: none
+		sourceColumn: pbi_workspace_url
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_selling_existing_customer_qual_bucket_tiers
+		dataType: string
+		lineageTag: 3c0ac3cd-f04d-4d43-9911-31a5f40911e4
+		summarizeBy: none
+		sourceColumn: di_pred_selling_existing_customer_qual_bucket_tiers
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_existing_customer_selling_attempts
+		dataType: int64
+		formatString: 0
+		lineageTag: e50dbfea-9118-47ee-bc4b-d032a5e402e5
+		summarizeBy: sum
+		sourceColumn: di_pred_existing_customer_selling_attempts
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_existing_customer_selling_auc
+		dataType: double
+		lineageTag: 6850e370-7996-4521-85fa-de4d1bfb9e12
+		summarizeBy: average
+		sourceColumn: di_pred_existing_customer_selling_auc
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_existing_customer_selling_avg_p_val
+		dataType: double
+		lineageTag: a64af590-9c55-4956-af7c-0678af732b0b
+		summarizeBy: sum
+		sourceColumn: di_pred_existing_customer_selling_avg_p_val
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_existing_customer_selling_end_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 42e5a3cf-1fc0-4f69-966f-f4cfd235e21e
+		summarizeBy: none
+		sourceColumn: di_pred_existing_customer_selling_end_date
+
+		variation Variation
+			isDefault
+			relationship: e1ff23e5-019b-42bb-95cb-8e1f6c486335
+			defaultHierarchy: LocalDateTable_ae492f8e-8199-484f-9904-e191d826d4ed.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_existing_customer_selling_r2
+		dataType: double
+		lineageTag: 09c59a3e-28b1-4a81-a9f9-f277fe718012
+		summarizeBy: average
+		sourceColumn: di_pred_existing_customer_selling_r2
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_existing_customer_selling_r2_data
+		dataType: string
+		lineageTag: 07a1ee31-cce9-41ae-8b58-87e58f11ba01
+		summarizeBy: none
+		sourceColumn: di_pred_existing_customer_selling_r2_data
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_existing_customer_selling_start_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 09830ca2-deae-4a3f-a51c-763b69c1009b
+		summarizeBy: none
+		sourceColumn: di_pred_existing_customer_selling_start_date
+
+		variation Variation
+			isDefault
+			relationship: c6dc36a7-66bf-4320-88bb-b0ae8c4ce9f9
+			defaultHierarchy: LocalDateTable_3df374ab-3989-4319-90e2-3c83b844bef2.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_existing_customer_selling_successes
+		dataType: int64
+		formatString: 0
+		lineageTag: 841cbc3f-b48b-40b3-a46e-48bf67023d00
+		summarizeBy: sum
+		sourceColumn: di_pred_existing_customer_selling_successes
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'col.pred_successs_prospecting_score' = ```
+			
+			var r2 = [di_pred_prospecting_r2]               // get the prospecting r2
+			var auc = [di_pred_prospecting_auc]             // get the prospecting auc
+			var expo_val = 0.65 //  after the score  let's use this expo
+			var rs_norm  = MAX(r2, 0) // let's removed the neg 
+			var auc_norm  = (MAX((auc-0.5),0)) + 0.5  //  applying the formula rob mentioned
+			
+			var score  = ((rs_norm + auc_norm)/2) ^ expo_val  //  normalized score and  boosting
+			var res = round(score * 100 ,0)  // rounding the nu,mber
+			return res 
+			```
+		lineageTag: edb62ecb-8b69-46cc-9865-e7a3cad845f4
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'col.pred_successs_new_logo_selling_score' = ```
+			
+			var r2 = [di_pred_new_logo_r2]               // get the new logo selling r2
+			var auc = [di_pred_new_logo_auc]             // get the new logo selling auc
+			var expo_val = 0.65 //  after the score  let's use this expo
+			var rs_norm  = MAX(r2, 0) // let's removed the neg 
+			var auc_norm  = (MAX((auc-0.5),0)) + 0.5  //  applying the formula rob mentioned
+			
+			var score  = ((rs_norm + auc_norm)/2) ^ expo_val  //  normalized score and  boosting
+			var res = round(score * 100 ,0)  // rounding the nu,mber
+			return res 
+			```
+		lineageTag: 2a40efed-e621-4f03-88a5-e23e3863f0c8
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'col.pred_successs_post_sales_support_score' = ```
+			
+			var r2 = [di_pred_post_sales_r2]               // get the post sales support r2
+			var auc = [di_pred_post_sales_auc]             // get the post sales support auc
+			var expo_val = 0.65 //  after the score  let's use this expo
+			var rs_norm  = MAX(r2, 0) // let's removed the neg 
+			var auc_norm  = (MAX((auc-0.5),0)) + 0.5  //  applying the formula rob mentioned
+			
+			var score  = ((rs_norm + auc_norm)/2) ^ expo_val  //  normalized score and  boosting
+			var res = round(score * 100 ,0)  // rounding the nu,mber
+			return res 
+			```
+		lineageTag: 2c7476e0-400d-4fe0-8e45-af51aa31b4e4
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'col.pred_successs_existing_customer_selling_score' = ```
+			
+			var r2 = [di_pred_existing_customer_selling_r2]               // get the existing customer selling r2
+			var auc = [di_pred_existing_customer_selling_auc]             // get the existing customer selling auc
+			var expo_val = 0.65 //  after the score  let's use this expo
+			var rs_norm  = MAX(r2, 0) // let's removed the neg 
+			var auc_norm  = (MAX((auc-0.5),0)) + 0.5  //  applying the formula rob mentioned
+			
+			var score  = ((rs_norm + auc_norm)/2) ^ expo_val  //  normalized score and  boosting
+			var res = round(score * 100 ,0)  // rounding the nu,mber
+			return res 
+			```
+		lineageTag: cb69e5e9-23b6-426f-8b43-297331da6a60
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'col.pred_success_score' = ```
+			
+			var temp_tbl  = {
+			                    [col.pred_successs_prospecting_score],
+			                    [col.pred_successs_new_logo_selling_score],
+			                    [col.pred_successs_post_sales_support_score],       //creating a temp table 
+			                    [col.pred_successs_existing_customer_selling_score]
+			                } 
+			            
+			var score = AVERAGEX(temp_tbl,[Value]) // avg the values that are not null. col name is "Value" since not specified
+			
+			var res = round(score * 1 ,0) // make it an integer score
+			return res 
+			```
+		lineageTag: 69bb1c23-179d-4d6a-af5d-61cb64637ce7
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'col.pred_success_score_text' = ```
+			
+			var score = [col.pred_success_score] // get the pred_success_score
+			
+			var res =IF(
+			    score > 94, "Excellent", 
+			        If(score > 84,  "Great", 
+			            If(score > 74 ,"Good", 
+			                if(score> 49, "Fair", "Limited" 
+			            )
+			        )
+			    )
+			)  // use the legend
+			return res 
+			```
+		lineageTag: dd2c1dab-15f5-4a1a-bc14-07fe2c84fb4a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column fiscal_year_offset
+		dataType: int64
+		formatString: 0
+		lineageTag: f3b4e831-27a7-4c60-ab40-2302a0b3d76a
+		summarizeBy: sum
+		sourceColumn: fiscal_year_offset
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_success_prob_training_score
+		dataType: double
+		lineageTag: 6eaf0303-93c0-486e-8aa1-232fb425f78b
+		summarizeBy: sum
+		sourceColumn: di_success_prob_training_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_success_prob_validation_score
+		dataType: double
+		lineageTag: 5d615dbd-f1ca-4cf2-993b-1a8a47c48dfa
+		summarizeBy: sum
+		sourceColumn: di_success_prob_validation_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column status
+		dataType: string
+		lineageTag: 6cc6c657-e6ef-4ca7-89a8-cc298b3c43b8
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	column region
+		dataType: string
+		lineageTag: d847add2-dd7f-4b4d-871f-8a805a05eec7
+		summarizeBy: none
+		sourceColumn: region
+
+		annotation SummarizationSetBy = Automatic
+
+	column added_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b43274f9-9a8f-4cde-a5aa-a08130b28432
+		summarizeBy: none
+		sourceColumn: added_on
+
+		variation Variation
+			isDefault
+			relationship: 087934f7-9f13-43d5-84e4-c6ccae4b0621
+			defaultHierarchy: LocalDateTable_1c349e7f-5ccd-46ca-b4b5-15a9f36a653b.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column deactivated_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e7c02984-cbb5-4eee-a079-e5f4bf930b21
+		summarizeBy: none
+		sourceColumn: deactivated_on
+
+		variation Variation
+			isDefault
+			relationship: 11d58592-680a-4958-b0d3-5c6ab00de5f8
+			defaultHierarchy: LocalDateTable_58f9ddd7-a641-4d77-bcb4-84ec8de4fb99.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column purged_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 5abfe6ff-5009-4068-8b72-256c40902ab0
+		summarizeBy: none
+		sourceColumn: purged_on
+
+		variation Variation
+			isDefault
+			relationship: 6c97ee3b-9661-4cba-bc46-97dcda992d08
+			defaultHierarchy: LocalDateTable_78a834fb-36df-4d38-b23f-94167c2005c4.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_conn_status
+		dataType: string
+		lineageTag: a204fec9-10fc-4fda-b185-bd84a2620a60
+		summarizeBy: none
+		sourceColumn: crm_conn_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column job_status
+		dataType: string
+		lineageTag: 2e961cee-f716-4a2e-a940-86d7d20bd9bb
+		summarizeBy: none
+		sourceColumn: job_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column erp_conn_status
+		dataType: string
+		lineageTag: e339bb13-772e-4af5-9dfc-c25523eefcf8
+		summarizeBy: none
+		sourceColumn: erp_conn_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column co_hq_country
+		dataType: string
+		lineageTag: 97bfc392-9f57-46d6-9bfc-7708c2479434
+		summarizeBy: none
+		sourceColumn: co_hq_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column co_type_industry
+		dataType: string
+		lineageTag: bebf0202-d315-492d-9d8c-f360801925ac
+		summarizeBy: none
+		sourceColumn: co_type_industry
+
+		annotation SummarizationSetBy = Automatic
+
+	column co_target_market
+		dataType: string
+		lineageTag: 88f3892d-793b-47b9-b1e5-4371ebb2704a
+		summarizeBy: none
+		sourceColumn: co_target_market
+
+		annotation SummarizationSetBy = Automatic
+
+	column co_target_geo
+		dataType: string
+		lineageTag: 4c72a422-8089-4bb7-9861-0a26d0706d0c
+		summarizeBy: none
+		sourceColumn: co_target_geo
+
+		annotation SummarizationSetBy = Automatic
+
+	column founded_year
+		dataType: int64
+		formatString: 0
+		lineageTag: 0c7e9548-6365-46c3-9931-de90707682d0
+		summarizeBy: sum
+		sourceColumn: founded_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_employees
+		dataType: int64
+		formatString: 0
+		lineageTag: 20c57c75-b971-44a9-b638-eac82caa04ba
+		summarizeBy: sum
+		sourceColumn: total_employees
+
+		annotation SummarizationSetBy = Automatic
+
+	column ref_currency
+		dataType: string
+		lineageTag: 7e6072ee-5c36-41a7-aa3b-3cb8037a6b30
+		summarizeBy: none
+		sourceColumn: ref_currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column ttm_ref_date_revenue
+		dataType: int64
+		formatString: 0
+		lineageTag: d9655bb5-44c1-4481-b800-bbc32bf7fca0
+		summarizeBy: sum
+		sourceColumn: ttm_ref_date_revenue
+
+		annotation SummarizationSetBy = Automatic
+
+	column ttm_ref_date_bookings
+		dataType: int64
+		formatString: 0
+		lineageTag: ccabd21e-bea9-4bcf-b4e2-e9f8a5d9b2b2
+		summarizeBy: sum
+		sourceColumn: ttm_ref_date_bookings
+
+		annotation SummarizationSetBy = Automatic
+
+	column ref_dare_potential_growth_rate
+		dataType: double
+		lineageTag: 4128bc71-fd73-4c9f-86fc-03557c15bb08
+		summarizeBy: sum
+		sourceColumn: ref_dare_potential_growth_rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column consolidation_status
+		dataType: string
+		lineageTag: a91363a4-994b-44a0-892b-8121657bd9cc
+		summarizeBy: none
+		sourceColumn: consolidation_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column primary_contact
+		dataType: string
+		lineageTag: 4d8be83c-0649-439e-8433-8c32fe164cfe
+		summarizeBy: none
+		sourceColumn: primary_contact
+
+		annotation SummarizationSetBy = Automatic
+
+	column users_hr_file
+		dataType: int64
+		formatString: 0
+		lineageTag: 1a554704-8d64-4adb-9faf-6ccc0f531e94
+		summarizeBy: sum
+		sourceColumn: users_hr_file
+
+		annotation SummarizationSetBy = Automatic
+
+	column users_match_hr_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 1e46ec31-ac30-41c6-be41-04d876ceaa57
+		summarizeBy: sum
+		sourceColumn: users_match_hr_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column users_match_hr_id_nd_role
+		dataType: int64
+		formatString: 0
+		lineageTag: 76fb7722-5003-4ea7-981e-cc192f025bd7
+		summarizeBy: sum
+		sourceColumn: users_match_hr_id_nd_role
+
+		annotation SummarizationSetBy = Automatic
+
+	column users_non_match_hr_id_won_deals
+		dataType: int64
+		formatString: 0
+		lineageTag: 95734728-b60d-4940-a94d-4dc1c179f4f9
+		summarizeBy: sum
+		sourceColumn: users_non_match_hr_id_won_deals
+
+		annotation SummarizationSetBy = Automatic
+
+	column users_non_match_hr_id_pipeline
+		dataType: int64
+		formatString: 0
+		lineageTag: 6e1ca739-0889-494f-8e56-a4048c03fabf
+		summarizeBy: sum
+		sourceColumn: users_non_match_hr_id_pipeline
+
+		annotation SummarizationSetBy = Automatic
+
+	column users_non_match_hr_id_leads
+		dataType: int64
+		formatString: 0
+		lineageTag: e20ad3ce-21f9-49e2-9395-61f66be7139a
+		summarizeBy: sum
+		sourceColumn: users_non_match_hr_id_leads
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_post_ssr_ml_last_attempt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d6dfd295-7dfe-4d09-9e71-69c667e3d29f
+		summarizeBy: none
+		sourceColumn: processing_post_ssr_ml_last_attempt
+
+		variation Variation
+			isDefault
+			relationship: d8a04a56-3ee1-4f9b-aeb5-f99099c689bf
+			defaultHierarchy: LocalDateTable_f3cb3866-5b6b-4d36-a3fd-095ab6bf7312.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_post_ssr_ml_last_success
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 31341bbc-bb5f-40be-bb3e-11e56afbf716
+		summarizeBy: none
+		sourceColumn: processing_post_ssr_ml_last_success
+
+		variation Variation
+			isDefault
+			relationship: 5b71f284-6ea5-4c0f-8e03-64b3dba81f58
+			defaultHierarchy: LocalDateTable_94aeb6c0-ce7b-4bf6-a0d1-2ab51c0a3075.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_post_ssr_ml_last_success_time_sec
+		dataType: double
+		lineageTag: 09edbc27-2528-4a0c-b5cf-89643640728d
+		summarizeBy: sum
+		sourceColumn: processing_post_ssr_ml_last_success_time_sec
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column processing_pre_ssr_ml_last_attempt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: af8c0f23-de46-4ad3-88b2-2833a63750ad
+		summarizeBy: none
+		sourceColumn: processing_pre_ssr_ml_last_attempt
+
+		variation Variation
+			isDefault
+			relationship: 48f2d8e3-8968-4ad6-8ed8-dba61376e09c
+			defaultHierarchy: LocalDateTable_02446a86-10d2-446a-9e36-c18b45dab416.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_pre_ssr_ml_last_success
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d4af6550-e464-4ac6-b77f-ea49c5970151
+		summarizeBy: none
+		sourceColumn: processing_pre_ssr_ml_last_success
+
+		variation Variation
+			isDefault
+			relationship: a22f40ae-250a-4288-a0bb-b104596daec7
+			defaultHierarchy: LocalDateTable_5db8f38b-fd2b-4002-a3b6-6d39264e2f8c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column processing_pre_ssr_ml_last_success_time_sec
+		dataType: double
+		lineageTag: 1e3c1a0d-d970-4d48-8f02-620077c78fea
+		summarizeBy: sum
+		sourceColumn: processing_pre_ssr_ml_last_success_time_sec
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column geo_required_leads
+		dataType: int64
+		formatString: 0
+		lineageTag: 4bb68885-f893-4722-94d2-10b80d4010b3
+		summarizeBy: sum
+		sourceColumn: geo_required_leads
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_required_accounts
+		dataType: int64
+		formatString: 0
+		lineageTag: 6fcdd628-d227-4c57-94cb-2346ee73ed1f
+		summarizeBy: sum
+		sourceColumn: geo_required_accounts
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_required_contacts
+		dataType: int64
+		formatString: 0
+		lineageTag: 30d3a1d9-1734-455f-b633-2438767f81c4
+		summarizeBy: sum
+		sourceColumn: geo_required_contacts
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_required_users
+		dataType: int64
+		formatString: 0
+		lineageTag: f46729d5-4431-4855-9f71-404ada6f778e
+		summarizeBy: sum
+		sourceColumn: geo_required_users
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_required_hr_users
+		dataType: int64
+		formatString: 0
+		lineageTag: 91701913-f511-4fc2-a88f-d8bec52a0967
+		summarizeBy: sum
+		sourceColumn: geo_required_hr_users
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_api_requests_leads
+		dataType: int64
+		formatString: 0
+		lineageTag: 5edaa992-6487-4195-9123-c8ce4be9c189
+		summarizeBy: sum
+		sourceColumn: geo_api_requests_leads
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_api_requests_accounts
+		dataType: int64
+		formatString: 0
+		lineageTag: 6d3cd10e-21f4-4a18-9c80-4335908610df
+		summarizeBy: sum
+		sourceColumn: geo_api_requests_accounts
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_api_requests_contacts
+		dataType: int64
+		formatString: 0
+		lineageTag: 444353e6-104c-4e44-92dd-8351cf1d6517
+		summarizeBy: sum
+		sourceColumn: geo_api_requests_contacts
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_api_requests_users
+		dataType: int64
+		formatString: 0
+		lineageTag: 83fdd208-93a0-46c9-a510-627e58479829
+		summarizeBy: sum
+		sourceColumn: geo_api_requests_users
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_api_requests_hr_users
+		dataType: int64
+		formatString: 0
+		lineageTag: 15a6f64e-0ed6-4fe6-9011-74643490f0b5
+		summarizeBy: sum
+		sourceColumn: geo_api_requests_hr_users
+
+		annotation SummarizationSetBy = Automatic
+
+	column users_non_match_hr_id_nd_group
+		dataType: int64
+		formatString: 0
+		lineageTag: 3e119c9b-e803-4773-a55c-0f213ead0cff
+		summarizeBy: sum
+		sourceColumn: users_non_match_hr_id_nd_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column pbi_version
+		dataType: string
+		lineageTag: a6881c82-b203-4ad7-82af-d0a1d1a49f25
+		summarizeBy: none
+		sourceColumn: pbi_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column pbi_report_links
+		dataType: string
+		lineageTag: b6ee70d7-7680-42ab-b9d2-91ef9fa74c59
+		summarizeBy: none
+		sourceColumn: pbi_report_links
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'col.currency_format' = ```
+			
+			VAR CurrencyCode = [company_currency]
+			RETURN 
+			SWITCH(CurrencyCode,
+			    "USD", "$",      // Shows as $123.5K
+			    "EUR", "€",      // Shows as €123.5K
+			    "$"              // Default: $123.5K
+			)
+			// VAR CurrencyCode = [company_currency]
+			// RETURN 
+			// SWITCH(CurrencyCode,
+			//     "USD", "$#,0",
+			//     "EUR", "€#,##0",
+			//     "$#,##0"
+			// )
+			```
+		lineageTag: 46632ceb-f313-4905-a74c-8cc0b1d1eb13
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column min_ext_match_confidence
+		dataType: double
+		lineageTag: b9b69362-1057-43f8-8590-2d91682d159e
+		summarizeBy: sum
+		sourceColumn: min_ext_match_confidence
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column matched_accounts_percentage
+		dataType: double
+		lineageTag: 9cd23976-c8f3-4e3b-ac9e-2d32325a07c2
+		summarizeBy: sum
+		sourceColumn: matched_accounts_percentage
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column accounts_avg_match_conf
+		dataType: double
+		lineageTag: 199dcea8-7501-40cb-9355-f8576aa95c59
+		summarizeBy: sum
+		sourceColumn: accounts_avg_match_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column matched_leads_percentage
+		dataType: double
+		lineageTag: 4c5d4b29-f67d-4522-869e-54ad9e260ec6
+		summarizeBy: sum
+		sourceColumn: matched_leads_percentage
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column leads_avg_match_conf
+		dataType: double
+		lineageTag: 46b28c90-a9c9-49fc-8942-fd318cef7127
+		summarizeBy: sum
+		sourceColumn: leads_avg_match_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column matched_contacts_percentage
+		dataType: double
+		lineageTag: ce6ee19a-7eea-42d0-841c-04bcfb1d9452
+		summarizeBy: sum
+		sourceColumn: matched_contacts_percentage
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column contacts_avg_match_conf
+		dataType: double
+		lineageTag: efb973bc-1519-4f6f-8383-b480a30ef302
+		summarizeBy: sum
+		sourceColumn: contacts_avg_match_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column company_currency_symbol
+		dataType: string
+		lineageTag: 250e0463-39d1-48ca-9e20-09d5064a870e
+		summarizeBy: none
+		sourceColumn: company_currency_symbol
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_new_logo_score
+		dataType: string
+		lineageTag: 38e91438-b4d4-44ba-abbf-25589e296439
+		summarizeBy: none
+		sourceColumn: di_pred_new_logo_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_post_sales_score
+		dataType: string
+		lineageTag: 0b000289-bd18-4420-84f8-c4840bf6ca31
+		summarizeBy: none
+		sourceColumn: di_pred_post_sales_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_prospecting_score
+		dataType: string
+		lineageTag: 77bde7d9-b0ac-4257-93ad-7a981d98d83b
+		summarizeBy: none
+		sourceColumn: di_pred_prospecting_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_existing_customer_selling_score
+		dataType: string
+		lineageTag: 44483654-2b49-4966-bbf5-9cea2854fb8d
+		summarizeBy: none
+		sourceColumn: di_pred_existing_customer_selling_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_all_score
+		dataType: string
+		lineageTag: aa955d9a-9554-4c71-b5ac-38b30041c95c
+		summarizeBy: none
+		sourceColumn: di_pred_all_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_all_label
+		dataType: string
+		lineageTag: fdfe369f-4798-431f-96d9-00f82df89d16
+		summarizeBy: none
+		sourceColumn: di_pred_all_label
+
+		annotation SummarizationSetBy = Automatic
+
+	partition companies_history = m
+		mode: import
+		source =
+				let
+				
+				  dbTable = getDBTable("companies_history"),
+				    #"Changed Type" = Table.TransformColumnTypes(dbTable,{
+				        {"_sys_as_of", type datetime},
+				{"_sys_co_id", type text},
+				{"_sys_doc_id", type text},
+				{"_sys_filt_end_date", type date},
+				{"_sys_filt_start_date", type date},
+				{"_sys_image_size", type text},
+				{"_sys_last_modified_on", type datetime},
+				{"_sys_processed_as_of", type datetime},
+				{"_sys_reference_date", type datetime},
+				{"_sys_scheduled_daily", type logical},
+				{"_sys_scheduled_weekly", type logical},
+				{"_sys_version", type text},
+				{"accounts_avg_match_conf", type number},
+				{"added_on", type datetime},
+				{"co_hq_country", type text},
+				{"co_target_geo", type text},
+				{"co_target_market", type text},
+				{"co_type_industry", type text},
+				{"company_currency", type text},
+				{"company_logo", type text},
+				{"company_name", type text},
+				{"consolidation_status", type text},
+				{"contacts_avg_match_conf", type number},
+				{"crm_conn_status", type text},
+				{"deactivated_on", type datetime},
+				{"dev_tracked", type logical},
+				{"di_acv_company_size_factors", type text},
+				{"di_acv_country_factors", type text},
+				{"di_acv_industry_factors", type text},
+				{"di_amt_won_last12months", type number},
+				{"di_pred_existing_customer_selling_attempts", Int64.Type},
+				{"di_pred_existing_customer_selling_auc", type number},
+				{"di_pred_existing_customer_selling_avg_p_val", type number},
+				{"di_pred_existing_customer_selling_end_date", type datetime},
+				{"di_pred_existing_customer_selling_r2", type number},
+				{"di_pred_existing_customer_selling_r2_data", type text},
+				{"di_pred_existing_customer_selling_start_date", type datetime},
+				{"di_pred_existing_customer_selling_successes", Int64.Type},
+				{"di_pred_new_logo_attempts", Int64.Type},
+				{"di_pred_new_logo_auc", type number},
+				{"di_pred_new_logo_avg_p_val", type number},
+				{"di_pred_new_logo_end_date", type datetime},
+				{"di_pred_new_logo_r2", type number},
+				{"di_pred_new_logo_r2_data", type text},
+				{"di_pred_new_logo_start_date", type datetime},
+				{"di_pred_new_logo_successes", Int64.Type},
+				{"di_pred_post_sales_attempts", Int64.Type},
+				{"di_pred_post_sales_auc", type number},
+				{"di_pred_post_sales_avg_p_val", type number},
+				{"di_pred_post_sales_end_date", type datetime},
+				{"di_pred_post_sales_qual_bucket_tiers", type text},
+				{"di_pred_post_sales_r2", type number},
+				{"di_pred_post_sales_r2_data", type text},
+				{"di_pred_post_sales_start_date", type datetime},
+				{"di_pred_post_sales_successes", Int64.Type},
+				{"di_pred_prospecting_attempts", Int64.Type},
+				{"di_pred_prospecting_auc", type number},
+				{"di_pred_prospecting_avg_p_val", type number},
+				{"di_pred_prospecting_end_date", type datetime},
+				{"di_pred_prospecting_model_reset_on", type datetime},
+				{"di_pred_prospecting_qual_bucket_tiers", type text},
+				{"di_pred_prospecting_r2", type number},
+				{"di_pred_prospecting_r2_data", type text},
+				{"di_pred_prospecting_start_date", type datetime},
+				{"di_pred_prospecting_successes", Int64.Type},
+				{"di_pred_selling_existing_customer_qual_bucket_tiers", type text},
+				{"di_pred_selling_new_logo_qual_bucket_tiers", type text},
+				{"di_success_prob_training_score", type number},
+				{"di_success_prob_validation_score", type number},
+				{"erp_conn_status", type text},
+				{"fiscal_year_offset", Int64.Type},
+				{"founded_year", Int64.Type},
+				{"geo_api_requests_accounts", Int64.Type},
+				{"geo_api_requests_contacts", Int64.Type},
+				{"geo_api_requests_hr_users", Int64.Type},
+				{"geo_api_requests_leads", Int64.Type},
+				{"geo_api_requests_users", Int64.Type},
+				{"geo_required_accounts", Int64.Type},
+				{"geo_required_contacts", Int64.Type},
+				{"geo_required_hr_users", Int64.Type},
+				{"geo_required_leads", Int64.Type},
+				{"geo_required_users", Int64.Type},
+				{"job_status", type text},
+				{"leads_avg_match_conf", type number},
+				{"matched_accounts_percentage", type number},
+				{"matched_contacts_percentage", type number},
+				{"matched_leads_percentage", type number},
+				{"min_ext_match_confidence", type number},
+				{"partner_base64_logo", type text},
+				{"partner_co_id", type text},
+				{"partner_name", type text},
+				{"partner_product_name", type text},
+				{"pbi_report_links", type text},
+				{"pbi_version", type text},
+				{"pbi_workspace_name", type text},
+				{"pbi_workspace_url", type text},
+				{"primary_contact", type text},
+				{"processing_all_last_attempt", type datetime},
+				{"processing_all_last_success", type datetime},
+				{"processing_all_last_success_time_sec", type number},
+				{"processing_api_export_last_attempt", type datetime},
+				{"processing_api_export_last_success", type datetime},
+				{"processing_api_export_last_success_time_sec", type number},
+				{"processing_max_last_modified_on_act", type datetime},
+				{"processing_max_last_modified_on_opp_histories", type datetime},
+				{"processing_max_last_modified_on_opps", type datetime},
+				{"processing_max_last_modified_on_users", type datetime},
+				{"processing_mode", type text},
+				{"processing_post_ssr_ml_last_attempt", type datetime},
+				{"processing_post_ssr_ml_last_success", type datetime},
+				{"processing_post_ssr_ml_last_success_time_sec", type number},
+				{"processing_pre_ssr_ml_last_attempt", type datetime},
+				{"processing_pre_ssr_ml_last_success", type datetime},
+				{"processing_pre_ssr_ml_last_success_time_sec", type number},
+				{"processing_sync_last_attempt", type datetime},
+				{"processing_sync_last_success", type datetime},
+				{"processing_sync_last_success_time_sec", type number},
+				{"processing_transform_last_attempt", type datetime},
+				{"processing_transform_last_success", type datetime},
+				{"processing_transform_last_success_time_sec", type number},
+				{"purged_on", type datetime},
+				{"ref_currency", type text},
+				{"ref_dare_potential_growth_rate", type number},
+				{"region", type text},
+				{"status", type text},
+				{"total_employees", Int64.Type},
+				{"ttm_ref_date_bookings", Int64.Type},
+				{"ttm_ref_date_revenue", Int64.Type},
+				{"users", Int64.Type},
+				{"users_active", Int64.Type},
+				{"users_hr_file", Int64.Type},
+				{"users_match_hr_id", Int64.Type},
+				{"users_match_hr_id_nd_role", Int64.Type},
+				{"users_non_match_hr_id_leads", Int64.Type},
+				{"users_non_match_hr_id_nd_group", Int64.Type},
+				{"users_non_match_hr_id_pipeline", Int64.Type},
+				{"users_non_match_hr_id_won_deals", Int64.Type},
+				{"users_sales", Int64.Type}
+				    })
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,358 @@
+table sales_process_summary
+	lineageTag: ef2e46a4-dc53-4296-88d6-ed05ebba1fa7
+
+	measure 'meas.crm_sales_process_score_display' =
+			
+			var res = round([meas.crm_sales_process_score]  * 100,0)  // just multiply by 100 and remove decimals
+			return res
+		formatString: 0
+		displayFolder: _sales_process_score
+		lineageTag: 262b5f13-1cf6-4906-8892-f31e7c0461db
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'meas.crm_sales_process_score_industry_avg' =
+			//47
+			var _score = CALCULATE(
+			    MAX(metadata_reference_values[value]),
+			    metadata_reference_values[_sys_doc_id]="salesproc4"
+			)
+			
+			RETURN
+			_score
+		formatString: 0
+		displayFolder: _sales_process_score
+		lineageTag: 34aa2bb1-687e-4824-8c2e-417e2bd4ba26
+
+	measure 'meas.trueai_sales_process_score_display' =
+			
+			var _before = [meas.crm_sales_process_score_display]                    // get the before score
+			var _after = round([meas.trueai_sales_process_score] * 100,0)  // just multiply by 100 and remove decimals
+			var res = IF(
+			    _after < _before,
+			    _before,
+			    _after
+			)
+			
+			RETURN
+			res
+		formatString: 0
+		displayFolder: _sales_process_score
+		lineageTag: 1021f740-fe87-4306-8ad1-a0d7b8ce2b29
+
+	measure 'meas.trueai_sales_process_score_improvement' =
+			
+			var trueai_score = ROUND([meas.trueai_sales_process_score_display],2)
+			var crm_score = ROUND([meas.crm_sales_process_score_display],2)
+			var imp = divide(trueai_score- crm_score,  crm_score, 0)
+			var res = imp
+			return res
+		formatString: +#%;-#%;0%
+		displayFolder: _sales_process_score
+		lineageTag: a2030f4d-bbe6-4176-9e59-3f139e79231d
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.crm_all_ade_score_display' = ```
+			
+			var score = (dupe_summary[meas.crm_dupe_score_display] + completeness_summary[meas.crm_completeness_score_display] + consistency_summary[meas.crm_consistency_score_display] + sales_process_summary[meas.crm_sales_process_score_display] + act_capture_level_summary[meas.crm_act_capt_score]
+			) / 5 
+			
+			var res = round(score, 0)
+			return res
+			
+			```
+		formatString: 0
+		displayFolder: _all_ade_score
+		lineageTag: 1cfa7cf6-b17d-4810-98ac-00713451dee9
+
+	measure 'meas.crm_all_ade_score_industry_avg' = ```
+			
+			var score = (dupe_summary[meas.crm_dupe_score_industry_avg_display] + completeness_summary[meas.crm_completeness_score_industry_avg] + consistency_summary[meas.crm_consistency_score_industry_avg] 
+			+ sales_process_summary[meas.crm_sales_process_score_industry_avg]
+			+ act_capture_level_summary[meas.crm_act_capt_score_industry_avg]
+			) / 5 
+			
+			var res = round(score, 0)
+			return res
+			
+			```
+		formatString: 0
+		displayFolder: _all_ade_score
+		lineageTag: ac155e8c-fcdf-4362-bacd-b0a63f1c66aa
+
+	measure 'meas.trueai_all_ade_score_display' = ```
+			
+			var score = (dupe_summary[meas.trueai_dupe_score_display] + completeness_summary[meas.trueai_completeness_score] 
+			+ consistency_summary[meas.trueai_consistency_score_display] 
+			+ sales_process_summary[meas.trueai_sales_process_score_display]
+			+ act_capture_level_summary[meas.trueai_act_capt_score]
+			+ ai_conf_pred_qual_summary[meas.ai_conf_overall_score]
+			) / 6 
+			
+			var res = round(score, 0)
+			return res
+			
+			```
+		formatString: 0
+		displayFolder: _all_ade_score
+		lineageTag: 748ba898-0069-4b13-a51b-a5cf7129cc13
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'meas.trueai_all_ade_score_improvement' = ```
+			
+			var trueai_score = ROUND([meas.trueai_all_ade_score_display],2)
+			var crm_score = ROUND([meas.crm_all_ade_score_display],2)
+			var imp = divide(trueai_score - crm_score,  crm_score, 0)
+			var res = imp
+			return res
+			
+			
+			```
+		formatString: +#%;-#%;0%
+		displayFolder: _all_ade_score
+		lineageTag: 3ac790cd-26eb-4104-a7bb-3b6f71aa4131
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.crm_sales_process_score' =
+			
+			
+			var total_rules_applied = [meas.crm_sales_process_any_rules_count]
+			var sdt_rules_applied =  [meas.crm_sales_process_any_rules_std_count]
+			var adjusted_ratio= divide (sdt_rules_applied ,  total_rules_applied)
+			// return as an int between 0-100
+			var res = adjusted_ratio
+			return res
+		displayFolder: _sales_process_score
+		lineageTag: e212399d-1f75-40a8-82ed-bde6bfa9ce9b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.trueai_sales_process_score' =
+			
+			
+			
+			var total_rules_applied = [meas.crm_sales_process_any_rules_count]
+			var sdt_rules_applied =  [meas.crm_sales_process_any_rules_std_count]
+			var avg_conf_non_crm = .85  // get the avg non crm conf
+			var diff = (total_rules_applied - sdt_rules_applied  ) * avg_conf_non_crm  // create a diff model
+			var adjusted_ratio= divide (sdt_rules_applied +diff ,  total_rules_applied) // add the diff for the new ratio
+			// return as an int between 0-100
+			var res = adjusted_ratio
+			return res
+		formatString: 0.00
+		displayFolder: _sales_process_score
+		lineageTag: ee1995a9-f95e-48ad-835f-dd308716cbbf
+
+	measure 'meas.crm_sales_process_any_rules_count' =
+			
+			
+			var total_rules_applied = CALCULATE(count(ssr_history[_sys_doc_id]) )
+			var res = total_rules_applied
+			return If(IsBlank(res), 0,res)
+		displayFolder: _sales_process_score
+		lineageTag: 94032c44-e048-4480-88da-4ccc82a5200d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.crm_sales_process_ownership_rules_std_count' = ```
+			
+			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
+			//var dd = COUNTROWS(tbl_crm_rules) // check the count
+			var filt = filter(ssr_history, (ssr_history[step_owner_rule] & "" IN tbl_crm_rules)) // look for ONLY crm rules and exclude lead gen 
+			var std_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
+			var res = std_rules_applied // return the res
+			return If(IsBlank(res), 0,res)
+			```
+		displayFolder: _sales_process_score
+		lineageTag: 0decf15d-bf95-4158-b2d9-7687b44193b8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.crm_sales_process_ownership_rules_non_std_count' = ```
+			
+			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
+			//var dd = COUNTROWS(tbl_crm_rules) // check the count
+			var filt = filter(ssr_history,NOT(ssr_history[step_owner_rule] & "" IN tbl_crm_rules)) // look for NONE crm rules and exclude lead gen 
+			var sdt_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
+			var res = sdt_rules_applied // return the res
+			return If(IsBlank(res), 0,res)
+			```
+		formatString: 0
+		displayFolder: _sales_process_score
+		lineageTag: 97d25616-7fe7-412d-9397-c0075aa44e42
+
+	measure 'meas.crm_sales_process_end_rules_non_std_count' = ```
+			
+			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
+			//var dd = COUNTROWS(tbl_crm_rules) // check the count
+			var filt = filter(ssr_history, not (ssr_history[step_end_rule] & "" IN tbl_crm_rules) ) // look for NONE crm rules and exclude lead gen 
+			var sdt_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
+			var res = sdt_rules_applied // return the res
+			return If(IsBlank(res), 0,res)
+			```
+		formatString: 0
+		displayFolder: _sales_process_score
+		lineageTag: 9dfa3fc6-d190-452a-8b64-e8d9a6a0aff5
+
+	measure 'meas.crm_sales_process_end_rules_std_count ' = ```
+			
+			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
+			//var dd = COUNTROWS(tbl_crm_rules) // check the count
+			var filt = filter(ssr_history, (ssr_history[step_end_rule] & "" IN tbl_crm_rules) ) // look for ONLY crm rules and exclude lead gen 
+			var std_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
+			var res = std_rules_applied // return the res
+			return If(IsBlank(res), 0,res)
+			```
+		displayFolder: _sales_process_score
+		lineageTag: f7cd03d7-0290-46f8-95d3-4867b0bc66e4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.crm_sales_process_outcome_rules_non_std_count' = ```
+			
+			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
+			//var dd = COUNTROWS(tbl_crm_rules) // check the count
+			var filt = filter(ssr_history, not (ssr_history[step_outcome_rule] & "" IN tbl_crm_rules) ) // look for NONE crm rules and exclude lead gen 
+			var sdt_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
+			var res = sdt_rules_applied // return the res
+			return If(IsBlank(res), 0,res)
+			```
+		formatString: 0
+		displayFolder: _sales_process_score
+		lineageTag: a657c9cb-8377-4d32-81d7-f6ff96382fdc
+
+	measure 'meas.crm_sales_process_outcome_rules_std_count' = ```
+			
+			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
+			//var dd = COUNTROWS(tbl_crm_rules) // check the count
+			var filt = filter(ssr_history,(ssr_history[step_outcome_rule] & "" IN tbl_crm_rules) ) // look for ONLY crm rules and exclude lead gen 
+			var std_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
+			var res = std_rules_applied // return the res
+			return If(IsBlank(res), 0,res)
+			```
+		displayFolder: _sales_process_score
+		lineageTag: 705de9ee-9abe-4371-8cc4-6b0bce5ce92a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.crm_sales_process_any_rules_non_std_count' =
+			
+			var res = sales_process_summary[meas.crm_sales_process_any_rules_count] - sales_process_summary[meas.crm_sales_process_any_rules_std_count] // just get the diff
+			return If(IsBlank(res), 0,res)
+		formatString: 0
+		displayFolder: _sales_process_score
+		lineageTag: 23b67383-b0af-4194-bba9-cd2a8ab33bae
+
+	measure 'meas.crm_sales_process_any_rules_std_count' = ```
+			
+			
+			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
+			//var dd = COUNTROWS(tbl_crm_rules) // check the count
+			var filt = filter(ssr_history, 
+			 (
+			     ssr_history[step_owner_rule] & "" IN tbl_crm_rules  &&  
+			     ssr_history[step_outcome_rule] & "" IN tbl_crm_rules &&   
+			      ssr_history[step_end_rule] & "" IN tbl_crm_rules  
+			) 
+			) // look for NONE crm rules and exclude lead gen 
+			var sdt_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
+			var res = sdt_rules_applied // return the res
+			
+			
+			return If(IsBlank(res), 0,res)
+			```
+		formatString: 0
+		displayFolder: _sales_process_score
+		lineageTag: ed668400-4a42-436c-9090-ddde1589f0a7
+
+	column row
+		formatString: 0
+		lineageTag: 8fbab856-5f4b-4af8-9508-f59c541c8fa2
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [row]
+
+		annotation SummarizationSetBy = Automatic
+
+	column available_data
+		lineageTag: b06d31b0-7784-4617-938f-b71b5bf140d5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [available_data]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_docid
+		lineageTag: fba69a4f-0936-4e74-9b5b-acb7403b271a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_docid]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_filter_start_date
+		formatString: General Date
+		lineageTag: a390999a-f592-4056-9469-80c68e4a2dcc
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_filter_start_date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_completeness_contact_method
+		lineageTag: ae957319-63f1-4061-95e2-e6faa0a73728
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [trueai_completeness_contact_method]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column revenue
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 8d6bfd4f-a84e-4578-bd86-5b86c508920e
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [revenue]
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_user_id
+		lineageTag: 91562e1a-91c4-4534-9dea-5abe0a6aaab1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_user_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition sales_process_summary-d957d583-a7da-4afc-b646-8ae4becc5266 = calculated
+		mode: import
+		source = ```
+				UNION(
+				
+				 SELECTCOLUMNS(leads, "row",1 , "available_data", "New Leads",  "_sys_docid", leads[_sys_docid],  "_sys_user_id", leads[crm_owner_id],  "_sys_filter_start_date", leads[_sys_filt_start_date],  
+				"trueai_completeness_contact_method", leads[crm_complt_contact_method], "revenue", BLANK()) // leads
+				,
+				 SELECTCOLUMNS(leads, "row",2 , "available_data", "-",  "_sys_docid", BLANK(), "_sys_user_id", leads[crm_owner_id],  "_sys_filter_start_date",leads[_sys_filt_start_date],  
+				"trueai_completeness_contact_method", blank(), "revenue", BLANK()) // leads
+				,
+				
+				SELECTCOLUMNS(opps, "row",3 , "available_data", "New Opps",  "_sys_docid", opps[_sys_docid],  "_sys_user_id", opps[crm_owner_id],  "_sys_filter_start_date", opps[_sys_filt_start_date],  
+				"trueai_completeness_contact_method", blank(), "revenue", BLANK()) // opps
+				,
+				SELECTCOLUMNS(filter(opps, opps[crm_is_won]=true),  "row",6 , "available_data", "Won Opps",  "_sys_docid", opps[_sys_docid],   "_sys_user_id", opps[crm_owner_id],  "_sys_filter_start_date", opps[_sys_filt_start_date],  
+				"trueai_completeness_contact_method", blank(),  "revenue", opps[crm_booking_amt]) // opps
+				)
+				
+				```
+
+	annotation PBI_Id = a464eefbb3a34e10b9242db6db1dc19b
+

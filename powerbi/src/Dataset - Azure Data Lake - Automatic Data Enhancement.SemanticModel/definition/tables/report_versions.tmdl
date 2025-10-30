@@ -1,0 +1,45 @@
+table report_versions
+	lineageTag: 5d2f2f16-4794-44fe-95f6-985a6fb15e7f
+
+	measure 'meas.report_versions_current_ver' = maxx(topn(1, report_versions, report_versions[release_date] ,DESC), [version])
+		lineageTag: 1ebb5671-f76b-4904-a0e2-70027decbc86
+
+	column version
+		dataType: string
+		lineageTag: 81c28b95-6f45-4db0-943e-f630d5f71fa6
+		summarizeBy: none
+		sourceColumn: version
+
+		annotation SummarizationSetBy = Automatic
+
+	column release_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 60a1d4e1-f9ac-4094-8aa1-ecbe65ba991e
+		summarizeBy: none
+		sourceColumn: release_date
+
+		variation Variation
+			isDefault
+			relationship: 20e7509d-3844-4873-99b1-d96841f4e7d9
+			defaultHierarchy: LocalDateTable_7d2ccde7-5bca-40cc-8a42-23bd11b2b52f.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition report_versions = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMtEz0DM2VtJRMjTSN9U3MjAyVoqNBQA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [version = _t, release_date = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"version", type text}, {"release_date", type date}}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Changed Type","4.0.33","4.2.38",Replacer.ReplaceText,{"version"}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value",#date(2023, 12, 5),#date(2025, 10, 30),Replacer.ReplaceValue,{"release_date"})
+				in
+				    #"Replaced Value1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
