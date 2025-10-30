@@ -1,0 +1,105 @@
+table metadata_graphics
+	lineageTag: ab15f0f1-0dc9-4338-b6a4-ad87205a536f
+
+	column _sys_base64
+		dataType: string
+		lineageTag: aca3c604-9b72-477b-9636-adfbd68c244d
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: _sys_base64
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_dimensions
+		dataType: string
+		lineageTag: ef7679d9-988c-488d-989d-a866ebc4611d
+		summarizeBy: none
+		sourceColumn: _sys_dimensions
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_doc_id
+		dataType: string
+		lineageTag: 09cee8dd-56b9-4250-95a9-9cdfd980f382
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_name
+		dataType: string
+		lineageTag: fa782f8a-42f5-4bf0-9c90-3e1a9b9dba41
+		summarizeBy: none
+		sourceColumn: _sys_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_url
+		dataType: string
+		lineageTag: 5df2f7c6-5fa9-458d-87e3-3f0552d84fbc
+		summarizeBy: none
+		sourceColumn: _sys_url
+
+		annotation SummarizationSetBy = Automatic
+
+	column notes
+		dataType: string
+		lineageTag: 84e24a0a-905b-4522-985a-f5211544f514
+		summarizeBy: none
+		sourceColumn: notes
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_is_active
+		dataType: string
+		lineageTag: 78a1ef56-6012-48b9-8fcf-6334b17c342b
+		summarizeBy: none
+		sourceColumn: _sys_is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_modified_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 21cbe11b-2d09-4cb8-ae95-3ddbd46daef0
+		summarizeBy: none
+		sourceColumn: _sys_modified_on
+
+		variation Variation
+			isDefault
+			relationship: 1dfe9347-104e-46c4-b88c-4eb281b566e1
+			defaultHierarchy: LocalDateTable_b02b69a3-bb76-4f7f-b5a7-469245e1919a.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Image
+		dataType: string
+		lineageTag: 9e6f9c20-7600-4973-bce6-cc22d2e6d419
+		summarizeBy: none
+		sourceColumn: Image
+
+		annotation SummarizationSetBy = Automatic
+
+	partition metadata_graphics = m
+		mode: import
+		source =
+				let
+				    dbTable = getDBTable("metadata_graphics"), // get the right table
+				    newTableField= Table.AddColumn(dbTable, "Image", each Binary.FromText(Text.AfterDelimiter([_sys_base64], ","), BinaryEncoding.Base64)),
+				    #"Changed Type" = Table.TransformColumnTypes(newTableField,{
+				{"_sys_base64", type text},
+				{"_sys_dimensions", type text},
+				{"_sys_doc_id", type text},
+				{"_sys_is_active", type text},
+				{"_sys_modified_on", type datetime},
+				{"_sys_name", type text},
+				{"_sys_url", type text},
+				{"notes", type text}
+				    })
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

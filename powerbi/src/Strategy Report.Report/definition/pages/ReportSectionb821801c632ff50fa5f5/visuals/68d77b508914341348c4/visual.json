@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
   "name": "68d77b508914341348c4",
   "position": {
     "x": 874.98589139797616,
@@ -53,11 +53,11 @@
                       "Entity": "ssr_history"
                     }
                   },
-                  "Property": "col.lost_stage"
+                  "Property": "opp_lost_stage"
                 }
               },
-              "queryRef": "ssr_history.col.lost_stage",
-              "displayName": "Lost Stage"
+              "queryRef": "ssr_history.opp_lost_stage",
+              "nativeQueryRef": "opp_lost_stage"
             }
           ]
         },
@@ -65,22 +65,17 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "ssr_history"
-                        }
-                      },
-                      "Property": "col.lost_stage"
+                    "SourceRef": {
+                      "Entity": "opps"
                     }
                   },
-                  "Function": 5
+                  "Property": "meas.lost_count"
                 }
               },
-              "queryRef": "CountNonNull(ssr_history.col.lost_stage)",
-              "displayName": "Deals Lost"
+              "queryRef": "opps.meas.lost_count",
+              "nativeQueryRef": "meas.lost_count"
             }
           ]
         }
@@ -486,5 +481,76 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "92e5865d889e1383eb30",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "ssr_history"
+              }
+            },
+            "Property": "opp_lost_stage"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "s",
+              "Entity": "ssr_history",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "s"
+                          }
+                        },
+                        "Property": "opp_lost_stage"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'Early'"
+                        }
+                      }
+                    ],
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'Late'"
+                        }
+                      }
+                    ],
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'Mid'"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }

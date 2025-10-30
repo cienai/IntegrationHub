@@ -3220,8 +3220,8 @@ table metadata_heatmap_items
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[col.trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date]  >= period_start)  // client before start of period,  churn after period started
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[col.trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			var new_cnt = CALCULATE(
 			    COUNTROWS( EXCEPT(ending_custs,starting_custs )),
@@ -3247,10 +3247,10 @@ table metadata_heatmap_items
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[col.trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[col.trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date] >= period_start && ssr[col.trueai_churn_date] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[col.trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -3362,7 +3362,7 @@ table metadata_heatmap_items
 			
 			var contact_ai = CALCULATETABLE(
 			    completeness_summary,      // get the contact info average score for entity Leads
-			    completeness_summary[entity]="Contacts"
+			    completeness_summary[entity]="Opps"
 			)
 			
 			
@@ -3378,7 +3378,7 @@ table metadata_heatmap_items
 			
 			var contact_ai = CALCULATETABLE(
 			    completeness_summary,      // get the contact info average score for entity Leads
-			    completeness_summary[entity]="Leads"
+			    completeness_summary[entity]="Opps"
 			)
 			
 			

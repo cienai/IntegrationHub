@@ -1,0 +1,286 @@
+table dupe_summary
+	lineageTag: f7b99aab-df1a-410a-affa-c6c31f68180a
+
+	measure 'meas.crm_dupe_score' = ```
+			
+			//calculate ratio
+			
+			var tbl_scores = CALCULATETABLE(SUMMARIZE(dupe_summary, dupe_summary[problem], 
+			"rec_count", COUNT(dupe_summary[_sys_docid]), 
+			"prob_rec_count", COUNTX(dupe_summary,IF (dupe_summary[is_dupe] =true, dupe_summary[_sys_docid])), 
+			"max_acceptable_pct", MAX(dupe_summary[max_acceptable_pct])
+			))  // summarize by problem area
+			
+			--var temp = SUMX(tbl_scores, [prob_rec_count]) -- just a test
+			
+			var dupe_ratio = AVERAGEX(tbl_scores, 
+			    IF((DIVIDE(DIVIDE([prob_rec_count], [rec_count]), [max_acceptable_pct]))> 1,
+			    0.99,DIVIDE(DIVIDE([prob_rec_count], [rec_count]), [max_acceptable_pct]))
+			) // get the problem record rate divided by the acceptable rate per summarized category and then avg those scores in an avg score (the trick is to calculate per record)
+			
+			var res = 1 - dupe_ratio -- invert to get the score
+			
+			return
+			IF(
+			    res=BLANK(),
+			    0,
+			    res
+			)
+			
+			```
+		formatString: 0.00
+		displayFolder: _dupe_score
+		lineageTag: acf77ee7-4191-4d2b-b5c6-2595509ce4e5
+
+		changedProperty = FormatString
+
+	measure 'meas.crm_dupe_score_industry_avg_display' =
+			//0.55 * 100
+			var _score = CALCULATE(
+			    MAX(metadata_reference_values[value]),
+			    metadata_reference_values[_sys_doc_id]="dup1"
+			)
+			
+			RETURN
+			_score
+		formatString: 0
+		displayFolder: _dupe_score
+		lineageTag: d0e5e2bd-776d-4c12-bb76-0981cde94199
+
+	measure 'meas.trueai_dupe_score' = ```
+			
+			var all_recs =  [meas.crm_records]
+			var prob_recs =  [meas.crm_dupe_problem_records] // get the problematic records
+			var non_prob_recs = all_recs - prob_recs  // get the ok records
+			var avg_conf = CALCULATE(AVERAGE(dupe_summary[dupe_conf])) // get the avg confidence for corrected records 
+			var res = Divide((non_prob_recs * 1 ) +  (prob_recs * avg_conf) , all_recs) // dedeuct by conf for corrected recrods 
+			return 
+			IF(
+			    res=BLANK(),
+			    0,
+			    res
+			)
+			```
+		displayFolder: _dupe_score
+		lineageTag: 3b35d7b9-f525-4ad5-8374-7ee283d722de
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.trueai_dupe_score_improvement' = ```
+			
+			var trueai_score = ROUND([meas.trueai_dupe_score_display],2)      // get the trueai dupe score
+			var crm_score = ROUND([meas.crm_dupe_score_display],2)               // get the crm score 
+			var imp = divide(trueai_score - crm_score,  crm_score, blank())
+			var res = imp
+			return res
+			```
+		formatString: +#%;-#%;0%
+		displayFolder: _dupe_score
+		lineageTag: 0b69f420-2ae6-44c0-bf93-9769337276a2
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'meas.crm_dupe_problem_records' =
+			
+			var _count = CALCULATE(COUNT(dupe_summary[_sys_docid]), dupe_summary[is_dupe] = true)
+			var res = IF(
+			    _count=BLANK(),
+			    0,          // get the condition for blank with 0
+			    _count
+			)
+			
+			RETURN
+			res
+		formatString: #,0
+		displayFolder: _dupe_score
+		lineageTag: 8d19908d-4174-40e7-982c-32c4f734c86c
+
+		changedProperty = FormatString
+
+	measure 'meas.crm_dupe_problem_records_pct' =
+			
+			var res = divide ([meas.crm_dupe_problem_records], [meas.crm_records] )
+			
+			RETURN
+			IF(res=BLANK(),
+			0,
+			res)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _dupe_score
+		lineageTag: 96915103-bc8f-433d-95fe-ee434db43ee5
+
+		changedProperty = FormatString
+
+	measure 'meas.crm_records' =
+			
+			var _count = CALCULATE(COUNT(dupe_summary[_sys_docid]))
+			
+			var res = IF(
+			    _count=BLANK(),
+			    0,
+			    _count
+			)
+			
+			RETURN
+			res
+		formatString: #,0
+		displayFolder: _dupe_score
+		lineageTag: 12e6feb9-5d6a-40ab-a3ea-af7844955a3d
+
+		changedProperty = FormatString
+
+	measure 'meas.trueai_corrected_records' =
+			
+			var _count = CALCULATE(count(dupe_summary[_sys_docid]), dupe_summary[is_master] = true)
+			var res = IF(
+			    _count=BLANK(),
+			    0,
+			    _count
+			)
+			
+			RETURN
+			res
+		formatString: #,0
+		displayFolder: _dupe_score
+		lineageTag: 4acf7700-52dc-4a32-b5b3-9831dba569f7
+
+		changedProperty = FormatString
+
+	measure 'meas.crm_dupe_score_display' = [meas.crm_dupe_score] * 100
+		formatString: 0
+		displayFolder: _dupe_score
+		lineageTag: 416329b6-8580-4f7c-94e5-3487ae032aaf
+
+		changedProperty = FormatString
+
+	measure 'meas.trueai_dupe_score_display' =
+			
+			var _crm_score = [meas.crm_dupe_score_display]              // get the crm sciore(before)
+			var _trueai_score = [meas.trueai_dupe_score]*100                // get the after score
+			
+			var res = IF(
+			    _trueai_score < _crm_score,
+			    _crm_score,                     // condiotinl for score not to show score less then before
+			    _trueai_score
+			)
+			RETURN
+			res
+		formatString: 0
+		displayFolder: _dupe_score
+		lineageTag: 4c30b04e-8de3-42c0-bd5d-9a83a64c5853
+
+		changedProperty = FormatString
+
+	column entity
+		lineageTag: 523e1f04-c261-47b1-8921-ab44d54fcfc8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [entity]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_docid
+		lineageTag: 539daabb-d59f-47c8-a425-51b226cb343d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_docid]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_filter_start_date
+		formatString: General Date
+		lineageTag: 5d9e1e80-2f66-4ab3-aa77-976b45ff9859
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_sys_filter_start_date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column dupe_id
+		lineageTag: ce11aa73-204f-4d5a-9e41-208154d77b5e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [dupe_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_dupe
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a7c64657-e43c-41d1-a120-7f7360abd140
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [is_dupe]
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_master
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 062f5d3d-4c9b-42fe-9944-2730b60c473d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [is_master]
+
+		annotation SummarizationSetBy = Automatic
+
+	column problem
+		lineageTag: d4999f60-8446-4c28-b809-1d9220f53af8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Problem]
+
+		annotation SummarizationSetBy = Automatic
+
+	column max_acceptable_pct
+		lineageTag: 9d221c38-3a78-4466-939b-2d863aa76d56
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [max_acceptable_pct]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dupe_conf
+		lineageTag: a2ad179f-a3c1-454e-a44c-00c1bf70e71a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [dupe_conf]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column sort
+		formatString: 0
+		lineageTag: 6c94190f-41f3-4a08-bd7f-c54d80f8ed9d
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dupe_summary-b80c587f-3882-4d86-9169-70d0a3fe1c6f = calculated
+		mode: import
+		source = ```
+				UNION(
+				
+				 SELECTCOLUMNS(leads, "sort",1, "entity", "Leads", "problem", "Duplication of Indv. Leads", "_sys_docid", leads[_sys_docid],  "_sys_filter_start_date", leads[_sys_filt_start_date],  
+				"dupe_id", "leads-" & leads[trueai_lead_dupe_id], "is_dupe",  IF(ISBLANK(leads[trueai_lead_dupe_id]) , False, True), "is_master", leads[trueai_is_master] , "max_acceptable_pct", 0.06, "dupe_conf", CONVERT( leads[trueai_lead_dupe_conf] ,DOUBLE)) // leads
+				,
+				SELECTCOLUMNS(accounts, "sort",2, "entity", "Accounts", "problem", "Duplication of Accounts", "_sys_docid", accounts[_sys_docid],  "_sys_filter_start_date", accounts[_sys_filt_start_date],  
+				"dupe_id", "accounts-" & accounts[trueai_account_dupe_id], "is_dupe",  IF( ISBLANK(accounts[trueai_account_dupe_id]), False, True),"is_master", accounts[trueai_is_master]  , "max_acceptable_pct", 0.08 , "dupe_conf",  CONVERT(accounts[trueai_account_dupe_conf],DOUBLE )) // accounts
+				,
+				SELECTCOLUMNS(leads, "sort",3, "entity", "Leads", "problem", "Duplication of Leads per Account", "_sys_docid", leads[_sys_docid],  "_sys_filter_start_date", leads[_sys_filt_start_date],  
+				"dupe_id", "leads-" & leads[_sys_ssr_id], "is_dupe",  IF((leads[col.trueai_ssr_dupe_count]> 1), True, False),"is_master", IF( ISBLANK(leads[trueai_company_dupe_id]), True, false) , "max_acceptable_pct", 1, "dupe_conf", CONVERT(leads[trueai_company_dupe_conf],DOUBLE)) // accounts
+				
+				,
+				SELECTCOLUMNS(FILTER(ssr, ssr[col.crm_has_accounts]), "sort",4,"entity", "SSR", "problem", "Overlapping Unlinked Leads & Accts", "_sys_docid", ssr[_sys_doc_id],  "_sys_filter_start_date", ssr[_sys_filt_start_date],  
+				    "dupe_id", "ssr-" & ssr[_sys_doc_id], "is_dupe",  IF(AND(ssr[col.crm_has_leads_without_account_id], ssr[col.crm_has_accounts]), TRUE(), FALSE()), "is_master", IF(ISBLANK(ssr[trueai_account_is_master]), TRUE(), ssr[trueai_account_is_master]), "max_acceptable_pct", .08, "dupe_conf", CONVERT(.66, DOUBLE)) // ssr
+				
+				)
+				```
+
+	annotation PBI_Id = 0bd2993db7b7406fbb8cb8deaa7548b8
+

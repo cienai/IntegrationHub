@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
   "name": "0d73b84e6936cbf3d3c2",
   "position": {
     "x": 859.11857943120276,
@@ -53,11 +53,12 @@
                       "Entity": "users"
                     }
                   },
-                  "Property": "col.user_role_function"
+                  "Property": "trueai_user_role_function"
                 }
               },
-              "queryRef": "users.col.user_role_function",
-              "displayName": "User Role"
+              "queryRef": "users.trueai_user_role_function",
+              "nativeQueryRef": "User Role Function",
+              "displayName": "User Role Function"
             }
           ]
         },
@@ -65,53 +66,20 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "ssr_history"
-                        }
-                      },
-                      "Property": "col.next_step_success_prob"
+                    "SourceRef": {
+                      "Entity": "ssr_history"
                     }
                   },
-                  "Function": 1
+                  "Property": "meas.ssr_history_avg_next_steps_prob"
                 }
               },
-              "queryRef": "Avg(ssr_history.col.next_step_success_prob)"
+              "queryRef": "ssr_history.meas.ssr_history_avg_next_steps_prob",
+              "nativeQueryRef": "meas.ssr_history_avg_next_steps_prob"
             }
           ]
         }
-      },
-      "sortDefinition": {
-        "sort": [
-          {
-            "field": {
-              "HierarchyLevel": {
-                "Expression": {
-                  "Hierarchy": {
-                    "Expression": {
-                      "PropertyVariationSource": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Entity": "cal_end_dates"
-                          }
-                        },
-                        "Name": "Variación",
-                        "Property": "Fiscal Date"
-                      }
-                    },
-                    "Hierarchy": "Date Hierarchy"
-                  }
-                },
-                "Level": "Year"
-              }
-            },
-            "direction": "Ascending"
-          }
-        ],
-        "isDefaultSort": true
       }
     },
     "objects": {
@@ -772,54 +740,45 @@
         "howCreated": "User"
       },
       {
-        "name": "15014bd126d1f70c0214",
-        "ordinal": 5,
+        "name": "8616a55e3ec913d5c229",
+        "ordinal": 1,
+        "field": {
+          "HierarchyLevel": {
+            "Expression": {
+              "Hierarchy": {
+                "Expression": {
+                  "PropertyVariationSource": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "cal_end_dates"
+                      }
+                    },
+                    "Name": "Variación",
+                    "Property": "Fiscal Date"
+                  }
+                },
+                "Hierarchy": "Date Hierarchy"
+              }
+            },
+            "Level": "Year"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "e9dcb6ab28482fcdc175",
+        "ordinal": 2,
         "field": {
           "Measure": {
             "Expression": {
               "SourceRef": {
-                "Entity": "cal_end_dates"
+                "Entity": "ssr_history"
               }
             },
-            "Property": "meas.ssr_history_threshold_filter_less_than_3%"
+            "Property": "meas.ssr_history_avg_next_steps_prob"
           }
         },
-        "type": "Advanced",
-        "filter": {
-          "Version": 2,
-          "From": [
-            {
-              "Name": "c",
-              "Entity": "cal_end_dates",
-              "Type": 0
-            }
-          ],
-          "Where": [
-            {
-              "Condition": {
-                "Comparison": {
-                  "ComparisonKind": 1,
-                  "Left": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Source": "c"
-                        }
-                      },
-                      "Property": "meas.ssr_history_threshold_filter_less_than_3%"
-                    }
-                  },
-                  "Right": {
-                    "Literal": {
-                      "Value": "0L"
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        },
-        "howCreated": "User"
+        "type": "Advanced"
       }
     ],
     "filterSortOrder": "Custom"

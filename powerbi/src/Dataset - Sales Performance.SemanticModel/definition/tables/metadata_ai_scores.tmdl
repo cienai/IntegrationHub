@@ -638,22 +638,13 @@ table metadata_ai_scores
 
 	measure 'meas.ai_scores_list_price' = ```
 			
-			var factor1 = CALCULATE(count(opp_line_items[trueai_list_price]))      // get all the list_price count 
-			var factor2 = CALCULATE(
-			    count(opp_line_items[trueai_list_price]),      // non default list price items count
-			    opp_line_items[trueai_list_price_rule] <> 103007
-			)
-			
-			VAR score =
-			    IF(
-			        factor2 = 0,
-			        0.49,  // Force fixed score to show 49 if there is no non default count
-			        ( factor2 * 0.49 + (factor2 - factor1) * 1 ) / factor1
-			    )
-			
-			var res = MIN(MAX(ROUND(score*100, 0),0),100)           // get the rounded value not less then 0 and not greater then 100
-			RETURN
-			res
+			var total_list_items = CALCULATE(count(opp_line_items[trueai_list_price]))      // get all the list_price count
+			var total_list_items_non_default = CALCULATE( count(opp_line_items[trueai_list_price]),    opp_line_items[trueai_list_price_rule] <> 103007) // non default
+			var total_list_items_default = total_list_items- total_list_items_non_default
+			 
+			var score = DIVIDE(total_list_items_non_default, total_list_items )* 0.49 + DIVIDE(total_list_items_default, total_list_items) // penalize non default scores
+			var res = ROUND(score*100, 0)
+			RETURN  res
 			```
 		formatString: 0
 		displayFolder: _ai_scores
@@ -698,15 +689,16 @@ table metadata_ai_scores
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.ai_scores_opps_history' = ```
+	measure 'meas.ai_scores_opps_history' =
 			
-			var factor1 = CALCULATE(COUNT(ssr_history[entity_opp_id]))         // get the count of the opp id
-			var factor2 = CALCULATE(DISTINCTCOUNT(open_pipeline[crm_opp_id]))         // get the opps with Opp history
-			var _conf = DIVIDE(factor2, factor1,0)
-			var res = ROUND(_conf*100,0)
-			RETURN 
-			res
-			```
+			VAR factor1 =
+			    DISTINCTCOUNT ( open_pipeline[crm_opp_id] )   // opps that have history
+			VAR factor2 =
+			    DISTINCTCOUNT ( opps[_sys_doc_id] )            // all opps
+			VAR res =
+			    ROUND ( DIVIDE ( factor1, factor2, 0 ) * 100, 0 )
+			RETURN
+			    res
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 32567516-5874-4226-8182-cabb1f40e3b7
@@ -1099,43 +1091,50 @@ table metadata_ai_scores
 
 	measure 'meas.ai_scores_rep_org_calibration' = ```
 			
-			var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC))       // grt the most latest row
+			VAR latest_table = 
+			    CALCULATETABLE(
+			        TOPN(1, companies_history, companies_history[_sys_processed_as_of], DESC)
+			    )
 			
-			var _total_users = MAXX(latest_table,companies_history[users_sales])          // total users
+			VAR _total_users = MAXX(latest_table, companies_history[users_sales])
+			VAR users_match_hr_id = MAXX(latest_table, [users_match_hr_id])
+			VAR users_hr_file = MAXX(latest_table, companies_history[users_hr_file])
+			VAR users_non_match_hr_id_won_deals = MAXX(latest_table, companies_history[users_non_match_hr_id_won_deals])
+			VAR users_non_match_hr_id_pipeline = MAXX(latest_table, companies_history[users_non_match_hr_id_pipeline])
+			VAR users_non_match_hr_id_leads = MAXX(latest_table, companies_history[users_non_match_hr_id_leads])
+			VAR users_match_hr_id_nd_role = MAXX(latest_table, companies_history[users_match_hr_id_nd_role])
+			VAR users_match_hr_id_nd_group = 0  -- placeholder, unused in current calc
 			
-			var users_match_hr_id = MAXX(latest_table, [users_match_hr_id])         // total matched reps
-			var users_hr_file = MAXX(latest_table, companies_history[users_hr_file])           // reps in hr file
+			-- Individual component scores
+			VAR matched_reps_score = DIVIDE(users_match_hr_id, users_hr_file, 0)
+			VAR won_deals_score = 1 - DIVIDE(users_non_match_hr_id_won_deals, _total_users, 0)
+			VAR pipeline_gen_score = 1 - DIVIDE(users_non_match_hr_id_pipeline, _total_users, 0)
+			VAR lead_gen_score = 1 - DIVIDE(users_non_match_hr_id_leads, _total_users, 0)
+			VAR reps_w_role_score = 1 - DIVIDE(users_match_hr_id_nd_role, users_hr_file, 0)
 			
-			var users_non_match_hr_id_won_deals = MAXX(latest_table, companies_history[users_non_match_hr_id_won_deals])            // non match won deals reps
-			var users_non_match_hr_id_pipeline = MAXX(latest_table, companies_history[users_non_match_hr_id_pipeline])          // non match pipeline gen reps
-			var users_non_match_hr_id_leads = MAXX(latest_table, companies_history[users_non_match_hr_id_leads])          // non match lead gen reps count
-			var users_match_hr_id_nd_role = MAXX(latest_table, companies_history[users_match_hr_id_nd_role])                  // non match reps with role
-			var users_match_hr_id_nd_group = 0
+			-- Weighted scoring table
+			VAR Row1 = ROW("Value", matched_reps_score, "Weight", 3)
+			VAR Row2 = ROW("Value", won_deals_score, "Weight", 2)
+			VAR Row3 = ROW("Value", pipeline_gen_score, "Weight", 1)
+			VAR Row4 = ROW("Value", lead_gen_score, "Weight", 1)
+			VAR Row5 = ROW("Value", reps_w_role_score, "Weight", 2)
 			
-			var matched_reps_score = DIVIDE(users_match_hr_id,users_hr_file,0)
-			var won_deals_score = (1 - DIVIDE(users_non_match_hr_id_won_deals, _total_users, 0))
-			var pipeline_gen_score = (1 - DIVIDE(users_non_match_hr_id_pipeline, _total_users, 0))
-			var lead_gen_score = (1 - DIVIDE(users_non_match_hr_id_leads, _total_users, 0))               //raw score calculation for each
-			var reps_w_role_score = (1 - DIVIDE(users_match_hr_id_nd_role,users_hr_file,0))
-			//var reps_w_group_ratio = DIVIDE(reps_group,_hr_file_users,0)
+			VAR temp_tbl = UNION(Row1, Row2, Row3, Row4, Row5)
 			
-			VAR Row1 = ROW ( "Value", matched_reps_score, "Weight", 3 )
-			VAR Row2 = ROW ( "Value", won_deals_score, "Weight", 2 )
-			VAR Row3 = ROW ( "Value", pipeline_gen_score, "Weight", 1 )          //raw score and weight  added in the table  for each reps count
-			VAR Row4 = ROW ( "Value", lead_gen_score, "Weight", 1 )
-			VAR Row5 = ROW ( "Value", reps_w_role_score, "Weight", 2 )
-			VAR temp_tbl =
-			    UNION ( Row1, Row2, Row3, Row4, Row5 )          //creating the table
+			-- Calculate weighted average (raw score)
+			VAR _adj_calib = SUMX(temp_tbl, [Value] * [Weight])
+			VAR _importance = SUMX(temp_tbl, [Weight])
+			VAR raw_score = DIVIDE(_adj_calib, _importance, 0)
 			
-			var _adj_calib = SUMX(temp_tbl, [Value]*[Weight])           // get the adjusted raw score
-			var _importance = SUMX(temp_tbl, [Weight])                  // sum of the total weight
-			var raw_score = DIVIDE(_adj_calib, _importance,0)                 // get the score
+			-- Safeguard and exponent boost
+			VAR boost_expo = 0.9
+			VAR safe_raw_score = MIN(MAX(raw_score, 0), 1)  -- ensure score stays within 0–1
+			VAR score = POWER(safe_raw_score, boost_expo)
 			
-			var boost_expo = 0.9            // we use this to get the closer one value
-			var score = raw_score^boost_expo     // boosting the actual 
-			var res = MIN(MAX(ROUND(score*100,0),0),100)
-			RETURN
-			res
+			-- Final result as a percentage, clamped to 0–100
+			VAR res = MIN(MAX(ROUND(score * 100, 0), 0), 100)
+			
+			RETURN res
 			```
 		formatString: 0
 		displayFolder: _ai_scores
@@ -1837,7 +1836,7 @@ table metadata_ai_scores
 			
 			var score_name = MAX(metadata_ai_scores[score_name])
 			
-			var res = SWITCH(
+			var pre_boost_value = SWITCH(
 			    score_name,
 			    "Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],    // score_id 1
 			    "New Logo Selling Success Predictions", [meas.ai_scores_pred_new_logo_selling],    // score_id 2
@@ -1875,13 +1874,15 @@ table metadata_ai_scores
 			    "Leads & Accounts Completeness  Data Present",[meas.ai_scores_general_score],
 			    BLANK()
 			)
-			RETURN
-			res+0
+			
+			var expo_boost = MAX(metadata_ai_scores[boost_expo])
+			var post_boosted_value = pre_boost_value ^ expo_boost // // Raise the pre-boost value to the power of expo_boost (exponential boost)
+			
+			RETURN post_boosted_value
 			```
-		formatString: 0
 		lineageTag: a0c3cd02-2e23-4742-8929-8b59cae71b90
 
-		annotation PBI_FormatHint = {"isDecimal":true}
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'meas.ai_score_formula' = ```
 			
@@ -3272,6 +3273,25 @@ table metadata_ai_scores
 			res
 		displayFolder: _factor2_value
 		lineageTag: fbd3245f-7c2f-401f-b3b5-6a3f19fa62ff
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.ai_score_text_value' =
+			
+			VAR _score = [meas.average_ai_score]
+			VAR _label =
+			    SWITCH(
+			        TRUE(),
+			        _score >= 95, "Excellent",
+			        _score >= 85, "Great",
+			        _score >= 75, "Good",
+			        _score >= 50, "Fair",
+			        _score >= 0,  "Limited",
+			        BLANK()
+			    )
+			RETURN
+			    IF(ISBLANK(_label), " - ", _label)
+		lineageTag: 8989505c-ff92-4181-ba3d-07b1e14dd582
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 

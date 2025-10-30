@@ -1394,6 +1394,23 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	measure 'meas.in_last_12m_from_reference_date' =
+			
+			VAR _refDate =
+			    MAX('companies_history'[_sys_reference_date])        // use each company's config date
+			VAR _startDate =
+			    EDATE(_refDate, -12)                                 // go back 12 months
+			RETURN
+			    IF(
+			        MAX('companies_history'[_sys_filt_end_date]) >= _startDate &&
+			        MAX('companies_history'[_sys_filt_end_date]) <= _refDate,
+			        1,
+			        0
+			    )
+		lineageTag: d4395789-04f8-40d3-9d0b-ff62ca2c45cb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column _sys_as_of
 		dataType: dateTime
 		formatString: General Date
@@ -2937,6 +2954,72 @@ table companies_history
 		annotation SummarizationSetBy = Automatic
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column company_currency_symbol
+		dataType: string
+		lineageTag: 250e0463-39d1-48ca-9e20-09d5064a870e
+		summarizeBy: none
+		sourceColumn: company_currency_symbol
+
+		annotation SummarizationSetBy = Automatic
+
+	column di_pred_new_logo_score
+		dataType: double
+		lineageTag: 38e91438-b4d4-44ba-abbf-25589e296439
+		summarizeBy: sum
+		sourceColumn: di_pred_new_logo_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_post_sales_score
+		dataType: double
+		lineageTag: 0b000289-bd18-4420-84f8-c4840bf6ca31
+		summarizeBy: sum
+		sourceColumn: di_pred_post_sales_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_prospecting_score
+		dataType: double
+		lineageTag: 77bde7d9-b0ac-4257-93ad-7a981d98d83b
+		summarizeBy: sum
+		sourceColumn: di_pred_prospecting_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_existing_customer_selling_score
+		dataType: double
+		lineageTag: 44483654-2b49-4966-bbf5-9cea2854fb8d
+		summarizeBy: sum
+		sourceColumn: di_pred_existing_customer_selling_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_all_score
+		dataType: double
+		lineageTag: aa955d9a-9554-4c71-b5ac-38b30041c95c
+		summarizeBy: sum
+		sourceColumn: di_pred_all_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column di_pred_all_label
+		dataType: string
+		lineageTag: fdfe369f-4798-431f-96d9-00f82df89d16
+		summarizeBy: none
+		sourceColumn: di_pred_all_label
+
+		annotation SummarizationSetBy = Automatic
 
 	partition companies_history = m
 		mode: import
