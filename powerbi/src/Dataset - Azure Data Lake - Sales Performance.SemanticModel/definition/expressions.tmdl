@@ -1,0 +1,157 @@
+/// abc
+expression db_name = "cien_cmirthhguabxxs2rt_db" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 8b6cfed5-886b-475d-993c-da391b7f61bd
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression db_server_sql = "INVALID_HOST" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 3540c0d1-9224-45b5-b0d7-10b971d389f1
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression db_type = "Azure Data Lake" meta [IsParameterQuery=true, List={"PostgresSQL", "SQL Server", "Azure Data Lake"}, DefaultValue="Azure Data Lake", Type="Text", IsParameterQueryRequired=true]
+	lineageTag: b4ad5e7b-61f6-4a45-b4f0-69e705528de8
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression getDBConnection = ```
+		let
+		    getDBConnection = () =>
+		
+		    let
+		        dbConn = 
+		    //    if db_type = "SQL Server" then  //SQL 
+		    //            Sql.Database(db_server_sql, db_name)
+		        //else 
+		        // if db_type = "PostgresSQL" then // Postgres
+		          //    PostgreSQL.Database(db_server_postgres, db_name) // get the param connection
+		        // //else 
+		        if db_type = "Azure Data Lake" then // Azure Data Lake
+		                AzureStorage.DataLake(file_server_data_lake & file_folder_data_lake) // get the param connection
+		        else 
+		            error "Invalid database type specified"
+		    in
+		        dbConn
+		in
+		    getDBConnection
+		```
+	lineageTag: 6cba268f-2ed0-4a50-97d8-493330d0b0a3
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression getDBTable = ```
+		let
+		    getDBTable = (tableName as text) =>
+		
+		    let
+		        dbTable = 
+		        if db_type = "SQL Server" then
+		                getDBConnection(){[Schema="dbo",Item=tableName]}[Data] // get the right table
+		        else if db_type = "PostgresSQL" then
+		                getDBConnection(){[Schema="public",Item=tableName]}[Data] // get the right table
+		
+		        else if db_type = "Azure Data Lake" then
+		                let azureTable =
+		                        let Source  = getDBConnection(), // get the folder info
+		                                RenamedColumns = Table.RenameColumns(Source,{{"Folder Path", "FolderPath"}}), // rename so easier to search for
+		                                folder = RenamedColumns{0}[FolderPath], // get one file name
+		                                coid = Text.BetweenDelimiters(folder, "cien_", "_"), // get the coid
+		                                fileName =   coid & "_" &  tableName &  "/", // get the file name we're searching for. need the co id because some tables have the same suffix
+		                                FilteredRowsJustCurrentTable = Table.SelectRows(RenamedColumns, each Text.EndsWith([FolderPath],fileName)),  // find all files for that table
+		                                FilteredRowsJustParquet = Table.SelectRows(FilteredRowsJustCurrentTable, each ([Extension] = ".parquet")), // filter out just teh parquet files
+		                                FilteredRpwsMpHiddenFiles = Table.SelectRows(FilteredRowsJustParquet, each [Attributes]?[Hidden]? <> true), // dont include hidden files if there are any
+		                                InvokeTransformParquetFunction1 = Table.AddColumn(FilteredRpwsMpHiddenFiles, "Transform_File", each transformParquetFile([Content])), // push in the trasnformed parquity data as as pbi table for each row in a new col
+		                                RemovedOtherColumns = Table.SelectColumns(InvokeTransformParquetFunction1, {"Transform_File"}), // get rid of all other cvols
+		                                ColNames= Table.ColumnNames(RemovedOtherColumns{0}[Transform_File]), // get the col names from the first row
+		                                ExpandedBinRowColsIntoTable = Table.ExpandTableColumn(RemovedOtherColumns, "Transform_File",ColNames),  // combine those rows into a single table
+		
+		                                // Check if "_sys_doc_id" column exists
+		                                CheckColumnExists = if List.Contains(ColNames, "_sys_doc_id") then
+		                                        Table.SelectRows(ExpandedBinRowColsIntoTable, each [ _sys_doc_id ] <> null and [ _sys_doc_id ] <> "") // Remove rows where "_sys_doc_id" is blank
+		                                else
+		                                        ExpandedBinRowColsIntoTable // If column doesn't exist, return the table as it is 
+		                        in CheckColumnExists   
+		                in azureTable
+		        
+		        else 
+		            error "Invalid database type specifieds"
+		        
+		    in
+		        dbTable
+		in
+		    getDBTable
+		```
+	lineageTag: a6cb1606-1005-479d-bdb8-a8db811f3738
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression db_server_postgres = "INVALID_HOST" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 8706c9f4-fc4d-4040-8c59-5a10ac9c7fcd
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression getDBQuery = ```
+		let
+		    getDBQuery= (sql as text) =>
+		
+		    let
+		        dbQuery = 
+		        if db_type = "SQL Server" then
+		                getDBConnection(){[Schema="dbo",Item=sql]}[Data] // get the right table
+		        else if db_type = "PostgresSQL" then
+		                Value.NativeQuery(PostgreSQL.Database(db_server_postgres, db_name, [CommandTimeout=#duration(0, 0, 1, 0)]), sql, null, [EnableFolding=true])
+		        
+		        else 
+		            error "Invalid database type specified"
+		        
+		    in
+		        dbQuery
+		in
+		    getDBQuery
+		```
+	lineageTag: 62dc5c01-0c3a-48cf-8b75-848bdc3378e3
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression transformParquetFile =
+		let
+		    Source = (Parameter1 as binary) => let
+		        Source = Parquet.Document(Parameter1, [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+		    in
+		        Source
+		in
+		    Source
+	lineageTag: 08fcdffb-b65f-4ecf-b4a9-25181304b30b
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression file_server_data_lake = "https://cienjobdataus.dfs.core.windows.net/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 498c4c3f-5afe-497c-8c76-265407d76ee3
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+expression file_folder_data_lake = "acemini/export/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: e977d287-1584-4a28-82e5-55b0c8094f2a
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
