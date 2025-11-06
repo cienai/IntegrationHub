@@ -119,7 +119,7 @@ table opp_line_items
 	measure 'meas.opps_deals_pct' =
 			
 			var stepCount = [meas.ssr_history_step_count]       // calculating the step count
-			var disdeals = CALCULATE(count(opps[_sys_doc_id]), opps[col.discount_tier] <> BLANK())  // gt the count of opps that has discount tier
+			var disdeals = CALCULATE(count(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK())  // gt the count of opps that has discount tier
 			
 			var res = DIVIDE(stepCount, disdeals)           // getb the pct
 			
@@ -128,18 +128,27 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: c7df8b8f-3864-41d9-94e5-b44b2836158f
 
-	measure 'meas.opps_delta_expected_pct' = ```
+	measure 'meas.opps_delta_expected_pct' =
 			
-			[meas.ssr_history_success_rate] - [meas.ssr_history_success_prob_avg]  // get the diff of success rate and success prob avg
-			
-			```
+			VAR SuccessRate =
+			    CALCULATE(
+			        [meas.ssr_history_success_rate],
+			        KEEPFILTERS(opps)
+			    )
+			VAR ExpectedRate =
+			    CALCULATE(
+			        [meas.ssr_history_success_prob_avg],
+			        KEEPFILTERS(opps)
+			    )
+			RETURN
+			    SuccessRate - ExpectedRate
 		formatString: 0%;-0%;0%
 		displayFolder: discount opp
 		lineageTag: 9d875de2-fc0a-47b4-86e6-f717b75bf26f
 
 	measure 'meas.opps_tot_deals' =
 			
-			CALCULATE(COUNT(opps[_sys_doc_id]), opps[col.discount_tier] <> BLANK()) // get the total deals count
+			CALCULATE(COUNT(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK()) // get the total deals count
 		formatString: 0
 		displayFolder: discount opp
 		lineageTag: ba127637-f77b-4fbe-8646-8ee9fea3c6a3
@@ -176,6 +185,37 @@ table opp_line_items
 		lineageTag: 317da6da-348b-4ea6-96ac-5b2f9dc328a9
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'meas.avg_discount_pct_change' =
+			
+			VAR MinVisibleDate =
+			    CALCULATE(
+			        MIN('cal_end_dates'[Date]),
+			        ALLSELECTED('cal_end_dates')
+			    )
+			VAR MaxVisibleDate =
+			    CALCULATE(
+			        MAX('cal_end_dates'[Date]),
+			        ALLSELECTED('cal_end_dates')
+			    )
+			
+			VAR StartValue =
+			    CALCULATE(
+			        [meas.opp_line_items_avg_discount_pct],
+			        KEEPFILTERS('cal_end_dates'[Date] = MinVisibleDate)
+			    )
+			
+			VAR EndValue =
+			    CALCULATE(
+			        [meas.opp_line_items_avg_discount_pct],
+			        KEEPFILTERS('cal_end_dates'[Date] = MaxVisibleDate)
+			    )
+			
+			RETURN
+			    EndValue - StartValue
+		lineageTag: 60809788-e731-4fbf-a298-65c5f0ddb9d6
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column _sys_doc_id
 		dataType: string
@@ -598,6 +638,22 @@ table opp_line_items
 		lineageTag: 4281878e-6c1f-4c07-94db-23ca8c456ddd
 		summarizeBy: none
 		sourceColumn: cust_bool2
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_revenue_type_context
+		dataType: string
+		lineageTag: e4cdd869-5199-4fe7-848b-a5de41a8f86f
+		summarizeBy: none
+		sourceColumn: trueai_revenue_type_context
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_revenue_type
+		dataType: string
+		lineageTag: 3e6c36eb-2060-4657-a0ac-093356801632
+		summarizeBy: none
+		sourceColumn: trueai_revenue_type
 
 		annotation SummarizationSetBy = Automatic
 

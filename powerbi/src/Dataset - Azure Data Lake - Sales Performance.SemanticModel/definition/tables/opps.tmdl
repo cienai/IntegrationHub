@@ -556,6 +556,582 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	measure 'meas.opps_optimal_disc_level' = ```
+			
+			// --- Virtual Table 1: TierBase ---
+			VAR TierBase =
+			    // Create a summarized table grouping all Opportunities by their Discount Tier.
+			    SUMMARIZE(
+			        opps,
+			        opps[trueai_discount_pct_tier], // The grouping key (e.g., "10-20%", "5%+").
+			        "TierLabel", MAX(opps[trueai_discount_pct_tier]), // Get the label for display.
+			        "DeltaVal", [meas.opps_delta_expected_pct] // Calculate the Delta value for each tier group.
+			    )
+			    
+			// --- Virtual Table 2: TierParsed ---
+			VAR TierParsed =
+			    // Clean up the Tier Labels to prepare them for numerical extraction.
+			    ADDCOLUMNS(
+			        TierBase,
+			        // Remove '%' and '+' symbols (e.g., "10-20%" becomes "10-20").
+			        "CleanText", SUBSTITUTE(SUBSTITUTE([TierLabel], "%", ""), "+", ""),
+			        // Find the position of the dash to separate the range start/end.
+			        "DashPos", FIND("-", SUBSTITUTE(SUBSTITUTE([TierLabel], "%", ""), "+", ""), 1, 0)
+			    )
+			
+			// --- Virtual Table 3: TierBounded ---
+			VAR TierBounded =
+			    // Extract the numerical start and end bounds of each tier.
+			    ADDCOLUMNS(
+			        TierParsed,
+			        // Calculate the starting percentage (TierStart).
+			        "TierStart",
+			            IF(
+			                [DashPos] > 0, // Check if it is a range (e.g., "10-20").
+			                VALUE(LEFT([CleanText], [DashPos] - 1)), // Extract value before the dash.
+			                VALUE([CleanText]) // Single value tier (e.g., "5").
+			            ),
+			        // Calculate the ending percentage (TierEnd).
+			        "TierEnd",
+			            IF(
+			                [DashPos] > 0, // Check if it is a range.
+			                VALUE(RIGHT([CleanText], LEN([CleanText]) - [DashPos])), // Extract value after the dash.
+			                // Handle single-value tiers: if it ends with '+', treat the end as very high (1,000,000).
+			                IF(RIGHT([TierLabel], 1) = "+", 1000000, VALUE([CleanText]))
+			            )
+			    )
+			
+			// --- Virtual Table 4: TierRanked ---
+			VAR TierRanked =
+			    // Add sorting and ranking columns based on the tier boundaries.
+			    ADDCOLUMNS(
+			        TierBounded,
+			        // Create a robust numerical key for sorting (TierStart * 1000 + TierEnd).
+			        // This ensures tiers are always sorted correctly, e.g., "5-10" comes before "10-15".
+			        "SortKey", [TierStart] * 1000 + [TierEnd],
+			        // Rank the tiers based on the SortKey.
+			        "Rank", RANKX(TierBounded, [TierStart] * 1000 + [TierEnd], , ASC, DENSE)
+			    )
+			
+			---
+			
+			// 1. Calculate Baseline and Threshold
+			// Calculate the average DeltaVal for the first two lowest-ranked tiers.
+			VAR Baseline =
+			    AVERAGEX(
+			        FILTER(TierRanked, [Rank] <= 2), 
+			        [DeltaVal]
+			    )
+			
+			// Define the threshold: Baseline plus the 5% (0.05) increase target.
+			VAR Threshold = Baseline + 0.05
+			
+			---
+			
+			// 2. Find the Optimal Tier's SortKey
+			// Find the *minimum* SortKey (i.e., the first/lowest tier) that meets both conditions:
+			// a) Its DeltaVal is >= the calculated Threshold.
+			// b) Its Rank is > 2 (it's not one of the baseline tiers).
+			VAR OptimalSortKey =
+			    MINX(
+			        FILTER(
+			            TierRanked, 
+			            [DeltaVal] >= Threshold && [Rank] > 2
+			        ),
+			        [SortKey]
+			    )
+			
+			// 3. Look up the Label using the Optimal SortKey
+			// Use the found OptimalSortKey to pull the actual TierLabel.
+			// MAXX is used here to safely pull a single corresponding text value.
+			VAR ResultLabel =
+			    MAXX(
+			        FILTER(
+			            TierRanked, 
+			            [SortKey] = OptimalSortKey
+			        ),
+			        [TierLabel]
+			    )
+			
+			RETURN
+			    // Returns the Tier Label (e.g., "20-30%") of the first tier
+			    // that exceeds the 5% improvement threshold.
+			    ResultLabel
+			```
+		lineageTag: 66645cae-a7a3-415a-869b-7803897fe2f0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opps_optimal_discount_deal_count_pct' =
+			
+			-- Step 1: Get the result from your existing "Optimal Discount Level" measure
+			VAR BestTier = [meas.opps_optimal_disc_level]   -- e.g. returns "30–40%"
+			
+			-- Step 2: Count deals in that tier
+			VAR OptimalTierDeals =
+			    CALCULATE(
+			        [meas.ssr_history_step_count],
+			        TREATAS({ BestTier }, opps[trueai_discount_pct_tier])  -- apply tier filter at opp_line_items level
+			    )
+			
+			-- Step 3: Count total deals across all tiers
+			VAR TotalDeals =
+			    CALCULATE(
+			        [meas.ssr_history_step_count],
+			        ALL(opps[trueai_discount_pct_tier])
+			    )
+			
+			-- Step 4: Return % of deals in the optimal tier
+			RETURN
+			    DIVIDE(OptimalTierDeals, TotalDeals)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 4088315a-082d-4abf-93a2-2fafde065533
+
+	measure 'meas.opps_over_discounted_deal_pct' =
+			
+			-- Step 1: Get the optimal discount tier (e.g. "30-40%" or "40%+")
+			VAR BestTier = [meas.opps_optimal_disc_level]
+			
+			-- Step 2: Clean and parse the upper bound of that tier
+			VAR BestTierClean =
+			    SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(TRIM(BestTier), "–", "-"), "—", "-"), " ", "")
+			VAR BestTierUpper =
+			    VAR parts = SUBSTITUTE(BestTierClean, "%", "")
+			    VAR dashPos = SEARCH("-", parts, 1, BLANK())
+			    VAR upperText =
+			        SWITCH(
+			            TRUE(),
+			            NOT ISBLANK(dashPos), MID(parts, dashPos + 1, LEN(parts) - dashPos),  -- "30-40%" → "40"
+			            RIGHT(parts, 1) = "+", LEFT(parts, LEN(parts) - 1),                   -- "40%+"   → "40"
+			            TRUE(), parts                                                        -- "0%"     → "0"
+			        )
+			    RETURN VALUE(upperText)
+			
+			-- Step 3: Build a lookup of all tiers with numeric upper bounds
+			VAR Tiers =
+			    ADDCOLUMNS(
+			        VALUES(opps[trueai_discount_pct_tier]),
+			        "Upper",
+			            VAR clean = SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(TRIM(opps[trueai_discount_pct_tier]), "–", "-"), "—", "-"), " ", "")
+			            VAR p = SUBSTITUTE(clean, "%", "")
+			            VAR dashPos = SEARCH("-", p, 1, BLANK())
+			            VAR upperText =
+			                SWITCH(
+			                    TRUE(),
+			                    RIGHT(p, 1) = "+", "999",                      -- treat “%+” as open-ended top bucket
+			                    NOT ISBLANK(dashPos), MID(p, dashPos + 1, LEN(p) - dashPos),
+			                    TRUE(), p
+			                )
+			            RETURN VALUE(upperText)
+			    )
+			
+			-- Step 4: Select tiers whose numeric upper bound is higher than the optimal tier
+			VAR OverTiers =
+			    SELECTCOLUMNS(
+			        FILTER(Tiers, [Upper] > BestTierUpper),
+			        "Tier", opps[trueai_discount_pct_tier]
+			    )
+			
+			-- Step 5: Count deals in those “over-discounted” tiers
+			VAR OverDeals =
+			    CALCULATE(
+			        [meas.ssr_history_step_count],
+			        TREATAS(OverTiers, opps[trueai_discount_pct_tier])
+			    )
+			
+			-- Step 6: Count all deals (for denominator)
+			VAR TotalDeals =
+			    CALCULATE(
+			        [meas.ssr_history_step_count],
+			        ALL(opps[trueai_discount_pct_tier])
+			    )
+			
+			-- Step 7: Return % of deals over optimal tier
+			RETURN
+			    COALESCE(DIVIDE(OverDeals, TotalDeals), 0)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 63b0aff0-9501-46ad-a241-5c4d4be19b7d
+
+	measure 'meas.opps_no_discount_count' =
+			
+			CALCULATE(
+			    [meas.ssr_history_step_count],                 -- or COUNT of opps if you prefer
+			    TREATAS({ "0%" }, opps[trueai_discount_pct_tier])
+			)
+		lineageTag: 7f17629f-a273-407d-9136-24660f365ac5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opps_over_discount_deal_count' =
+			
+			VAR BestTier = [meas.opps_optimal_disc_level]
+			VAR BestTierClean =
+			    SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(TRIM(BestTier), "–", "-"), "—", "-"), " ", "")
+			VAR BestTierUpper =
+			    VAR parts = SUBSTITUTE(BestTierClean, "%", "")
+			    VAR dashPos = SEARCH("-", parts, 1, BLANK())
+			    VAR upperText =
+			        SWITCH(
+			            TRUE(),
+			            NOT ISBLANK(dashPos), MID(parts, dashPos + 1, LEN(parts) - dashPos),  -- "30-40%" → "40"
+			            RIGHT(parts, 1) = "+", LEFT(parts, LEN(parts) - 1),                   -- "40%+"   → "40"
+			            TRUE(), parts                                                        -- "0%"     → "0"
+			        )
+			    RETURN VALUE(upperText)
+			
+			VAR Tiers =
+			    ADDCOLUMNS(
+			        VALUES(opps[trueai_discount_pct_tier]),
+			        "Upper",
+			            VAR clean = SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(TRIM(opps[trueai_discount_pct_tier]), "–", "-"), "—", "-"), " ", "")
+			            VAR p = SUBSTITUTE(clean, "%", "")
+			            VAR dashPos = SEARCH("-", p, 1, BLANK())
+			            VAR upperText =
+			                SWITCH(
+			                    TRUE(),
+			                    RIGHT(p, 1) = "+", "999",                      -- treat “%+” as open-ended
+			                    NOT ISBLANK(dashPos), MID(p, dashPos + 1, LEN(p) - dashPos),
+			                    TRUE(), p
+			                )
+			            RETURN VALUE(upperText)
+			    )
+			
+			VAR OverTiers =
+			    SELECTCOLUMNS(
+			        FILTER(Tiers, [Upper] > BestTierUpper),
+			        "Tier", opps[trueai_discount_pct_tier]
+			    )
+			
+			RETURN
+			    CALCULATE(
+			        [meas.ssr_history_step_count],
+			        TREATAS(OverTiers, opps[trueai_discount_pct_tier])
+			    )
+		lineageTag: 25e3810a-7540-4eaf-ae38-99d14a3688c4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opps_optimal_discount_deal_count' =
+			
+			VAR BestTier = [meas.opps_optimal_disc_level]
+			RETURN
+			    CALCULATE(
+			        [meas.ssr_history_step_count],
+			        TREATAS({ BestTier }, opps[trueai_discount_pct_tier])
+			    )
+		formatString: 0
+		lineageTag: 3df4757a-4c6f-4c6e-b5a8-fb9c558fe44f
+
+	measure 'meas.opps_no_discount_pct' =
+			
+			VAR NoDiscDeals =
+			    CALCULATE(
+			        [meas.ssr_history_step_count],
+			        TREATAS({ "0%" }, opps[trueai_discount_pct_tier])
+			    )
+			VAR TotalDeals =
+			    CALCULATE(
+			        [meas.ssr_history_step_count],
+			        ALL(opps[trueai_discount_pct_tier])
+			    )
+			RETURN
+			    DIVIDE(NoDiscDeals, TotalDeals)
+		lineageTag: 112e76c9-31a5-4380-ab5e-d65f6a54ef96
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opps_under_discount_deal_count' =
+			
+			VAR BestTier = [meas.opps_optimal_disc_level]
+			
+			-- Convert the tier text (e.g. "20-30%") to its upper numeric boundary
+			VAR BestTierUpper =
+			    VALUE(
+			        SUBSTITUTE(
+			            SUBSTITUTE(
+			                RIGHT(BestTier, LEN(BestTier) - SEARCH("-", BestTier, 1, 0)),
+			                "%",
+			                ""
+			            ),
+			            "+",
+			            ""
+			        )
+			    )
+			
+			RETURN
+			    CALCULATE(
+			        [meas.ssr_history_step_count],
+			        FILTER(
+			            ALL(opps[trueai_discount_pct_tier]),
+			            VAR Tier = opps[trueai_discount_pct_tier]
+			            VAR TierClean =
+			                SUBSTITUTE(SUBSTITUTE(Tier, "%", ""), "+", "")
+			            VAR DashPos = SEARCH("-", TierClean, 1, BLANK())
+			            VAR UpperText =
+			                SWITCH(
+			                    TRUE(),
+			                    ISBLANK(DashPos), TierClean,
+			                    RIGHT(TierClean, 1) = "+", "999",
+			                    TRUE(), MID(TierClean, DashPos + 1, LEN(TierClean))
+			                )
+			            VAR TierUpper = VALUE(UpperText)
+			            RETURN
+			                TierUpper < BestTierUpper &&     // under optimal
+			                TierUpper > 0                    // exclude 0% and negatives
+			        )
+			    )
+		lineageTag: fc573d3e-78f1-4f98-8026-133216143789
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opps_under_discount_deal_pct' =
+			
+			VAR UnderCount = [meas.opps_under_discount_deal_count]
+			VAR TotalCount =
+			    CALCULATE(
+			        [meas.ssr_history_step_count],
+			        ALL(opps[trueai_discount_pct_tier])
+			    )
+			RETURN
+			    DIVIDE(UnderCount, TotalCount)
+		lineageTag: f65c7a41-f806-4a0e-ac7c-1780f66da52f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.optimal_discount_tier_background' =
+			
+			VAR OptimalTier =
+			    CALCULATE(
+			        [meas.opps_optimal_disc_level],
+			        REMOVEFILTERS('opps')
+			    )
+			VAR ThisTier = SELECTEDVALUE('opps'[trueai_discount_pct_tier])
+			
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ThisTier = OptimalTier, "#78903B",   // Optimal tier (green)
+			        ThisTier < OptimalTier, "#595B6F",   // Under optimal (dark blue-gray)
+			        ThisTier > OptimalTier, "#912452",   // Over optimal (purple-gray)
+			        "#1E1E1E"                            // Default / fallback
+			    )
+		lineageTag: e358cd7c-fade-48a9-8d27-8493a0f1bce1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opps_optimal_discount_pct' =
+			
+			-- Get the optimal discount tier text (e.g. "30-40%")
+			VAR TierText = [meas.opps_optimal_disc_level]
+			
+			-- Find the position of the dash "-" (used to split lower/upper bounds)
+			VAR DashPos = SEARCH("-", TierText, 1, BLANK())
+			
+			-- Extract the upper bound of the range (e.g. "40" from "30-40%")
+			VAR UpperPart =
+			    IF(
+			        ISBLANK(DashPos),
+			        SUBSTITUTE(TierText, "%", ""),         -- if no dash, just remove "%"
+			        MID(TierText, DashPos + 1, LEN(TierText))  -- else get text after "-"
+			    )
+			
+			-- Convert upper bound text to a number and divide by 100 to get percent (e.g. "40" → 0.4)
+			VAR UpperPct = VALUE(SUBSTITUTE(SUBSTITUTE(UpperPart, "%", ""), "+", "")) / 100
+			
+			-- Extract the lower bound of the range (e.g. "30" from "30-40%")
+			VAR LowerPart =
+			    IF(
+			        ISBLANK(DashPos),
+			        SUBSTITUTE(TierText, "%", ""),         -- if no dash, just use the single number
+			        LEFT(TierText, DashPos - 1)            -- else get text before "-"
+			    )
+			
+			-- Convert lower bound text to a number and divide by 100 (e.g. "30" → 0.3)
+			VAR LowerPct = VALUE(SUBSTITUTE(SUBSTITUTE(LowerPart, "%", ""), "+", "")) / 100
+			
+			-- Return the midpoint of the range (e.g. (0.3 + 0.4) / 2 = 0.35)
+			RETURN
+			    DIVIDE(UpperPct + LowerPct, 2)
+		lineageTag: 4bebb021-1832-44b1-bd86-13afcb8a7888
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opps_over_discount_amt' = ```
+			
+			// 1️⃣ Get the current optimal discount tier text (e.g., "30-40%" or "50%+")
+			VAR BestTier = [meas.opps_optimal_disc_level]
+			
+			// --- Robust Parsing Logic for BestTierUpper ---
+			
+			// Handle cases where BestTier might be BLANK() (e.g., no data met the optimal criteria)
+			VAR IsValidTier = NOT ISBLANK(BestTier)
+			
+			// Simplified parsing: 
+			// Finds the numeric value *after* the dash (for ranges) OR the entire value (for X% or X%+).
+			// We'll rely on the logic from the previous measure's parsing for robustness.
+			VAR CleanText = 
+			    IF(
+			        IsValidTier,
+			        SUBSTITUTE(SUBSTITUTE(BestTier, "%", ""), "+", ""),
+			        BLANK()
+			    )
+			
+			VAR DashPos = 
+			    IF(
+			        IsValidTier,
+			        SEARCH("-", CleanText, 1, 0), // If no dash, returns 0 (handled by error/default below)
+			        BLANK()
+			    )
+			
+			// Determine the value to use as the upper bound:
+			VAR BestTierUpperPct =
+			    IF(
+			        NOT IsValidTier,
+			        BLANK(), // Skip calculation if BestTier is blank.
+			        IF(
+			            DashPos > 0,
+			            // Case 1: Range tier (e.g., "30-40" -> take "40")
+			            VALUE(RIGHT(CleanText, LEN(CleanText) - DashPos)),
+			            // Case 2: Single tier (e.g., "50" or "50+")
+			            IF(
+			                RIGHT(BestTier, 1) = "+",
+			                // For X%+, BestTierUpper should be X% (the lower bound of the 'over' range).
+			                VALUE(CleanText), 
+			                // For a single tier like "50%", treat BestTierUpper as 50.
+			                VALUE(CleanText)
+			            )
+			        )
+			    )
+			
+			// 2️⃣ Convert the parsed upper numeric boundary to a decimal percentage (e.g., 40 → 0.40)
+			VAR BestTierUpper = DIVIDE(BestTierUpperPct, 100, BLANK())
+			
+			
+			RETURN
+			// Check if a valid optimal tier was found before summing (prevents errors)
+			IF(
+			    ISBLANK(BestTierUpper),
+			    0, // Return 0 if no optimal tier was determined.
+			
+			    // 3️⃣ Iterate all deals in opps, summing leakage for those above the optimal tier
+			    SUMX(
+			        FILTER(
+			            'opps',
+			            // Only deals whose discount percentage is *strictly greater* than the upper bound of the optimal tier.
+			            'opps'[trueai_discount_pct] > BestTierUpper && 
+			            'opps'[trueai_discount_pct] > 0 && 
+			            'opps'[trueai_booking_amt] > 0
+			        ),
+			        
+			        VAR ActualDisc = 'opps'[trueai_discount_pct]
+			        VAR Amount = 'opps'[trueai_booking_amt]
+			
+			        // 4️⃣ Compute the Gross (list) Price before discount
+			        // Avoids division by zero/near-zero if discount is 1 (100%) or higher
+			        VAR Gross = DIVIDE(Amount, 1 - ActualDisc, BLANK()) 
+			
+			        // 5️⃣ The "extra" discount given beyond the upper limit of the optimal tier
+			        VAR ExtraDiscountPct = ActualDisc - BestTierUpper
+			
+			        // 6️⃣ Calculate leakage ($) = list price × excess discount %
+			        VAR Wasted = Gross * ExtraDiscountPct
+			
+			        // Return the wasted amount (ensure it's not negative, though logic should prevent that)
+			        RETURN IF(Wasted > 0, Wasted, 0)
+			    )
+			)
+			```
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 507893f4-f755-4633-8227-88d3a5e498e8
+
+	measure 'meas.opps_under_discount_amt' =
+			
+			VAR BestTier = [meas.opps_optimal_disc_level]
+			
+			-- 🧩 Ensure the measure has a valid string before parsing
+			VAR SafeTier =
+			    IF(
+			        NOT ISBLANK(BestTier),
+			        BestTier,
+			        "0-0%"     -- default fallback to prevent string errors
+			    )
+			
+			-- Extract lower boundary safely
+			VAR DashPos = SEARCH("-", SafeTier, 1, BLANK())
+			
+			VAR BestTierLowerText =
+			    IF(
+			        ISBLANK(DashPos),
+			        SUBSTITUTE(SUBSTITUTE(SafeTier, "%", ""), "+", ""),
+			        LEFT(SafeTier, DashPos - 1)
+			    )
+			
+			VAR BestTierLower = VALUE(BestTierLowerText) / 100
+			
+			RETURN
+			SUMX(
+			    FILTER(
+			        'opps',
+			        'opps'[trueai_discount_pct] < BestTierLower &&
+			        'opps'[trueai_discount_pct] > 0 &&
+			        'opps'[trueai_booking_amt] > 0
+			    ),
+			    VAR ActualDisc = 'opps'[trueai_discount_pct]
+			    VAR Amount = 'opps'[trueai_booking_amt]
+			    VAR Gross = DIVIDE(Amount, 1 - ActualDisc)
+			    VAR Missed = Gross * (BestTierLower - ActualDisc)
+			    RETURN IF(Missed > 0, Missed, 0)
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 3b0c2120-0320-4b5f-b0ee-169487a43ba8
+
+	measure 'meas.opps_discount_avg_pct' =
+			
+			AVERAGEX(
+			    VALUES('opps'[_sys_doc_id]),
+			    VAR BookedAmt =
+			        CALCULATE(SUM('opps'[trueai_booking_amt]))
+			    VAR ListAmt =
+			        CALCULATE(SUM('opp_line_items'[trueai_list_price]))
+			    RETURN
+			        IF(
+			            ListAmt > 0,
+			            ABS(DIVIDE(ListAmt - BookedAmt, ListAmt)),   // ← always positive
+			            BLANK()
+			        )
+			)
+		lineageTag: 0a4f6d01-86d8-4647-a75d-6f5468467ccb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.trueai_discount_avg_pct' = ```
+			
+			VAR list_price = CALCULATE(SUM (opps[col.trueai_list_price_amt])) 
+			VAR booking = CALCULATE(SUM (opps[trueai_booking_amt])) 
+			VAR res = DIVIDE(list_price - booking, list_price, BLANK()) 
+			RETURN res
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 6e72aa0a-1689-423c-a601-75d453bd1b16
+
+	measure 'meas.opps_avg_discount_pct' = ```
+			
+			AVERAGE('opps'[trueai_discount_pct]) 
+			```
+		lineageTag: d7195d3c-688d-44b8-94cb-20117f9b2a55
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas._diagnostic_delta_test' =
+			
+			VAR SuccessRate = CALCULATE([meas.ssr_history_success_rate], KEEPFILTERS(opps))
+			VAR ExpectedRate = CALCULATE([meas.ssr_history_success_prob_avg], KEEPFILTERS(opps))
+			RETURN
+			SuccessRate - ExpectedRate
+		lineageTag: cc8997f7-91d5-4b35-a9fb-ba06e2532354
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 88fcbd55-d718-43f8-9717-ccc01592c495
@@ -1345,28 +1921,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	column 'col.discount_tier' = ```
-			
-			
-			var opp_id = CALCULATE(FIRSTNONBLANK(opps[_sys_doc_id],opps[_sys_doc_id]))
-			var rest = CALCULATE([meas.opp_line_item_discount_pct], FILTER(opps, opps[_sys_doc_id] = opp_id))
-			var pct = ABS(rest)
-			
-			var res = IF(pct > 0.4 , "40%+",
-			                IF( pct > 0.3, "30-40%", 
-			                    IF(pct > 0.2 , "20-30%",
-			                        IF(pct> 0.1, "10-20%", 
-			                            IF( pct > 0.05, "05-10%", 
-			                                IF(pct > 0, "0-5%", 
-			                                    IF(pct = 0, "0%"))))))) 
-			                    
-			RETURN res
-			```
-		lineageTag: 8965fd37-d34f-45ee-bfe5-32f2ea83976b
-		summarizeBy: none
-
-		annotation SummarizationSetBy = Automatic
-
 	column trueai_discount_amt
 		dataType: double
 		lineageTag: dd9afbc5-9311-4dbb-90fd-76e9c3596e80
@@ -1648,22 +2202,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	column 'col.creator_name' = ```
-			
-			var _id = [_sys_doc_id]          // get the creator id 
-			var res = CALCULATE(
-			    MAX(ssr_history[step_owner_id]),
-			    ssr_history[entity_opp_id]=_id
-			)
-			
-			RETURN
-			res
-			```
-		lineageTag: ea1caa8e-5f3c-40d3-aa3d-0e90ff62e2ef
-		summarizeBy: none
-
-		annotation SummarizationSetBy = Automatic
-
 	column 'col.opp_age' =
 			
 			var _current_date = TODAY()
@@ -1785,6 +2323,81 @@ table opps
 		lineageTag: d5d56924-c4f6-4819-ab08-6cca48c59b9f
 		summarizeBy: none
 		sourceColumn: trueai_discount_pct_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_nnb_amt
+		dataType: string
+		lineageTag: e9f6bc83-15bd-48c0-91ec-d57c3a73a98b
+		summarizeBy: none
+		sourceColumn: trueai_nnb_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_downgrade_amt
+		dataType: string
+		lineageTag: bd379382-b3be-4dd3-8ef7-189895232667
+		summarizeBy: none
+		sourceColumn: trueai_downgrade_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_cross_sale_amt
+		dataType: string
+		lineageTag: a2b152b4-9691-4e96-8d53-7cac21ea41fe
+		summarizeBy: none
+		sourceColumn: trueai_cross_sale_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_renewal_amt
+		dataType: string
+		lineageTag: 5130b759-05ac-429f-b8d6-b640da10ec5c
+		summarizeBy: none
+		sourceColumn: trueai_renewal_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_expansion_amt
+		dataType: string
+		lineageTag: 2aa9029e-00e5-4143-b125-ff4976f53cd7
+		summarizeBy: none
+		sourceColumn: trueai_expansion_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_one_time_amt
+		dataType: string
+		lineageTag: 89b7956b-1362-4c1b-b5b3-94b83d51344b
+		summarizeBy: none
+		sourceColumn: trueai_one_time_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_nd_amt
+		dataType: string
+		lineageTag: 0ebcb086-8b02-4f52-8347-ba15c0ad5583
+		summarizeBy: none
+		sourceColumn: trueai_nd_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_arr_amt
+		dataType: string
+		lineageTag: 1093cd30-1cdd-48a7-8902-022cc75af8cb
+		summarizeBy: none
+		sourceColumn: trueai_arr_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'col.trueai_list_price_amt' = ```
+			
+			[trueai_booking_amt]-[trueai_discount_amt]
+			
+			```
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: d7a4f08b-42aa-4f41-8ae6-082461941af8
+		summarizeBy: sum
 
 		annotation SummarizationSetBy = Automatic
 
