@@ -342,22 +342,16 @@ table metadata_ai_scores
 			
 			var fromDate =[meas.context_date_min] 
 			var toDate = [meas.context_date_max] 
-			
 			var applicable_rows_tbl = CALCULATETABLE(users_history, users_history[col.ci.perf_ramping_status] ="Ramping" ,  LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-			
 			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <  toDate   && if(isblank([trueai_termination_date]), date(2100,1,1),[trueai_termination_date]) >=  toDate) // make sure we only include reps that are in the active 
-			
 			var _cnt = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, users_history[_sys_user_id]))) // get a disctinct count of users from that filter context 
-			
 			var ramp_rate  = MIN(_cnt/3, 1)       // get the minimum if there is no ramping reps 
-			
 			var perf_score =  CALCULATE(
 			    AVERAGE(users_history[ci_perf_qtly_performance_tier_conf]),       // get the avg perf conf
 			    users_history[col.ci.perf_ramping_status] ="Ramping"
 			)
-			var boost_expo = 0.5            // we use this to get the closer one value
-			var score = (ramp_rate * perf_score)^boost_expo     // boosting the actual 
-			var res = ROUND(score*100, 0)+0
+			var score = (ramp_rate * perf_score)
+			var res = score 
 			RETURN
 			res
 			```
@@ -925,12 +919,14 @@ table metadata_ai_scores
 			var users_match_hr_id = MAXX(latest_table, [users_match_hr_id]) +0        
 			var users_hr_file = MAXX(latest_table, companies_history[users_hr_file]) +0           
 			
-			var res = (1 - DIVIDE(users_match_hr_id, users_hr_file, 0))
+			var res = (DIVIDE(users_match_hr_id, users_hr_file, 0))
 			RETURN res
 			
 			```
 		displayFolder: _factor1_value
 		lineageTag: cb095a91-0df2-4e56-81a5-262990050f8f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'meas.ai_scores_revenue_calibration_factor1_value' = ```
 			
@@ -1027,7 +1023,7 @@ table metadata_ai_scores
 							    "33", [meas.ai_scores_booking_calibration], // score_id 33 "booking calub"
 							    "34", [meas.ai_scores_revenue_calibration], // score_id 34 "rev calib"
 							    "35",[meas.ai_scores_general_score],  // score_id 35
-			 				    BLANK()
+			 				    0
 							)
 							var boost = MAX(metadata_ai_scores[boost_expo])
 							var post_boost_val 	= pre_boost_val ^ boost // pre boost is a decimal value - if u apply an exponent less than 1 it will be boosted toward 1 yielding a better score. Needed to normalize some scores 
