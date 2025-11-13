@@ -35,16 +35,15 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "opp_line_items"
+                      "Entity": "opps"
                     }
                   },
-                  "Property": "meas.opps_average_discount_pct"
+                  "Property": "meas.trueai_disc_avg_pct"
                 }
               },
-              "queryRef": "opps.meas.opps_average_discount_pct",
-              "nativeQueryRef": "Avg. Discount %",
-              "displayName": "Avg. Discount %",
-              "format": "0.0 %;-0.0 %;0.0 %"
+              "queryRef": "opps.meas.trueai_disc_avg_pct",
+              "nativeQueryRef": "Avg. Discount in Tier",
+              "displayName": "Avg. Discount in Tier"
             },
             {
               "field": {
@@ -54,12 +53,12 @@
                       "Entity": "ssr_history"
                     }
                   },
-                  "Property": "meas.ssr_history_booking_amt"
+                  "Property": "meas.ssr_history_won_amt"
                 }
               },
-              "queryRef": "ssr_history.meas.ssr_history_booking_amt",
-              "nativeQueryRef": "Total Booking Amt.",
-              "displayName": "Total Booking Amt."
+              "queryRef": "ssr_history.meas.ssr_history_won_amt",
+              "nativeQueryRef": "Total Won Amt.",
+              "displayName": "Total Won Amt."
             },
             {
               "field": {
@@ -78,53 +77,18 @@
             },
             {
               "field": {
-                "Arithmetic": {
-                  "Left": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "ssr_history"
-                        }
-                      },
-                      "Property": "meas.ssr_history_step_count"
-                    }
-                  },
-                  "Right": {
-                    "ScopedEval": {
-                      "Expression": {
-                        "Measure": {
-                          "Expression": {
-                            "SourceRef": {
-                              "Entity": "ssr_history"
-                            }
-                          },
-                          "Property": "meas.ssr_history_step_count"
-                        }
-                      },
-                      "Scope": []
-                    }
-                  },
-                  "Operator": 3
-                }
-              },
-              "queryRef": "Divide(ssr_history.meas.ssr_history_step_count, ScopedEval(ssr_history.meas.ssr_history_step_count, []))",
-              "nativeQueryRef": "% of Deals",
-              "displayName": "% of Deals"
-            },
-            {
-              "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "opp_line_items"
+                      "Entity": "ssr_history"
                     }
                   },
-                  "Property": "meas.opps_avg_deals_amt"
+                  "Property": "meas.ssr_history_rev_avg_won_amt"
                 }
               },
-              "queryRef": "opps.meas.opps_deals_after_discount_amt",
-              "nativeQueryRef": "Avg Deal Size",
-              "displayName": "Avg Deal Size"
+              "queryRef": "ssr_history.meas.ssr_history_rev_avg_won_amt",
+              "nativeQueryRef": "Avg Won Amount",
+              "displayName": "Avg Won Amount"
             },
             {
               "field": {
@@ -168,57 +132,60 @@
                 }
               },
               "queryRef": "opps.meas.opps_delta_expected_pct",
-              "nativeQueryRef": "Success Rate Performance Lift (Actual vs Expected)",
-              "displayName": "Success Rate Performance Lift (Actual vs Expected)"
+              "nativeQueryRef": "Success Rate Performance Lift (Actual vs Expected) ⁴",
+              "displayName": "Success Rate Performance Lift (Actual vs Expected) ⁴"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "opp_line_items"
+                      "Entity": "opps"
                     }
                   },
-                  "Property": "meas.opps_deal_discount_amt"
+                  "Property": "meas.opps_over_discounted_amt"
                 }
               },
-              "queryRef": "opps.meas.opps_deal_discount_amt",
-              "nativeQueryRef": "Discounted Amt in Tier",
-              "displayName": "Discounted Amt in Tier"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "opp_line_items"
-                    }
-                  },
-                  "Property": "meas.delta_expected_booking_amt"
-                }
-              },
-              "queryRef": "opps.meas.delta_expected_booking_amt",
-              "nativeQueryRef": "Success Delta Amt (Actual vs. Expected) ",
-              "displayName": "Success Delta Amt (Actual vs. Expected) "
+              "queryRef": "opps.meas.opps_over_discounted_amt",
+              "nativeQueryRef": "Potentially Over Discounted Amount ³",
+              "displayName": "Potentially Over Discounted Amount ³",
+              "format": "\\$#,0;(\\$#,0);\\$#,0"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "opps"
+                  }
+                },
+                "Property": "trueai_discount_pct_tier"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
       }
     },
     "objects": {
       "columnFormatting": [
         {
           "properties": {
-            "labelPrecision": {
+            "styleTotal": {
               "expr": {
                 "Literal": {
-                  "Value": "0L"
+                  "Value": "false"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "opps.meas.opps_deal_discount_amt"
+            "metadata": "opps.meas.opps_over_discounted_amt"
           }
         },
         {
@@ -232,49 +199,7 @@
             }
           },
           "selector": {
-            "metadata": "opps.meas.delta_expected_booking_amt"
-          }
-        },
-        {
-          "properties": {
-            "labelPrecision": {
-              "expr": {
-                "Literal": {
-                  "Value": "0L"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "opps.meas.opps_deals_after_discount_amt"
-          }
-        },
-        {
-          "properties": {
-            "labelPrecision": {
-              "expr": {
-                "Literal": {
-                  "Value": "0L"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Divide(ssr_history.meas.ssr_history_step_count, ScopedEval(ssr_history.meas.ssr_history_step_count, []))"
-          }
-        },
-        {
-          "properties": {
-            "labelPrecision": {
-              "expr": {
-                "Literal": {
-                  "Value": "0L"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "opps.meas.opps_average_discount_pct"
+            "metadata": "opps.meas.trueai_disc_avg_pct"
           }
         }
       ],
@@ -298,7 +223,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "83.98012167428978D"
+                  "Value": "123.38868694292813D"
                 }
               }
             }
@@ -312,7 +237,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "85.73026327312857D"
+                  "Value": "135.00749106631264D"
                 }
               }
             }
@@ -326,35 +251,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "119.9934603122844D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "opps.meas.opps_deal_discount_amt"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "121.36400259853883D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "opps.meas.opps_deals_after_discount_amt"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "141.167956933124D"
+                  "Value": "149.0283295447869D"
                 }
               }
             }
@@ -368,35 +265,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "179.23950377640884D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "opps.meas.delta_expected_booking_amt"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "88.33918776627954D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "opps.meas.opps_average_discount_pct"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "82.83837651985604D"
+                  "Value": "124.91623348408876D"
                 }
               }
             }
@@ -410,13 +279,55 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "125.18985682062964D"
+                  "Value": "177.60741187573444D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "ssr_history.meas.ssr_history_booking_amt"
+            "metadata": "opps.meas.opps_over_discounted_amt"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "145.32531572025783D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ssr_history.meas.ssr_history_rev_avg_won_amt"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "100.55471319881019D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "opps.meas.trueai_disc_avg_pct"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "140.6540442494929D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ssr_history.meas.ssr_history_won_amt"
           }
         }
       ],
@@ -586,97 +497,7 @@
                 }
               }
             ],
-            "metadata": "opps.meas.opps_average_discount_pct"
-          }
-        },
-        {
-          "properties": {
-            "backColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "opps"
-                        }
-                      },
-                      "Property": "meas.optimal_discount_tier_background"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "data": [
-              {
-                "dataViewWildcard": {
-                  "matchingOption": 1
-                }
-              }
-            ],
             "metadata": "ssr_history.meas.ssr_history_step_count"
-          }
-        },
-        {
-          "properties": {
-            "backColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "opps"
-                        }
-                      },
-                      "Property": "meas.optimal_discount_tier_background"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "data": [
-              {
-                "dataViewWildcard": {
-                  "matchingOption": 1
-                }
-              }
-            ],
-            "metadata": "Divide(ssr_history.meas.ssr_history_step_count, ScopedEval(ssr_history.meas.ssr_history_step_count, []))"
-          }
-        },
-        {
-          "properties": {
-            "backColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "opps"
-                        }
-                      },
-                      "Property": "meas.optimal_discount_tier_background"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "data": [
-              {
-                "dataViewWildcard": {
-                  "matchingOption": 1
-                }
-              }
-            ],
-            "metadata": "opps.meas.opps_deals_after_discount_amt"
           }
         },
         {
@@ -766,36 +587,6 @@
                 }
               }
             ],
-            "metadata": "opps.meas.opps_deal_discount_amt"
-          }
-        },
-        {
-          "properties": {
-            "backColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "opps"
-                        }
-                      },
-                      "Property": "meas.optimal_discount_tier_background"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "data": [
-              {
-                "dataViewWildcard": {
-                  "matchingOption": 1
-                }
-              }
-            ],
             "metadata": "opps.meas.opps_delta_expected_pct"
           }
         },
@@ -826,7 +617,7 @@
                 }
               }
             ],
-            "metadata": "opps.meas.delta_expected_booking_amt"
+            "metadata": "opps.meas.opps_over_discounted_amt"
           }
         },
         {
@@ -856,7 +647,67 @@
                 }
               }
             ],
-            "metadata": "ssr_history.meas.ssr_history_booking_amt"
+            "metadata": "ssr_history.meas.ssr_history_won_amt"
+          }
+        },
+        {
+          "properties": {
+            "backColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "opps"
+                        }
+                      },
+                      "Property": "meas.optimal_discount_tier_background"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "ssr_history.meas.ssr_history_rev_avg_won_amt"
+          }
+        },
+        {
+          "properties": {
+            "backColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "opps"
+                        }
+                      },
+                      "Property": "meas.optimal_discount_tier_background"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "opps.meas.trueai_disc_avg_pct"
           }
         }
       ],
@@ -1073,7 +924,8 @@
             "Property": "meas.opps_avg_deals_amt"
           }
         },
-        "type": "Advanced"
+        "type": "Advanced",
+        "howCreated": "User"
       },
       {
         "name": "9154fea18d174a51a810",
@@ -1088,7 +940,8 @@
             "Property": "meas.opps_average_discount_pct"
           }
         },
-        "type": "Advanced"
+        "type": "Advanced",
+        "howCreated": "User"
       },
       {
         "name": "ccfaa7db095842bad2ca",
@@ -1103,7 +956,8 @@
             "Property": "meas.delta_expected_booking_amt"
           }
         },
-        "type": "Advanced"
+        "type": "Advanced",
+        "howCreated": "User"
       },
       {
         "name": "69fa7980a9c29b6dd4d8",
@@ -1133,7 +987,8 @@
             "Property": "meas.opps_deal_discount_amt"
           }
         },
-        "type": "Advanced"
+        "type": "Advanced",
+        "howCreated": "User"
       },
       {
         "name": "a25f06815e7000b770d3",
@@ -1225,8 +1080,7 @@
             "Property": "meas.ssr_history_won_amt"
           }
         },
-        "type": "Advanced",
-        "howCreated": "User"
+        "type": "Advanced"
       },
       {
         "name": "8938673549484e33e35e",
@@ -1241,46 +1095,11 @@
             "Property": "trueai_discount_pct_tier"
           }
         },
-        "type": "Categorical"
-      },
-      {
-        "name": "abc9e8415cd8f71159b9",
-        "ordinal": 12,
-        "field": {
-          "Arithmetic": {
-            "Left": {
-              "Measure": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "ssr_history"
-                  }
-                },
-                "Property": "meas.ssr_history_step_count"
-              }
-            },
-            "Right": {
-              "ScopedEval": {
-                "Expression": {
-                  "Measure": {
-                    "Expression": {
-                      "SourceRef": {
-                        "Entity": "ssr_history"
-                      }
-                    },
-                    "Property": "meas.ssr_history_step_count"
-                  }
-                },
-                "Scope": []
-              }
-            },
-            "Operator": 3
-          }
-        },
         "type": "Advanced"
       },
       {
         "name": "08e6234812d6c42b5c0f",
-        "ordinal": 13,
+        "ordinal": 12,
         "field": {
           "Measure": {
             "Expression": {
@@ -1289,6 +1108,37 @@
               }
             },
             "Property": "meas.ssr_history_booking_amt"
+          }
+        },
+        "type": "Advanced",
+        "howCreated": "User"
+      },
+      {
+        "name": "628dd25b993361c3d6c8",
+        "ordinal": 13,
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "opps"
+              }
+            },
+            "Property": "meas.opps_over_discounted_amt"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "1c84ff828a281f4fc329",
+        "ordinal": 14,
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "ssr_history"
+              }
+            },
+            "Property": "meas.ssr_history_rev_avg_won_amt"
           }
         },
         "type": "Advanced"
