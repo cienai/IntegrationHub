@@ -11,7 +11,7 @@ table metadata_heatmap_items
 			    IF(
 			        ISBLANK(_name),
 			        "--",
-			        FORMAT(_score * 100, "0") & " - " & _bucket
+			        FORMAT(_score, "0") & " - " & _bucket
 			    )
 			
 			RETURN
@@ -31,7 +31,7 @@ table metadata_heatmap_items
 			    IF(
 			        ISBLANK(_name),
 			        "--",
-			        FORMAT(_score * 100, "0") & " - " & _bucket
+			        FORMAT(_score, "0") & " - " & _bucket
 			    )
 			
 			RETURN
@@ -699,7 +699,7 @@ table metadata_heatmap_items
 			
 			var res = CALCULATE(
 			    AVERAGE(
-			        'completeness_summary'[crm_completeness]            // get the average of the crm completeness score
+			        'ssr'[trueai_crm_complt_all]            // get the average of the crm completeness score
 			    )
 			)
 			
@@ -1266,26 +1266,32 @@ table metadata_heatmap_items
 
 	measure 'meas.getHeatmapKPI_AIScore' =
 			
-			VAR kpi1 = [meas.kpi1_ai_score_trust_value]
-			VAR kpi2 = [meas.kpi2_ai_score_trust_value]
+			VAR kpi1 = [meas.kpi1_ai_score_trust_value]   -- 0–100 scale
+			VAR kpi2 = [meas.kpi2_ai_score_trust_value]   -- 0–100 scale
+			
+			-- KPI2 is truly missing only when it returns BLANK
+			VAR _kpi2_missing =
+			    ISBLANK(kpi2)
 			
 			VAR _combined =
 			    IF(
-			        ISBLANK(kpi2),
-			        kpi1 * 100,
-			        ROUND(((kpi1 + kpi2) / 2) * 100, 0)
+			        _kpi2_missing,
+			        kpi1,                                -- use only KPI1
+			        ROUND( (kpi1 + kpi2) / 2, 0 )        -- average 0–100 scores
 			    )
 			
 			VAR res =
-			    IF(
+			    SWITCH(
+			        TRUE(),
 			        ISBLANK(_combined) || _combined < 50, "Limited",
-			        IF(_combined < 75, "Fair",
-			        IF(_combined < 85, "Good",
-			        IF(_combined < 95, "Great", "Excellent")))
+			        _combined < 75, "Fair",
+			        _combined < 85, "Good",
+			        _combined < 95, "Great",
+			        "Excellent"
 			    )
 			
 			RETURN
-			res
+			    res
 		formatString: 0.00
 		displayFolder: heatmap_kpis
 		lineageTag: c5d815dd-024f-4300-b354-bfb72811632a
@@ -2314,19 +2320,18 @@ table metadata_heatmap_items
 
 	measure 'meas.KPI1_AI_score_bucket' =
 			
-			var kpi1 = [meas.kpi1_ai_score_trust_value]       // get the KPI1 AI Score
-			VAR res = SWITCH(
-			    TRUE(),
-			    kpi1 < 0.50, "Limited",
-			    kpi1 < 0.75, "Fair",
-			    kpi1 < 0.85, "Good",
-			    kpi1 < 0.95, "Great",
-			    kpi1 >= 0.95, "Excellent"
-			)
-			
+			VAR _score = [meas.kpi1_ai_score_trust_value]   -- 0-100 score
 			
 			RETURN
-			res
+			SWITCH(
+			    TRUE(),
+			    _score >= 95, "Excellent",
+			    _score >= 85, "Great",
+			    _score >= 75, "Good",
+			    _score >= 50, "Fair",
+			    _score >= 0,  "Limited",
+			    BLANK()
+			)
 		displayFolder: heatmap_kpis
 		lineageTag: 97a5e09a-34cc-450c-bf60-8dbdd581d164
 
@@ -2351,28 +2356,42 @@ table metadata_heatmap_items
 
 	measure 'meas.kpi1_ai_score_trust_value' =
 			
-			var _score_name = MAX(metadata_heatmap_items[heatmap_kpi1_ai_score_name])          // get the ai score name from heatmap table for kpi1
+			VAR _score_name =
+			    MAX(metadata_heatmap_items[heatmap_kpi1_ai_score_name])
 			
-			var res = SWITCH(
+			-- underlying normalized value (0–1)
+			VAR _raw =
+			    SWITCH(
 			        TRUE(),
-			        _score_name="Adjusted Duration", [meas.ai_scores_adj_duration],
-			        _score_name="Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],
-			        _score_name="AI Score Not Needed (insight always available)",100,
-			        _score_name="Existing Customer Success Predictions", [meas.ai_scores_pred_existing_customer_selling],
-			        _score_name="Rep Org. Calibration", [meas.ai_scores_rep_org_calibration],
-			        _score_name="New Logo Success Predictions", [meas.ai_scores_pred_new_logo_selling],
-			        _score_name="Sales Process", [meas.ai_scores_sales_process],
-			        _score_name="Activity Capture Levels", [meas.ai_scores_ci_act_capt_lvl],
-			        _score_name="Bookings Calibration", [meas.ai_scores_booking_calibration],
-			        _score_name="Revenue Calibration", [meas.ai_scores_revenue_calibration],
-			        _score_name="Line-Item Products", [meas.ai_scores_line_items_products],
-			        _score_name="Performance Tiers", [meas.ai_scores_performance_tiers],
-			        _score_name="Ramping Success", [meas.ai_scores_ramping]
-			)
-			VAR _capped = MAX(0, MIN(res, 100))
+			        _score_name = "Adjusted Duration",                      [meas.ai_scores_adj_duration],
+			        _score_name = "AI Score Not Needed (insight always available)", 1,
+			        _score_name = "SSR Leadsource Consolidation",           [meas.ai_scores_ssr_leadsource],
+			        _score_name = "Sales Process",                          [meas.ai_scores_sales_process],
+			        _score_name = "Activity Capture Levels",                [meas.ai_scores_ci_act_capt_lvl],
+			        _score_name = "Bookings Calibration",                   [meas.ai_scores_booking_calibration],
+			        _score_name = "Revenue Calibration",                    [meas.ai_scores_revenue_calibration],
+			        _score_name = "Line-Item Products",                     [meas.ai_scores_line_items_products],
+			        _score_name = "Performance Tiers",                      [meas.ai_scores_performance_tiers],
+			        _score_name = "Ramping Success",                        [meas.ai_scores_ramping],
+			        _score_name = "Prospecting Success Predictions",        [meas.ai_scores_pred_prospecting],
+			        _score_name = "Existing Customer Success Predictions",  [meas.ai_scores_pred_existing_customer_selling],
+			        _score_name = "Rep Org. Calibration",                   [meas.ai_scores_rep_org_calibration],
+			        _score_name = "New Logo Success Predictions",           [meas.ai_scores_pred_new_logo_selling]
+			    )
+			
+			-- scale 0–1 → 0–100
+			VAR _scaled = _raw * 100
+			
+			-- preserve BLANK instead of converting to 0
+			VAR _capped =
+			    IF(
+			        ISBLANK(_scaled),
+			        BLANK(),
+			        MAX(0, MIN(_scaled, 100))
+			    )
 			
 			RETURN
-			_capped
+			    _capped
 		displayFolder: heatmap_kpis
 		lineageTag: 33ed841f-d4d2-4575-95cd-c4a06c7ee262
 
@@ -2397,19 +2416,18 @@ table metadata_heatmap_items
 
 	measure 'meas.KPI2_AI_score_bucket' =
 			
-			var kpi2 = [meas.kpi2_ai_score_trust_value]        // get KPI2
-			VAR res = SWITCH(
-			    TRUE(),
-			    kpi2 < 0.50, "Limited",
-			    kpi2 < 0.75, "Fair",
-			    kpi2 < 0.85, "Good",
-			    kpi2 < 0.95, "Great",
-			    kpi2 >= 0.95, "Excellent"
-			)
-			
+			VAR _score = [meas.kpi2_ai_score_trust_value]   -- 0-100 score
 			
 			RETURN
-			res
+			SWITCH(
+			    TRUE(),
+			    _score >= 95, "Excellent",
+			    _score >= 85, "Great",
+			    _score >= 75, "Good",
+			    _score >= 50, "Fair",
+			    _score >= 0,  "Limited",
+			    BLANK()
+			)
 		displayFolder: heatmap_kpis
 		lineageTag: 5248f2f7-65f4-4b40-b2d7-284c0fd05fba
 
@@ -2431,32 +2449,44 @@ table metadata_heatmap_items
 		displayFolder: heatmap_kpis
 		lineageTag: 218b2659-eb4c-43fd-b080-5245eeb846bb
 
-	measure 'meas.kpi2_ai_score_trust_value' = ```
+	measure 'meas.kpi2_ai_score_trust_value' =
 			
-			var _score_name = MAX(metadata_heatmap_items[heatmap_kpi2_ai_score_name])          // get the ai_score_name from heatmap table
+			VAR _score_name =
+			    MAX(metadata_heatmap_items[heatmap_kpi2_ai_score_name])
 			
-			var res = SWITCH(
+			-- underlying normalized value (0–1)
+			VAR _raw =
+			    SWITCH(
 			        TRUE(),
-			        _score_name="Adjusted Duration", [meas.ai_scores_adj_duration],
-			        _score_name="AI Score Not Needed (insight always available)",100,
-			        _score_name="SSR Leadsource Consolidation", [meas.ai_scores_ssr_leadsource],
-			        _score_name="Sales Process", [meas.ai_scores_sales_process],
-			        _score_name="Activity Capture Levels", [meas.ai_scores_ci_act_capt_lvl],
-			        _score_name="Bookings Calibration", [meas.ai_scores_booking_calibration],
-			        _score_name="Revenue Calibration", [meas.ai_scores_revenue_calibration],
-			        _score_name="Line-Item Products", [meas.ai_scores_line_items_products],
-			        _score_name="Performance Tiers", [meas.ai_scores_performance_tiers],
-			        _score_name="Ramping Success", [meas.ai_scores_ramping],
-			        _score_name="Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],
-			        _score_name="Existing Customer Success Predictions", [meas.ai_scores_pred_existing_customer_selling],
-			        _score_name="Rep Org. Calibration", [meas.ai_scores_rep_org_calibration],
-			        _score_name="New Logo Success Predictions", [meas.ai_scores_pred_new_logo_selling]
-			       
-			)
+			        _score_name = "Adjusted Duration",                      [meas.ai_scores_adj_duration],
+			        _score_name = "AI Score Not Needed (insight always available)", 1,   -- normalized
+			        _score_name = "SSR Leadsource Consolidation",           [meas.ai_scores_ssr_leadsource],
+			        _score_name = "Sales Process",                          [meas.ai_scores_sales_process],
+			        _score_name = "Activity Capture Levels",                [meas.ai_scores_ci_act_capt_lvl],
+			        _score_name = "Bookings Calibration",                   [meas.ai_scores_booking_calibration],
+			        _score_name = "Revenue Calibration",                    [meas.ai_scores_revenue_calibration],
+			        _score_name = "Line-Item Products",                     [meas.ai_scores_line_items_products],
+			        _score_name = "Performance Tiers",                      [meas.ai_scores_performance_tiers],
+			        _score_name = "Ramping Success",                        [meas.ai_scores_ramping],
+			        _score_name = "Prospecting Success Predictions",        [meas.ai_scores_pred_prospecting],
+			        _score_name = "Existing Customer Success Predictions",  [meas.ai_scores_pred_existing_customer_selling],
+			        _score_name = "Rep Org. Calibration",                   [meas.ai_scores_rep_org_calibration],
+			        _score_name = "New Logo Success Predictions",           [meas.ai_scores_pred_new_logo_selling]
+			    )
+			
+			-- scale 0–1 → 0–100
+			VAR _scaled = _raw * 100
+			
+			-- cap between 0 and 100
+			VAR _capped =
+			    IF(
+			        ISBLANK(_scaled),
+			        BLANK(),
+			        MAX(0, MIN(_scaled, 100))
+			    )
 			
 			RETURN
-			res
-			```
+			    _capped
 		formatString: 0
 		displayFolder: heatmap_kpis
 		lineageTag: 9a0c2441-1cdd-4190-a24e-05a59c2ff85b
@@ -3366,11 +3396,11 @@ table metadata_heatmap_items
 		displayFolder: _record_counts
 		lineageTag: 55e0401e-3d03-476c-8c00-2cb04c885156
 
-	measure 'meas.calc_hyp2_kpi1_nominator_count' =
+	measure 'meas.calc_hyp2_kpi1_nominator_count' = ```
 			
 			var contact_ai = CALCULATETABLE(
-			    completeness_summary,      // get the contact info average score for entity Leads
-			    completeness_summary[entity]="Opps"
+			    ssr      // get the count of ssr records
+			   
 			)
 			
 			
@@ -3378,6 +3408,7 @@ table metadata_heatmap_items
 			
 			RETURN
 			res
+			```
 		formatString: 0
 		displayFolder: _record_counts
 		lineageTag: baedc44c-944c-4ab7-8093-a224304ed2bd
