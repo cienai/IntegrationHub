@@ -17,8 +17,8 @@ table ssr_history
 			
 			// get the period dates based on current filter contetxt 
 			// this is a test for git
-			var period_start = [meas.context_date_min]		// get the context max date 
-			var period_end = [meas.context_date_max]		// get the context min dat
+			var period_start = [meas.context_date_min]      // get the context max date 
+			var period_end = [meas.context_date_max]        // get the context min dat
 			var period_in_months =  DATEDIFF(period_start, period_end + 1, month) * -1
 			var prev_period_start = EDATE(period_start,period_in_months)
 			var prev_period_end =   EDATE(period_end,period_in_months)
@@ -26,10 +26,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -65,10 +65,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -104,10 +104,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -126,7 +126,7 @@ table ssr_history
 			var res = new_cnt 
 			return IF(isblank(res), 0, res)
 			```
-		formatString: " + "0
+		formatString: " +"0
 		displayFolder: _rev_analysis
 		lineageTag: e76d7667-1b75-4934-8baf-1225f9151615
 
@@ -143,10 +143,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -183,10 +183,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -221,10 +221,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -258,10 +258,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -297,10 +297,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -347,10 +347,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -441,10 +441,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -498,10 +498,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -519,7 +519,7 @@ table ssr_history
 			var res = starting_cnt 
 			return IF(isblank(res), 0, res)
 			```
-		formatString: 0
+		formatString: #,0
 		displayFolder: _rev_analysis
 		lineageTag: 141956ef-eb73-49c3-b921-1eb39da38f15
 
@@ -1025,10 +1025,10 @@ table ssr_history
 			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
 			
 			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
@@ -1061,10 +1061,15 @@ table ssr_history
 			var period_in_months =  DATEDIFF(period_start, period_end + 1, month) * -1
 			var prev_period_start = EDATE(period_start,period_in_months)
 			var prev_period_end =   EDATE(period_end,period_in_months)  >= period_start  // client before start of period,  churn after period started
-			var starting_custs =  Filter((ALL(ssr)), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter(ALL(ssr), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter(ALL(ssr), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter(ALL(ssr), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
+			
+			
+			var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  prev_period_start &&  cal_end_dates[Date] < prev_period_end) -- get current filter context except all dates
+			
+			// get the tables - break out of filter context (AKK) and override based on first purch and churn
+			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_start)  // client before start of period,  churn after period started
+			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // client before start of period,  churn after period end
+			var churned_custs = Filter((overridden_dates_tbl), ssr[col.trueai_churn_date_no_blanks] >= period_start && ssr[col.trueai_churn_date_no_blanks] <= period_end)  // churned after period started, before period ended
+			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[col.trueai_churn_date_no_blanks]  >= period_end)  // // client before end of period, churn after  period ended
 			
 			// get the values based on temp tables
 			var starting_cnt = COUNTROWS(starting_custs)
