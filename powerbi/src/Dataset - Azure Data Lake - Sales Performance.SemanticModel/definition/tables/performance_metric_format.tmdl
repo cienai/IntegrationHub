@@ -1,0 +1,87 @@
+table performance_metric_format
+	lineageTag: 534838ad-0dca-4363-b3fc-987b1bffd9ef
+
+	calculationGroup
+
+		calculationItem 'calc.apply_format' = SELECTEDMEASURE()
+
+			formatStringDefinition =
+					-----------------------------------------
+					-- 📌 Dynamic Format Engine (no K/M abbreviations)
+					-----------------------------------------
+					
+					VAR _prefix =
+					    SELECTEDVALUE( 'metadata_performance_metrics'[metric_prefix] )
+					
+					VAR _fmtMeta =
+					    SELECTEDVALUE( 'metadata_performance_metrics'[metric_format] )
+					
+					VAR _id =
+					    SELECTEDVALUE( 'metadata_performance_metrics'[sys_doc_id] )
+					
+					VAR _val =
+					    SELECTEDMEASURE()
+					
+					-----------------------------------------
+					-- 📌 Type Detection
+					-----------------------------------------
+					VAR _isRevenue =
+					    LEFT(_id, 3) = "rev"
+					
+					VAR _isPercent  = NOT ISBLANK(_fmtMeta) && CONTAINSSTRING(_fmtMeta, "%")
+					VAR _isDuration = NOT ISBLANK(_fmtMeta) && CONTAINSSTRING(_fmtMeta, "hrs")
+					VAR _isDays     = NOT ISBLANK(_fmtMeta) && CONTAINSSTRING(_fmtMeta, "Days")
+					
+					VAR _withPrefix = NOT ISBLANK(_prefix)
+					
+					-----------------------------------------
+					-- 📌 Prefix Helper  (adds space after prefix)
+					-----------------------------------------
+					VAR _p =
+					    IF(_withPrefix, _prefix & " ", "")
+					
+					-----------------------------------------
+					-- 📌 Revenue: always full currency, no K/M
+					-----------------------------------------
+					VAR _revenueFmt =
+					    IF(
+					        _isRevenue,
+					        _p & "$#,0",        -- <== no ,K or ,,M here
+					        BLANK()
+					    )
+					
+					-----------------------------------------
+					-- 📌 Percent, Duration, Days (use metadata)
+					-----------------------------------------
+					VAR _nonAbbrevFmt =
+					    SWITCH(
+					        TRUE(),
+					        _isPercent,  _p & _fmtMeta,
+					        _isDuration, _p & _fmtMeta,
+					        _isDays,     _p & _fmtMeta,
+					        BLANK()
+					    )
+					
+					-----------------------------------------
+					-- 📌 Fallback
+					-----------------------------------------
+					RETURN
+					    COALESCE(
+					        _nonAbbrevFmt,          -- percentages, durations, days
+					        _revenueFmt,            -- revenue (full dollars)
+					        _p & _fmtMeta,          -- any other custom format from metadata
+					        "#,0"                   -- ultimate fallback
+					    )
+
+	column Name
+		dataType: string
+		lineageTag: 20122f4c-86d5-431f-b4d6-c7b65b022f38
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 29f3be15-a5d6-4b49-90fc-c0012173c217
+		sourceColumn: Ordinal
+
