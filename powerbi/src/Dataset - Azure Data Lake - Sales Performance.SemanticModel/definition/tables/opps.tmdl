@@ -496,8 +496,12 @@ table opps
 
 	measure 'meas.opps_max_stages' =
 			
-			CALCULATE (
-			    sum( opps[col.trueai_opp_stages_recorded] )
+			SUMX(
+			    VALUES(opps[_sys_doc_id]),
+			    CALCULATE(
+			        DISTINCTCOUNT(open_pipeline[trueai_stage_name]),
+			        opps[trueai_is_won] = TRUE()
+			    )
 			)
 		formatString: 0
 		displayFolder: _success_metrics
@@ -1103,6 +1107,71 @@ table opps
 			    )
 			)
 		lineageTag: f9d49b07-aa70-4715-8772-9628091580b5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opp_nd_amt' =
+			
+			SUM ( opps[trueai_nd_amt] )
+		lineageTag: 03045633-016e-4492-9659-cc27636d00bb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opp_nnb_amt' = ```
+			
+			SUM ( opps[trueai_nnb_amt] )
+			
+			```
+		lineageTag: efe1d8fb-30b1-4ab3-89e7-804be31fb5dd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opp_downgrade_amt' =
+			
+			SUM ( opps[trueai_downgrade_amt] )
+		lineageTag: 6f61a270-93c2-4d9b-a3b6-0d9401d9dfb8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opp_cross_sale_amt' =
+			
+			SUM ( opps[trueai_cross_sale_amt] )
+		lineageTag: a5c87d1c-4dcc-4ec0-8f2b-63b6fb6bfb77
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opp_renewal_amt' =
+			
+			SUM ( opps[trueai_renewal_amt] )
+		lineageTag: 4ac06b0a-b120-4372-8791-aad52081fe68
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opp_arr_amt' =
+			
+			SUM ( opps[trueai_arr_amt] )
+		lineageTag: d14fb762-ef99-4ec6-9aa4-04f50d08f0cb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opp_one_time_amt' =
+			
+			SUM ( opps[trueai_one_time_amt] )
+		lineageTag: 73387f7c-1bdc-4587-9605-88d477f6790c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opp_mrr_amt' =
+			
+			DIVIDE( [meas.opp_arr_amt], 12 )
+		lineageTag: 2f7a6496-8c0e-4236-bc17-b61e4a8c2e85
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.opp_expansion_amt' =
+			
+			SUM ( opps[trueai_expansion_amt] )
+		lineageTag: 3eb58e07-0156-413b-b2f8-efcbf9ec8cff
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
