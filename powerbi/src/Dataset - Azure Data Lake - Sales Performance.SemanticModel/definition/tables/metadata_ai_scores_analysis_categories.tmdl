@@ -82,26 +82,10 @@ table metadata_ai_scores_analysis_categories
 		mode: import
 		source =
 				let
-				    Source = Table.FromRows(
-				        {
-				            {"SAM", true, #datetime(2025, 10, 15, 0, 0, 0), "Segmentation & SAM Analysis", "Determines if, after ADE we are able to confidently segment accounts and assess TAM.", 1},
-				            {"PROD", true, #datetime(2025, 10, 15, 0, 0, 0), "Product & Pricing Mix Analysis", "Determines if, after ADE we are able to confidently assess product mix and portfolio strength.", 2},
-				            {"PIPE", true, #datetime(2025, 10, 15, 0, 0, 0), "Pipeline Analysis", "Determines if, after ADE we are able to confidently assess the quality and stage distribution of the pipeline.", 3},
-				            {"PERF", true, #datetime(2025, 10, 15, 0, 0, 0), "Rep Performance Analysis", "Determines if, after ADE we are able to confidently assess rep performance relative to benchmarks.", 4},
-				            {"SKILL", true, #datetime(2025, 10, 15, 0, 0, 0), "Rep Skills and Behaviors Analysis", "Determines if, after ADE we are able to confidently assess sales skills and behavioral patterns.", 5},
-				            {"CALIB", true, #datetime(2025, 10, 15, 0, 0, 0), "Calibration Level", "Determines how close the top line numbers and team organization is to the recevieved calibration information.", 0}
-				        },
-				        type table [
-				            _sys_doc_id = text,
-				            _sys_is_active = logical,
-				            _sys_modified_on = datetime,
-				            category_name = text,
-				            description = text,
-				            sort_order = Int64.Type
-				        ]
-				    )
+				    metadata_ai_scores_analysis_categories = getDBTable("metadata_ai_scores_analysis_categories"),
+				    #"Changed Type" = Table.TransformColumnTypes(metadata_ai_scores_analysis_categories,{{"_sys_doc_id", type text}, {"_sys_is_active", type logical}, {"_sys_modified_on", type datetime}, {"category_name", type text}, {"description", type text}, {"sort_order", Int64.Type}})
 				in
-				    Source
+				    #"Changed Type"
 
 	annotation PBI_NavigationStepName = Navigation
 

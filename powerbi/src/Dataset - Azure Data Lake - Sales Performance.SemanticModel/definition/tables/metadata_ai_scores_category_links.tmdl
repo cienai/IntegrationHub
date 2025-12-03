@@ -81,56 +81,10 @@ table metadata_ai_scores_category_links
 		mode: import
 		source =
 				let
-				    Source = Table.FromRows(
-				        {
-				            {1, true, #datetime(2025, 10, 15, 0, 0, 0), 32, "CALIB", 1, "Rep Organization Calibration"},
-				            {2, true, #datetime(2025, 10, 15, 0, 0, 0), 33, "CALIB", 1, "Bookings Calibration"},
-				            {3, true, #datetime(2025, 10, 15, 0, 0, 0), 34, "CALIB", 1, "Revenue Calibration"},
-				            {4, true, #datetime(2025, 10, 15, 0, 0, 0), 28, "PERF", 1, "Performance Tiers"},
-				            {5, true, #datetime(2025, 10, 15, 0, 0, 0), 29, "PERF", 1, "Ramping Success"},
-				            {6, true, #datetime(2025, 10, 15, 0, 0, 0), 9, "PIPE", 1, "Opportunities History"},
-				            {32, true, #datetime(2025, 10, 15, 0, 0, 0), 1, "PIPE", 1, "Prospecting Success Predictions"},
-				            {31, true, #datetime(2025, 10, 15, 0, 0, 0), 2, "PIPE", 1, "New Logo Selling Success Predictions"},
-				            {34, true, #datetime(2025, 10, 15, 0, 0, 0), 3, "PIPE", 1, "Post-Sales Support Success Predictions"},
-				            {33, true, #datetime(2025, 10, 15, 0, 0, 0), 4, "PIPE", 1, "Existing Customer Selling Success Predictions"},
-				            {7, true, #datetime(2025, 10, 15, 0, 0, 0), 22, "PROD", 1, "Adjusted Duration"},
-				            {8, true, #datetime(2025, 10, 15, 0, 0, 0), 7, "PROD", 1, "List Price"},
-				            {9, true, #datetime(2025, 10, 15, 0, 0, 0), 8, "PROD", 1, "Line Item Products"},
-				            {10, true, #datetime(2025, 10, 15, 0, 0, 0), 16, "SAM", 1, "SSR Industry Consolidation"},
-				            {11, true, #datetime(2025, 10, 15, 0, 0, 0), 17, "SAM", 1, "SSR Lead Source Consolidation"},
-				            {12, true, #datetime(2025, 10, 15, 0, 0, 0), 18, "SAM", 1, "Leads & Accounts Completeness  Data Present"},
-				            {13, true, #datetime(2025, 10, 15, 0, 0, 0), 22, "SAM", 1, "Adjusted Duration"},
-				            {14, true, #datetime(2025, 10, 15, 0, 0, 0), 1, "SAM", 1, "Prospecting Success Predictions"},
-				            {15, true, #datetime(2025, 10, 15, 0, 0, 0), 2, "SAM", 1, "New Logo Selling Success Predictions"},
-				            {16, true, #datetime(2025, 10, 15, 0, 0, 0), 6, "SAM", 1, "Potential ACV"},
-				            {17, true, #datetime(2025, 10, 15, 0, 0, 0), 22, "SKILL", 1, "Adjusted Duration"},
-				            {18, true, #datetime(2025, 10, 15, 0, 0, 0), 23, "SKILL", 1, "Closing Ability"},
-				            {19, true, #datetime(2025, 10, 15, 0, 0, 0), 27, "SKILL", 1, "Deal Maximizing"},
-				            {20, true, #datetime(2025, 10, 15, 0, 0, 0), 24, "SKILL", 1, "Discovery Skill"},
-				            {21, true, #datetime(2025, 10, 15, 0, 0, 0), 25, "SKILL", 1, "Engagement Ability"},
-				            //{22, true, #datetime(2025, 10, 15, 0, 0, 0), 30, "SKILL", 1, "Time Management"},
-				            {23, true, #datetime(2025, 10, 15, 0, 0, 0), 26, "SKILL", 1, "Work Effort"},
-				            {24, true, #datetime(2025, 10, 15, 0, 0, 0), 19, "SKILL", 1, "Activity Capture Level"},
-				            //{25, true, #datetime(2025, 10, 15, 0, 0, 0), 20, "SKILL", 1, "Activity Capture Level Confidence"},
-				            {26, true, #datetime(2025, 10, 15, 0, 0, 0), 21, "SKILL", 1, "Time Allocation"},
-				            {27, true, #datetime(2025, 10, 15, 0, 0, 0), 4, "SKILL", 1, "Existing Customer Selling Success Predictions"},
-				            {28, true, #datetime(2025, 10, 15, 0, 0, 0), 3, "SKILL", 1, "Post-Sales Support Success Predictions"},
-				            {29, true, #datetime(2025, 10, 15, 0, 0, 0), 1, "SKILL", 1, "Prospecting Success Predictions"},
-				            {30, true, #datetime(2025, 10, 15, 0, 0, 0), 2, "SKILL", 1, "New Logo Selling Success Predictions"}
-				        },
-				        type table [
-				            _sys_doc_id = Int64.Type,
-				            _sys_is_active = logical,
-				            _sys_modified_on = datetime,
-				            score_id = Int64.Type,
-				            analysis_category_id = text,
-				            weighting = Int64.Type,
-				            notes = text
-				        ]
-				    ),
-				    #"Filtered Rows" = Table.SelectRows(Source, each true)
+				    Source = getDBTable("metadata_ai_scores_category_links"),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"_sys_doc_id", Int64.Type}, {"_sys_is_active", type logical}, {"_sys_modified_on", type datetime}, {"score_id", Int64.Type}, {"analysis_category_id", type text}, {"weighting", Int64.Type}, {"notes", type text}})
 				in
-				    #"Filtered Rows"
+				    #"Changed Type"
 
 	annotation PBI_NavigationStepName = Navigation
 
