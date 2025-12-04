@@ -363,31 +363,37 @@ table metadata_ai_scores
 
 	measure 'meas.ai_scores_rep_org_calibration' =
 			
-			
-			var factor1 = [meas.ai_scores_rep_org_calibration_factor1_value]
+			VAR factor1 = [meas.ai_scores_rep_org_calibration_factor1_value]
 			VAR factor2 = [meas.ai_scores_rep_org_calibration_factor2_value]
 			VAR factor3 = [meas.ai_scores_rep_org_calibration_factor3_value]
 			
+			-- weight to apply
+			VAR w = 2
 			
+			-- Build a table with named columns, then remove blanks
+			VAR temp_tbl =
+			    FILTER (
+			        SELECTCOLUMNS (
+			            {
+			                (factor1, w),
+			                (factor2, w),
+			                (factor3, w)
+			            },
+			            "Value", [Value1],
+			            "Weight", [Value2]
+			        ),
+			        NOT ISBLANK ( [Value] )
+			    )
 			
-			-- Weighted scoring table
-			VAR Row1 = ROW("Value", factor1, "Weight", 2)
-			VAR Row2 = ROW("Value", factor2, "Weight", 2)
-			VAR Row3 = ROW("Value", factor3, "Weight", 2)
+			-- Weighted score calculation
+			VAR _adj = SUMX ( temp_tbl, [Value] * [Weight] )
+			VAR _wt = SUMX ( temp_tbl, [Weight] )
+			VAR raw_score = DIVIDE ( _adj, _wt )
 			
-			VAR temp_tbl = UNION(Row1, Row2, Row3)
+			-- Clamp score between 0 and 1
+			VAR safe = MIN ( MAX ( raw_score, 0 ), 1 )
 			
-			-- Calculate weighted average (raw score)
-			VAR _adj_calib = SUMX(temp_tbl, [Value] * [Weight])
-			VAR _importance = SUMX(temp_tbl, [Weight])
-			VAR raw_score = DIVIDE(_adj_calib, _importance, 0)
-			
-			VAR safe_raw_score = MIN(MAX(raw_score, 0), 1)  -- ensure score stays within 0–1
-			
-			-- Final result as a percentage, clamped to 0–100
-			VAR res = safe_raw_score
-			
-			RETURN res
+			RETURN safe
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 65e27ada-7d1f-40df-8bd5-50a4fa39c4d5
@@ -472,10 +478,7 @@ table metadata_ai_scores
 
 	measure 'meas.ai_scores_ci_time_allocation_factor2_value' =
 			
-			var reps_tot = CALCULATE([meas.data_logs_user_count_eop], users[trueai_user_role_function] in {"AE", "AM", "SDR"})
-			
-			RETURN
-			reps_tot
+			BLANK()
 		formatString: 0
 		displayFolder: _factor2_value
 		lineageTag: fe8e4dc4-c3c2-464d-b0f2-7bd0aa9e848e
@@ -913,16 +916,23 @@ table metadata_ai_scores
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.ai_scores_rep_org_calibration_factor1_value' = ```
+	measure 'meas.ai_scores_rep_org_calibration_factor1_value' =
 			
-			var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC))       // grt the most latest row
-			var users_match_hr_id = MAXX(latest_table, [users_match_hr_id]) +0        
-			var users_hr_file = MAXX(latest_table, companies_history[users_hr_file]) +0           
+			VAR latest_table =
+			    CALCULATETABLE(
+			        TOPN(1, companies_history, companies_history[_sys_processed_as_of], DESC),
+			        ALL(companies_history)   -- remove filters to get real latest row
+			    )
 			
-			var res = (DIVIDE(users_match_hr_id, users_hr_file, 0))
-			RETURN res
+			VAR users_match_hr_id = MAXX(latest_table, [users_match_hr_id])
+			VAR users_hr_file     = MAXX(latest_table, companies_history[users_hr_file])
 			
-			```
+			RETURN
+			IF(
+			    users_hr_file = 0 || ISBLANK(users_hr_file),
+			    BLANK(),  -- no HR file uploaded → ignore this factor
+			    DIVIDE(users_match_hr_id, users_hr_file, 0)  -- HR file exists → always return value (0–1)
+			)
 		displayFolder: _factor1_value
 		lineageTag: cb095a91-0df2-4e56-81a5-262990050f8f
 
@@ -981,56 +991,85 @@ table metadata_ai_scores
 		displayFolder: _factor1_value
 		lineageTag: 88399f1d-a2a5-4dc6-85ab-5d9be411da54
 
-	measure 'meas.ai_score' = ```
+	measure 'meas.ai_score' =
 			
-					
-							var score_id = MAX(metadata_ai_scores[_sys_doc_id])
-							
-							var pre_boost_val = SWITCH(
-							    score_id,
-							    "1", [meas.ai_scores_pred_prospecting],    // score_id 1 "Prospecting Success Predictions"
-							    "2", [meas.ai_scores_pred_new_logo_selling],    // score_id 2 "New Logo Selling Success Predictions",
-							    "3", [meas.ai_scores_pred_post_sales_support],    // score_id 3 "Post-Sales Support Success Predictions"
-							    "4", [meas.ai_scores_pred_existing_customer_selling],    // score_id 4 "Existing Customer Selling Success Predictions"
-							    "5", [meas.ai_scores_success_factor_analysis],                      // score id 5 "Success Factor Analysis"
-							    "6", [meas.ai_scores_potential_acv],                      // score id 6 "Potential ACV"
-							    "7", [meas.ai_scores_list_price],                      // score id 7 "List Price"
-							    "8", [meas.ai_scores_line_items_products],                // score id 8 "Line Item Products"
-							    "9", [meas.ai_scores_opps_history],                      // score id 9"Opportunities History"
-								"10", [meas.ai_scores_accts_industry],                // score id 10  "Accounts Industry Consolidation"
-								"11", [meas.ai_scores_accts_leadsource],                // score id 11 "Accounts Lead Source Consolidation"
-							    "12", [meas.ai_scores_leads_industry],                // score id 12  "Leads Industry Consolidation"
-							    "13", [meas.ai_scores_leads_leadsource],                // score id 13 "Leads Lead Source Consolidation"
-							    "14", [meas.ai_scores_opps_industry],                // score id 14 "Opps Industry Consolidation"
-							    "15", [meas.ai_scores_opps_leadsource],                // score id 15 "Opps Lead Source Consolidation"
-							    "16", [meas.ai_scores_ssr_industry],                // score id 16 "SSR Industry Consolidation"
-							    "17", [meas.ai_scores_ssr_leadsource],       // score id 17 "SSR Lead Source Consolidation"
-								"18", [meas.ai_scores_general_score],                // score id 18 Leads & Accounts Completeness  Data Present
-							    "19", [meas.ai_scores_ci_act_capt_lvl],                // score id 19 "Activity Capture Level"
-							    "20", [meas.ai_scores_ci_act_capt_lvl_conf],                // score id 20 "Activity Capture Level Confidence"
-							    "21", [meas.ai_scores_ci_time_alloc],                // score id 21 "Time Allocation"
-							    "22", [meas.ai_scores_adj_duration],                // score id 22 "Adjusted Duration"
-							    "23", [meas.ai_scores_ci_closing_ability],                  // score_id 23 "Closing Ability"
-							    "24", [meas.ai_scores_ci_discovery_skill],               // score_id 24 "Discovery Skill"
-							    "25", [meas.ai_scores_ci_engagement_ability],                      // score_id 25 "Engagement Ability"
-							    "26", [meas.ai_scores_ci_work_effort],                      // score_id 26 "Work Effort"
-							    "27", [meas.ai_scores_ci_deal_maxing],                        // score_id 27 "Deal Maximizing"
-							    "28", [meas.ai_scores_performance_tiers],                            // score_id 28 "Performance Tiers"
-							    "29", [meas.ai_scores_ramping],                                  // score_id 29 "Ramping Success"
-							    "30", [meas.ai_scores_ci_time_management],                // score_id 30 "Time Management"
-							    "31", [meas.ai_scores_vi],               // score_id 31 "VI Amount"
-							    "32", [meas.ai_scores_rep_org_calibration],  // score_id 32 "rep calib"
-							    "33", [meas.ai_scores_booking_calibration], // score_id 33 "booking calub"
-							    "34", [meas.ai_scores_revenue_calibration], // score_id 34 "rev calib"
-							    "35",[meas.ai_scores_general_score],  // score_id 35
-			 				    0
-							)
-							var boost = MAX(metadata_ai_scores[boost_expo])
-							var post_boost_val 	= pre_boost_val ^ boost // pre boost is a decimal value - if u apply an exponent less than 1 it will be boosted toward 1 yielding a better score. Needed to normalize some scores 
-							var res = post_boost_val * 100 // multiply by 100
+			VAR score_id =
+			    MAX( metadata_ai_scores[_sys_doc_id] )
 			
-							return 	res+0
-			```
+			/* ===========================================================
+			   1) GET RAW METRIC VALUE (may not be numeric)
+			   =========================================================== */
+			VAR raw_val =
+			    SWITCH(
+			        score_id,
+			        "1",  [meas.ai_scores_pred_prospecting],
+			        "2",  [meas.ai_scores_pred_new_logo_selling],
+			        "3",  [meas.ai_scores_pred_post_sales_support],
+			        "4",  [meas.ai_scores_pred_existing_customer_selling],
+			        "5",  [meas.ai_scores_success_factor_analysis],
+			        "6",  [meas.ai_scores_potential_acv],
+			        "7",  [meas.ai_scores_list_price],
+			        "8",  [meas.ai_scores_line_items_products],
+			        "9",  [meas.ai_scores_opps_history],
+			        "10", [meas.ai_scores_accts_industry],
+			        "11", [meas.ai_scores_accts_leadsource],
+			        "12", [meas.ai_scores_leads_industry],
+			        "13", [meas.ai_scores_leads_leadsource],
+			        "14", [meas.ai_scores_opps_industry],
+			        "15", [meas.ai_scores_opps_leadsource],
+			        "16", [meas.ai_scores_ssr_industry],
+			        "17", [meas.ai_scores_ssr_leadsource],
+			        "18", [meas.ai_scores_general_score],
+			        "19", [meas.ai_scores_ci_act_capt_lvl],
+			        "20", [meas.ai_scores_ci_act_capt_lvl_conf],
+			        "21", [meas.ai_scores_ci_time_alloc],
+			        "22", [meas.ai_scores_adj_duration],
+			        "23", [meas.ai_scores_ci_closing_ability],
+			        "24", [meas.ai_scores_ci_discovery_skill],
+			        "25", [meas.ai_scores_ci_engagement_ability],
+			        "26", [meas.ai_scores_ci_work_effort],
+			        "27", [meas.ai_scores_ci_deal_maxing],
+			        "28", [meas.ai_scores_performance_tiers],
+			        "29", [meas.ai_scores_ramping],
+			        "30", [meas.ai_scores_ci_time_management],
+			        "31", [meas.ai_scores_vi],
+			        "32", [meas.ai_scores_rep_org_calibration],
+			        "33", [meas.ai_scores_booking_calibration],
+			        "34", [meas.ai_scores_revenue_calibration],
+			        "35", [meas.ai_scores_general_score],
+			        BLANK()
+			    )
+			
+			/* ===========================================================
+			   2) ENSURE RAW VALUE IS NUMERIC (ELIMINATE TEXT/NaN)
+			   =========================================================== */
+			VAR pre_boost_val =
+			    VAR n = VALUE(raw_val)
+			    RETURN IF(ISNUMBER(n), n, 0)
+			
+			/* ===========================================================
+			   3) READ BOOST EXPONENT (may also be non-numeric!)
+			   =========================================================== */
+			VAR boost_raw = MAX(metadata_ai_scores[boost_expo])
+			VAR boost = IF(ISNUMBER(boost_raw), boost_raw, 1)
+			
+			/* ===========================================================
+			   4) APPLY BOOST SAFELY (avoid fractional exponent on <=0)
+			   =========================================================== */
+			VAR boost_is_fraction = boost <> INT(boost)
+			VAR safe_post_boost_val =
+			    IF(
+			        pre_boost_val <= 0 && boost_is_fraction,
+			        pre_boost_val,
+			        POWER(ABS(pre_boost_val), boost)
+			    )
+			
+			/* ===========================================================
+			   5) SCALE TO 0–100
+			   =========================================================== */
+			VAR result_score = safe_post_boost_val * 100
+			
+			RETURN result_score + 0
 		formatString: 0
 		lineageTag: a0c3cd02-2e23-4742-8929-8b59cae71b90
 
@@ -1269,20 +1308,29 @@ table metadata_ai_scores
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.ai_scores_rep_org_calibration_factor2_value' = ```
+	measure 'meas.ai_scores_rep_org_calibration_factor2_value' =
 			
-			var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC))       
-			var _total_users = MAXX(latest_table,companies_history[users_sales])   + 0       
-			          
-			var users_non_match_hr_id_won_deals = MAXX(latest_table, companies_history[users_non_match_hr_id_won_deals])+ 0        
-			var users_non_match_hr_id_pipeline = MAXX(latest_table, companies_history[users_non_match_hr_id_pipeline]) + 0
+			VAR latest_table =
+			    CALCULATETABLE(
+			        TOPN(1, companies_history, companies_history[_sys_processed_as_of], DESC),
+			        ALL(companies_history)       -- Remove external filters
+			    )
 			
+			VAR _hr_file              = MAXX(latest_table, companies_history[users_hr_file])
+			VAR _total_users          = MAXX(latest_table, companies_history[users_sales])
+			VAR _non_match_won        = MAXX(latest_table, companies_history[users_non_match_hr_id_won_deals])
+			VAR _non_match_pipe       = MAXX(latest_table, companies_history[users_non_match_hr_id_pipeline])
 			
-			var _total_non_match_users_with_act_ratio = 1- DIVIDE( users_non_match_hr_id_won_deals + users_non_match_hr_id_pipeline , (_total_users * 2 ))
+			VAR _bad_users = _non_match_won + _non_match_pipe
 			
-			RETURN  _total_non_match_users_with_act_ratio
-			
-			```
+			RETURN
+			IF(
+			    _hr_file = 0 || ISBLANK(_hr_file),
+			    BLANK(),   -- no HR file -> ignore this factor
+			    VAR _safe_total = MAX(_total_users, 1)    -- avoid divide-by-zero
+			    VAR score = 1 - DIVIDE(_bad_users, _safe_total * 2, 0)
+			    RETURN MIN(MAX(score, 0), 1)  -- clamp 0–1
+			)
 		formatString: 0
 		displayFolder: _factor2_value
 		lineageTag: 6c5c7bdc-4060-4389-8523-828fd2b65c3a

@@ -1,0 +1,91 @@
+table metadata_performance_metrics_slicer
+	lineageTag: f205912c-0ca6-4ad7-abe9-94137ab2dcb2
+
+	column sys_doc_id
+		lineageTag: 8f05e006-07f8-49d8-9a90-b7e7c798e0ed
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [sys_doc_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		lineageTag: aa29c0ab-4cd3-4a0d-9e86-0d8c32e8cbc3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [category]
+
+		annotation SummarizationSetBy = Automatic
+
+	column label
+		lineageTag: 56f3169f-b447-4740-95d7-82a559f76675
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [label]
+
+		annotation SummarizationSetBy = Automatic
+
+	column sort
+		lineageTag: 7692068c-c0c2-4d72-9b25-47bf95770b4f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_header =
+			
+			IF(
+			    metadata_performance_metrics_slicer[sys_doc_id] = BLANK(),
+			    TRUE(),
+			    FALSE()
+			)
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 9e98e9a4-c240-4069-b4e4-bde5af080824
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column display_label =
+			
+			IF(
+			    metadata_performance_metrics_slicer[is_header],
+			    metadata_performance_metrics_slicer[label],
+			    "    " & metadata_performance_metrics_slicer[label]
+			)
+		lineageTag: 66efbbe1-b1df-4b81-acf6-bbf48d985018
+		summarizeBy: none
+		sortByColumn: sort
+
+		annotation SummarizationSetBy = Automatic
+
+	partition metadata_performance_metrics_slicer = calculated
+		mode: import
+		source = ```
+				
+				VAR T = 
+				    SELECTCOLUMNS(
+				        metadata_performance_metrics,
+				        "sys_doc_id", metadata_performance_metrics[sys_doc_id],
+				        "category", metadata_performance_metrics[metric_group],
+				        "label", metadata_performance_metrics[metric_name],
+				        "sort", metadata_performance_metrics[sort_order]
+				    )
+				
+				VAR Categories =
+				    DISTINCT(
+				        SELECTCOLUMNS(
+				            metadata_performance_metrics,
+				            "sys_doc_id", BLANK(),
+				            "category", metadata_performance_metrics[metric_group],
+				            "label", metadata_performance_metrics[metric_group],
+				            "sort", metadata_performance_metrics[metric_group] & "000"
+				        )
+				    )
+				
+				RETURN
+				    UNION(T, Categories)
+				```
+
+	annotation PBI_Id = 752aca69a3224dc398585a872c69bccc
+
