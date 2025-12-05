@@ -139,27 +139,6 @@ table act_time_alloc_summary
 		displayFolder: _tl_analysis
 		lineageTag: ad57e66a-3b39-4ea3-b2f6-0b6ed7e07337
 
-	measure 'meas.act_time_alloc_hours_weekly_test' =
-			
-			var _cap_dure = [meas.act_time_alloc_captured_durations_h]              // get the captured durations hrs
-			var adj_factor = AVERAGE(act_time_alloc_summary[act_capt_lvl_adjustment])               // get the adjustment factor
-			var prep_factor = AVERAGE(act_time_alloc_summary[prep_adjustment])                      // get the prep factor
-			var _total_duration = (_cap_dure*adj_factor*prep_factor)                                // calculate the total duration
-			
-			
-			var _min_date = CALCULATE(MIN(act_time_alloc_summary[_sys_filter_start_date]))
-			var _max_date = CALCULATE(MAX(act_time_alloc_summary[_sys_filter_end_date]))
-			var week_count = DATEDIFF(_min_date,_max_date,WEEK)             // count of week
-			
-			var _reps_w_ta = [meas.act_time_alloc_reps_w_act_capt_level]        // get the reps with time allocation
-			var res = DIVIDE(_total_duration, (week_count * _reps_w_ta) )
-			RETURN
-			res
-		displayFolder: _tl_analysis
-		lineageTag: c04f4aa8-43c4-4305-b135-3d99b59e3891
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	column sort
 		formatString: 0
 		lineageTag: 4f986b40-1642-4f04-9d7c-12a316a62281
