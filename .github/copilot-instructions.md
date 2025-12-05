@@ -155,8 +155,10 @@ All customer-facing documentation should:
 
 - **Salesforce**: Scripts sync data from Salesforce.com using sfdx CLI
 - **Power BI Service**: Deployment scripts interact with Power BI workspaces via Power BI REST API
-- **Azure Data Lake**: Some datasets connect to Azure Data Lake Storage
-- **Database Servers**: Scripts support both SQL Server and PostgreSQL
+- **Azure Data Lake**: Two datasets specifically connect to Azure Data Lake Storage:
+  - `Dataset - Azure Data Lake - Automatic Data Enhancement.pbix`: Contains automatic data enhancement metrics and insights
+  - `Dataset - Azure Data Lake - Sales Performance.pbix`: Contains sales performance data and analytics
+- **Database Servers**: Scripts support both SQL Server and PostgreSQL for data source connections
 
 ## Notes for AI Coding Agents
 
