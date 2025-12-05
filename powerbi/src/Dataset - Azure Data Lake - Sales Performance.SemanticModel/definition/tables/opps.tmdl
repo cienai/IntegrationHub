@@ -949,16 +949,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas._diagnostic_delta_test' =
-			
-			VAR SuccessRate = CALCULATE([meas.ssr_history_success_rate], KEEPFILTERS(opps))
-			VAR ExpectedRate = CALCULATE([meas.ssr_history_success_prob_avg], KEEPFILTERS(opps))
-			RETURN
-			SuccessRate - ExpectedRate
-		lineageTag: cc8997f7-91d5-4b35-a9fb-ba06e2532354
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	measure 'meas.opps_over_discounted_total' =
 			
 			CALCULATE(
@@ -2029,40 +2019,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column trueai_test
-		dataType: string
-		lineageTag: 8235a218-47c3-488d-94b6-f0fc6734df6a
-		summarizeBy: none
-		sourceColumn: trueai_test
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_test_conf
-		dataType: double
-		lineageTag: c26bab90-9678-4bff-a19d-3c932528c7de
-		summarizeBy: sum
-		sourceColumn: trueai_test_conf
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column trueai_test_rule
-		dataType: string
-		lineageTag: bb9e0b1e-408f-4af7-8170-f562456c840b
-		summarizeBy: none
-		sourceColumn: trueai_test_rule
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_test_debug
-		dataType: string
-		lineageTag: b2c5a489-baa2-4e76-9490-72ff85b96c81
-		summarizeBy: none
-		sourceColumn: trueai_test_debug
-
-		annotation SummarizationSetBy = Automatic
-
 	column trueai_close_date_rule
 		dataType: int64
 		formatString: 0
@@ -2600,12 +2556,13 @@ table opps
 				    }),
 				    #"Removed Duplicates" = Table.Distinct(dbTableTyped, {"_sys_doc_id"}),
 				    #"Added Conditional Column" = Table.AddColumn(#"Removed Duplicates", "trueai_sale_type_num", each if [trueai_sale_type] = "New Logo Sale" then 1 else if [trueai_sale_type] = "Existing Customer Sale" then 2 else if [trueai_sale_type] = "Renewal" then 3 else 4),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Added Conditional Column",{{"trueai_sale_type_num", Int64.Type}})
+				    #"Changed Type" = Table.TransformColumnTypes(#"Added Conditional Column",{{"trueai_sale_type_num", Int64.Type}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"trueai_test_debug", "trueai_test", "trueai_test_conf", "trueai_test_rule"})
 				in
-				    #"Changed Type"
+				    #"Removed Columns"
 				```
 
-	annotation PBI_ResultType = Exception
+	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navigation
 
