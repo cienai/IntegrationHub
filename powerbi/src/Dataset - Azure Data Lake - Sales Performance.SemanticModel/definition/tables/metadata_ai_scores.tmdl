@@ -1465,7 +1465,11 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_opps_history_factor2_value' = ```
 			
 			
-			var tbl_won_open_pipeline =calculatetable(open_pipeline, opps[trueai_is_won] = true) // get the won deal history
+			var tbl_won_open_pipeline =FILTER(
+			        open_pipeline, 
+			        open_pipeline[opp_is_won] = TRUE()
+			    ) // get the won deal history
+			    
 			var tbl_summarized = SUMMARIZE(tbl_won_open_pipeline, [crm_opp_id], "unique_trueai_stage_ids", DISTINCTCOUNT(open_pipeline[trueai_stage_id])) // get distinct count
 			var count_sum_tbl = COUNTROWS(tbl_summarized) 
 			var the_20_pct_ordinal = ROUND(count_sum_tbl * 0.8,0) // get the top 20th% item
@@ -1473,6 +1477,9 @@ table metadata_ai_scores
 			var top_stage_count = MAXX(top_tbl_summarized, [unique_trueai_stage_ids]) // get teh avg stages
 			var res = MAX(top_stage_count, 3) // at least 3 since we may have nothing
 			RETURN res
+			
+			
+			
 			```
 		formatString: 0.00
 		displayFolder: _factor2_value
