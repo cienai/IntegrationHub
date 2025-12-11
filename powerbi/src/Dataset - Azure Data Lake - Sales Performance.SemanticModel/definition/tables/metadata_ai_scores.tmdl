@@ -821,12 +821,27 @@ table metadata_ai_scores
 		displayFolder: _factor1_value
 		lineageTag: e12ed20f-f892-45c4-aad8-7bcf1b703801
 
-	measure 'meas.ai_scores_opps_history_factor1_value' =
+	measure 'meas.ai_scores_opps_history_factor1_value' = ```
 			
-			var tbl_won_open_pipeline =calculatetable(open_pipeline, opps[trueai_is_won] = true) // get the won deal history
-			var tbl_summarized = SUMMARIZE(tbl_won_open_pipeline, [crm_opp_id], "unique_trueai_stage_id", DISTINCTCOUNT(open_pipeline[trueai_stage_id])) // get distinct count
-			var res = AVERAGEX(tbl_summarized, [unique_trueai_stage_id]) // get teh avg stages
+			
+			var tbl_won_open_pipeline =
+			FILTER(
+			open_pipeline,
+			open_pipeline[opp_is_won] = TRUE()
+			)
+			
+			var tbl_summarized =
+			SUMMARIZE(
+			tbl_won_open_pipeline,
+			open_pipeline[crm_opp_id],
+			"unique_trueai_stage_id",
+			DISTINCTCOUNT(open_pipeline[trueai_stage_id])
+			)
+			
+			var res = AVERAGEX(tbl_summarized, [unique_trueai_stage_id])
 			RETURN res
+			
+			```
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 88220627-b28d-4a2f-a86e-a370dad00ede
