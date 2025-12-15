@@ -25,6 +25,14 @@ table metadata_performance_metrics
 
 		annotation SummarizationSetBy = Automatic
 
+	column metric_subgroup
+		dataType: string
+		lineageTag: 37f56080-992c-41b8-b831-60b06f8072b8
+		summarizeBy: none
+		sourceColumn: metric_subgroup
+
+		annotation SummarizationSetBy = Automatic
+
 	column metric_prefix
 		dataType: string
 		lineageTag: 55e43ef4-8c66-4d06-88ef-b1f70bbe58cd
@@ -38,6 +46,14 @@ table metadata_performance_metrics
 		lineageTag: e844f6ba-6896-4590-ab74-d01b47eda941
 		summarizeBy: none
 		sourceColumn: metric_format
+
+		annotation SummarizationSetBy = Automatic
+
+	column metric_format_type
+		dataType: string
+		lineageTag: fe6f42f4-5a41-4ea6-8b96-81e2259bb2e4
+		summarizeBy: none
+		sourceColumn: metric_format_type
 
 		annotation SummarizationSetBy = Automatic
 
@@ -58,6 +74,15 @@ table metadata_performance_metrics
 
 		annotation SummarizationSetBy = Automatic
 
+	column is_active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 498ba713-ceec-46cc-b208-3db4cbcc4051
+		summarizeBy: none
+		sourceColumn: is_active
+
+		annotation SummarizationSetBy = Automatic
+
 	column description
 		dataType: string
 		lineageTag: 20c5f49a-6f14-4562-93ca-98f3f12c554a
@@ -74,69 +99,12 @@ table metadata_performance_metrics
 
 		annotation SummarizationSetBy = Automatic
 
-	column _sys_is_active
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: cf30131f-cfe2-4a69-a07e-ba26389359ab
-		summarizeBy: none
-		sourceColumn: _sys_is_active
-
-		annotation SummarizationSetBy = Automatic
-
-	column _sys_modified_on
-		dataType: dateTime
-		formatString: General Date
-		lineageTag: 897386bf-2864-48ec-965f-4f9c8037cee4
-		summarizeBy: none
-		sourceColumn: _sys_modified_on
-
-		variation Variation
-			isDefault
-			relationship: 45b06e23-f712-4fc4-a619-13c0faa3f374
-			defaultHierarchy: LocalDateTable_ca1343be-9e50-4f99-9bb9-5a612386ee2f.'Date Hierarchy'
-
-		annotation SummarizationSetBy = Automatic
-
-	column metric_prio
-		dataType: string
-		lineageTag: 765b1b82-e6dd-466d-8b59-29d9c09784d4
-		summarizeBy: none
-		sourceColumn: metric_prio
-
-		annotation SummarizationSetBy = Automatic
-
-	column metric_category
-		dataType: string
-		lineageTag: be132760-29a8-4fe8-8d0c-c4fe1125a70f
-		summarizeBy: none
-		sourceColumn: metric_category
-
-		annotation SummarizationSetBy = Automatic
-
-	column notes
-		dataType: string
-		lineageTag: aed8b62e-e7c1-4a82-b41b-98a18d752d3d
-		summarizeBy: none
-		sourceColumn: notes
-
-		annotation SummarizationSetBy = Automatic
-
-	column peer_measure_ref
-		dataType: string
-		lineageTag: c3eb0a2c-3ca4-421b-9db4-bc205a55aabd
-		summarizeBy: none
-		sourceColumn: peer_measure_ref
-
-		annotation SummarizationSetBy = Automatic
-
 	partition metadata_performance_metrics = m
 		mode: import
 		source =
 				let
-				    Source = GoogleSheets.Contents("https://docs.google.com/spreadsheets/d/1jjClrTUZRPauc3RvtMsKcaJtVV5lUKGvlWYevVqG96o/edit?gid=0#gid=0"),
-				    Sheet1_Table = Source{[name="Sheet1",ItemKind="Table"]}[Data],
-				    #"Promoted Headers" = Table.PromoteHeaders(Sheet1_Table, [PromoteAllScalars=true]),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"sys_doc_id", type text}, {"metric_name", type text}, {"metric_group", type text}, {"metric_category", type text}, {"description", type text}, {"metric_prefix", type text}, {"metric_format", type text}, {"notes", type text}, {"measure_ref", type text}, {"_sys_is_active", type logical}, {"metric_sort", type text}, {"sort_order", Int64.Type}, {"_sys_modified_on", type datetime}, {"metric_prio", type text}})
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("rZX7T9swEMf/lagbEpOg65KWx49pqQQShCrlsQlQ5CVHG5HYke2Uddofv3MebjriFhhSpCT2PT65++Z8d9cRJOl96+x1rpgkiTVk7CmmM2HdMmq5qezizpQkIKwJ8EfGU0JDwLUbkuTqjtfnT3s9vI1yzoGGS3xMgYiuEDyYx0IyvgyeGQ1IKnGryORfj0vXqXs+nv7p9RDgYa9EsXF5DWLEcioNFPUeXiWEl6fA49DEEFb2djuFrSkcXJ4wCVTGWBR3dPPuMkieA4mDrA4WkHCBe047gaMJ+rh8WqJbtzG1fCLB2t35YgCpTcp4vW6vt6M+AXiIackMWisS04CXPv12nL7GGeDyZZaJ/2qHVBILWJbpRgza8w6KvFmcFcqcxBkkMYVaj/r9AiRGF2+WY1YFaNXk5GwyPj/zxitZKg67+H6glk4+zcMQhKir3gL1np4wzLHiE2WOuku2EdTWoE6TpW5IC9xbfp10lsoVVN07x0jjaBqlK3cx61rrtXNnqOWILMWXdriTHL84ZlTzWfcdZX7feQm6XjGymAXKMkBti6rIfSNoqW8SykJnbijjRSyXumx64Q1lk0/zJBIBSdSfLnWx1jXmjq7Obs6ufqw0phjsZspxSuJEfAwEqFiG4ddEsTWKs54YpBrHHwOTltEMMmriOBqn39CEdcpybmB5oZuuUs6ctwqnqfCocgzmRei+kalUDIdFoRgPpOXBszXMBYoPh4E+uXY9b6jE7cMCaA7WkAN5itgzLbzQI/6tnryheWKpOUnpz9Yh5Y9vxt51Y0YpItXYEWdC7E8hWR3lWym+F/abQUIVN8CToB6atonH1jyqsyeYbMZJBNtwLuUcuHIo3jaQRHXECsQxgTgapF/kpPBMtlalMqufNqPw0rgC6ZtAVppRx51LaY4cPoQYEUmsGmPX9X2TZLS1CuD7m7EI5xXSwIQ00EgHde2/XtMIHlHG0WtbVd836TeqSA5MJAea5FCFpLB/Fadb1eIxut+sCfopt80wDM8HiVYV0qEJ6VAjHeHG+FdGqFCDZwuTNvzneQMR1GYV0pEJ6UgjHTfVYF0wKufJsjF3Ll4noottIkq1iI5NUMedh4e/", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [sys_doc_id = _t, metric_name = _t, metric_group = _t, metric_subgroup = _t, metric_prefix = _t, metric_format = _t, metric_format_type = _t, measure_ref = _t, sort_order = _t, is_active = _t, description = _t, metric_sort = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"sys_doc_id", type text}, {"metric_name", type text}, {"metric_group", type text}, {"metric_subgroup", type text}, {"metric_prefix", type text}, {"metric_format", type text}, {"metric_format_type", type text}, {"measure_ref", type text}, {"sort_order", Int64.Type}, {"is_active", type logical}, {"description", type text}, {"metric_sort", type text}})
 				in
 				    #"Changed Type"
 

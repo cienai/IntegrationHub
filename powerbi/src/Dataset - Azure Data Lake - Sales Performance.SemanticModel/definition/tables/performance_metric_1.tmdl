@@ -1554,9 +1554,6 @@ table performance_metric_1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.slicer_placeholder' = SELECTEDVALUE( metadata_performance_metrics_slicer[sys_doc_id] )
-		lineageTag: dc634891-d706-4118-b640-36637669037f
-
 	measure 'meas._debug_is_group_applied' =
 			
 			CALCULATE(
@@ -1565,6 +1562,71 @@ table performance_metric_1
 			)
 		formatString: 0
 		lineageTag: d369502c-936b-4414-92bb-c1501e6dd5d2
+
+	measure 'meas.slicer_placeholder' = SELECTEDVALUE( metadata_performance_metrics_slicer[sys_doc_id] )
+		lineageTag: dc634891-d706-4118-b640-36637669037f
+
+	measure 'meas.performance_metric_value_secondary' =
+			
+			VAR _id =
+			    SELECTEDVALUE( metadata_performance_metrics_secondary[sys_doc_id] )
+			
+			VAR _measureToReturn =
+			    SWITCH(
+			        TRUE(),
+			
+			        /* ============================
+			           :pushpin: Revenue Type Metrics
+			           ============================ */
+			        _id = "rev01", [meas.opp_nnb_amt],
+			        _id = "rev02", [meas.opp_cross_sale_amt],
+			        _id = "rev03", [meas.opp_downgrade_amt],
+			        _id = "rev04", [meas.opp_renewal_amt],
+			        _id = "rev05", [meas.opp_arr_amt],
+			        _id = "rev06", [meas.opp_nd_amt],
+			        _id = "rev07", [meas.opp_one_time_amt],
+			        _id = "rev08", [meas.opp_expansion_amt],
+			        _id = "rev09", [meas.opp_mrr_amt],
+			
+			        /* ============================
+			           :pushpin: Existing Sales Metrics
+			           ============================ */
+			        _id = "sal01", [meas.ssr_history_won_amt],
+			        _id = "sal02", [meas.total_opps_count],
+			        _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			        _id = "sal04", [meas.ssr_history_win_rate],
+			        _id = "sal05", [meas.total_opps_count],
+			
+			        /* ============================
+			           :pushpin: Pipeline Metrics
+			           ============================ */
+			        _id = "pip01", [meas.pipeline_amt],
+			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			
+			        /* ============================
+			           :pushpin: Activity Metrics
+			           ============================ */
+			        _id = "act01", [meas.stkhlds_all_act_count],
+			        _id = "act02", [meas.stkhlds_all_act_email_count],
+			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			        _id = "act04", [meas.ssr_history_duration_hrs],
+			
+			        /* ============================
+			           :octagonal_sign: Default
+			           ============================ */
+			        BLANK()
+			    )
+			
+			RETURN
+			IF(
+			    ISBLANK(_measureToReturn),
+			    BLANK(),
+			    _measureToReturn   -- :brain: NO CALCULATE HERE (keeps row context intact)
+			)
+		lineageTag: 51123fb2-ea43-45b9-b92a-1f943b3cd12d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column _sys_doc_id
 		dataType: string

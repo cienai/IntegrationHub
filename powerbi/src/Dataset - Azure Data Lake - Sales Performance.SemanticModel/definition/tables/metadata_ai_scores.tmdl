@@ -1377,6 +1377,48 @@ table metadata_ai_scores
 		displayFolder: _factor2_value
 		lineageTag: fe0ca8bb-d25a-4122-958a-cd48c5152bbd
 
+	measure 'meas.ai_scores_rep_org_calibration_test' = ```
+			
+			var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC))       // grt the most latest row
+			var _total_users = MAXX(latest_table,companies_history[users])          // total users
+			
+			var users_match_hr_id = MAXX(latest_table, [users_match_hr_id])         // total matched reps
+			var users_hr_file = MAXX(latest_table, companies_history[users_hr_file])           // reps in hr file
+			
+			var users_non_match_hr_id_won_deals = MAXX(latest_table, companies_history[users_non_match_hr_id_won_deals])        // non match won deals reps
+			var users_non_match_hr_id_pipeline = MAXX(latest_table, companies_history[users_non_match_hr_id_pipeline])          // non match pipeline gen reps
+			var users_non_match_hr_id_leads = MAXX(latest_table, companies_history[users_non_match_hr_id_leads])          // non match lead gen reps count
+			var users_match_hr_id_nd_role = MAXX(latest_table, companies_history[users_match_hr_id_nd_role])                  // non match reps with role
+			var users_match_hr_id_nd_group = 0
+			
+			var matched_reps_score = DIVIDE(users_match_hr_id,users_hr_file,0)
+			var won_deals_score = (1 - DIVIDE(users_non_match_hr_id_won_deals, _total_users, 0))
+			var pipeline_gen_score = (1 - DIVIDE(users_non_match_hr_id_pipeline, _total_users, 0))
+			var lead_gen_score = (1 - DIVIDE(users_non_match_hr_id_leads, _total_users, 0))               //raw score calculation for each
+			var reps_w_role_score = (1 - DIVIDE(users_match_hr_id_nd_role,users_hr_file,0))
+			//var reps_w_group_ratio = DIVIDE(reps_group,_hr_file_users,0)
+			
+			VAR Row1 = ROW ( "Value", matched_reps_score, "Weight", 3 )
+			VAR Row2 = ROW ( "Value", won_deals_score, "Weight", 2 )
+			VAR Row3 = ROW ( "Value", pipeline_gen_score, "Weight", 1 )          //raw score and weight  added in the table  for each reps count
+			VAR Row4 = ROW ( "Value", lead_gen_score, "Weight", 1 )
+			VAR Row5 = ROW ( "Value", reps_w_role_score, "Weight", 2 )
+			VAR temp_tbl =
+			    UNION ( Row1, Row2, Row3, Row4, Row5 )          //creating the table
+			
+			var _adj_calib = SUMX(temp_tbl, [Value]*[Weight])           // get the adjusted raw score
+			var _importance = SUMX(temp_tbl, [Weight])                  // sum of the total weight
+			var raw_score = DIVIDE(_adj_calib, _importance,0)                 // get the score
+			
+			var boost_expo = 0.9            // we use this to get the closer one value
+			var score = raw_score^boost_expo     // boosting the actual 
+			var res = MIN(MAX(ROUND(score*100,0),0),100)
+			RETURN
+			matched_reps_score
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 6e7ee0ed-34bf-446a-9ffe-e98ccb212335
+
 	measure 'meas.ai_scores_sales_process' = ```
 			
 			var _count = CALCULATE(count(ssr_history[_sys_doc_id]) )
@@ -1505,48 +1547,6 @@ table metadata_ai_scores
 		lineageTag: 8989505c-ff92-4181-ba3d-07b1e14dd582
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure 'meas.ai_scores_rep_org_calibration_test' = ```
-			
-			var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC))       // grt the most latest row
-			var _total_users = MAXX(latest_table,companies_history[users])          // total users
-			
-			var users_match_hr_id = MAXX(latest_table, [users_match_hr_id])         // total matched reps
-			var users_hr_file = MAXX(latest_table, companies_history[users_hr_file])           // reps in hr file
-			
-			var users_non_match_hr_id_won_deals = MAXX(latest_table, companies_history[users_non_match_hr_id_won_deals])        // non match won deals reps
-			var users_non_match_hr_id_pipeline = MAXX(latest_table, companies_history[users_non_match_hr_id_pipeline])          // non match pipeline gen reps
-			var users_non_match_hr_id_leads = MAXX(latest_table, companies_history[users_non_match_hr_id_leads])          // non match lead gen reps count
-			var users_match_hr_id_nd_role = MAXX(latest_table, companies_history[users_match_hr_id_nd_role])                  // non match reps with role
-			var users_match_hr_id_nd_group = 0
-			
-			var matched_reps_score = DIVIDE(users_match_hr_id,users_hr_file,0)
-			var won_deals_score = (1 - DIVIDE(users_non_match_hr_id_won_deals, _total_users, 0))
-			var pipeline_gen_score = (1 - DIVIDE(users_non_match_hr_id_pipeline, _total_users, 0))
-			var lead_gen_score = (1 - DIVIDE(users_non_match_hr_id_leads, _total_users, 0))               //raw score calculation for each
-			var reps_w_role_score = (1 - DIVIDE(users_match_hr_id_nd_role,users_hr_file,0))
-			//var reps_w_group_ratio = DIVIDE(reps_group,_hr_file_users,0)
-			
-			VAR Row1 = ROW ( "Value", matched_reps_score, "Weight", 3 )
-			VAR Row2 = ROW ( "Value", won_deals_score, "Weight", 2 )
-			VAR Row3 = ROW ( "Value", pipeline_gen_score, "Weight", 1 )          //raw score and weight  added in the table  for each reps count
-			VAR Row4 = ROW ( "Value", lead_gen_score, "Weight", 1 )
-			VAR Row5 = ROW ( "Value", reps_w_role_score, "Weight", 2 )
-			VAR temp_tbl =
-			    UNION ( Row1, Row2, Row3, Row4, Row5 )          //creating the table
-			
-			var _adj_calib = SUMX(temp_tbl, [Value]*[Weight])           // get the adjusted raw score
-			var _importance = SUMX(temp_tbl, [Weight])                  // sum of the total weight
-			var raw_score = DIVIDE(_adj_calib, _importance,0)                 // get the score
-			
-			var boost_expo = 0.9            // we use this to get the closer one value
-			var score = raw_score^boost_expo     // boosting the actual 
-			var res = MIN(MAX(ROUND(score*100,0),0),100)
-			RETURN
-			matched_reps_score
-			```
-		formatString: 0.00%;-0.00%;0.00%
-		lineageTag: 6e7ee0ed-34bf-446a-9ffe-e98ccb212335
 
 	column _sys_doc_id
 		dataType: string
