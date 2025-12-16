@@ -8685,6 +8685,22 @@ table ssr_history
 		displayFolder: _opps_detail
 		lineageTag: d9858295-bb0b-49ea-9a18-3dd6cd87b4e5
 
+	measure 'meas.test_done.average_duration_hrs' = ROUND(AVERAGE(ssr_history[stkhlds_all_adj_dur])/3600,0)
+		displayFolder: _opps_detail
+		lineageTag: f70f9a9c-5f8c-49c4-9c83-c6d695328589
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.ssr_history_all_social_media_engagement_rate-test' =
+			
+			var acts =  [meas.ssr_history_all_meeting_avg_count]
+			var eng_acts =  [meas.ssr_history_all_meeting_avg_eng_count]
+			var res = DIVIDE(eng_acts, acts, 0)
+			RETURN
+			acts &"--" & eng_acts & "--" & res
+		displayFolder: _activity_analysis
+		lineageTag: 42544446-fb91-4004-81b3-b3137a813f7e
+
 	measure 'meas.ssr_history_all_meeting_avg_eng_count' = ```
 			
 			CALCULATE(AVERAGE(ssr_history[stkhlds_all_act_type_meeting_eng_count])) 
@@ -12808,6 +12824,13 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	measure 'meas._debug_selected_metric' =
+			
+			SELECTEDVALUE( metadata_performance_metrics_old[sys_doc_id], "NO SELECTION" )
+		lineageTag: c8216aa7-dbf6-413d-b072-ff3e2d7fcbb8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	measure 'meas.dynamic_metric_title' =
 			
 			VAR _name =
@@ -12820,29 +12843,6 @@ table ssr_history
 			    _name
 			)
 		lineageTag: 3f9038ee-49d8-4937-ae88-4f486f9e27b3
-
-	measure 'meas.test_done.average_duration_hrs' = ROUND(AVERAGE(ssr_history[stkhlds_all_adj_dur])/3600,0)
-		displayFolder: _opps_detail
-		lineageTag: f70f9a9c-5f8c-49c4-9c83-c6d695328589
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure 'meas.ssr_history_all_social_media_engagement_rate-test' =
-			
-			var acts =  [meas.ssr_history_all_meeting_avg_count]
-			var eng_acts =  [meas.ssr_history_all_meeting_avg_eng_count]
-			var res = DIVIDE(eng_acts, acts, 0)
-			RETURN
-			acts &"--" & eng_acts & "--" & res
-		displayFolder: _activity_analysis
-		lineageTag: 42544446-fb91-4004-81b3-b3137a813f7e
-
-	measure 'meas._debug_selected_metric' =
-			
-			SELECTEDVALUE( metadata_performance_metrics_old[sys_doc_id], "NO SELECTION" )
-		lineageTag: c8216aa7-dbf6-413d-b072-ff3e2d7fcbb8
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'meas.ssr_history_sum_opp_renewal_amt' = SUM(ssr_history[opp_renewal_amt])
 		displayFolder: _rev_analysis

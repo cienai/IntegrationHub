@@ -1213,6 +1213,28 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: f86e3bdf-05a5-4e3a-8fe9-7889136e011e
 
+	measure 'meas.trueai_pace_score_test' =
+			
+			
+			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
+			var _capped_avg = IF(_avg > 5, 5, _avg)  // Cap the value at 5
+			var res = SWITCH(
+			    _capped_avg,
+			    0, "0 - Static",
+			    1, "1 - Slow-Moving",           // creating switch to display the pace
+			    2, "2 - Progressing",
+			    3, "3 - Advancing",
+			    4, "4 - Accelerated",
+			    5, "5 - Rapid"
+			)
+			
+			RETURN
+			res
+		displayFolder: _open_opps_pipeline
+		lineageTag: 227888e3-aabf-42c0-9433-a0c33babd0aa
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	measure 'meas.open_pipeline_stage_sort_index' = ```
 			
 			var avg_seq = CALCULATE(AVERAGE(open_pipeline[trueai_step_sequence])) // lower avg indidctes earlier stage
@@ -1461,28 +1483,6 @@ table open_pipeline
 			RETURN
 			    _cond
 		lineageTag: c5ec0e68-cb24-4f7f-afa1-0d61eb1d2a5c
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure 'meas.trueai_pace_score_test' =
-			
-			
-			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
-			var _capped_avg = IF(_avg > 5, 5, _avg)  // Cap the value at 5
-			var res = SWITCH(
-			    _capped_avg,
-			    0, "0 - Static",
-			    1, "1 - Slow-Moving",           // creating switch to display the pace
-			    2, "2 - Progressing",
-			    3, "3 - Advancing",
-			    4, "4 - Accelerated",
-			    5, "5 - Rapid"
-			)
-			
-			RETURN
-			res
-		displayFolder: _open_opps_pipeline
-		lineageTag: 227888e3-aabf-42c0-9433-a0c33babd0aa
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
