@@ -949,6 +949,16 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	measure 'meas._diagnostic_delta_test' =
+			
+			VAR SuccessRate = CALCULATE([meas.ssr_history_success_rate], KEEPFILTERS(opps))
+			VAR ExpectedRate = CALCULATE([meas.ssr_history_success_prob_avg], KEEPFILTERS(opps))
+			RETURN
+			SuccessRate - ExpectedRate
+		lineageTag: cc8997f7-91d5-4b35-a9fb-ba06e2532354
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	measure 'meas.opps_over_discounted_total' =
 			
 			CALCULATE(
@@ -1165,13 +1175,10 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas._diagnostic_delta_test' =
+	measure 'meas.opps_non_nnb_amt' =
 			
-			VAR SuccessRate = CALCULATE([meas.ssr_history_success_rate], KEEPFILTERS(opps))
-			VAR ExpectedRate = CALCULATE([meas.ssr_history_success_prob_avg], KEEPFILTERS(opps))
-			RETURN
-			SuccessRate - ExpectedRate
-		lineageTag: cc8997f7-91d5-4b35-a9fb-ba06e2532354
+			[meas.opps_booking_amt] - [meas.opp_nnb_amt]
+		lineageTag: ede2a06f-8f34-430d-889a-82b9010afa15
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -2029,6 +2036,40 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	column trueai_test
+		dataType: string
+		lineageTag: 8235a218-47c3-488d-94b6-f0fc6734df6a
+		summarizeBy: none
+		sourceColumn: trueai_test
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_test_conf
+		dataType: double
+		lineageTag: c26bab90-9678-4bff-a19d-3c932528c7de
+		summarizeBy: sum
+		sourceColumn: trueai_test_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_test_rule
+		dataType: string
+		lineageTag: bb9e0b1e-408f-4af7-8170-f562456c840b
+		summarizeBy: none
+		sourceColumn: trueai_test_rule
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_test_debug
+		dataType: string
+		lineageTag: b2c5a489-baa2-4e76-9490-72ff85b96c81
+		summarizeBy: none
+		sourceColumn: trueai_test_debug
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_close_date_rule
 		dataType: int64
 		formatString: 0
@@ -2423,40 +2464,6 @@ table opps
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: d7a4f08b-42aa-4f41-8ae6-082461941af8
 		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_test
-		dataType: string
-		lineageTag: 8235a218-47c3-488d-94b6-f0fc6734df6a
-		summarizeBy: none
-		sourceColumn: trueai_test
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_test_conf
-		dataType: double
-		lineageTag: c26bab90-9678-4bff-a19d-3c932528c7de
-		summarizeBy: sum
-		sourceColumn: trueai_test_conf
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column trueai_test_rule
-		dataType: string
-		lineageTag: bb9e0b1e-408f-4af7-8170-f562456c840b
-		summarizeBy: none
-		sourceColumn: trueai_test_rule
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_test_debug
-		dataType: string
-		lineageTag: b2c5a489-baa2-4e76-9490-72ff85b96c81
-		summarizeBy: none
-		sourceColumn: trueai_test_debug
 
 		annotation SummarizationSetBy = Automatic
 
