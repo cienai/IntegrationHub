@@ -176,7 +176,7 @@ table performance_metric_1
 			
 			var _total = [meas.ssr_history_won_amt]         // get the won amt
 			var reps_count = [meas.data_logs_user_count_all]            // total rep count
-			var res = DIVIDE(_total, reps_count)            // GET THE avg by reps
+			var res = DIVIDE( _total, reps_count)            // GET THE avg by reps
 			RETURN
 			res
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -1688,6 +1688,496 @@ table performance_metric_1
 			    _measureToReturn   -- :brain: NO CALCULATE HERE (keeps row context intact)
 			)
 		lineageTag: 3828ecc7-4fa9-468f-a709-05e58ebde70f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.avg_ssr_hst_won_amt' = ```
+			
+			CALCULATE(AVERAGEX( ssr_history, [meas.ssr_history_won_amt]), ssr_history[opp_won_amt] > 0)
+			
+			
+			// meas.ssr_history_rev_avg_won_amt = CALCULATE(Average(ssr_history[opp_won_amt]), ssr_history[opp_won_amt] > 0 )
+			
+			// 'meas.ssr_history_won_amt' =
+						
+			// 			var res = CALCULATE(
+			// 			    SUM(ssr_history[opp_won_amt])
+			// 			)
+						
+			// 			RETURN
+			// 			res
+			```
+		displayFolder: _average
+		lineageTag: 04997a67-3c50-4426-be67-6d8ad4d5fbda
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_avg' = ```
+			
+						
+			    VAR _id =
+			        SELECTEDVALUE( metadata_performance_metrics[sys_doc_id] )
+			    
+			    VAR _measureToReturn =
+			        SWITCH(
+			            TRUE(),
+			    
+			            /* ============================
+			                📌 Revenue Type Metrics
+			                ============================ */
+			            _id = "rev01", [meas.opp_nnb_amt],
+			            _id = "rev02", [meas.opp_cross_sale_amt],
+			            _id = "rev03", [meas.opp_downgrade_amt],
+			            _id = "rev04", [meas.opp_renewal_amt],
+			            _id = "rev05", [meas.opp_arr_amt],
+			            _id = "rev06", [meas.opp_nd_amt],
+			            _id = "rev07", [meas.opp_one_time_amt],
+			            _id = "rev08", [meas.opp_expansion_amt],
+			            _id = "rev09", [meas.opp_mrr_amt],
+			            _id = "rev10", [meas.opps_non_nnb_amt],
+			    
+			            /* ============================
+			                📌 Existing Sales Metrics
+			                ============================ */
+			            _id = "sal01", [meas.ssr_history_rev_avg_won_amt],
+			            _id = "sal02", [meas.total_opps_count],
+			            _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			            _id = "sal04", [meas.ssr_history_win_rate],
+			            _id = "sal05", [meas.total_opps_count],
+			    
+			            /* ============================
+			                📌 Pipeline Metrics
+			                ============================ */
+			            _id = "pip01", [meas.pipeline_amt],
+			            _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			            _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			    
+			            /* ============================
+			                📌 Activity Metrics
+			                ============================ */
+			            _id = "act01", [meas.stkhlds_all_act_count],
+			            _id = "act02", [meas.stkhlds_all_act_email_count],
+			            _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			            _id = "act04", [meas.ssr_history_duration_hrs],
+			    
+			            /* ============================
+			                🛑 Default
+			                ============================ */
+			            BLANK()
+			        )
+			    
+			    RETURN
+			    IF(
+			        ISBLANK(_measureToReturn),
+			        BLANK(),
+			        _measureToReturn   -- 🧠 NO CALCULATE HERE (keeps row context intact)
+			    )
+			
+			
+			```
+		lineageTag: 2779f423-d006-4068-b1fc-5089fcf728d4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_max' = ```
+			
+						
+			    VAR _id =
+			        SELECTEDVALUE( metadata_performance_metrics[sys_doc_id] )
+			    
+			    VAR _measureToReturn =
+			        SWITCH(
+			            TRUE(),
+			    
+			            /* ============================
+			                📌 Revenue Type Metrics
+			                ============================ */
+			            _id = "rev01", [meas.opp_nnb_amt],
+			            _id = "rev02", [meas.opp_cross_sale_amt],
+			            _id = "rev03", [meas.opp_downgrade_amt],
+			            _id = "rev04", [meas.opp_renewal_amt],
+			            _id = "rev05", [meas.opp_arr_amt],
+			            _id = "rev06", [meas.opp_nd_amt],
+			            _id = "rev07", [meas.opp_one_time_amt],
+			            _id = "rev08", [meas.opp_expansion_amt],
+			            _id = "rev09", [meas.opp_mrr_amt],
+			            _id = "rev10", [meas.opps_non_nnb_amt],
+			    
+			            /* ============================
+			                📌 Existing Sales Metrics
+			                ============================ */
+			            _id = "sal01", [meas.ssr_history_rev_avg_won_amt],
+			            _id = "sal02", [meas.total_opps_count],
+			            _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			            _id = "sal04", [meas.ssr_history_win_rate],
+			            _id = "sal05", [meas.total_opps_count],
+			    
+			            /* ============================
+			                📌 Pipeline Metrics
+			                ============================ */
+			            _id = "pip01", [meas.pipeline_amt],
+			            _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			            _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			    
+			            /* ============================
+			                📌 Activity Metrics
+			                ============================ */
+			            _id = "act01", [meas.stkhlds_all_act_count],
+			            _id = "act02", [meas.stkhlds_all_act_email_count],
+			            _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			            _id = "act04", [meas.ssr_history_duration_hrs],
+			    
+			            /* ============================
+			                🛑 Default
+			                ============================ */
+			            BLANK()
+			        )
+			    
+			    RETURN
+			    IF(
+			        ISBLANK(_measureToReturn),
+			        BLANK(),
+			        _measureToReturn   -- 🧠 NO CALCULATE HERE (keeps row context intact)
+			    )
+			
+			
+			```
+		lineageTag: 33158416-bf01-4d63-bc8b-4e9d8926169e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_min' = ```
+			
+						
+			    VAR _id =
+			        SELECTEDVALUE( metadata_performance_metrics[sys_doc_id] )
+			    
+			    VAR _measureToReturn =
+			        SWITCH(
+			            TRUE(),
+			    
+			            /* ============================
+			                📌 Revenue Type Metrics
+			                ============================ */
+			            _id = "rev01", [meas.opp_nnb_amt],
+			            _id = "rev02", [meas.opp_cross_sale_amt],
+			            _id = "rev03", [meas.opp_downgrade_amt],
+			            _id = "rev04", [meas.opp_renewal_amt],
+			            _id = "rev05", [meas.opp_arr_amt],
+			            _id = "rev06", [meas.opp_nd_amt],
+			            _id = "rev07", [meas.opp_one_time_amt],
+			            _id = "rev08", [meas.opp_expansion_amt],
+			            _id = "rev09", [meas.opp_mrr_amt],
+			            _id = "rev10", [meas.opps_non_nnb_amt],
+			    
+			            /* ============================
+			                📌 Existing Sales Metrics
+			                ============================ */
+			            _id = "sal01", [meas.ssr_history_rev_avg_won_amt],
+			            _id = "sal02", [meas.total_opps_count],
+			            _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			            _id = "sal04", [meas.ssr_history_win_rate],
+			            _id = "sal05", [meas.total_opps_count],
+			    
+			            /* ============================
+			                📌 Pipeline Metrics
+			                ============================ */
+			            _id = "pip01", [meas.pipeline_amt],
+			            _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			            _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			    
+			            /* ============================
+			                📌 Activity Metrics
+			                ============================ */
+			            _id = "act01", [meas.stkhlds_all_act_count],
+			            _id = "act02", [meas.stkhlds_all_act_email_count],
+			            _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			            _id = "act04", [meas.ssr_history_duration_hrs],
+			    
+			            /* ============================
+			                🛑 Default
+			                ============================ */
+			            BLANK()
+			        )
+			    
+			    RETURN
+			    IF(
+			        ISBLANK(_measureToReturn),
+			        BLANK(),
+			        _measureToReturn   -- 🧠 NO CALCULATE HERE (keeps row context intact)
+			    )
+			
+			
+			```
+		lineageTag: b84aec58-d9ed-4d42-9d45-0e7744a13e71
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_median' = ```
+			
+						
+			    VAR _id =
+			        SELECTEDVALUE( metadata_performance_metrics[sys_doc_id] )
+			    
+			    VAR _measureToReturn =
+			        SWITCH(
+			            TRUE(),
+			    
+			            /* ============================
+			                📌 Revenue Type Metrics
+			                ============================ */
+			            _id = "rev01", [meas.opp_nnb_amt],
+			            _id = "rev02", [meas.opp_cross_sale_amt],
+			            _id = "rev03", [meas.opp_downgrade_amt],
+			            _id = "rev04", [meas.opp_renewal_amt],
+			            _id = "rev05", [meas.opp_arr_amt],
+			            _id = "rev06", [meas.opp_nd_amt],
+			            _id = "rev07", [meas.opp_one_time_amt],
+			            _id = "rev08", [meas.opp_expansion_amt],
+			            _id = "rev09", [meas.opp_mrr_amt],
+			            _id = "rev10", [meas.opps_non_nnb_amt],
+			    
+			            /* ============================
+			                📌 Existing Sales Metrics
+			                ============================ */
+			            _id = "sal01", [meas.ssr_history_rev_avg_won_amt],
+			            _id = "sal02", [meas.total_opps_count],
+			            _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			            _id = "sal04", [meas.ssr_history_win_rate],
+			            _id = "sal05", [meas.total_opps_count],
+			    
+			            /* ============================
+			                📌 Pipeline Metrics
+			                ============================ */
+			            _id = "pip01", [meas.pipeline_amt],
+			            _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			            _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			    
+			            /* ============================
+			                📌 Activity Metrics
+			                ============================ */
+			            _id = "act01", [meas.stkhlds_all_act_count],
+			            _id = "act02", [meas.stkhlds_all_act_email_count],
+			            _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			            _id = "act04", [meas.ssr_history_duration_hrs],
+			    
+			            /* ============================
+			                🛑 Default
+			                ============================ */
+			            BLANK()
+			        )
+			    
+			    RETURN
+			    IF(
+			        ISBLANK(_measureToReturn),
+			        BLANK(),
+			        _measureToReturn   -- 🧠 NO CALCULATE HERE (keeps row context intact)
+			    )
+			
+			
+			```
+		lineageTag: e5aaceb6-baad-40e9-8eef-49ea6a791961
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_std_deviation' = ```
+			
+						
+			    VAR _id =
+			        SELECTEDVALUE( metadata_performance_metrics[sys_doc_id] )
+			    
+			    VAR _measureToReturn =
+			        SWITCH(
+			            TRUE(),
+			    
+			            /* ============================
+			                📌 Revenue Type Metrics
+			                ============================ */
+			            _id = "rev01", [meas.opp_nnb_amt],
+			            _id = "rev02", [meas.opp_cross_sale_amt],
+			            _id = "rev03", [meas.opp_downgrade_amt],
+			            _id = "rev04", [meas.opp_renewal_amt],
+			            _id = "rev05", [meas.opp_arr_amt],
+			            _id = "rev06", [meas.opp_nd_amt],
+			            _id = "rev07", [meas.opp_one_time_amt],
+			            _id = "rev08", [meas.opp_expansion_amt],
+			            _id = "rev09", [meas.opp_mrr_amt],
+			            _id = "rev10", [meas.opps_non_nnb_amt],
+			    
+			            /* ============================
+			                📌 Existing Sales Metrics
+			                ============================ */
+			            _id = "sal01", [meas.ssr_history_rev_avg_won_amt],
+			            _id = "sal02", [meas.total_opps_count],
+			            _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			            _id = "sal04", [meas.ssr_history_win_rate],
+			            _id = "sal05", [meas.total_opps_count],
+			    
+			            /* ============================
+			                📌 Pipeline Metrics
+			                ============================ */
+			            _id = "pip01", [meas.pipeline_amt],
+			            _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			            _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			    
+			            /* ============================
+			                📌 Activity Metrics
+			                ============================ */
+			            _id = "act01", [meas.stkhlds_all_act_count],
+			            _id = "act02", [meas.stkhlds_all_act_email_count],
+			            _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			            _id = "act04", [meas.ssr_history_duration_hrs],
+			    
+			            /* ============================
+			                🛑 Default
+			                ============================ */
+			            BLANK()
+			        )
+			    
+			    RETURN
+			    IF(
+			        ISBLANK(_measureToReturn),
+			        BLANK(),
+			        _measureToReturn   -- 🧠 NO CALCULATE HERE (keeps row context intact)
+			    )
+			
+			
+			```
+		lineageTag: 7f27aa38-38c7-41ca-b8c7-2feee75afeaa
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_count' = ```
+			
+						
+			    VAR _id =
+			        SELECTEDVALUE( metadata_performance_metrics[sys_doc_id] )
+			    
+			    VAR _measureToReturn =
+			        SWITCH(
+			            TRUE(),
+			    
+			            /* ============================
+			                📌 Revenue Type Metrics
+			                ============================ */
+			            _id = "rev01", [meas.opp_nnb_amt],
+			            _id = "rev02", [meas.opp_cross_sale_amt],
+			            _id = "rev03", [meas.opp_downgrade_amt],
+			            _id = "rev04", [meas.opp_renewal_amt],
+			            _id = "rev05", [meas.opp_arr_amt],
+			            _id = "rev06", [meas.opp_nd_amt],
+			            _id = "rev07", [meas.opp_one_time_amt],
+			            _id = "rev08", [meas.opp_expansion_amt],
+			            _id = "rev09", [meas.opp_mrr_amt],
+			            _id = "rev10", [meas.opps_non_nnb_amt],
+			    
+			            /* ============================
+			                📌 Existing Sales Metrics
+			                ============================ */
+			            _id = "sal01", [meas.ssr_history_rev_avg_won_amt],
+			            _id = "sal02", [meas.total_opps_count],
+			            _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			            _id = "sal04", [meas.ssr_history_win_rate],
+			            _id = "sal05", [meas.total_opps_count],
+			    
+			            /* ============================
+			                📌 Pipeline Metrics
+			                ============================ */
+			            _id = "pip01", [meas.pipeline_amt],
+			            _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			            _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			    
+			            /* ============================
+			                📌 Activity Metrics
+			                ============================ */
+			            _id = "act01", [meas.stkhlds_all_act_count],
+			            _id = "act02", [meas.stkhlds_all_act_email_count],
+			            _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			            _id = "act04", [meas.ssr_history_duration_hrs],
+			    
+			            /* ============================
+			                🛑 Default
+			                ============================ */
+			            BLANK()
+			        )
+			    
+			    RETURN
+			    IF(
+			        ISBLANK(_measureToReturn),
+			        BLANK(),
+			        _measureToReturn   -- 🧠 NO CALCULATE HERE (keeps row context intact)
+			    )
+			
+			
+			```
+		lineageTag: 26dd96be-da13-4bc7-b34f-2bbcf87ae145
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_sum' = ```
+			
+						
+			    VAR _id =
+			        SELECTEDVALUE( metadata_performance_metrics[sys_doc_id] )
+			    
+			    VAR _measureToReturn =
+			        SWITCH(
+			            TRUE(),
+			    
+			            /* ============================
+			                📌 Revenue Type Metrics
+			                ============================ */
+			            _id = "rev01", [meas.opp_nnb_amt],
+			            _id = "rev02", [meas.opp_cross_sale_amt],
+			            _id = "rev03", [meas.opp_downgrade_amt],
+			            _id = "rev04", [meas.opp_renewal_amt],
+			            _id = "rev05", [meas.opp_arr_amt],
+			            _id = "rev06", [meas.opp_nd_amt],
+			            _id = "rev07", [meas.opp_one_time_amt],
+			            _id = "rev08", [meas.opp_expansion_amt],
+			            _id = "rev09", [meas.opp_mrr_amt],
+			            _id = "rev10", [meas.opps_non_nnb_amt],
+			    
+			            /* ============================
+			                📌 Existing Sales Metrics
+			                ============================ */
+			            _id = "sal01", [meas.ssr_history_rev_avg_won_amt],
+			            _id = "sal02", [meas.total_opps_count],
+			            _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			            _id = "sal04", [meas.ssr_history_win_rate],
+			            _id = "sal05", [meas.total_opps_count],
+			    
+			            /* ============================
+			                📌 Pipeline Metrics
+			                ============================ */
+			            _id = "pip01", [meas.pipeline_amt],
+			            _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			            _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			    
+			            /* ============================
+			                📌 Activity Metrics
+			                ============================ */
+			            _id = "act01", [meas.stkhlds_all_act_count],
+			            _id = "act02", [meas.stkhlds_all_act_email_count],
+			            _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			            _id = "act04", [meas.ssr_history_duration_hrs],
+			    
+			            /* ============================
+			                🛑 Default
+			                ============================ */
+			            BLANK()
+			        )
+			    
+			    RETURN
+			    IF(
+			        ISBLANK(_measureToReturn),
+			        BLANK(),
+			        _measureToReturn   -- 🧠 NO CALCULATE HERE (keeps row context intact)
+			    )
+			
+			
+			```
+		lineageTag: 4cd46dff-fa0c-42b1-af62-8ff080a2f5ac
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
