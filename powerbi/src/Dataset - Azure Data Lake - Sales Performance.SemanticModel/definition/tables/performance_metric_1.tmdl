@@ -1691,77 +1691,19 @@ table performance_metric_1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure test = ```
-			
-			 CALCULATE(MEDIAN(ssr_history[opp_nnb_amt]), opps[trueai_nnb_amt] > 0 )
-			```
-		displayFolder: _average
-		lineageTag: 04997a67-3c50-4426-be67-6d8ad4d5fbda
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	measure 'meas.performance_metric_value_avg' = ```
 			
-			                
-			        VAR _id =
-			            SELECTEDVALUE( metadata_performance_metrics[sys_doc_id] )
-			        
-			        VAR _measureToReturn =
-			            SWITCH(
-			                TRUE(),
-			        
-			                /* ============================
-			                    📌 Revenue Type Metrics
-			                    ============================ */
-			                _id = "rev01",  CALCULATE(AVERAGEX(FILTER(opps, [meas.opp_nnb_amt] > 0), [meas.opp_nnb_amt])),
-			                _id = "rev02",  CALCULATE(AVERAGEX(FILTER(opps, [meas.opp_cross_sale_amt] > 0), [meas.opp_cross_sale_amt])),
-			                _id = "rev03",  CALCULATE(AVERAGEX(FILTER(opps, [meas.opp_downgrade_amt] > 0), [meas.opp_downgrade_amt])),
-			                _id = "rev04",  CALCULATE(AVERAGEX(FILTER(opps, [meas.opp_renewal_amt] > 0), [meas.opp_renewal_amt])),
-			                _id = "rev05",  CALCULATE(AVERAGEX(FILTER(opps, [meas.opp_arr_amt] > 0), [meas.opp_arr_amt])),
-			                _id = "rev06",  CALCULATE(AVERAGEX(FILTER(opps, [meas.opp_nd_amt] > 0), [meas.opp_nd_amt])),
-			                _id = "rev07",  CALCULATE(AVERAGEX(FILTER(opps, [meas.opp_one_time_amt] > 0), [meas.opp_one_time_amt])),
-			                _id = "rev08",  CALCULATE(AVERAGEX(FILTER(opps, [meas.opp_expansion_amt] > 0), [meas.opp_expansion_amt])),
-			                _id = "rev09",  CALCULATE(AVERAGEX(FILTER(opps, [meas.opp_mrr_amt] > 0), [meas.opp_mrr_amt])),
-			                _id = "rev10", CALCULATE(AVERAGEX(FILTER(opps, [meas.opps_non_nnb_amt] > 0), [meas.opps_non_nnb_amt])),
-			        
-			                /* ============================
-			                    📌 Existing Sales Metrics
-			                    ============================ */
-			                _id = "sal01", [meas.ssr_history_rev_avg_won_amt],
-			                _id = "sal02", [meas.total_opps_count],
-			                // _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
-			                _id = "sal03",  CALCULATE(AVERAGEX( open_pipeline, [meas.open_pipeline_sum_days_in_stage] )),
-			                // _id = "sal04", [meas.ssr_history_win_rate],
-			                 // _id = "sal04", CALCULATE( AVERAGEX(ssr_history, [meas.ssr_history_win_rate])), // !!!! Not working, must be updated, iterator is either 0 or 1 % due to filter context
-			                _id = "sal05", [meas.total_opps_count],
-			        
-			                /* ============================
-			                    📌 Pipeline Metrics
-			                    ============================ */
-			                _id = "pip01", [meas.pipeline_amt],
-			                _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
-			                _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
-			        
-			                /* ============================
-			                    📌 Activity Metrics
-			                    ============================ */
-			                _id = "act01", [meas.stkhlds_all_act_count],
-			                _id = "act02", [meas.stkhlds_all_act_email_count],
-			                _id = "act03", [meas.stkhlds_all_act_meeting_count],
-			                _id = "act04", [meas.ssr_history_duration_hrs],
-			        
-			                /* ============================
-			                    🛑 Default
-			                    ============================ */
-			                BLANK()
-			            )
-			        
-			        RETURN
-			        IF(
-			            ISBLANK(_measureToReturn),
-			            BLANK(),
-			            _measureToReturn   -- 🧠 NO CALCULATE HERE (keeps row context intact)
-			        )
+			  
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
+						
+			)
+			var perf_metric_average_per_rep = AVERAGEX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+			
+			RETURN perf_metric_average_per_rep
+			
+			
 			```
 		lineageTag: 2779f423-d006-4068-b1fc-5089fcf728d4
 
@@ -2166,6 +2108,22 @@ table performance_metric_1
 			
 			```
 		lineageTag: 4cd46dff-fa0c-42b1-af62-8ff080a2f5ac
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.avg_test' = ```
+			
+			
+			var tbl = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Measure_Pre_AGG",[meas.performance_metric_value]
+						
+			        )
+			 RETURN AVERAGEX( tbl , [MEASURE_PRE_AGG] )
+			
+			
+			```
+		lineageTag: 69a0eb9f-0cf1-4719-b96d-14e40ba4a2b4
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
