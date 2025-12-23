@@ -1767,64 +1767,14 @@ table performance_metric_1
 	measure 'meas.performance_metric_value_std_deviation' = ```
 			
 						
-			    VAR _id =
-			        SELECTEDVALUE( metadata_performance_metrics[sys_doc_id] )
-			    
-			    VAR _measureToReturn =
-			        SWITCH(
-			            TRUE(),
-			    
-			            /* ============================
-			                📌 Revenue Type Metrics
-			                ============================ */
-			            _id = "rev01", CALCULATE(STDEVX.P(FILTER(opps, [meas.opp_nnb_amt] > 0), [meas.opp_nnb_amt])),
-			            _id = "rev02", CALCULATE(STDEVX.P(FILTER(opps, [meas.opp_cross_sale_amt]  > 0), [meas.opp_cross_sale_amt] )),
-			            _id = "rev03", CALCULATE(STDEVX.P(FILTER(opps, [meas.opp_downgrade_amt]  > 0), [meas.opp_downgrade_amt] )),
-			            _id = "rev04", CALCULATE(STDEVX.P(FILTER(opps, [meas.opp_renewal_amt]  > 0), [meas.opp_renewal_amt] )),
-			            _id = "rev05", CALCULATE(STDEVX.P(FILTER(opps, [meas.opp_arr_amt]  > 0), [meas.opp_arr_amt] )),
-			            _id = "rev06", CALCULATE(STDEVX.P(FILTER(opps, [meas.opp_nd_amt]  > 0), [meas.opp_nd_amt] )),
-			            _id = "rev07", CALCULATE(STDEVX.P(FILTER(opps, [meas.opp_one_time_amt]  > 0), [meas.opp_one_time_amt] )),
-			            _id = "rev08", CALCULATE(STDEVX.P(FILTER(opps, [meas.opp_expansion_amt]  > 0), [meas.opp_expansion_amt] )),
-			            _id = "rev09", CALCULATE(STDEVX.P(FILTER(opps, [meas.opp_mrr_amt]  > 0), [meas.opp_mrr_amt] )),
-			            _id = "rev10", CALCULATE(STDEVX.P(FILTER(opps, [meas.opps_non_nnb_amt] > 0), [meas.opps_non_nnb_amt])),
-			    
-			            /* ============================
-			                📌 Existing Sales Metrics
-			                ============================ */
-			            _id = "sal01", CALCULATE(STDEVX.P(FILTER(ssr_history, [meas.ssr_history_won_amt] > 0), [meas.ssr_history_won_amt])),
-			            _id = "sal02", [meas.total_opps_count],
-			            _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
-			            _id = "sal04", [meas.ssr_history_win_rate],
-			            _id = "sal05", [meas.total_opps_count],
-			    
-			            /* ============================
-			                📌 Pipeline Metrics
-			                ============================ */
-			            _id = "pip01", [meas.pipeline_amt],
-			            _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
-			            _id = "pip04", CALCULATE(STDEVX.P(open_pipeline, [meas.open_pipeline_sum_days_in_stage])),
-			    
-			            /* ============================
-			                📌 Activity Metrics
-			                ============================ */
-			            _id = "act01", [meas.stkhlds_all_act_count],
-			            _id = "act02", [meas.stkhlds_all_act_email_count],
-			            _id = "act03", [meas.stkhlds_all_act_meeting_count],
-			            _id = "act04", [meas.ssr_history_duration_hrs],
-			    
-			            /* ============================
-			                🛑 Default
-			                ============================ */
-			            BLANK()
-			        )
-			    
-			    RETURN
-			    IF(
-			        ISBLANK(_measureToReturn),
-			        BLANK(),
-			        _measureToReturn   -- 🧠 NO CALCULATE HERE (keeps row context intact)
-			    )
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
+						
+			)
+			var perf_metric_average_per_rep = STDEVX.P( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
 			
+			RETURN perf_metric_average_per_rep
 			
 			```
 		lineageTag: 7f27aa38-38c7-41ca-b8c7-2feee75afeaa
