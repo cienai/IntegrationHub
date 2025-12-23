@@ -1882,66 +1882,15 @@ table performance_metric_1
 
 	measure 'meas.performance_metric_value_count' = ```
 			
+			 // this count would tell the number of reps that contribute for other statistics 
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
 						
-			    VAR _id =
-			        SELECTEDVALUE( metadata_performance_metrics[sys_doc_id] )
-			    
-			    VAR _measureToReturn =
-			        SWITCH(
-			            TRUE(),
-			    
-			            /* ============================
-			                📌 Revenue Type Metrics
-			                ============================ */
-			            _id = "rev01", CALCULATE(COUNTROWS(FILTER(opps, [meas.opp_nnb_amt]  > 0))),
-			            _id = "rev02", CALCULATE(COUNTROWS(FILTER(opps, [meas.opp_cross_sale_amt]  > 0))),
-			            _id = "rev03", CALCULATE(COUNTROWS(FILTER(opps, [meas.opp_downgrade_amt] > 0))),
-			            _id = "rev04", CALCULATE(COUNTROWS(FILTER(opps, [meas.opp_renewal_amt] > 0))),
-			            _id = "rev05", CALCULATE(COUNTROWS(FILTER(opps, [meas.opp_arr_amt] > 0))),
-			            _id = "rev06", CALCULATE(COUNTROWS(FILTER(opps, [meas.opp_nd_amt] > 0))),
-			            _id = "rev07", CALCULATE(COUNTROWS(FILTER(opps, [meas.opp_one_time_amt] > 0))),
-			            _id = "rev08", CALCULATE(COUNTROWS(FILTER(opps, [meas.opp_expansion_amt] > 0))),
-			            _id = "rev09", CALCULATE(COUNTROWS(FILTER(opps, [meas.opp_mrr_amt] > 0))),
-			            _id = "rev10", CALCULATE(COUNTROWS(FILTER(opps, [meas.opp_nnb_amt] > 0))),
-			    
-			            /* ============================
-			                📌 Existing Sales Metrics
-			                ============================ */
-			            _id = "sal01", COUNTROWS( FILTER(ssr_history, [meas.ssr_history_won_amt]  > 0)),
-			            _id = "sal02", [meas.total_opps_count],
-			            _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
-			            _id = "sal04", [meas.ssr_history_win_rate],
-			            _id = "sal05", [meas.total_opps_count],
-			    
-			            /* ============================
-			                📌 Pipeline Metrics
-			                ============================ */
-			            _id = "pip01", [meas.pipeline_amt],
-			            _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
-			            _id = "pip04", COUNTROWS(open_pipeline),
-			    
-			            /* ============================
-			                📌 Activity Metrics
-			                ============================ */
-			            _id = "act01", [meas.stkhlds_all_act_count],
-			            _id = "act02", [meas.stkhlds_all_act_email_count],
-			            _id = "act03", [meas.stkhlds_all_act_meeting_count],
-			            _id = "act04", [meas.ssr_history_duration_hrs],
-			    
-			            /* ============================
-			                🛑 Default
-			                ============================ */
-			            BLANK()
-			        )
-			    
-			    RETURN
-			    IF(
-			        ISBLANK(_measureToReturn),
-			        BLANK(),
-			        _measureToReturn   -- 🧠 NO CALCULATE HERE (keeps row context intact)
-			    )
+			)
+			var perf_metric_average_per_rep = COUNTROWS(pre_agg_tbl_by_rep) 
 			
-			
+			RETURN perf_metric_average_per_rep
 			```
 		lineageTag: 26dd96be-da13-4bc7-b34f-2bbcf87ae145
 
