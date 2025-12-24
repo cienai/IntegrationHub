@@ -176,7 +176,7 @@ table performance_metric_1
 			
 			var _total = [meas.ssr_history_won_amt]         // get the won amt
 			var reps_count = [meas.data_logs_user_count_all]            // total rep count
-			var res = DIVIDE(_total, reps_count)            // GET THE avg by reps
+			var res = DIVIDE( _total, reps_count)            // GET THE avg by reps
 			RETURN
 			res
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -1688,6 +1688,129 @@ table performance_metric_1
 			    _measureToReturn   -- :brain: NO CALCULATE HERE (keeps row context intact)
 			)
 		lineageTag: 3828ecc7-4fa9-468f-a709-05e58ebde70f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_avg' = ```
+			
+			  
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
+						
+			)
+			var perf_metric_average_per_rep = AVERAGEX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+			
+			RETURN perf_metric_average_per_rep
+			
+			
+			```
+		lineageTag: 2779f423-d006-4068-b1fc-5089fcf728d4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_max' = ```
+			
+			  
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
+						
+			)
+			var perf_metric_average_per_rep = MAXX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+			
+			RETURN perf_metric_average_per_rep
+			
+			
+			```
+		lineageTag: 33158416-bf01-4d63-bc8b-4e9d8926169e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_min' = ```
+			
+						
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
+						
+			)
+			var perf_metric_average_per_rep = MINX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+			
+			RETURN perf_metric_average_per_rep
+			
+			
+			
+			```
+		lineageTag: b84aec58-d9ed-4d42-9d45-0e7744a13e71
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_median' = ```
+			
+						
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
+						
+			)
+			var perf_metric_average_per_rep = MEDIANX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+			
+			RETURN perf_metric_average_per_rep
+			
+			
+			```
+		lineageTag: e5aaceb6-baad-40e9-8eef-49ea6a791961
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_std_deviation' = ```
+			
+						
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
+						
+			)
+			var perf_metric_average_per_rep = STDEVX.P( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+			
+			RETURN perf_metric_average_per_rep
+			
+			```
+		lineageTag: 7f27aa38-38c7-41ca-b8c7-2feee75afeaa
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_count' = ```
+			
+			 // this count would tell the number of reps that contribute for other statistics 
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
+						
+			)
+			var perf_metric_average_per_rep = COUNTROWS(pre_agg_tbl_by_rep) 
+			
+			RETURN perf_metric_average_per_rep
+			```
+		lineageTag: 26dd96be-da13-4bc7-b34f-2bbcf87ae145
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_sum' = ```
+			
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
+						
+			)
+			var perf_metric_average_per_rep = SUMX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+			
+			RETURN perf_metric_average_per_rep
+			
+			
+			```
+		lineageTag: 4cd46dff-fa0c-42b1-af62-8ff080a2f5ac
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
