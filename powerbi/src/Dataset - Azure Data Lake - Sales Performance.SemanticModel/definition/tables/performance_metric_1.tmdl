@@ -1853,6 +1853,28 @@ table performance_metric_1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	measure 'meas.rank_reps_by_selected_sorting' = ```
+			
+			-- 1. Check which button is active in the slicer
+			VAR _SelectedField = SELECTEDVALUE('field_param_perf_metric_sort_selection_slicer'[Parameter Fields])
+			
+			RETURN
+			SWITCH(
+			    _SelectedField,
+			    -- If Button 1 is clicked, return Metric 1 values
+			    NAMEOF('performance_metric_1'[meas.performance_metric_name]), [meas.performance_metric_value],
+			    
+			    -- If Button 2 is clicked, return Metric 2 values
+			    NAMEOF('performance_metric_2'[meas.performance_metric_secondary_name]), [meas.performance_metric_value_secondary],
+			    
+			    -- Fallback: Sort by Metric 1 if nothing is selected
+			    [meas.performance_metric_name]
+			)
+			```
+		lineageTag: 30796767-70f0-4434-b4da-c6ad03a2e178
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 2212fa67-8aad-4292-87f7-94f44117c755
