@@ -1819,6 +1819,40 @@ table performance_metric_1
 			SELECTEDVALUE(metadata_performance_metrics[metric_name], "Multiple Selected Metrics for Metric1")
 		lineageTag: 02c374e5-be26-49c4-ab29-7921ea6a865d
 
+	measure 'meas.performance_correlation_metric1_vs_metric2' = ```
+			
+			-- Based on Pearson Correlation Coefficient
+			-- 1. Create the unified Virtual Table with both Metrics
+			VAR _RepTable = 
+			    SUMMARIZECOLUMNS(
+			        users[trueai_full_name],
+			        "x", [meas.performance_metric_value], -- Slicer 1
+			        "y", [meas.performance_metric_value_secondary]  -- Slicer 2
+			    )
+			
+			-- 2. Filter out Blanks (Correlation requires pairs of numbers)
+			VAR _CleanTable = 
+			    FILTER( _RepTable, NOT( ISBLANK([x]) || ISBLANK([y]) ) )
+			
+			-- 3. The Math Steps (Pearson Correlation)
+			VAR _n      = COUNTROWS(_CleanTable)
+			VAR _avgX   = AVERAGEX(_CleanTable, [x])
+			VAR _avgY   = AVERAGEX(_CleanTable, [y])
+			
+			VAR _sumXY  = SUMX(_CleanTable, ([x] - _avgX) * ([y] - _avgY))
+			VAR _sumX2  = SUMX(_CleanTable, POWER([x] - _avgX, 2))
+			VAR _sumY2  = SUMX(_CleanTable, POWER([y] - _avgY, 2))
+			
+			VAR _denom  = SQRT(_sumX2 * _sumY2)
+			
+			RETURN
+			    -- Return blank if not enough data (need at least 2 reps)
+			    IF( _n < 2 || _denom = 0, BLANK(), DIVIDE(_sumXY, _denom) )
+			```
+		lineageTag: 0829e423-3078-4b1d-abdc-b4ee30fad4e7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 2212fa67-8aad-4292-87f7-94f44117c755
