@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
   "name": "db5e78838e590588e5b6",
   "position": {
-    "x": 120.01104292983938,
-    "y": 439.75475016434,
+    "x": 0,
+    "y": 0,
     "z": 27000,
-    "height": 345.46035929089476,
-    "width": 964.37445211478064,
+    "height": 399.36082719032544,
+    "width": 1010.482377695094,
     "tabOrder": 27000
   },
   "visual": {
@@ -75,16 +75,16 @@
         "sort": [
           {
             "field": {
-              "Column": {
+              "Measure": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "users"
+                    "Entity": "performance_metric_1"
                   }
                 },
-                "Property": "trueai_full_name"
+                "Property": "meas.performance_metric_value"
               }
             },
-            "direction": "Ascending"
+            "direction": "Descending"
           }
         ]
       }
@@ -106,7 +106,7 @@
                   "expr": {
                     "ThemeDataColor": {
                       "ColorId": 4,
-                      "Percent": 0
+                      "Percent": 0.6
                     }
                   }
                 }
@@ -223,6 +223,48 @@
               }
             ]
           }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 4,
+                      "Percent": 0.6
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "scopeId": {
+                  "Comparison": {
+                    "ComparisonKind": 0,
+                    "Left": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "metadata_performance_metrics"
+                          }
+                        },
+                        "Property": "metric_name"
+                      }
+                    },
+                    "Right": {
+                      "Literal": {
+                        "Value": "'Annual Recurring Revenue (ARR)'"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
         }
       ],
       "categoryAxis": [
@@ -253,7 +295,7 @@
                   "expr": {
                     "ThemeDataColor": {
                       "ColorId": 0,
-                      "Percent": 0
+                      "Percent": -0.1
                     }
                   }
                 }
@@ -274,6 +316,27 @@
               }
             },
             "concatenateLabels": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "titleFontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bold": {
               "expr": {
                 "Literal": {
                   "Value": "true"
@@ -350,6 +413,34 @@
                   }
                 }
               }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "labelOrientation": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "labelPosition": {
+              "expr": {
+                "Literal": {
+                  "Value": "'OutsideEnd'"
+                }
+              }
+            },
+            "optimizeLabelDisplay": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
             }
           }
         }
@@ -372,6 +463,25 @@
               }
             },
             "labelColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": -0.1
+                    }
+                  }
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "gridlineColor": {
               "solid": {
                 "color": {
                   "expr": {
@@ -420,14 +530,14 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
                 }
               }
             },
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Performance Metrics - by Rep'"
+                  "Value": "'Selected Performance Metrics - by Rep'"
                 }
               }
             },
@@ -440,6 +550,13 @@
                       "Percent": -0.1
                     }
                   }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
                 }
               }
             }
@@ -462,6 +579,7 @@
     },
     "drillFilterOtherVisuals": true
   },
+  "parentGroupName": "36193a1835e3baa744e0",
   "filterConfig": {
     "filters": [
       {
@@ -522,6 +640,11 @@
                         "Name": "u",
                         "Entity": "users",
                         "Type": 0
+                      },
+                      {
+                        "Name": "p",
+                        "Entity": "performance_metric_1",
+                        "Type": 0
                       }
                     ],
                     "Select": [
@@ -541,18 +664,13 @@
                       {
                         "Direction": 2,
                         "Expression": {
-                          "Aggregation": {
+                          "Measure": {
                             "Expression": {
-                              "Column": {
-                                "Expression": {
-                                  "SourceRef": {
-                                    "Source": "u"
-                                  }
-                                },
-                                "Property": "_sys_doc_id"
+                              "SourceRef": {
+                                "Source": "p"
                               }
                             },
-                            "Function": 3
+                            "Property": "meas.rank_reps_by_selected_sorting"
                           }
                         }
                       }
@@ -595,6 +713,61 @@
             }
           ]
         }
+      },
+      {
+        "name": "e73041a6dab09b4f30d6",
+        "ordinal": 3,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "performance_metric_format"
+              }
+            },
+            "Property": "Name"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "p",
+              "Entity": "performance_metric_format",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "p"
+                          }
+                        },
+                        "Property": "Name"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'calc.apply_format'"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User"
       }
     ],
     "filterSortOrder": "Custom"
