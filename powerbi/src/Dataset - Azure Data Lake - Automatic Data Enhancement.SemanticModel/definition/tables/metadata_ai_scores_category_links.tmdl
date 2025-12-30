@@ -1,0 +1,92 @@
+table metadata_ai_scores_category_links
+	lineageTag: 367eaadf-25c4-454e-b64d-34ef80fe01d3
+
+	measure 'meas.metadata_score_weighting_pct' =
+			
+			var curr_weight = CALCULATE(SUM(metadata_ai_scores_category_links[weighting]))
+			var all_weights = CALCULATE(SUM(metadata_ai_scores_category_links[weighting]), metadata_ai_scores[score_name] <> "" )
+			var res = DIVIDE(curr_weight, all_weights)
+			return res
+		lineageTag: 298a2a88-bc40-4700-a0d9-133df54e53ac
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _sys_doc_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 2da126dc-7f98-4a66-813b-7d42da700d1c
+		summarizeBy: sum
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_is_active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d9c80bad-9246-4e7d-9900-8fd41b497017
+		summarizeBy: none
+		sourceColumn: _sys_is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_modified_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e68b1e6a-176b-40b9-965a-ee934fe01db9
+		summarizeBy: none
+		sourceColumn: _sys_modified_on
+
+		variation Variation
+			isDefault
+			relationship: 6acdf8e2-e94d-4f7e-929e-dc8f2e09cda8
+			defaultHierarchy: LocalDateTable_bc88a46e-48bc-4745-bf7f-3e25dd0e4806.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column score_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 27b88482-2943-4581-9ed5-b93fddc3cba4
+		summarizeBy: sum
+		sourceColumn: score_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column analysis_category_id
+		dataType: string
+		lineageTag: 77647aef-1021-4e04-9a52-2466d3453a01
+		summarizeBy: none
+		sourceColumn: analysis_category_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column weighting
+		dataType: int64
+		formatString: 0
+		lineageTag: cbd64eea-08b1-4515-906d-d3698b6c4de5
+		summarizeBy: sum
+		sourceColumn: weighting
+
+		annotation SummarizationSetBy = Automatic
+
+	column notes
+		dataType: string
+		lineageTag: fc69c8ad-f234-491d-8bdc-df8ec62f7351
+		summarizeBy: none
+		sourceColumn: notes
+
+		annotation SummarizationSetBy = Automatic
+
+	partition metadata_ai_scores_category_links = m
+		mode: import
+		source =
+				let
+				    Source = getDBTable("metadata_ai_scores_category_links"),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"_sys_doc_id", Int64.Type}, {"_sys_is_active", type logical}, {"_sys_modified_on", type datetime}, {"score_id", Int64.Type}, {"analysis_category_id", type text}, {"weighting", Int64.Type}, {"notes", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
