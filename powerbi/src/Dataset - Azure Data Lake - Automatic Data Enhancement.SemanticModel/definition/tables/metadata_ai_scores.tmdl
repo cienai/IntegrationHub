@@ -2471,8 +2471,7 @@ table metadata_ai_scores
 		annotation SummarizationSetBy = Automatic
 
 	column _sys_is_active
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
+		dataType: string
 		lineageTag: 6989f60d-d162-4a6c-88ae-4709e680d73e
 		summarizeBy: none
 		sourceColumn: _sys_is_active
@@ -2511,44 +2510,47 @@ table metadata_ai_scores
 		annotation SummarizationSetBy = Automatic
 
 	column boost_expo
-		dataType: string
+		dataType: double
 		lineageTag: 4a28a566-df03-4764-b5c8-388b3689913f
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: boost_expo
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column weight
-		dataType: string
+		dataType: double
 		lineageTag: e842acab-771b-4c59-ab36-a672b3f2754c
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: weight
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition metadata_ai_scores = m
 		mode: import
-		source = ```
+		source =
 				let
 				    dbTable = getDBTable("metadata_ai_scores"),      // get the right table
 				    dbTableTyped = Table.TransformColumnTypes(dbTable,{
-				        {"_sys_doc_id", type text}, 
-				        {"_sys_is_active", type logical}, 
-				        {"_sys_modified_on", type datetime}, 
-				        {"category", type text}, 
-				        {"score_name", type text}, 
-				        {"description", type text}, 
-				        {"sort", Int64.Type}, 
-				        {"factor_1_name", type text}, 
-				        {"factor_2_name", type text}, 
-				        {"factor_3_name", type text}, 
-				        {"notes", type text}
-				        
-				        })
-				   
+				        {"_sys_doc_id", type text},
+				        {"_sys_is_active", type text},
+				        {"_sys_modified_on", type datetime},
+				        {"boost_expo", type number},
+				        {"category", type text},
+				        {"description", type text},
+				        {"factor_1_name", type text},
+				        {"factor_2_name", type text},
+				        {"factor_3_name", type text},
+				        {"notes", type text},
+				        {"score_name", type text},
+				        {"sort", Int64.Type},
+				        {"weight", type number}
+				                })
 				in
 				   dbTableTyped
-				```
 
 	annotation PBI_NavigationStepName = Navigation
 
