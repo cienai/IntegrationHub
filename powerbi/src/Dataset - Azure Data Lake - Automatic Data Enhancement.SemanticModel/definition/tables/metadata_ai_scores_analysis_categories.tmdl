@@ -1,0 +1,88 @@
+table metadata_ai_scores_analysis_categories
+	lineageTag: c982a1de-fbdd-4862-8f42-4e3cb9b62329
+
+	measure 'meas.analysis_cat_weighted_avg' =
+			
+			var sum_prod = SUMX(
+			    metadata_ai_scores,
+			    [meas.ai_score] * [meas.metadata_score_weighting_pct]
+			) // get teh sum product of the weighting and the score
+			var sum_weights = SUMX(
+			    metadata_ai_scores,
+			     [meas.metadata_score_weighting_pct]
+			) // get the sum of weighting
+			var res = DIVIDE( sum_prod, sum_weights)
+			return res
+		lineageTag: cbe9e9f8-ca6c-4058-bc0c-e15a4a8fe77f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _sys_doc_id
+		dataType: string
+		lineageTag: dbb69802-caa8-484e-8be3-75b192e7f6f8
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_is_active
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: f13deb94-0035-46bf-9bcf-3edeb1ef3afb
+		summarizeBy: none
+		sourceColumn: _sys_is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_modified_on
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2ab4e3f8-3ffb-44f0-91e2-77103fc7b182
+		summarizeBy: none
+		sourceColumn: _sys_modified_on
+
+		variation Variation
+			isDefault
+			relationship: 7ecc6683-a1f4-44f1-a24d-f789fe296ef5
+			defaultHierarchy: LocalDateTable_88298d59-b0e1-46ce-9b54-76e2ed5a9069.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_name
+		dataType: string
+		lineageTag: 25bace88-c783-4a96-b715-4153e1dcaca2
+		summarizeBy: none
+		sourceColumn: category_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column description
+		dataType: string
+		lineageTag: 38d99a98-6de7-4e8d-aed4-eb253b8b2a37
+		summarizeBy: none
+		sourceColumn: description
+
+		annotation SummarizationSetBy = Automatic
+
+	column sort_order
+		dataType: int64
+		formatString: 0
+		lineageTag: b94c710b-9e24-422c-9b76-d56da16ee272
+		summarizeBy: sum
+		sourceColumn: sort_order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition metadata_ai_scores_analysis_categories = m
+		mode: import
+		source =
+				let
+				    metadata_ai_scores_analysis_categories = getDBTable("metadata_ai_scores_analysis_categories"),
+				    #"Changed Type" = Table.TransformColumnTypes(metadata_ai_scores_analysis_categories,{{"_sys_doc_id", type text}, {"_sys_is_active", type logical}, {"_sys_modified_on", type datetime}, {"category_name", type text}, {"description", type text}, {"sort_order", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1527,7 +1527,7 @@ table performance_metric_1
 			        /* ============================
 			           📌 Pipeline Metrics
 			           ============================ */
-			        _id = "pip01", [meas.pipeline_amt],
+			        _id = "pip01", [meas.pipeline_amt_sum],
 			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
 			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
 			
@@ -1566,68 +1566,6 @@ table performance_metric_1
 
 	measure 'meas.slicer_placeholder' = SELECTEDVALUE( metadata_performance_metrics_slicer[sys_doc_id] )
 		lineageTag: dc634891-d706-4118-b640-36637669037f
-
-	measure 'meas.performance_metric_value_secondary' =
-			
-			VAR _id =
-			    SELECTEDVALUE( metadata_performance_metrics_secondary[sys_doc_id] )
-			
-			VAR _measureToReturn =
-			    SWITCH(
-			        TRUE(),
-			
-			        /* ============================
-			           :pushpin: Revenue Type Metrics
-			           ============================ */
-			        _id = "rev01", [meas.opp_nnb_amt],
-			        _id = "rev02", [meas.opp_cross_sale_amt],
-			        _id = "rev03", [meas.opp_downgrade_amt],
-			        _id = "rev04", [meas.opp_renewal_amt],
-			        _id = "rev05", [meas.opp_arr_amt],
-			        _id = "rev06", [meas.opp_nd_amt],
-			        _id = "rev07", [meas.opp_one_time_amt],
-			        _id = "rev08", [meas.opp_expansion_amt],
-			        _id = "rev09", [meas.opp_mrr_amt],
-			
-			        /* ============================
-			           :pushpin: Existing Sales Metrics
-			           ============================ */
-			        _id = "sal01", [meas.ssr_history_won_amt],
-			        _id = "sal02", [meas.total_opps_count],
-			        _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
-			        _id = "sal04", [meas.ssr_history_win_rate],
-			        _id = "sal05", [meas.total_opps_count],
-			
-			        /* ============================
-			           :pushpin: Pipeline Metrics
-			           ============================ */
-			        _id = "pip01", [meas.pipeline_amt],
-			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
-			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
-			
-			        /* ============================
-			           :pushpin: Activity Metrics
-			           ============================ */
-			        _id = "act01", [meas.stkhlds_all_act_count],
-			        _id = "act02", [meas.stkhlds_all_act_email_count],
-			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
-			        _id = "act04", [meas.ssr_history_duration_hrs],
-			
-			        /* ============================
-			           :octagonal_sign: Default
-			           ============================ */
-			        BLANK()
-			    )
-			
-			RETURN
-			IF(
-			    ISBLANK(_measureToReturn),
-			    BLANK(),
-			    _measureToReturn   -- :brain: NO CALCULATE HERE (keeps row context intact)
-			)
-		lineageTag: c453710f-4a24-41a3-a56a-5af756a2cf7d
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'meas.restricted_line_chart_only_performance_metric_value_secondary' =
 			
@@ -1811,6 +1749,129 @@ table performance_metric_1
 			
 			```
 		lineageTag: 4cd46dff-fa0c-42b1-af62-8ff080a2f5ac
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_name' =
+			
+			SELECTEDVALUE(metadata_performance_metrics[metric_name], "Multiple Selected Metrics for Metric1")
+		lineageTag: 02c374e5-be26-49c4-ab29-7921ea6a865d
+
+	measure 'meas.performance_correlation_metric1_vs_metric2' = ```
+			
+			-- Based on Pearson Correlation Coefficient
+			-- 1. Create the unified Virtual Table with both Metrics
+			VAR _RepTable = 
+			    SUMMARIZECOLUMNS(
+			        users[trueai_full_name],
+			        "x", [meas.performance_metric_value], -- Slicer 1
+			        "y", [meas.performance_metric_value_secondary]  -- Slicer 2
+			    )
+			
+			-- 2. Filter out Blanks (Correlation requires pairs of numbers)
+			VAR _CleanTable = 
+			    FILTER( _RepTable, NOT( ISBLANK([x]) || ISBLANK([y]) ) )
+			
+			-- 3. The Math Steps (Pearson Correlation)
+			VAR _n      = COUNTROWS(_CleanTable)
+			VAR _avgX   = AVERAGEX(_CleanTable, [x])
+			VAR _avgY   = AVERAGEX(_CleanTable, [y])
+			
+			VAR _sumXY  = SUMX(_CleanTable, ([x] - _avgX) * ([y] - _avgY))
+			VAR _sumX2  = SUMX(_CleanTable, POWER([x] - _avgX, 2))
+			VAR _sumY2  = SUMX(_CleanTable, POWER([y] - _avgY, 2))
+			
+			VAR _denom  = SQRT(_sumX2 * _sumY2)
+			
+			RETURN
+			    -- Return blank if not enough data (need at least 2 reps)
+			    IF( _n < 2 || _denom = 0, BLANK(), DIVIDE(_sumXY, _denom) )
+			```
+		lineageTag: 0829e423-3078-4b1d-abdc-b4ee30fad4e7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.rank_reps_by_selected_sorting' = ```
+			
+			-- 1. Check which button is active in the slicer
+			VAR _SelectedField = SELECTEDVALUE('field_param_perf_metric_sort_selection_slicer'[Parameter Fields])
+			
+			RETURN
+			SWITCH(
+			    _SelectedField,
+			    -- If Button 1 is clicked, return Metric 1 values
+			    NAMEOF('performance_metric_1'[meas.performance_metric_name]), [meas.performance_metric_value],
+			    
+			    -- If Button 2 is clicked, return Metric 2 values
+			    NAMEOF('performance_metric_2'[meas.performance_metric_secondary_name]), [meas.performance_metric_value_secondary],
+			    
+			    -- Fallback: Sort by Metric 1 if nothing is selected
+			    [meas.performance_metric_name]
+			)
+			```
+		lineageTag: 30796767-70f0-4434-b4da-c6ad03a2e178
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_secondary' =
+			
+			VAR _id =
+			    SELECTEDVALUE( metadata_performance_metrics_secondary[sys_doc_id] )
+			
+			VAR _measureToReturn =
+			    SWITCH(
+			        TRUE(),
+			
+			        /* ============================
+			           :pushpin: Revenue Type Metrics
+			           ============================ */
+			        _id = "rev01", [meas.opp_nnb_amt],
+			        _id = "rev02", [meas.opp_cross_sale_amt],
+			        _id = "rev03", [meas.opp_downgrade_amt],
+			        _id = "rev04", [meas.opp_renewal_amt],
+			        _id = "rev05", [meas.opp_arr_amt],
+			        _id = "rev06", [meas.opp_nd_amt],
+			        _id = "rev07", [meas.opp_one_time_amt],
+			        _id = "rev08", [meas.opp_expansion_amt],
+			        _id = "rev09", [meas.opp_mrr_amt],
+			
+			        /* ============================
+			           :pushpin: Existing Sales Metrics
+			           ============================ */
+			        _id = "sal01", [meas.ssr_history_won_amt],
+			        _id = "sal02", [meas.total_opps_count],
+			        _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			        _id = "sal04", [meas.ssr_history_win_rate],
+			        _id = "sal05", [meas.total_opps_count],
+			
+			        /* ============================
+			           :pushpin: Pipeline Metrics
+			           ============================ */
+			        _id = "pip01", [meas.pipeline_amt_sum],
+			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			
+			        /* ============================
+			           :pushpin: Activity Metrics
+			           ============================ */
+			        _id = "act01", [meas.stkhlds_all_act_count],
+			        _id = "act02", [meas.stkhlds_all_act_email_count],
+			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			        _id = "act04", [meas.ssr_history_duration_hrs],
+			
+			        /* ============================
+			           :octagonal_sign: Default
+			           ============================ */
+			        BLANK()
+			    )
+			
+			RETURN
+			IF(
+			    ISBLANK(_measureToReturn),
+			    BLANK(),
+			    _measureToReturn   -- :brain: NO CALCULATE HERE (keeps row context intact)
+			)
+		lineageTag: c453710f-4a24-41a3-a56a-5af756a2cf7d
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
