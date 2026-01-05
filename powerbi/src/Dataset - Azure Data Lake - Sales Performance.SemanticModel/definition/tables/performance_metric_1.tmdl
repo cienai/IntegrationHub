@@ -1641,7 +1641,6 @@ table performance_metric_1
 			
 			RETURN perf_metric_average_per_rep
 			
-			
 			```
 		lineageTag: 2779f423-d006-4068-b1fc-5089fcf728d4
 
@@ -1889,22 +1888,59 @@ table performance_metric_1
 			//     REMOVEFILTERS(users[trueai_full_name]) 
 			// )
 			
-			IF(
-			    NOT ISFILTERED(ssr_history[col.step_owner_group]) && NOT ISFILTERED(ssr_history[trueai_user_role_alias]),
-			    BLANK(), -- Hide the number if no context is selected
 			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            ssr_history[col.step_owner_group],
-			            ssr_history[trueai_user_role_alias],
+			        -- We summarize the USERS table to get a list of people
+			    VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
 			            "Measure_Pre_AGG", [meas.performance_metric_value]
 			        )
-			        RETURN AVERAGEX( tbl, [Measure_Pre_AGG] ),
+			        RETURN AVERAGEX( tbl, [Measure_Pre_AGG] )
+			        ,
+			        REMOVEFILTERS(users[trueai_full_name])
+			
+			    )
+			
+			
+			```
+		lineageTag: 5160e701-f84f-4f9c-bf98-a9d289d0c26f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_count_peer' = ```
+			
+			IF(
+			    NOT ISFILTERED(ssr_history[col.step_owner_group]) && NOT ISFILTERED(ssr_history[trueai_user_role_alias]),
+			    BLANK(), 
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN COUNTROWS(tbl), 
 			        REMOVEFILTERS(users[trueai_full_name]) 
 			    )
 			)
 			
 			```
-		lineageTag: 5160e701-f84f-4f9c-bf98-a9d289d0c26f
+		formatString: 0
+		lineageTag: eae44156-0021-4e10-9e2a-1b63a3d84fad
+
+	measure 'meas.performance_metric_value_max_peer' = ```
+			
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN MAXX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			
+			
+			
+			```
+		lineageTag: d3806bb9-112d-4660-8a82-d3ffce27082b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
