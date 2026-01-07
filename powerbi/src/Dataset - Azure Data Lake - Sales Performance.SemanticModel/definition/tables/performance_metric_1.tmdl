@@ -1641,7 +1641,6 @@ table performance_metric_1
 			
 			RETURN perf_metric_average_per_rep
 			
-			
 			```
 		lineageTag: 2779f423-d006-4068-b1fc-5089fcf728d4
 
@@ -1872,6 +1871,137 @@ table performance_metric_1
 			    _measureToReturn   -- :brain: NO CALCULATE HERE (keeps row context intact)
 			)
 		lineageTag: c453710f-4a24-41a3-a56a-5af756a2cf7d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_avg_peer' = ```
+			
+			// CALCULATE(
+			//     VAR tbl = SUMMARIZECOLUMNS(
+			//         ssr_history[col.step_owner_group],
+			//         ssr_history[trueai_user_role_alias],
+			//         "Measure_Pre_AGG", [meas.performance_metric_value]
+			//     )
+			//     RETURN AVERAGEX( tbl, [Measure_Pre_AGG] )
+			//     ,
+			//     -- This removes any filter specifically on the Rep's name
+			//     REMOVEFILTERS(users[trueai_full_name]) 
+			// )
+			
+			    CALCULATE(
+			        -- We summarize the USERS table to get a list of people
+			    VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN AVERAGEX( tbl, [Measure_Pre_AGG] )
+			        ,
+			        REMOVEFILTERS(users[trueai_full_name])
+			
+			    )
+			
+			
+			```
+		lineageTag: 5160e701-f84f-4f9c-bf98-a9d289d0c26f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_count_peer' = ```
+			
+			IF(
+			    NOT ISFILTERED(users[trueai_group]) && NOT ISFILTERED(users[trueai_user_role_alias]),
+			    BLANK(), 
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN COUNTROWS(tbl), 
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			)
+			
+			```
+		formatString: 0
+		lineageTag: eae44156-0021-4e10-9e2a-1b63a3d84fad
+
+	measure 'meas.performance_metric_value_max_peer' = ```
+			
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN MAXX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			
+			
+			
+			```
+		lineageTag: d3806bb9-112d-4660-8a82-d3ffce27082b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_min_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN MINX(tbl, [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: d352ee87-3732-49c6-afb3-f4dc027068e4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_median_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN MEDIANX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			
+			```
+		lineageTag: 40b78582-969b-4a96-9566-1193bee9f26f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_std_deviation_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN STDEVX.P( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: 2465309d-38ce-49c1-82d1-08c029932ff7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_sum_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN SUMX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: 66f44f39-7246-4b8c-baa9-ed16c350de1e
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
