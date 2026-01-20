@@ -1,0 +1,110 @@
+table metadata_performance_metric_pairs
+	lineageTag: fb1e6eda-32aa-4283-a41d-5c132b571d8a
+
+	measure 'meas.performance_corr_metric1_vs_metric2' =
+			
+			VAR _m1 =
+			    SELECTEDVALUE ( metadata_performance_metric_pairs[metric_1_name] )
+			VAR _m2 =
+			    SELECTEDVALUE ( metadata_performance_metric_pairs[metric_2_name] )
+			
+			-- Build a per-user table of paired observations for the two metrics
+			VAR _RepTable =
+			    SUMMARIZECOLUMNS (
+			        users[trueai_full_name],
+			        "x",
+			            CALCULATE (
+			                [meas.performance_metric_value],
+			                TREATAS ( { _m1 }, metadata_performance_metrics[metric_name] )
+			            ),
+			        "y",
+			            CALCULATE (
+			                [meas.performance_metric_value_secondary],
+			                TREATAS ( { _m2 }, metadata_performance_metrics_secondary[metric_name] )
+			            )
+			    )
+			
+			-- Remove rows where either x or y is blank (Pearson requires paired values)
+			VAR _CleanTable =
+			    FILTER ( _RepTable, NOT ( ISBLANK ( [x] ) || ISBLANK ( [y] ) ) )
+			
+			-- Pearson correlation steps
+			VAR _n    = COUNTROWS ( _CleanTable )
+			VAR _avgX = AVERAGEX ( _CleanTable, [x] )
+			VAR _avgY = AVERAGEX ( _CleanTable, [y] )
+			
+			VAR _sumXY = SUMX ( _CleanTable, ( [x] - _avgX ) * ( [y] - _avgY ) )
+			VAR _sumX2 = SUMX ( _CleanTable, POWER ( [x] - _avgX, 2 ) )
+			VAR _sumY2 = SUMX ( _CleanTable, POWER ( [y] - _avgY, 2 ) )
+			
+			VAR _denom = SQRT ( _sumX2 * _sumY2 )
+			
+			RETURN
+			    IF (
+			        _m1 = _m2,
+			        1,
+			        IF ( _n < 2 || _denom = 0, BLANK (), DIVIDE ( _sumXY, _denom ) )
+			    )
+		lineageTag: 68cdadd7-a310-48ce-b991-dc31dc36594a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_correlation_n' =
+			
+			VAR _m1 =
+			    SELECTEDVALUE ( metadata_performance_metric_pairs[metric_1_name] )
+			VAR _m2 =
+			    SELECTEDVALUE ( metadata_performance_metric_pairs[metric_2_name] )
+			
+			VAR _RepTable =
+			    SUMMARIZECOLUMNS (
+			        users[trueai_full_name],
+			        "x",
+			            CALCULATE (
+			                [meas.performance_metric_value],
+			                TREATAS ( { _m1 }, metadata_performance_metrics[metric_name] )
+			            ),
+			        "y",
+			            CALCULATE (
+			                [meas.performance_metric_value_secondary],
+			                TREATAS ( { _m2 }, metadata_performance_metrics_secondary[metric_name] )
+			            )
+			    )
+			RETURN
+			COUNTROWS ( FILTER ( _RepTable, NOT ( ISBLANK ( [x] ) || ISBLANK ( [y] ) ) ) )
+		formatString: 0
+		lineageTag: fc97ef20-c5a5-4b67-af1f-d46769a4b5e9
+
+	column metric_1_name
+		lineageTag: ff13c009-034d-4824-9d45-07b2c620a9c5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [metric_1_name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column metric_2_name
+		lineageTag: d8f4ba30-9939-420b-847c-8b679da62f8f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [metric_2_name]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition metadata_performance_metric_pairs = calculated
+		mode: import
+		source =
+				
+				CROSSJOIN (
+				    SELECTCOLUMNS (
+				        metadata_performance_metrics,
+				        "metric_1_name", metadata_performance_metrics[metric_name]
+				    ),
+				    SELECTCOLUMNS (
+				        metadata_performance_metrics_secondary,
+				        "metric_2_name", metadata_performance_metrics_secondary[metric_name]
+				    )
+				)
+
+	annotation PBI_Id = 455708b8b70a4d8fb0240f773616a3ff
+
