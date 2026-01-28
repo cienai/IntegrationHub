@@ -389,15 +389,18 @@ table quality_buckets
 
 	partition quality_buckets = m
 		mode: import
-		source =
+		source = ```
 				let
 				    Source = companies_history,
 				    #"Sorted Rows" = Table.Sort(Source,{{"_sys_processed_as_of", Order.Descending}}),
 				    #"Kept First Rows" = Table.FirstN(#"Sorted Rows",1),
-				    newTable = Table.SelectColumns(#"Kept First Rows", {"_sys_doc_id", "di_pred_post_sales_qual_bucket_tiers", "di_pred_prospecting_qual_bucket_tiers", "di_pred_selling_new_logo_qual_bucket_tiers", "di_pred_selling_existing_customer_qual_bucket_tiers"}),
+				    
+				    // Updated column names in selection
+				    newTable = Table.SelectColumns(#"Kept First Rows", {"_sys_doc_id", "di_pred_post_sales_qual_bucket_tiers", "di_pred_prospecting_qual_bucket_tiers", "di_pred_new_logo_qual_bucket_tiers", "di_pred_existing_customer_qual_bucket_tiers"}),
 				    dbTableNoNull = Table.SelectRows(newTable, each [di_pred_post_sales_qual_bucket_tiers] <> null),
-				    Parsed_JSON = Table.TransformColumns(dbTableNoNull,{{"di_pred_post_sales_qual_bucket_tiers", Json.Document}, {"di_pred_prospecting_qual_bucket_tiers", Json.Document}, {"di_pred_selling_new_logo_qual_bucket_tiers", Json.Document}, {"di_pred_selling_existing_customer_qual_bucket_tiers", Json.Document}}),
-				
+				    
+				    // Updated column names in JSON parsing
+				    Parsed_JSON = Table.TransformColumns(dbTableNoNull,{{"di_pred_post_sales_qual_bucket_tiers", Json.Document}, {"di_pred_prospecting_qual_bucket_tiers", Json.Document}, {"di_pred_new_logo_qual_bucket_tiers", Json.Document}, {"di_pred_existing_customer_qual_bucket_tiers", Json.Document}}),
 				
 				    postsalesTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_post_sales_qual_bucket_tiers"}),
 				    postSalesAddCol = Table.AddColumn(postsalesTable, "direction", each "Post-Sales Support"),
@@ -407,13 +410,14 @@ table quality_buckets
 				    ProsAddCol = Table.AddColumn(ProsTable, "direction", each "Prospecting"),
 				    ProsExpanded = Table.ExpandRecordColumn(ProsAddCol, "di_pred_prospecting_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
-				    NewLogoTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_selling_new_logo_qual_bucket_tiers"}),
+				    NewLogoTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_new_logo_qual_bucket_tiers"}),
 				    NewLogoAddCol = Table.AddColumn(NewLogoTable, "direction", each "New Logo Selling"),
-				    NewLogoExpanded = Table.ExpandRecordColumn(NewLogoAddCol, "di_pred_selling_new_logo_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    NewLogoExpanded = Table.ExpandRecordColumn(NewLogoAddCol, "di_pred_new_logo_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
-				    UpsellingTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_selling_existing_customer_qual_bucket_tiers"}),
+				    // Updated column name in Existing Customer (Upselling) logic
+				    UpsellingTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_existing_customer_qual_bucket_tiers"}),
 				    UpsellingAddCol = Table.AddColumn(UpsellingTable, "direction", each "Existing Customer Selling"),
-				    UpsellingExpanded = Table.ExpandRecordColumn(UpsellingAddCol, "di_pred_selling_existing_customer_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    UpsellingExpanded = Table.ExpandRecordColumn(UpsellingAddCol, "di_pred_existing_customer_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
 				    combinedTable = Table.Combine({postSalesExpanded, ProsExpanded, NewLogoExpanded, UpsellingExpanded}),
 				
@@ -424,16 +428,13 @@ table quality_buckets
 				    LowestAddCol = Table.AddColumn(LowestTable, "bucket", each "Lowest"),
 				    LowestExpanded = Table.ExpandRecordColumn(LowestAddCol, "Lowest", {"l", "u"}, {"prob_lower_bound", "prob_upper_bound"}),
 				
-				
 				    LowTable = Table.SelectColumns(RenamedTable, {"_sys_doc_id","step_name", "Low"}),
 				    LowAddCol = Table.AddColumn(LowTable, "bucket", each "Low"),
 				    LowExpanded = Table.ExpandRecordColumn(LowAddCol, "Low", {"l", "u"}, {"prob_lower_bound", "prob_upper_bound"}),
 				
-				
 				    MidTable = Table.SelectColumns(RenamedTable, {"_sys_doc_id","step_name", "Mid"}),
 				    MidAddCol = Table.AddColumn(MidTable, "bucket", each "Mid"),
 				    MidExpanded = Table.ExpandRecordColumn(MidAddCol, "Mid", {"l", "u"}, {"prob_lower_bound", "prob_upper_bound"}),
-				
 				
 				    HighTable = Table.SelectColumns(RenamedTable, {"_sys_doc_id","step_name", "High"}),
 				    HighAddCol = Table.AddColumn(HighTable, "bucket", each "High"),
@@ -450,6 +451,7 @@ table quality_buckets
 				    AddedCombineCol = Table.AddColumn(ChangedType, "step_name_bucket_num", each Text.Combine({[step_name], "-", [bucket]}))
 				in
 				    AddedCombineCol
+				```
 
 	annotation PBI_ResultType = Table
 

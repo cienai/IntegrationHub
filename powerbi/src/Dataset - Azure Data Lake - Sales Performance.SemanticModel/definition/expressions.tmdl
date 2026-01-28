@@ -141,17 +141,81 @@ expression transformParquetFile =
 
 	annotation PBI_ResultType = Function
 
-expression file_server_data_lake = "https://cienjobdataus.dfs.core.windows.net/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+expression file_server_data_lake = "https://cienjobdatastgus.dfs.core.windows.net/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
 	lineageTag: 498c4c3f-5afe-497c-8c76-265407d76ee3
 
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Text
 
-expression file_folder_data_lake = "aceme24/export/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+expression file_folder_data_lake = "jobdata/dGhYzcWxDPTrMPQQT/export/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
 	lineageTag: e977d287-1584-4a28-82e5-55b0c8094f2a
 
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Text
+
+expression ssr_history_success_factors =
+		let
+		    // --- READ FROM DB ---
+		    dbTable = getDBTable("ssr_history_success_factors"),
+		
+		    // --- RENAME COLUMNS TO MATCH LEGACY FIELDS ---
+		    RenamedColumns = Table.RenameColumns(dbTable, {
+		        {"_sys_ssr_history_id", "_sys_ssr_history_id"},
+		        {"trueai_model_name", "model"},
+		        {"trueai_value", "value"},
+		        // {"trueai_value_impact", "impact"},
+		        // {"trueai_value_impact_sign", "sig"},
+		        {"trueai_factor_name", "name"},
+		        // {"trueai_sort", "sort"},
+		        {"trueai_factor_impact", "feature_impact"},
+		        // {"trueai_ordering_factor", "ordering_factor"},
+		        {"trueai_ssr_history_name", "step_name"},
+		        {"trueai_is_significant", "display"}
+		    }),
+		
+		    // --- SAFE TYPE CASTING ---
+		    CastedTable = Table.TransformColumns(RenamedColumns, {
+		        {"_sys_ssr_history_id", each try Text.From(_) otherwise null, type text},
+		        {"display", each try Logical.From(_) otherwise null, type logical},
+		        {"feature_impact", each try Number.From(_) otherwise null, type number},
+		        {"impact", each try Number.From(_) otherwise null, type number},
+		        {"model", each try Text.From(_) otherwise null, type text},
+		        {"name", each try Text.From(_) otherwise null, type text},
+		        {"sig", each try Text.From(_) otherwise null, type text},
+		        {"sort", each try Number.From(_) otherwise null, type number},
+		        {"step_name", each try Text.From(_) otherwise null, type text},
+		        {"value", each try Text.From(_) otherwise null, type text}
+		    })
+		in
+		    CastedTable
+	lineageTag: 1632c9a3-a07d-4eea-a7fe-48fba184346e
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+
+expression 'Errors in users' =
+		let
+		Source = users,
+		  #"Detected Type Mismatches" = let
+		    tableWithOnlyPrimitiveTypes = Table.SelectColumns(Source, Table.ColumnsOfType(Source, {type nullable number, type nullable text, type nullable logical, type nullable date, type nullable datetime, type nullable datetimezone, type nullable time, type nullable duration})),
+		    recordTypeFields = Type.RecordFields(Type.TableRow(Value.Type(tableWithOnlyPrimitiveTypes))),
+		    fieldNames = Record.FieldNames(recordTypeFields),
+		    fieldTypes = List.Transform(Record.ToList(recordTypeFields), each [Type]),
+		    pairs = List.Transform(List.Positions(fieldNames), (i) => {fieldNames{i}, (v) => if v = null or Value.Is(v, fieldTypes{i}) then v else error [Message = "The type of the value does not match the type of the column.", Detail = v], fieldTypes{i}})
+		in
+		    Table.TransformColumns(Source, pairs),
+		  #"Added Index" = Table.AddIndexColumn(#"Detected Type Mismatches", "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"_sys_as_of", "_sys_filt_end_date", "_sys_filt_start_date", "_sys_co_id", "_sys_doc_id", "_sys_last_modified_on", "crm_addr_city", "crm_addr_country", "crm_addr_postal_code", "crm_addr_state", "crm_addr_street", "crm_created_on", "crm_creator_id", "crm_department", "crm_division", "crm_deep_link", "crm_email", "crm_first_name", "crm_language_locale", "crm_last_login_time", "crm_last_name", "crm_locale", "crm_mgr_id", "crm_profile_url", "crm_role", "crm_time_zone", "crm_title", "crm_user_type", "crm_username", "trueai_full_name", "trueai_test", "trueai_test_conf", "trueai_test_rule", "trueai_test_debug", "trueai_addr_city", "trueai_addr_country", "trueai_addr_lat", "trueai_addr_long", "trueai_addr_postal_code", "trueai_addr_state", "trueai_addr_street", "trueai_billable", "trueai_direct_reports", "trueai_ext_match_id", "trueai_ext_match_rule", "trueai_group", "trueai_group_conf", "trueai_group_rule", "trueai_hire_date", "trueai_is_mgr", "trueai_mgr_id", "trueai_mgr_id_conf", "trueai_mgr_id_rule", "trueai_mgr_ids", "trueai_performance_lvl_reached_on", "trueai_role", "trueai_role_conf", "trueai_tenure", "trueai_ramping_status", "trueai_termination_date", "trueai_title", "trueai_title_conf", "trueai_tot_reports", "trueai_user_behavior", "trueai_user_behavior_conf", "trueai_user_role", "trueai_user_role_alias", "trueai_user_role_department", "trueai_user_role_function", "trueai_is_dummy", "cust_text1", "cust_text2", "cust_text3", "cust_text4", "cust_text5", "cust_num1", "cust_num2", "cust_num3", "cust_num4", "cust_num5", "cust_num6", "cust_num7", "cust_bool1", "cust_bool2", "trueai_user_role_sort", "trueai_user_role_function_sort", "trueai_user_role_dept_sort"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "_sys_as_of", "_sys_filt_end_date", "_sys_filt_start_date", "_sys_co_id", "_sys_doc_id", "_sys_last_modified_on", "crm_addr_city", "crm_addr_country", "crm_addr_postal_code", "crm_addr_state", "crm_addr_street", "crm_created_on", "crm_creator_id", "crm_department", "crm_division", "crm_deep_link", "crm_email", "crm_first_name", "crm_language_locale", "crm_last_login_time", "crm_last_name", "crm_locale", "crm_mgr_id", "crm_profile_url", "crm_role", "crm_time_zone", "crm_title", "crm_user_type", "crm_username", "trueai_full_name", "trueai_test", "trueai_test_conf", "trueai_test_rule", "trueai_test_debug", "trueai_addr_city", "trueai_addr_country", "trueai_addr_lat", "trueai_addr_long", "trueai_addr_postal_code", "trueai_addr_state", "trueai_addr_street", "trueai_billable", "trueai_direct_reports", "trueai_ext_match_id", "trueai_ext_match_rule", "trueai_group", "trueai_group_conf", "trueai_group_rule", "trueai_hire_date", "trueai_is_mgr", "trueai_mgr_id", "trueai_mgr_id_conf", "trueai_mgr_id_rule", "trueai_mgr_ids", "trueai_performance_lvl_reached_on", "trueai_role", "trueai_role_conf", "trueai_tenure", "trueai_ramping_status", "trueai_termination_date", "trueai_title", "trueai_title_conf", "trueai_tot_reports", "trueai_user_behavior", "trueai_user_behavior_conf", "trueai_user_role", "trueai_user_role_alias", "trueai_user_role_department", "trueai_user_role_function", "trueai_is_dummy", "cust_text1", "cust_text2", "cust_text3", "cust_text4", "cust_text5", "cust_num1", "cust_num2", "cust_num3", "cust_num4", "cust_num5", "cust_num6", "cust_num7", "cust_bool1", "cust_bool2", "trueai_user_role_sort", "trueai_user_role_function_sort", "trueai_user_role_dept_sort"})
+		in
+		    #"Reordered Columns"
+	lineageTag: db4cfd4c-e91e-4455-9ec8-2b8abc8c6bdc
+	queryGroup: 'Query Errors - 1/28/2026 4:08:55 PM'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
 
