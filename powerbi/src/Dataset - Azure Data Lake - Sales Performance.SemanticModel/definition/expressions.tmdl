@@ -155,47 +155,6 @@ expression file_folder_data_lake = "jobdata/dGhYzcWxDPTrMPQQT/export/" meta [IsP
 
 	annotation PBI_ResultType = Text
 
-expression ssr_history_success_factors =
-		let
-		    // --- READ FROM DB ---
-		    dbTable = getDBTable("ssr_history_success_factors"),
-		
-		    // --- RENAME COLUMNS TO MATCH LEGACY FIELDS ---
-		    RenamedColumns = Table.RenameColumns(dbTable, {
-		        {"_sys_ssr_history_id", "_sys_ssr_history_id"},
-		        {"trueai_model_name", "model"},
-		        {"trueai_value", "value"},
-		        // {"trueai_value_impact", "impact"},
-		        // {"trueai_value_impact_sign", "sig"},
-		        {"trueai_factor_name", "name"},
-		        // {"trueai_sort", "sort"},
-		        {"trueai_factor_impact", "feature_impact"},
-		        // {"trueai_ordering_factor", "ordering_factor"},
-		        {"trueai_ssr_history_name", "step_name"},
-		        {"trueai_is_significant", "display"}
-		    }),
-		
-		    // --- SAFE TYPE CASTING ---
-		    CastedTable = Table.TransformColumns(RenamedColumns, {
-		        {"_sys_ssr_history_id", each try Text.From(_) otherwise null, type text},
-		        {"display", each try Logical.From(_) otherwise null, type logical},
-		        {"feature_impact", each try Number.From(_) otherwise null, type number},
-		        {"impact", each try Number.From(_) otherwise null, type number},
-		        {"model", each try Text.From(_) otherwise null, type text},
-		        {"name", each try Text.From(_) otherwise null, type text},
-		        {"sig", each try Text.From(_) otherwise null, type text},
-		        {"sort", each try Number.From(_) otherwise null, type number},
-		        {"step_name", each try Text.From(_) otherwise null, type text},
-		        {"value", each try Text.From(_) otherwise null, type text}
-		    })
-		in
-		    CastedTable
-	lineageTag: 1632c9a3-a07d-4eea-a7fe-48fba184346e
-
-	annotation PBI_NavigationStepName = Navigation
-
-	annotation PBI_ResultType = Exception
-
 expression 'Errors in users' =
 		let
 		Source = users,

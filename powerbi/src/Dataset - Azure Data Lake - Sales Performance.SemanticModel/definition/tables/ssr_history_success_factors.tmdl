@@ -1,0 +1,148 @@
+table ssr_history_success_factors
+	lineageTag: bd30f4bf-e385-4269-bb7c-225bf02e6fb2
+
+	column _sys_doc_id
+		dataType: string
+		lineageTag: 1036ce3d-0d54-48bd-8507-52d1386d63f8
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_ssr_history_id
+		dataType: string
+		lineageTag: 3aaa3c26-d2a2-4479-bbb1-f2b1ecb45dd3
+		summarizeBy: none
+		sourceColumn: _sys_ssr_history_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_name
+		dataType: string
+		lineageTag: a4b9dbc1-0667-4e74-b55a-85b80f664456
+		summarizeBy: none
+		sourceColumn: step_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column model
+		dataType: string
+		lineageTag: 4bdf9918-c13d-4845-b92f-483cbfcc5ac7
+		summarizeBy: none
+		sourceColumn: model
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: 5c1f6189-243c-46e7-a741-63e66faeda81
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column feature_impact
+		dataType: double
+		lineageTag: d4645d09-4a13-482f-9170-fb5f7b6ad5df
+		summarizeBy: sum
+		sourceColumn: feature_impact
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column value
+		dataType: string
+		lineageTag: fd91224b-0621-4f65-b83f-14b47ffa8f74
+		summarizeBy: none
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	column sig
+		dataType: string
+		lineageTag: 3b11d551-79ed-4ce9-be1f-57019289de3b
+		summarizeBy: none
+		sourceColumn: sig
+
+		annotation SummarizationSetBy = Automatic
+
+	column impact
+		dataType: double
+		lineageTag: ab8360cc-17e2-42e1-9712-5548a541fa73
+		summarizeBy: sum
+		sourceColumn: impact
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column sort
+		dataType: double
+		lineageTag: 77fa77ab-87ff-4b1e-90b1-58b41d496db2
+		summarizeBy: sum
+		sourceColumn: sort
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ordering_factor
+		dataType: string
+		lineageTag: 548e89bf-cf18-431f-b232-f4a97fe31b52
+		summarizeBy: none
+		sourceColumn: ordering_factor
+
+		annotation SummarizationSetBy = Automatic
+
+	column display
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 7dd9781f-f08e-4452-9d80-d0d4582d2006
+		summarizeBy: none
+		sourceColumn: display
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ssr_history_success_factors = m
+		mode: import
+		source =
+				let
+				    // --- READ FROM DB ---
+				    dbTable = getDBTable("ssr_history_success_factors"),
+				
+				    // --- RENAME COLUMNS TO MATCH LEGACY FIELDS ---
+				    RenamedColumns = Table.RenameColumns(dbTable, {
+				        {"_sys_ssr_history_id", "_sys_ssr_history_id"},
+				        {"trueai_model_name", "model"},
+				        {"trueai_value", "value"},
+				        {"trueai_value_impact", "impact"},
+				        {"trueai_value_impact_sign", "sig"},
+				        {"trueai_factor_name", "name"},
+				        {"trueai_sort", "sort"},
+				        {"trueai_factor_impact", "feature_impact"},
+				        {"trueai_ordering_factor", "ordering_factor"},
+				        {"trueai_ssr_history_name", "step_name"},
+				        {"trueai_is_significant", "display"}
+				    }),
+				
+				    // --- SAFE TYPE CASTING ---
+				    CastedTable = Table.TransformColumns(RenamedColumns, {
+				        {"_sys_ssr_history_id", each try Text.From(_) otherwise null, type text},
+				        {"display", each try Logical.From(_) otherwise null, type logical},
+				        {"feature_impact", each try Number.From(_) otherwise null, type number},
+				        {"impact", each try Number.From(_) otherwise null, type number},
+				        {"model", each try Text.From(_) otherwise null, type text},
+				        {"name", each try Text.From(_) otherwise null, type text},
+				        {"sig", each try Text.From(_) otherwise null, type text},
+				        {"sort", each try Number.From(_) otherwise null, type number},
+				        {"step_name", each try Text.From(_) otherwise null, type text},
+				        {"value", each try Text.From(_) otherwise null, type text}
+				    })
+				in
+				    CastedTable
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
