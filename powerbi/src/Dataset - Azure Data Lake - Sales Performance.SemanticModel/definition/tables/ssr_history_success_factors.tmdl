@@ -1,149 +1,155 @@
 table ssr_history_success_factors
 	lineageTag: bd30f4bf-e385-4269-bb7c-225bf02e6fb2
 
+	measure 'meas.ssr_history_success_prob_factors_all_count' =
+			
+			var res = CALCULATE(
+			    COUNT(ssr_history_success_factors[_sys_ssr_history_id]),
+			    ssr_history_success_factors[trueai_factor_name] <> "aaa"
+			        && ssr_history_success_factors[trueai_value] <> "aaa"
+			)
+			RETURN res
+		displayFolder: success_prob_factors
+		lineageTag: fa320202-2de0-4dae-9af5-8633af2aa971
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'meas.ssr_history_success_prob_factors_count' =
+			
+			var res = CALCULATE(COUNT(ssr_history_success_factors[_sys_doc_id]))
+			RETURN res
+		displayFolder: success_prob_factors
+		lineageTag: 3b032ce1-5351-420a-867f-d37a7d630aa5
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'meas.ssr_history_success_prob_factors_pct' =
+			
+			var res = DIVIDE([meas.ssr_history_success_prob_factors_count], [meas.ssr_history_success_prob_factors_all_count])
+			RETURN res
+		formatString: 0.00%
+		displayFolder: success_prob_factors
+		lineageTag: 0cecea97-3966-4712-a476-eb8c11432562
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'meas.ssr_history_success_prob_factors_pct_how_many' =
+			
+			var step_count = [meas.ssr_history_step_count]
+			var _success_prob_count = [meas.ssr_history_success_prob_factors_count]
+			var res = DIVIDE(_success_prob_count, step_count, 0)
+			RETURN res
+		displayFolder: success_prob_factors
+		lineageTag: c8465601-bdca-4c9b-a7a3-3d9c514128e9
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'meas.ssr_history_success_prob_feature_impact' =
+			
+			CALCULATE(
+			    AVERAGEX(
+			        ssr_history_success_factors,
+			        ssr_history_success_factors[trueai_factor_impact]
+			    )
+			)
+		displayFolder: success_prob_factors
+		lineageTag: 0d167fdd-787e-468b-986c-e256c276132f
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'meas.ssr_history_success_prob_impact' =
+			
+			var _prob = CALCULATE(AVERAGE(ssr_history_success_factors[trueai_value_impact]))
+			var res = ROUND(_prob, 2)
+			RETURN res
+		displayFolder: success_prob_factors
+		lineageTag: 4b7f6162-a079-4de5-b066-c0ba7aee0279
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'meas.ssr_history_success_prob_impact_negative' =
+			
+			var Val = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
+			RETURN IF(Val < 0, Val, BLANK())
+		displayFolder: success_prob_factors
+		lineageTag: 1e43ccd7-bb13-499a-8c51-e9f8ea0f82c6
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'meas.ssr_history_success_prob_impact_neutral' =
+			
+			var Val = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
+			RETURN IF(Val = 0, Val, BLANK())
+		displayFolder: success_prob_factors
+		lineageTag: aa7bda30-4c6f-4d5f-aca3-b31d9a763f74
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'meas.ssr_history_success_prob_impact_positive' =
+			
+			var Val = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
+			RETURN IF(Val > 0, Val, BLANK())
+		displayFolder: success_prob_factors
+		lineageTag: 8fbc0d38-0e29-4fba-b51f-064c52e66772
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'meas.success_prob_factors_most_impact_str' =
+			
+			// Build top 4 factors by impact and count
+			VAR FactorImpactCount =
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            ssr_history_success_factors,
+			            ssr_history_success_factors[trueai_factor_name],
+			            ssr_history_success_factors[trueai_value],
+			            ssr_history_success_factors[trueai_value_impact]
+			        ),
+			        "Count", CALCULATE(COUNTROWS(ssr_history_success_factors))
+			    )
+			VAR RankedFactors =
+			    ADDCOLUMNS(
+			        FactorImpactCount,
+			        "Rank",
+			        RANKX(
+			            CALCULATETABLE(FactorImpactCount, ALL(ssr_history_success_factors)),
+			            [trueai_value_impact] * 10000 + [Count],
+			            ,
+			            DESC,
+			            Dense
+			        )
+			    )
+			VAR Top4Factors = FILTER(RankedFactors, [Rank] <= 4)
+			RETURN
+			    CONCATENATEX(
+			        Top4Factors,
+			        ssr_history_success_factors[trueai_factor_name] & " (Impact: " & [trueai_value_impact] & ", Count: " & [Count] & ")",
+			        ", ",
+			        [Rank],
+			        ASC
+			    )
+		displayFolder: success_prob_factors
+		lineageTag: 155be943-f4b8-4e9f-9539-81ef42a4f95f
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'meas.top_factor_name_by_impact' =
+			
+			VAR MaxImpact = MAXX(ssr_history_success_factors, ssr_history_success_factors[trueai_value_impact])
+			RETURN CALCULATE(
+			    MAX(ssr_history_success_factors[trueai_factor_name]),
+			    ssr_history_success_factors[trueai_value_impact] = MaxImpact
+			)
+		displayFolder: success_prob_factors
+		lineageTag: 8eb3e698-d4b3-488d-8fb0-78602109ca50
+
+		annotation SummarizationSetBy = Automatic
+
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 1036ce3d-0d54-48bd-8507-52d1386d63f8
 		summarizeBy: none
 		sourceColumn: _sys_doc_id
-
-		annotation SummarizationSetBy = Automatic
-
-	measure 'meas.ssr_history_success_prob_factors_all_count' = ```
-
-		var res = CALCULATE(
-		    COUNT(ssr_history_success_factors[_sys_ssr_history_id]),
-		    ssr_history_success_factors[trueai_factor_name] <> "aaa"
-		        && ssr_history_success_factors[trueai_value] <> "aaa"
-		)
-		RETURN res
-		```
-		displayFolder: success_prob_factors
-
-		annotation SummarizationSetBy = Automatic
-
-	measure 'meas.ssr_history_success_prob_factors_count' = ```
-
-		var res = CALCULATE(COUNT(ssr_history_success_factors[_sys_doc_id]))
-		RETURN res
-		```
-		displayFolder: success_prob_factors
-
-		annotation SummarizationSetBy = Automatic
-
-	measure 'meas.ssr_history_success_prob_factors_pct' = ```
-
-		var res = DIVIDE([meas.ssr_history_success_prob_factors_count], [meas.ssr_history_success_prob_factors_all_count])
-		RETURN res
-		```
-		displayFolder: success_prob_factors
-		formatString: 0.00%
-
-		annotation SummarizationSetBy = Automatic
-
-	measure 'meas.ssr_history_success_prob_factors_pct_how_many' = ```
-
-		var step_count = [meas.ssr_history_step_count]
-		var _success_prob_count = [meas.ssr_history_success_prob_factors_count]
-		var res = DIVIDE(_success_prob_count, step_count, 0)
-		RETURN res
-		```
-		displayFolder: success_prob_factors
-
-		annotation SummarizationSetBy = Automatic
-
-	measure 'meas.ssr_history_success_prob_feature_impact' = ```
-
-		RETURN CALCULATE(
-		    AVERAGEX(
-		        ssr_history_success_factors,
-		        ssr_history_success_factors[trueai_factor_impact]
-		    )
-		)
-		```
-		displayFolder: success_prob_factors
-
-		annotation SummarizationSetBy = Automatic
-
-	measure 'meas.ssr_history_success_prob_impact' = ```
-
-		var _prob = CALCULATE(AVERAGE(ssr_history_success_factors[trueai_value_impact]))
-		var res = ROUND(_prob, 2)
-		RETURN res
-		```
-		displayFolder: success_prob_factors
-
-		annotation SummarizationSetBy = Automatic
-
-	measure 'meas.ssr_history_success_prob_impact_negative' = ```
-
-		var Val = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
-		RETURN IF(Val < 0, Val, BLANK())
-		```
-		displayFolder: success_prob_factors
-
-		annotation SummarizationSetBy = Automatic
-
-	measure 'meas.ssr_history_success_prob_impact_neutral' = ```
-
-		var Val = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
-		RETURN IF(Val = 0, Val, BLANK())
-		```
-		displayFolder: success_prob_factors
-
-		annotation SummarizationSetBy = Automatic
-
-	measure 'meas.ssr_history_success_prob_impact_positive' = ```
-
-		var Val = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
-		RETURN IF(Val > 0, Val, BLANK())
-		```
-		displayFolder: success_prob_factors
-
-		annotation SummarizationSetBy = Automatic
-
-	measure 'meas.success_prob_factors_most_impact_str' = ```
-
-		// Build top 4 factors by impact and count
-		VAR FactorImpactCount =
-		    ADDCOLUMNS(
-		        SUMMARIZE(
-		            ssr_history_success_factors,
-		            ssr_history_success_factors[trueai_factor_name],
-		            ssr_history_success_factors[trueai_value],
-		            ssr_history_success_factors[trueai_value_impact]
-		        ),
-		        "Count", CALCULATE(COUNTROWS(ssr_history_success_factors))
-		    )
-		VAR RankedFactors =
-		    ADDCOLUMNS(
-		        FactorImpactCount,
-		        "Rank",
-		        RANKX(ALL(FactorImpactCount), [trueai_value_impact] * 10000 + [Count],, DESC, Dense)
-		    )
-		VAR Top4Factors = FILTER(RankedFactors, [Rank] <= 4)
-		RETURN
-		    CONCATENATEX(
-		        Top4Factors,
-		        ssr_history_success_factors[trueai_factor_name] & " (Impact: " & [trueai_value_impact] & ", Count: " & [Count] & ")",
-		        ", ",
-		        [Rank],
-		        ASC
-		    )
-		```
-		displayFolder: success_prob_factors
-
-		annotation SummarizationSetBy = Automatic
-
-	measure 'meas.top_factor_name_by_impact' = ```
-
-		VAR MaxImpact = MAXX(ssr_history_success_factors, ssr_history_success_factors[trueai_value_impact])
-		RETURN CALCULATE(
-		    MAX(ssr_history_success_factors[trueai_factor_name]),
-		    ssr_history_success_factors[trueai_value_impact] = MaxImpact
-		)
-		```
-		displayFolder: success_prob_factors
 
 		annotation SummarizationSetBy = Automatic
 
