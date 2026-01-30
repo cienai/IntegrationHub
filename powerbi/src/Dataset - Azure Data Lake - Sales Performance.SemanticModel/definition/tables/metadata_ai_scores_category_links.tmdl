@@ -12,17 +12,15 @@ table metadata_ai_scores_category_links
 		lineageTag: a935c4b2-c445-4a96-9f7a-e650a735168b
 
 	column _sys_doc_id
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: 0ece1910-f4fb-4fe2-a605-6e0f6df1f2be
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: _sys_doc_id
 
 		annotation SummarizationSetBy = Automatic
 
 	column _sys_is_active
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
+		dataType: string
 		lineageTag: ac344033-67e1-44e5-809c-5b9e6026d641
 		summarizeBy: none
 		sourceColumn: _sys_is_active
@@ -82,9 +80,16 @@ table metadata_ai_scores_category_links
 		source =
 				let
 				    Source = getDBTable("metadata_ai_scores_category_links"),
-				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"_sys_doc_id", Int64.Type}, {"_sys_is_active", type logical}, {"_sys_modified_on", type datetime}, {"score_id", Int64.Type}, {"analysis_category_id", type text}, {"weighting", Int64.Type}, {"notes", type text}})
-				in
-				    #"Changed Type"
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{
+				        {"_sys_doc_id", type text},
+				        {"_sys_is_active", type text},
+				        {"_sys_modified_on", type datetime},
+				        {"analysis_category_id", type text},
+				        {"notes", type text},
+				        {"score_id", Int64.Type},
+				        {"weighting", Int64.Type}})
+				        in
+				            #"Changed Type"
 
 	annotation PBI_NavigationStepName = Navigation
 

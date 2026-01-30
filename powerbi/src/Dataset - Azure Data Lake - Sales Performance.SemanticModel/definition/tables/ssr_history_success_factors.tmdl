@@ -17,90 +17,92 @@ table ssr_history_success_factors
 
 		annotation SummarizationSetBy = Automatic
 
-	column step_name
+	column trueai_ssr_history_name
 		dataType: string
 		lineageTag: a4b9dbc1-0667-4e74-b55a-85b80f664456
 		summarizeBy: none
-		sourceColumn: step_name
+		sourceColumn: trueai_ssr_history_name
 
 		annotation SummarizationSetBy = Automatic
 
-	column model
+	column trueai_model_name
 		dataType: string
 		lineageTag: 4bdf9918-c13d-4845-b92f-483cbfcc5ac7
 		summarizeBy: none
-		sourceColumn: model
+		sourceColumn: trueai_model_name
 
 		annotation SummarizationSetBy = Automatic
 
-	column name
-		dataType: string
-		lineageTag: 5c1f6189-243c-46e7-a741-63e66faeda81
-		summarizeBy: none
-		sourceColumn: name
-
-		annotation SummarizationSetBy = Automatic
-
-	column feature_impact
-		dataType: double
-		lineageTag: d4645d09-4a13-482f-9170-fb5f7b6ad5df
-		summarizeBy: sum
-		sourceColumn: feature_impact
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column value
+	column trueai_value
 		dataType: string
 		lineageTag: fd91224b-0621-4f65-b83f-14b47ffa8f74
 		summarizeBy: none
-		sourceColumn: value
+		sourceColumn: trueai_value
 
 		annotation SummarizationSetBy = Automatic
 
-	column sig
+	column trueai_value_impact_sign
 		dataType: string
 		lineageTag: 3b11d551-79ed-4ce9-be1f-57019289de3b
 		summarizeBy: none
-		sourceColumn: sig
+		sourceColumn: trueai_value_impact_sign
 
 		annotation SummarizationSetBy = Automatic
 
-	column impact
+	column trueai_factor_name
+		dataType: string
+		lineageTag: 5c1f6189-243c-46e7-a741-63e66faeda81
+		summarizeBy: none
+		sourceColumn: trueai_factor_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_value_impact
 		dataType: double
 		lineageTag: ab8360cc-17e2-42e1-9712-5548a541fa73
 		summarizeBy: sum
-		sourceColumn: impact
+		sourceColumn: trueai_value_impact
 
 		annotation SummarizationSetBy = Automatic
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column sort
+	column trueai_sort
 		dataType: double
 		lineageTag: 77fa77ab-87ff-4b1e-90b1-58b41d496db2
 		summarizeBy: sum
-		sourceColumn: sort
+		sourceColumn: trueai_sort
 
 		annotation SummarizationSetBy = Automatic
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column ordering_factor
-		dataType: string
-		lineageTag: 548e89bf-cf18-431f-b232-f4a97fe31b52
-		summarizeBy: none
-		sourceColumn: ordering_factor
+	column trueai_factor_impact
+		dataType: double
+		lineageTag: d4645d09-4a13-482f-9170-fb5f7b6ad5df
+		summarizeBy: sum
+		sourceColumn: trueai_factor_impact
 
 		annotation SummarizationSetBy = Automatic
 
-	column display
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_ordering_factor
+		dataType: double
+		lineageTag: 548e89bf-cf18-431f-b232-f4a97fe31b52
+		summarizeBy: sum
+		sourceColumn: trueai_ordering_factor
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_is_significant
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 7dd9781f-f08e-4452-9d80-d0d4582d2006
 		summarizeBy: none
-		sourceColumn: display
+		sourceColumn: trueai_is_significant
 
 		annotation SummarizationSetBy = Automatic
 
@@ -112,37 +114,24 @@ table ssr_history_success_factors
 				    dbTable = getDBTable("ssr_history_success_factors"),
 				
 				    // --- RENAME COLUMNS TO MATCH LEGACY FIELDS ---
-				    RenamedColumns = Table.RenameColumns(dbTable, {
-				        {"_sys_ssr_history_id", "_sys_ssr_history_id"},
-				        {"trueai_model_name", "model"},
-				        {"trueai_value", "value"},
-				        {"trueai_value_impact", "impact"},
-				        {"trueai_value_impact_sign", "sig"},
-				        {"trueai_factor_name", "name"},
-				        {"trueai_sort", "sort"},
-				        {"trueai_factor_impact", "feature_impact"},
-				        {"trueai_ordering_factor", "ordering_factor"},
-				        {"trueai_ssr_history_name", "step_name"},
-				        {"trueai_is_significant", "display"}
-				    }),
-				
-				    // --- SAFE TYPE CASTING ---
-				    CastedTable = Table.TransformColumns(RenamedColumns, {
-				        {"_sys_ssr_history_id", each try Text.From(_) otherwise null, type text},
-				        {"display", each try Logical.From(_) otherwise null, type logical},
-				        {"feature_impact", each try Number.From(_) otherwise null, type number},
-				        {"impact", each try Number.From(_) otherwise null, type number},
-				        {"model", each try Text.From(_) otherwise null, type text},
-				        {"name", each try Text.From(_) otherwise null, type text},
-				        {"sig", each try Text.From(_) otherwise null, type text},
-				        {"sort", each try Number.From(_) otherwise null, type number},
-				        {"step_name", each try Text.From(_) otherwise null, type text},
-				        {"value", each try Text.From(_) otherwise null, type text}
+				    dbTableTyped = Table.TransformColumnTypes(dbTable,{
+				       {"_sys_doc_id", type text},
+				{"_sys_ssr_history_id", type text},
+				{"trueai_factor_impact", type number},
+				{"trueai_factor_name", type text},
+				{"trueai_is_significant", type logical},
+				{"trueai_model_name", type text},
+				{"trueai_ordering_factor", type number},
+				{"trueai_sort", type number},
+				{"trueai_ssr_history_name", type text},
+				{"trueai_value", type text},
+				{"trueai_value_impact", type number},
+				{"trueai_value_impact_sign", type text}
 				    })
 				in
-				    CastedTable
-
-	annotation PBI_NavigationStepName = Navigation
+				    dbTableTyped
 
 	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
 

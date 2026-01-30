@@ -1,0 +1,1287 @@
+createOrReplace
+
+	table accounts
+		lineageTag: a6327903-d2c7-49aa-94b9-d45c52607f22
+
+		measure 'meas.account_trueai_dupe_rate' = CALCULATE(DISTINCTCOUNT(accounts[trueai_account_dupe_id]) / CALCULATE(count(accounts[_sys_docid])))
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 78562b48-eb24-4c22-9628-a15da188859a
+
+		measure 'meas.account_trueai_completeness_improvement' = ```
+				
+				var crmval = CALCULATE(AVERAGE([crm_complt]))
+				var aival = CALCULATE(AVERAGE([trueai_complt]))
+				var impro = Divide(aival - crmval, crmval) 
+				var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
+				return res 
+				
+				```
+			formatString: 0 %
+			lineageTag: 8e3a434f-82f7-400f-88ee-ac2551a93985
+
+		measure 'meas.accounts_trueai_non_dupe_counts' = ```
+				
+				
+				var res = calculate(COUNT(accounts[_sys_docid]) , accounts[trueai_is_master] = true || isblank(accounts[trueai_is_master]) = true )
+				
+				
+				
+				/*
+				id	name	dupeid	is master	
+				1	john	1	1	
+				2	morgan			
+				3	lucy			
+				4	john	1	0	
+				5	john	1	0	
+				6	ben			
+				7	rob	2	1	
+				8	rob	2	0	
+				9	ronny			
+				10	dodi			
+								
+					total	10	count(id)	
+					non dupes	7	count(id) - count(dupeid) - distinct count(dupeid)	ismaster =1 or null
+					records that are part of dupes	5	count (dupeid)	
+					unique records duped	2	distinctcount (dupeid)	
+					records that should not be included	3	 count(dupeid) - distinct count(dupeid)	ismaster=0
+				*/
+				
+				return res
+				```
+			formatString: 0
+			lineageTag: ef16364d-0133-48cc-bbbf-e0b706ffe258
+
+		column _sys_ssr_id
+			dataType: string
+			lineageTag: f61a3582-d6c5-4aff-8ab0-d79cbcfcb808
+			summarizeBy: none
+			sourceColumn: _sys_ssr_id
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_deep_link
+			dataType: string
+			lineageTag: 6b0ff765-12e8-4ec9-92a8-1d7cda849fdb
+			summarizeBy: none
+			sourceColumn: crm_deep_link
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_name
+			dataType: string
+			lineageTag: 5653bf07-edcc-4c33-a259-e75e02cb07fe
+			summarizeBy: none
+			sourceColumn: crm_name
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_account_type
+			dataType: string
+			lineageTag: bd2a1572-bfe3-40ec-87a7-546df341266a
+			summarizeBy: none
+			sourceColumn: crm_account_type
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_leadsource
+			dataType: string
+			lineageTag: eabe42c4-4ba1-4e3b-b049-5703a26a4f38
+			summarizeBy: none
+			sourceColumn: crm_leadsource
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_industry
+			dataType: string
+			lineageTag: f416a837-623b-4738-8eb2-b3be23cbf182
+			summarizeBy: none
+			sourceColumn: crm_industry
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_num_employees
+			dataType: int64
+			formatString: 0
+			lineageTag: 2d1865ff-599c-4c87-9e51-c821a68887a2
+			summarizeBy: sum
+			sourceColumn: crm_num_employees
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_is_master
+			dataType: boolean
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: 25e98588-65ff-476e-af2f-ddfd0d7e78da
+			summarizeBy: none
+			sourceColumn: trueai_is_master
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_first_touch
+			dataType: dateTime
+			formatString: General Date
+			lineageTag: 8f4efb91-dd81-44b8-a5e9-c4f641d2c753
+			summarizeBy: none
+			sourceColumn: trueai_first_touch
+
+			variation Variation
+				isDefault
+				relationship: aeaaaada-05b6-4a3c-b69c-87998e568a69
+				defaultHierarchy: LocalDateTable_1f6bcae4-59cc-43a4-a115-5cd0b4bac39f.'Date Hierarchy'
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_last_touch
+			dataType: dateTime
+			formatString: General Date
+			lineageTag: a6e3f5be-197a-4366-aee2-7cac1cf4ab6c
+			summarizeBy: none
+			sourceColumn: trueai_last_touch
+
+			variation Variation
+				isDefault
+				relationship: dec2f721-38e5-4b4f-96f6-788a56e91792
+				defaultHierarchy: LocalDateTable_d991489e-c9e1-498d-8a34-4f4e932d5225.'Date Hierarchy'
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_converted_date
+			dataType: dateTime
+			formatString: General Date
+			lineageTag: 4a6f27f1-9af4-438b-ad3e-f2e7823b68db
+			summarizeBy: none
+			sourceColumn: trueai_converted_date
+
+			variation Variation
+				isDefault
+				relationship: de43256c-b4b0-4ae7-8a27-3ecdd09e804f
+				defaultHierarchy: LocalDateTable_976536e2-db0b-42e6-8a41-ccc879cd8a4a.'Date Hierarchy'
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_last_outcome
+			dataType: dateTime
+			formatString: General Date
+			lineageTag: c9b3e7da-a5c2-43a5-a0ca-e958e207afb4
+			summarizeBy: none
+			sourceColumn: trueai_last_outcome
+
+			variation Variation
+				isDefault
+				relationship: f6973136-3570-416b-9b4c-8e803534da17
+				defaultHierarchy: LocalDateTable_3b9b047b-1244-4a6b-8608-ccd748bd7932.'Date Hierarchy'
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_leadsource
+			dataType: string
+			lineageTag: a71914d7-90ba-4f57-97d8-82581762df82
+			summarizeBy: none
+			sourceColumn: trueai_leadsource
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_industry
+			dataType: string
+			lineageTag: a9dbf3d6-c150-491f-ba9b-53c21529892d
+			summarizeBy: none
+			sourceColumn: trueai_industry
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_company_size
+			dataType: string
+			lineageTag: 1a29ec72-c250-4887-a27b-8f1ed0c19ecf
+			summarizeBy: none
+			sourceColumn: trueai_company_size
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_qual_bucket
+			dataType: string
+			lineageTag: 14404f74-c540-4b2c-a116-40d601550b7c
+			summarizeBy: none
+			sourceColumn: trueai_qual_bucket
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_parent_id
+			dataType: string
+			lineageTag: 9b74fa54-8d89-4d2a-a893-04b4fbd5d73c
+			summarizeBy: none
+			sourceColumn: crm_parent_id
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_company_size_rule
+			dataType: string
+			lineageTag: 589dd272-e5f2-48b6-ab0b-1a24d5251e2a
+			summarizeBy: none
+			sourceColumn: trueai_company_size_rule
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_industry_rule
+			dataType: string
+			lineageTag: a59811bb-69cd-4619-b452-6dd934339c12
+			summarizeBy: none
+			sourceColumn: trueai_industry_rule
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_leadsource_rule
+			dataType: string
+			lineageTag: 640b802a-5f21-4ef4-91c7-8e5f4ec2e274
+			summarizeBy: none
+			sourceColumn: trueai_leadsource_rule
+
+			annotation SummarizationSetBy = Automatic
+
+		column _sys_docid
+			dataType: string
+			lineageTag: b237a0b9-0021-47c2-8823-f2dc7b289d64
+			summarizeBy: none
+			sourceColumn: _sys_docid
+
+			annotation SummarizationSetBy = Automatic
+
+		column _sys_filt_end_date
+			dataType: dateTime
+			formatString: Long Date
+			lineageTag: 78cfaada-2b81-45ec-a731-14d261330b8b
+			summarizeBy: none
+			sourceColumn: _sys_filt_end_date
+
+			variation Variation
+				isDefault
+				relationship: 32a956d8-b123-444c-85a0-a1c0d362943e
+				defaultHierarchy: LocalDateTable_a0ecb5d6-d2c9-4a09-8f9a-fa5646cf2e23.'Date Hierarchy'
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column _sys_filt_start_date
+			dataType: dateTime
+			formatString: Long Date
+			lineageTag: 5f6cf5e1-8216-4b80-820c-44ed9e378b3b
+			summarizeBy: none
+			sourceColumn: _sys_filt_start_date
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column crm_addr_city
+			dataType: string
+			lineageTag: aa5b7f90-17bd-4df0-b33b-7b8e45567b45
+			summarizeBy: none
+			sourceColumn: crm_addr_city
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_addr_country
+			dataType: string
+			lineageTag: 4d2c16ac-3344-4525-b71e-8147d7c83e66
+			summarizeBy: none
+			sourceColumn: crm_addr_country
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_addr_postal_code
+			dataType: string
+			lineageTag: 31d86a02-884f-479f-b149-3a18f8e4b202
+			summarizeBy: none
+			sourceColumn: crm_addr_postal_code
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_addr_state
+			dataType: string
+			lineageTag: 3fa83180-d3e5-4e23-b40b-4e371dce8015
+			summarizeBy: none
+			sourceColumn: crm_addr_state
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_addr_street
+			dataType: string
+			lineageTag: fcc8a96b-9288-4d15-9990-0a510fb56cb3
+			summarizeBy: none
+			sourceColumn: crm_addr_street
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_complt
+			dataType: double
+			lineageTag: 7034ef3d-5251-4da5-90a3-2887fdc79377
+			summarizeBy: sum
+			sourceColumn: crm_complt
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column crm_complt_contact
+			dataType: double
+			lineageTag: 10fffbe0-e267-4abf-b666-3df65b5dce7e
+			summarizeBy: sum
+			sourceColumn: crm_complt_contact
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column crm_complt_contact_method
+			dataType: double
+			lineageTag: 4af167fd-1d2d-483d-9b9f-09d074804656
+			summarizeBy: sum
+			sourceColumn: crm_complt_contact_method
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column crm_complt_geo
+			dataType: double
+			lineageTag: 536f61f0-02ce-410c-9063-24766504de98
+			summarizeBy: sum
+			sourceColumn: crm_complt_geo
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column crm_complt_marketing
+			dataType: double
+			lineageTag: e5688b25-43ed-4b8c-acf3-ce99574adfb5
+			summarizeBy: sum
+			sourceColumn: crm_complt_marketing
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column crm_creator_id
+			dataType: string
+			lineageTag: fa08edff-ebcf-4957-84ab-ee84cbbb1776
+			summarizeBy: none
+			sourceColumn: crm_creator_id
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_last_act_time
+			dataType: dateTime
+			formatString: General Date
+			lineageTag: 55a336e3-a772-43ac-a171-4c08eb54d351
+			summarizeBy: none
+			sourceColumn: crm_last_act_time
+
+			variation Variation
+				isDefault
+				relationship: f48ea8d2-113a-40a8-90f9-4809bd12cfa2
+				defaultHierarchy: LocalDateTable_4093fb22-4030-45b1-95d3-345c047026d2.'Date Hierarchy'
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_owner_id
+			dataType: string
+			lineageTag: 937e97eb-6d34-4b70-88f5-22233cf76769
+			summarizeBy: none
+			sourceColumn: crm_owner_id
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_account_dupe_conf
+			dataType: double
+			lineageTag: 12a123f4-9d09-4e0c-841b-7ecf8c27b5fa
+			summarizeBy: sum
+			sourceColumn: trueai_account_dupe_conf
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_account_dupe_id
+			dataType: string
+			lineageTag: bd946f4d-b36e-408b-98eb-adad58c325cd
+			summarizeBy: none
+			sourceColumn: trueai_account_dupe_id
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_addr_city
+			dataType: string
+			lineageTag: 3d3c028b-26b3-4ed9-9bfe-1b96faa7b127
+			summarizeBy: none
+			sourceColumn: trueai_addr_city
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_addr_country
+			dataType: string
+			lineageTag: e1cc3cad-6753-4f46-abd1-1fbfee659b22
+			summarizeBy: none
+			sourceColumn: trueai_addr_country
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_addr_postal_code
+			dataType: string
+			lineageTag: a94a2d9f-6163-4260-918e-6fdce04afbf0
+			summarizeBy: none
+			sourceColumn: trueai_addr_postal_code
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_addr_rule
+			dataType: string
+			lineageTag: 919b4799-144c-4791-8e56-4bbe678e0788
+			summarizeBy: none
+			sourceColumn: trueai_addr_rule
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_addr_state
+			dataType: string
+			lineageTag: 1c0d1ab6-9aed-4688-937c-55f752573026
+			summarizeBy: none
+			sourceColumn: trueai_addr_state
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_addr_street
+			dataType: string
+			lineageTag: de1402fd-9500-42cc-8981-4e6ed40221f7
+			summarizeBy: none
+			sourceColumn: trueai_addr_street
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_complt
+			dataType: double
+			lineageTag: 778cf85f-2d79-4f81-8097-b7e9ea89f079
+			summarizeBy: sum
+			sourceColumn: trueai_complt
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_complt_contact
+			dataType: double
+			lineageTag: abdf9f2e-9311-43fa-90b5-2cc21a295ade
+			summarizeBy: sum
+			sourceColumn: trueai_complt_contact
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_complt_contact_method
+			dataType: double
+			lineageTag: dd32a007-7658-4d03-b6db-975263ea37e1
+			summarizeBy: sum
+			sourceColumn: trueai_complt_contact_method
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_complt_geo
+			dataType: double
+			lineageTag: d76921b7-a533-4125-bd6f-124ebd154bd4
+			summarizeBy: sum
+			sourceColumn: trueai_complt_geo
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_complt_marketing
+			dataType: double
+			lineageTag: a6c8c8b0-c784-47af-a70f-e5d4b0b02635
+			summarizeBy: sum
+			sourceColumn: trueai_complt_marketing
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_creator_id
+			dataType: string
+			lineageTag: d60f7a17-90ef-4c3c-bc36-ee9bd833460f
+			summarizeBy: none
+			sourceColumn: trueai_creator_id
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_dur
+			dataType: int64
+			lineageTag: b794f45b-272e-48db-93cd-90dc7462bf79
+			summarizeBy: sum
+			sourceColumn: trueai_dur
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_industry_conf
+			dataType: double
+			lineageTag: 17a45d1f-8fa3-4b98-87a6-f20bbe5e4222
+			summarizeBy: sum
+			sourceColumn: trueai_industry_conf
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_leadsource_conf
+			dataType: double
+			lineageTag: f4673330-56b7-43d6-8345-4464137d164b
+			summarizeBy: sum
+			sourceColumn: trueai_leadsource_conf
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_owner_id
+			dataType: string
+			lineageTag: 4ac06b46-5da3-4862-83fe-b28a34cf83a1
+			summarizeBy: none
+			sourceColumn: trueai_owner_id
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_title_department
+			dataType: string
+			lineageTag: 579fcef1-ca36-452e-b25f-15b0776d3a4d
+			summarizeBy: none
+			sourceColumn: trueai_title_department
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_title_department_conf
+			dataType: double
+			lineageTag: 09d74979-60bd-4a02-84d8-c48b329e082e
+			summarizeBy: sum
+			sourceColumn: trueai_title_department_conf
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_title_seniority
+			dataType: string
+			lineageTag: 5ff901b5-7189-4b3b-9ec3-f7e23f1817ee
+			summarizeBy: none
+			sourceColumn: trueai_title_seniority
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_title_seniority_conf
+			dataType: double
+			lineageTag: a7600a2b-42d4-47ec-8a9e-52a0a56d9d67
+			summarizeBy: sum
+			sourceColumn: trueai_title_seniority_conf
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_ssr_is_master
+			dataType: boolean
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: 3fb0cee7-ec8f-4ab6-9474-cb7db7d1499a
+			summarizeBy: none
+			sourceColumn: trueai_ssr_is_master
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_custom_value_1
+			dataType: string
+			lineageTag: b7172cad-913b-423a-b9db-afe486ecf6a5
+			summarizeBy: none
+			sourceColumn: crm_custom_value_1
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_custom_value_2
+			dataType: string
+			lineageTag: e116bad9-fec7-41cf-a7c1-da10681ce5ae
+			summarizeBy: none
+			sourceColumn: crm_custom_value_2
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_custom_value_3
+			dataType: string
+			lineageTag: 1205fc73-bcf0-4f0e-9182-04650cf0d993
+			summarizeBy: none
+			sourceColumn: crm_custom_value_3
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_addr_lat
+			dataType: double
+			lineageTag: 4878ad31-9003-4019-a79d-359cd04a650a
+			summarizeBy: sum
+			sourceColumn: trueai_addr_lat
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_addr_long
+			dataType: double
+			lineageTag: 30fea007-0c1c-4b8d-bbf5-a16fbeb53948
+			summarizeBy: sum
+			sourceColumn: trueai_addr_long
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_qual_bucket_num
+			dataType: int64
+			formatString: 0
+			lineageTag: 0db3a60c-f515-4eef-bb2d-5fcea5c84256
+			summarizeBy: sum
+			sourceColumn: trueai_qual_bucket_num
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_type
+			dataType: string
+			lineageTag: acd18fc6-c024-4150-9004-71f4c4339aaf
+			summarizeBy: none
+			sourceColumn: trueai_type
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_complt_custom
+			dataType: double
+			lineageTag: 11a5e328-8cbe-4e4a-a410-ee65f8621494
+			summarizeBy: sum
+			sourceColumn: crm_complt_custom
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column _sys_as_of
+			dataType: dateTime
+			formatString: General Date
+			lineageTag: 32ab6203-69df-4a90-89c6-7d779c6f894e
+			summarizeBy: none
+			sourceColumn: _sys_as_of
+
+			variation Variation
+				isDefault
+				relationship: 00bfa666-113a-4046-baf4-31c67d4e33b6
+				defaultHierarchy: LocalDateTable_c52d3b4e-5679-40d0-920e-1f43327a367f.'Date Hierarchy'
+
+			annotation SummarizationSetBy = Automatic
+
+		column _sys_last_modified_on
+			dataType: dateTime
+			formatString: General Date
+			lineageTag: 23e1350e-1531-4eba-91b7-d121d273ad38
+			summarizeBy: none
+			sourceColumn: _sys_last_modified_on
+
+			variation Variation
+				isDefault
+				relationship: 6033af1e-080d-47e1-8894-0dffbab4d378
+				defaultHierarchy: LocalDateTable_f25621ce-8284-4875-a608-2917257ba7fa.'Date Hierarchy'
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_created_on
+			dataType: dateTime
+			formatString: General Date
+			lineageTag: 5fbdb43a-9652-483a-99fc-b4e74d0b6bfc
+			summarizeBy: none
+			sourceColumn: crm_created_on
+
+			variation Variation
+				isDefault
+				relationship: 5f2e08fa-8c78-4642-86c6-bdf5a93b7561
+				defaultHierarchy: LocalDateTable_a0e13458-c7e6-4607-81e1-0d7ccc4351ee.'Date Hierarchy'
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_modified_on
+			dataType: dateTime
+			formatString: General Date
+			lineageTag: 8f566871-42da-44b3-a941-323270b5895b
+			summarizeBy: none
+			sourceColumn: crm_modified_on
+
+			variation Variation
+				isDefault
+				relationship: 059137e1-bcea-4744-bf02-fc7ebe444f47
+				defaultHierarchy: LocalDateTable_c0389f77-23db-4532-bb4e-8a9103618b4e.'Date Hierarchy'
+
+			annotation SummarizationSetBy = Automatic
+
+		column crm_web_url
+			dataType: string
+			lineageTag: 76bdc727-64be-4ecb-b393-02f08d39272c
+			summarizeBy: none
+			sourceColumn: crm_web_url
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_created_on
+			dataType: dateTime
+			formatString: General Date
+			lineageTag: ef39cf46-d094-418a-b2b4-95c1997726e9
+			summarizeBy: none
+			sourceColumn: trueai_created_on
+
+			variation Variation
+				isDefault
+				relationship: 6e3b4f89-4353-4cb7-a3a6-22125c2e522f
+				defaultHierarchy: LocalDateTable_a9937fa6-44dd-4a68-ad13-0837f8ee58bd.'Date Hierarchy'
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_prob_of_conversion
+			dataType: double
+			lineageTag: 2ee4d2dd-0568-48dc-8acb-802ca4a8785f
+			summarizeBy: sum
+			sourceColumn: trueai_prob_of_conversion
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_prob_of_conversion_explained
+			dataType: string
+			lineageTag: 7f8785ab-b904-4894-96e0-318b5d300b1d
+			summarizeBy: none
+			sourceColumn: trueai_prob_of_conversion_explained
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_prob_of_new_logo_win
+			dataType: double
+			lineageTag: 6cd9b0a3-6d2a-4f24-94b5-7663eaaf5bd3
+			summarizeBy: sum
+			sourceColumn: trueai_prob_of_new_logo_win
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column trueai_vi_lead_gen_value
+			dataType: decimal
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			lineageTag: 8989136d-3aec-45db-80c7-6916b435ba33
+			summarizeBy: sum
+			sourceColumn: trueai_vi_lead_gen_value
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		column trueai_is_erp
+			dataType: string
+			lineageTag: 769e9f5b-1b1a-43d7-b854-494bfd1f3170
+			summarizeBy: none
+			sourceColumn: trueai_is_erp
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_test
+			dataType: string
+			lineageTag: ce202b9c-4e53-419d-be28-3a5919f8060f
+			summarizeBy: none
+			sourceColumn: trueai_test
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_test_conf
+			dataType: string
+			lineageTag: 1515c8c8-ac72-49d6-87cd-4b12f2b8f5a4
+			summarizeBy: none
+			sourceColumn: trueai_test_conf
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_test_rule
+			dataType: string
+			lineageTag: 61a77390-2c44-40f4-a890-ff84a5c947e5
+			summarizeBy: none
+			sourceColumn: trueai_test_rule
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_test_debug
+			dataType: string
+			lineageTag: 4bdd6e36-f170-4968-b35b-582cef262e25
+			summarizeBy: none
+			sourceColumn: trueai_test_debug
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_created_on_rule
+			dataType: string
+			lineageTag: d7fce1fa-c335-4c42-8bef-5c539927f991
+			summarizeBy: none
+			sourceColumn: trueai_created_on_rule
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_first_touch_rule
+			dataType: string
+			lineageTag: 6bfb4896-a1cb-40b0-aedf-d764571dab50
+			summarizeBy: none
+			sourceColumn: trueai_first_touch_rule
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_last_outcome_rule
+			dataType: string
+			lineageTag: 14b2c64a-d43f-4cc8-8487-c4f4dda64dcd
+			summarizeBy: none
+			sourceColumn: trueai_last_outcome_rule
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_last_touch_rule
+			dataType: string
+			lineageTag: 6dc0ae36-5943-4177-862d-0ff9016ae309
+			summarizeBy: none
+			sourceColumn: trueai_last_touch_rule
+
+			annotation SummarizationSetBy = Automatic
+
+		column trueai_owner_id_rule
+			dataType: string
+			lineageTag: 927538b4-4f8c-4863-b7ea-b75bfc23db8d
+			summarizeBy: none
+			sourceColumn: trueai_owner_id_rule
+
+			annotation SummarizationSetBy = Automatic
+
+		column cust_text1
+			dataType: string
+			lineageTag: 6230bf7f-b829-4052-8ad8-08059c9b5791
+			summarizeBy: none
+			sourceColumn: cust_text1
+
+			annotation SummarizationSetBy = Automatic
+
+		column cust_text2
+			dataType: string
+			lineageTag: beead0fe-425a-4209-823f-49b0df6ca78a
+			summarizeBy: none
+			sourceColumn: cust_text2
+
+			annotation SummarizationSetBy = Automatic
+
+		column cust_text3
+			dataType: string
+			lineageTag: 12ffc0a8-1302-4cca-8de8-c76d11c7d4da
+			summarizeBy: none
+			sourceColumn: cust_text3
+
+			annotation SummarizationSetBy = Automatic
+
+		column cust_text4
+			dataType: string
+			lineageTag: 92d25d47-b637-4328-92f3-6d70c78185a1
+			summarizeBy: none
+			sourceColumn: cust_text4
+
+			annotation SummarizationSetBy = Automatic
+
+		column cust_text5
+			dataType: string
+			lineageTag: 11bafeab-913d-4c22-957d-5179017ea22a
+			summarizeBy: none
+			sourceColumn: cust_text5
+
+			annotation SummarizationSetBy = Automatic
+
+		column cust_num1
+			dataType: double
+			lineageTag: 98608169-7eda-49fb-854c-1efb8444dc01
+			summarizeBy: sum
+			sourceColumn: cust_num1
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column cust_num2
+			dataType: double
+			lineageTag: fd499a8c-e631-4db4-992a-dbaac860855e
+			summarizeBy: sum
+			sourceColumn: cust_num2
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column cust_num3
+			dataType: double
+			lineageTag: b36fa181-93b6-4b55-914c-187313fd7042
+			summarizeBy: sum
+			sourceColumn: cust_num3
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column cust_num4
+			dataType: double
+			lineageTag: 05b3c9ba-69f7-47f0-9807-9595abc07538
+			summarizeBy: sum
+			sourceColumn: cust_num4
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column cust_num5
+			dataType: double
+			lineageTag: ec9b013a-98d6-476a-9bb6-f1c0b438a191
+			summarizeBy: sum
+			sourceColumn: cust_num5
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column cust_num6
+			dataType: double
+			lineageTag: 98303d1c-6689-44e3-ae8e-84114ca58714
+			summarizeBy: sum
+			sourceColumn: cust_num6
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column cust_num7
+			dataType: double
+			lineageTag: 3e4a4ff8-8194-4aa0-99cf-bd0a9ac37bf2
+			summarizeBy: sum
+			sourceColumn: cust_num7
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column cust_bool1
+			dataType: boolean
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: 1efe13de-c2d8-48f1-b260-b5490ee44605
+			summarizeBy: none
+			sourceColumn: cust_bool1
+
+			annotation SummarizationSetBy = Automatic
+
+		column cust_bool2
+			dataType: boolean
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: c1b08327-f99a-42b3-8b1f-85e98ff1fdf6
+			summarizeBy: none
+			sourceColumn: cust_bool2
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_id
+			dataType: string
+			lineageTag: 3fb318a4-53cb-4a81-9513-5f85f5f76aa5
+			summarizeBy: none
+			sourceColumn: ext_id
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_source
+			dataType: string
+			lineageTag: 1cf0e932-b3c2-49cc-aa60-94fba1e3551e
+			summarizeBy: none
+			sourceColumn: ext_source
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_name
+			dataType: string
+			lineageTag: ae21d8d1-0564-4dd7-8ff9-eff020c2295b
+			summarizeBy: none
+			sourceColumn: ext_name
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_is_match
+			dataType: string
+			lineageTag: 569d1db6-0e1d-4f59-9b98-144083676ef3
+			summarizeBy: none
+			sourceColumn: ext_is_match
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_match_rule
+			dataType: string
+			lineageTag: 03488cb4-686a-4d87-aab0-daaeea8ea963
+			summarizeBy: none
+			sourceColumn: ext_match_rule
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_match_conf
+			dataType: double
+			lineageTag: 300aff84-9ea8-41b9-a702-58dbeea85581
+			summarizeBy: sum
+			sourceColumn: ext_match_conf
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column ext_num_employees_range
+			dataType: string
+			lineageTag: 78af6da5-e4db-40b3-aec5-9ea0e8567d77
+			summarizeBy: none
+			sourceColumn: ext_num_employees_range
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_revenue_range
+			dataType: string
+			lineageTag: ba0ff4af-73a9-43e0-bbb8-0d29ba47a455
+			summarizeBy: none
+			sourceColumn: ext_revenue_range
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_year_founded
+			dataType: string
+			lineageTag: 3b494c24-c1ef-4a51-8c55-d1a2996a6daa
+			summarizeBy: none
+			sourceColumn: ext_year_founded
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_industry
+			dataType: string
+			lineageTag: e979e463-3c86-43ac-bd65-e157e797f471
+			summarizeBy: none
+			sourceColumn: ext_industry
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_addr_street
+			dataType: string
+			lineageTag: ec86e494-a24a-4cea-a10a-75430998fee0
+			summarizeBy: none
+			sourceColumn: ext_addr_street
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_addr_city
+			dataType: string
+			lineageTag: 63c081b8-8d31-4f62-b155-1d35a7e0087a
+			summarizeBy: none
+			sourceColumn: ext_addr_city
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_addr_state
+			dataType: string
+			lineageTag: ef89c26c-cb23-40c1-b24f-814839796ee3
+			summarizeBy: none
+			sourceColumn: ext_addr_state
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_addr_postal_code
+			dataType: string
+			lineageTag: 5ebecd43-e5e5-4b16-acad-ddefe13805b3
+			summarizeBy: none
+			sourceColumn: ext_addr_postal_code
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_addr_country
+			dataType: string
+			lineageTag: 88d40c90-aecb-4a15-9837-536d3568d524
+			summarizeBy: none
+			sourceColumn: ext_addr_country
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_web_url
+			dataType: string
+			lineageTag: e43cd76c-0541-457f-9841-abcf94aed274
+			summarizeBy: none
+			sourceColumn: ext_web_url
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_phone
+			dataType: string
+			lineageTag: 62105f56-f8ed-4ab8-90fb-b9c9dae356d7
+			summarizeBy: none
+			sourceColumn: ext_phone
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_linkedin_url
+			dataType: string
+			lineageTag: 18e9504d-4f10-4ba5-92f3-990bad4dc303
+			summarizeBy: none
+			sourceColumn: ext_linkedin_url
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_self_verified
+			dataType: string
+			lineageTag: 8cdf0bf4-d0fd-489e-9152-594300c43418
+			summarizeBy: none
+			sourceColumn: ext_self_verified
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_last_updated
+			dataType: string
+			lineageTag: b05baae8-0e9a-46a9-a341-f7926f91ffc4
+			summarizeBy: none
+			sourceColumn: ext_last_updated
+
+			annotation SummarizationSetBy = Automatic
+
+		column ext_debug
+			dataType: string
+			lineageTag: 61570bf2-50ab-4d7e-bd4d-e74306135840
+			summarizeBy: none
+			sourceColumn: ext_debug
+
+			annotation SummarizationSetBy = Automatic
+
+		partition accounts-d25bbe48-ca95-4240-a9fa-3c0f5e0424c4 = m
+			mode: import
+			source = ```
+					let
+					  
+					  dbTable = getDBTable("accounts"), // get the right table
+					  dbTableRenamed = Table.RenameColumns(dbTable,{ // rename fields that were truncated in postgres
+					   }),
+					  dbTableTyped = Table.TransformColumnTypes(dbTableRenamed,{ // change types to what we're expecting
+					    {"_sys_as_of", type datetime},
+					    {"_sys_doc_id", type text},
+					    {"_sys_filt_end_date", type date},
+					    {"_sys_filt_start_date", type date},
+					    {"_sys_last_modified_on", type datetime},
+					    {"_sys_ssr_id", type text},
+					    {"crm_account_type", type text},
+					    {"crm_addr_city", type text},
+					    {"crm_addr_country", type text},
+					    {"crm_addr_postal_code", type text},
+					    {"crm_addr_state", type text},
+					    {"crm_addr_street", type text},
+					    {"crm_complt",  type number},
+					    {"crm_complt_contact",  type number},
+					    {"crm_complt_contact_method",  type number},
+					    {"crm_complt_custom",  type number},
+					    {"crm_complt_geo",  type number},
+					    {"crm_complt_marketing",  type number},
+					    {"crm_created_on", type datetime},
+					    {"crm_creator_id", type text},
+					    {"crm_custom_value_1", type text},
+					    {"crm_custom_value_2", type text},
+					    {"crm_custom_value_3", type text},
+					    {"crm_deep_link", type text},
+					    {"crm_industry", type text},
+					    {"crm_last_act_time", type datetime},
+					    {"crm_leadsource", type text},
+					    {"crm_modified_on", type datetime},
+					    {"crm_name", type text},
+					    {"crm_num_employees", Int64.Type},
+					    {"crm_owner_id", type text},
+					    {"crm_parent_id", type text},
+					    {"crm_web_url", type text},
+					    {"trueai_account_dupe_conf",  type number},
+					    {"trueai_account_dupe_id", type text},
+					    {"trueai_addr_city", type text},
+					    {"trueai_addr_country", type text},
+					    {"trueai_addr_lat",  type number},
+					    {"trueai_addr_long",  type number},
+					    {"trueai_addr_postal_code", type text},
+					    {"trueai_addr_rule", type text},
+					    {"trueai_addr_state", type text},
+					    {"trueai_addr_street", type text},
+					    {"trueai_company_size", type text},
+					    {"trueai_company_size_rule", type text},
+					    {"trueai_complt",  type number},
+					    {"trueai_complt_contact",  type number},
+					    {"trueai_complt_contact_method",  type number},
+					    {"trueai_complt_geo",  type number},
+					    {"trueai_complt_marketing",  type number},
+					    {"trueai_converted_date", type datetime},
+					    {"trueai_created_on", type datetime},
+					    {"trueai_creator_id", type text},
+					    {"trueai_dur", Int64.Type},
+					    {"trueai_first_touch", type datetime},
+					    {"trueai_industry", type text},
+					    {"trueai_industry_conf",  type number},
+					    {"trueai_industry_rule", type text},
+					    {"trueai_is_master", type logical},
+					    {"trueai_last_outcome", type datetime},
+					    {"trueai_last_touch", type datetime},
+					    {"trueai_leadsource", type text},
+					    {"trueai_leadsource_conf",  type number},
+					    {"trueai_leadsource_rule", type text},
+					    {"trueai_owner_id", type text},
+					    {"trueai_prob_of_conversion",  type number},
+					    {"trueai_prob_of_conversion_explained", type text},
+					    {"trueai_prob_of_new_logo_win",  type number},
+					    {"trueai_qual_bucket", type text},
+					    {"trueai_qual_bucket_num", Int64.Type},
+					    {"trueai_ssr_is_master", type logical},
+					    {"trueai_title_department", type text},
+					    {"trueai_title_department_conf",  type number},
+					    {"trueai_title_seniority", type text},
+					    {"trueai_title_seniority_conf",  type number},
+					    {"trueai_type", type text},
+					    {"trueai_vi_lead_gen_value",   Currency.Type},
+					    {"cust_bool1", type logical},
+					    {"cust_bool2", type logical},
+					    {"cust_num1",  type number},
+					    {"cust_num2",  type number},
+					    {"cust_num3",  type number},
+					    {"cust_num4",  type number},
+					    {"cust_num5",  type number},
+					    {"cust_num6",  type number},
+					    {"cust_num7",  type number},
+					    {"cust_text1", type text},
+					    {"cust_text2", type text},
+					    {"cust_text3", type text},
+					    {"cust_text4", type text},
+					    {"cust_text5", type text},
+					    {"ext_match_conf", type number}
+					
+					
+					
+					
+					    }),
+					  
+					dbTableTypedRenamed = Table.RenameColumns(dbTableTyped,{ // rename one more time to not have to redo column names in reports
+					
+					{"_sys_doc_id", "_sys_docid"}
+					}),
+					    #"Changed Type" = Table.TransformColumnTypes(dbTableTypedRenamed,{{"trueai_created_on_rule", type text}, {"trueai_first_touch_rule", type text}, {"trueai_last_outcome_rule", type text}, {"trueai_last_touch_rule", type text}, {"trueai_owner_id_rule", type text}, {"ext_match_conf", type number}})
+					in
+					#"Changed Type"
+					```
+
+		annotation PBI_ResultType = Table
+
+		annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,37 @@
+table pipelines
+	lineageTag: f7798f30-41fb-4fd8-a669-876809d0667c
+
+	column _sys_doc_id
+		dataType: string
+		lineageTag: 1792b9df-826c-422b-94cf-795ac7d48ba4
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_pipeline_name
+		dataType: string
+		lineageTag: e82d6667-27a2-4103-b331-39eae950ddf5
+		summarizeBy: none
+		sourceColumn: crm_pipeline_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition pipelines = m
+		mode: import
+		source =
+				let
+				    dbTable = getDBTable("pipelines"), // get the right table
+				
+				     dbTableTyped = Table.TransformColumnTypes(dbTable,{
+				       {"_sys_doc_id", type text},
+				        {"crm_pipeline_name", type text}
+				
+				})
+				in
+				    dbTableTyped
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
