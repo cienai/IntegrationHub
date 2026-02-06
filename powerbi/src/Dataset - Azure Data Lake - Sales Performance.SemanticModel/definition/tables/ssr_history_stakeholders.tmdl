@@ -33,7 +33,7 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 137d542d-667c-4931-b89c-d7a8afbe6a78
 
-	measure 'meas.stkhlds_title_dept' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_dept]))
+	measure 'meas.stkhlds_title_dept' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]))
 		displayFolder: champion_stkhld
 		lineageTag: 742263c3-150e-4a72-9d14-0bec256467be
 
@@ -157,7 +157,7 @@ table ssr_history_stakeholders
 			        ssr_history_stakeholders[trueai_act_dur]
 			    ), 
 			    ssr_history_stakeholders[trueai_title_seniority]=seniority,
-			    ssr_history_stakeholders[trueai_title_dept]= dept
+			    ssr_history_stakeholders[trueai_title_department]= dept
 			) 
 			
 			var total_dur = CALCULATE(SUM(ssr_history_stakeholders[trueai_act_dur]), ALLSELECTED())  // get the total duration
@@ -196,7 +196,7 @@ table ssr_history_stakeholders
 
 	measure 'meas.other_stkhlds_title_dept' =
 			
-			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_dept]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}) )  // get the  title dept filtering primary and secondary stakeholder
+			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}) )  // get the  title dept filtering primary and secondary stakeholder
 		displayFolder: champion_stkhld
 		lineageTag: 1f3c8d3c-eced-4f0f-b24b-2fdba44b5453
 
@@ -377,24 +377,6 @@ table ssr_history_stakeholders
 		sourceColumn: trueai_owner_id
 
 		annotation SummarizationSetBy = Automatic
-
-	column trueai_title_dept
-		dataType: string
-		lineageTag: 59adad1e-3994-4d75-be15-6b58ee40505e
-		summarizeBy: none
-		sourceColumn: trueai_title_dept
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_title_dept_conf
-		dataType: double
-		lineageTag: aa2feabe-45f6-4376-b825-84f0a96e6e8b
-		summarizeBy: sum
-		sourceColumn: trueai_title_dept_conf
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column trueai_title_seniority
 		dataType: string
@@ -758,6 +740,24 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	column trueai_title_department
+		dataType: string
+		lineageTag: 03b57bf8-5ae4-485b-8e4b-cd754a2662f9
+		summarizeBy: none
+		sourceColumn: trueai_title_department
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_title_department_conf
+		dataType: double
+		lineageTag: 35591b43-0fea-4400-9a75-164aadb5f692
+		summarizeBy: sum
+		sourceColumn: trueai_title_department_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition ssr_history_stakeholders = m
 		mode: import
 		source = ```
@@ -767,64 +767,64 @@ table ssr_history_stakeholders
 				
 				
 				  dbTableTyped = Table.TransformColumnTypes(dbTable,{
-				{"_sys_as_of", type datetime},
-				{"_sys_doc_id", type text},
-				{"_sys_filt_end_date", type date},
-				{"_sys_filt_start_date", type date},
-				{"_sys_last_modified_on", type datetime},
-				{"_sys_ssr_history_id", type text},
-				{"_sys_ssr_id", type text},
-				{"crm_complt", type number},
-				{"crm_first_name", type text},
-				{"crm_last_name", type text},
-				{"crm_title", type text},
-				{"trueai_act_adj_dur", type number},
-				{"trueai_act_adj_dur_rule", Int64.Type},
-				{"trueai_act_adj_eng_dur", type number},
-				{"trueai_act_count", Int64.Type},
-				{"trueai_act_dur", type number},
-				{"trueai_act_dur_eng", type number},
-				{"trueai_act_eng_count", Int64.Type},
-				{"trueai_act_type_auto_email_count", Int64.Type},
-				{"trueai_act_type_auto_email_eng_count", Int64.Type},
-				{"trueai_act_type_call_count", Int64.Type},
-				{"trueai_act_type_call_eng_count", Int64.Type},
-				{"trueai_act_type_email_count", Int64.Type},
-				{"trueai_act_type_email_eng_count", Int64.Type},
-				{"trueai_act_type_meeting_count", Int64.Type},
-				{"trueai_act_type_meeting_eng_count", Int64.Type},
-				{"trueai_act_type_nd_count", Int64.Type},
-				{"trueai_act_type_nd_eng_count", Int64.Type},
-				{"trueai_act_type_no_interaction_count", Int64.Type},
-				{"trueai_act_type_no_interaction_eng_count", Int64.Type},
-				{"trueai_act_type_social_count", Int64.Type},
-				{"trueai_act_type_social_eng_count", Int64.Type},
-				{"trueai_complt", type number},
-				{"trueai_created_by_step_owner", type logical},
-				{"trueai_created_on", type date},
-				{"trueai_creator_id", type text},
-				{"trueai_first_act", type datetime},
-				{"trueai_first_eng", type datetime},
-				{"trueai_last_act", type datetime},
-				{"trueai_last_eng", type datetime},
-				{"trueai_leadsource", type text},
-				{"trueai_leadsource_conf", type number},
-				{"trueai_owner_act_capt_lvl", type number},
-				{"trueai_owner_id", type text},
-				{"trueai_owner_prep_factor", type number},
-				{"trueai_primary_entity_id", type text},
-				{"trueai_primary_entity_type", type text},
-				{"trueai_stkhld_ranking", Int64.Type},
-				{"trueai_title_dept", type text},
-				{"trueai_title_dept_conf", type number},
-				{"trueai_title_seniority", type text},
-				{"trueai_title_seniority_conf", type number}
+				    {"_sys_as_of", type datetime},
+				    {"_sys_doc_id", type text},
+				    {"_sys_filt_end_date", type date},
+				    {"_sys_filt_start_date", type date},
+				    {"_sys_last_modified_on", type datetime},
+				    {"_sys_ssr_history_id", type text},
+				    {"_sys_ssr_id", type text},
+				    {"crm_complt", type number},
+				    {"crm_first_name", type text},
+				    {"crm_last_name", type text},
+				    {"crm_title", type text},
+				    {"trueai_act_adj_dur", type number},
+				    {"trueai_act_adj_dur_rule", Int64.Type},
+				    {"trueai_act_adj_eng_dur", type number},
+				    {"trueai_act_count", Int64.Type},
+				    {"trueai_act_dur", type number},
+				    {"trueai_act_dur_eng", type number},
+				    {"trueai_act_eng_count", Int64.Type},
+				    {"trueai_act_type_auto_email_count", Int64.Type},
+				    {"trueai_act_type_auto_email_eng_count", Int64.Type},
+				    {"trueai_act_type_call_count", Int64.Type},
+				    {"trueai_act_type_call_eng_count", Int64.Type},
+				    {"trueai_act_type_email_count", Int64.Type},
+				    {"trueai_act_type_email_eng_count", Int64.Type},
+				    {"trueai_act_type_meeting_count", Int64.Type},
+				    {"trueai_act_type_meeting_eng_count", Int64.Type},
+				    {"trueai_act_type_nd_count", Int64.Type},
+				    {"trueai_act_type_nd_eng_count", Int64.Type},
+				    {"trueai_act_type_no_interaction_count", Int64.Type},
+				    {"trueai_act_type_no_interaction_eng_count", Int64.Type},
+				    {"trueai_act_type_social_count", Int64.Type},
+				    {"trueai_act_type_social_eng_count", Int64.Type},
+				    {"trueai_complt", type number},
+				    {"trueai_created_by_step_owner", type logical},
+				    {"trueai_created_on", type date},
+				    {"trueai_creator_id", type text},
+				    {"trueai_first_act", type datetime},
+				    {"trueai_first_eng", type datetime},
+				    {"trueai_last_act", type datetime},
+				    {"trueai_last_eng", type datetime},
+				    {"trueai_leadsource", type text},
+				    {"trueai_leadsource_conf", type number},
+				    {"trueai_owner_act_capt_lvl", type number},
+				    {"trueai_owner_id", type text},
+				    {"trueai_owner_prep_factor", type number},
+				    {"trueai_primary_entity_id", type text},
+				    {"trueai_primary_entity_type", type text},
+				    {"trueai_stkhld_ranking", Int64.Type},
+				    {"trueai_title_department", type text},
+				    {"trueai_title_department_conf", type number},
+				    {"trueai_title_seniority", type text},
+				    {"trueai_title_seniority_conf", type number}
 				})
 				in
 				    dbTableTyped
 				```
 
-	annotation PBI_ResultType = Exception
+	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navigation
 

@@ -394,9 +394,9 @@ table quality_buckets
 				    Source = companies_history,
 				    #"Sorted Rows" = Table.Sort(Source,{{"_sys_processed_as_of", Order.Descending}}),
 				    #"Kept First Rows" = Table.FirstN(#"Sorted Rows",1),
-				    newTable = Table.SelectColumns(#"Kept First Rows", {"_sys_doc_id", "di_pred_post_sales_qual_bucket_tiers", "di_pred_prospecting_qual_bucket_tiers", "di_pred_selling_new_logo_qual_bucket_tiers", "di_pred_selling_existing_customer_qual_bucket_tiers"}),
+				    newTable = Table.SelectColumns(#"Kept First Rows", {"_sys_doc_id", "di_pred_post_sales_qual_bucket_tiers", "di_pred_prospecting_qual_bucket_tiers", "di_pred_new_logo_qual_bucket_tiers", "di_pred_existing_customer_qual_bucket_tiers"}),
 				    dbTableNoNull = Table.SelectRows(newTable, each [di_pred_post_sales_qual_bucket_tiers] <> null),
-				    Parsed_JSON = Table.TransformColumns(dbTableNoNull,{{"di_pred_post_sales_qual_bucket_tiers", Json.Document}, {"di_pred_prospecting_qual_bucket_tiers", Json.Document}, {"di_pred_selling_new_logo_qual_bucket_tiers", Json.Document}, {"di_pred_selling_existing_customer_qual_bucket_tiers", Json.Document}}),
+				    Parsed_JSON = Table.TransformColumns(dbTableNoNull,{{"di_pred_post_sales_qual_bucket_tiers", Json.Document}, {"di_pred_prospecting_qual_bucket_tiers", Json.Document}, {"di_pred_new_logo_qual_bucket_tiers", Json.Document}, {"di_pred_existing_customer_qual_bucket_tiers", Json.Document}}),
 				
 				
 				    postsalesTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_post_sales_qual_bucket_tiers"}),
@@ -407,13 +407,13 @@ table quality_buckets
 				    ProsAddCol = Table.AddColumn(ProsTable, "direction", each "Prospecting"),
 				    ProsExpanded = Table.ExpandRecordColumn(ProsAddCol, "di_pred_prospecting_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
-				    NewLogoTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_selling_new_logo_qual_bucket_tiers"}),
+				    NewLogoTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_new_logo_qual_bucket_tiers"}),
 				    NewLogoAddCol = Table.AddColumn(NewLogoTable, "direction", each "New Logo Selling"),
-				    NewLogoExpanded = Table.ExpandRecordColumn(NewLogoAddCol, "di_pred_selling_new_logo_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    NewLogoExpanded = Table.ExpandRecordColumn(NewLogoAddCol, "di_pred_new_logo_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
-				    UpsellingTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_selling_existing_customer_qual_bucket_tiers"}),
+				    UpsellingTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_existing_customer_qual_bucket_tiers"}),
 				    UpsellingAddCol = Table.AddColumn(UpsellingTable, "direction", each "Existing Customer Selling"),
-				    UpsellingExpanded = Table.ExpandRecordColumn(UpsellingAddCol, "di_pred_selling_existing_customer_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    UpsellingExpanded = Table.ExpandRecordColumn(UpsellingAddCol, "di_pred_existing_customer_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
 				    combinedTable = Table.Combine({postSalesExpanded, ProsExpanded, NewLogoExpanded, UpsellingExpanded}),
 				
