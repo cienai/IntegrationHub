@@ -155,37 +155,40 @@ table act_capture_level_summary
 		displayFolder: _acl_scores
 		lineageTag: 25caccab-5c62-4871-8096-7c890988147a
 
-	measure 'meas.trueai_act_capt_score' =
+	measure 'meas.trueai_act_capt_score' = ```
 			
-			var _before = [meas.crm_act_capt_score]                 // get the before score
-			VAR temp_tbl = CALCULATETABLE(ssr_history, ssr_history[step_name] in {"Prospecing", "New Logo Selling", "Post-Sales Support","Existing Customer Selling"}) // Get the current table context but exclude the unthcouded stage etc
-			VAR score_res = AVERAGEX(
-			    temp_tbl,
-			    SWITCH(
-			        ssr_history[stkhlds_all_adj_dur_rule],
-			        "133002", 0.4,  // 133002 is industry avg, not reliable
-			        "133001", 0.7,   // 133001 is peer avg, okay
-			        "133003", 0.97,   // 133003 is the best info from the owner
-			        "133004", 0.86    // 133004 is good data but not from the primary owner
+			VAR _before = [meas.crm_act_capt_score]
+			VAR temp_tbl =
+			    CALCULATETABLE(
+			        ssr_history,
+			        ssr_history[step_name] IN {
+			            "Prospecting",
+			            "New Logo Selling",
+			            "Post-Sales Support",
+			            "Existing Customer Selling"
+			        }
 			    )
-			)
-			var _after = ROUND(score_res*100,0)
+			VAR score_res =
+			    AVERAGEX(
+			        temp_tbl,
+			        SWITCH(
+			            ssr_history[stkhlds_all_adj_dur_rule],
+			            133002, 0.4,
+			            133001, 0.7,
+			            133003, 0.97,
+			            133004, 0.86
+			        )
+			    )
+			VAR _after = ROUND(score_res * 100, 0)
+			VAR res = IF(_after < _before, _before, _after)
+			RETURN res
 			
-			var res = IF(
-			    _after < _before,
-			    _before,
-			    _after
-			)
-			
-			
-			RETURN res  // Return the result
+			```
 		formatString: 0
 		displayFolder: _acl_scores
 		lineageTag: fbbac8e0-05bb-41a5-8e39-2343fc1b4f37
 
 		changedProperty = FormatString
-
-		annotation PBI_FormatHint = {"isDecimal":true}
 
 	measure 'meas.trueai_act_capt_score_improvement' =
 			

@@ -182,13 +182,11 @@ table ai_conf_skills_summary
 
 	column skill_confidence
 		lineageTag: 99ffa2e2-cddd-49c4-ae97-2b34b9f58d18
-		summarizeBy: sum
+		summarizeBy: none
 		isNameInferred
 		sourceColumn: [skill_confidence]
 
 		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column is_applicable
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -204,55 +202,70 @@ table ai_conf_skills_summary
 		source = ```
 				
 				UNION(
-				SELECTCOLUMNS(filter(users_history, users_history[trueai_user_role_function] in {"AE","AM","SDR" } )  , "sort", 1, 
-				"user_id",  users_history[_sys_user_id],
-				"filter_start_date", users_history[_sys_filt_start_date],
-				 "skill", "Work Effort",  
-				"user_role_function",  users_history[trueai_user_role_function] , 
-				"user_full_name",  users_history[col.full_name], 
-				"skill_value", users_history[ci_sb_work_effort],
-				"skill_confidence", users_history[ci_sb_work_effort_conf], 
-				"is_applicable", true), // work_effort
+				    SELECTCOLUMNS(
+				        FILTER(users_history, users_history[trueai_user_role_function] IN {"AE","AM","SDR"}),
+				        "sort", 1,
+				        "user_id", users_history[_sys_user_id],
+				        "filter_start_date", users_history[_sys_filt_start_date],
+				        "skill", "Work Effort",
+				        "user_role_function", users_history[trueai_user_role_function],
+				        "user_full_name", RELATED(users[col.full_name]),
+				        "skill_value", users_history[ci_sb_work_effort_num],
+				        "skill_confidence", users_history[ci_sb_work_effort_conf],
+				        "is_applicable", TRUE()
+				    ),
 				
-				SELECTCOLUMNS(filter(users_history,users_history[trueai_user_role_function] in {"AE","AM","SDR" })  , "sort", 2, 
-				"user_id",  users_history[_sys_user_id],
-				"filter_start_date", users_history[_sys_filt_start_date],
-				 "skill", "Engagement Ability",  
-				"user_role_function",  users_history[trueai_user_role_function] , 
-				"user_full_name",  users_history[col.full_name], 
-				"skill_value", users_history[ci_sb_engmt_ability],
-				"skill_confidence", users_history[ci_sb_engmt_ability_conf], 
-				"is_applicable",true), // engagement_ability
+				    SELECTCOLUMNS(
+				        FILTER(users_history, users_history[trueai_user_role_function] IN {"AE","AM","SDR"}),
+				        "sort", 2,
+				        "user_id", users_history[_sys_user_id],
+				        "filter_start_date", users_history[_sys_filt_start_date],
+				        "skill", "Engagement Ability",
+				        "user_role_function", users_history[trueai_user_role_function],
+				        "user_full_name", RELATED(users[col.full_name]),
+				        "skill_value", users_history[ci_sb_engmt_ability_num],
+				        "skill_confidence", users_history[ci_sb_engmt_ability_conf],
+				        "is_applicable", TRUE()
+				    ),
 				
-				SELECTCOLUMNS(filter(users_history, users_history[trueai_user_role_function] in {"AE","AM","SDR" })  , "sort", 3, 
-				"user_id",  users_history[_sys_user_id],
-				"filter_start_date", users_history[_sys_filt_start_date],
-				 "skill", "Discovery Skills",  
-				"user_role_function",  users_history[trueai_user_role_function] , 
-				"user_full_name",  users_history[col.full_name], 
-				"skill_value", users_history[ci_sb_discov_skills],
-				"skill_confidence", users_history[ci_sb_discov_skills_conf], 
-				"is_applicable", true), // discovery_skills
+				    SELECTCOLUMNS(
+				        FILTER(users_history, users_history[trueai_user_role_function] IN {"AE","AM","SDR"}),
+				        "sort", 3,
+				        "user_id", users_history[_sys_user_id],
+				        "filter_start_date", users_history[_sys_filt_start_date],
+				        "skill", "Discovery Skills",
+				        "user_role_function", users_history[trueai_user_role_function],
+				        "user_full_name", RELATED(users[col.full_name]),
+				        "skill_value", users_history[ci_sb_discov_skills_num],
+				        "skill_confidence", users_history[ci_sb_discov_skills_conf],
+				        "is_applicable", TRUE()
+				    ),
 				
-				SELECTCOLUMNS(filter(users_history, users_history[trueai_user_role_function]  in {"AE","AM","SDR" })  , "sort", 4, 
-				"user_id",  users_history[_sys_user_id],
-				"filter_start_date", users_history[_sys_filt_start_date],
-				 "skill", "Closing Ability",  
-				"user_role_function",  users_history[trueai_user_role_function] , 
-				"user_full_name",  users_history[col.full_name], 
-				"skill_value", users_history[ci_sb_closing_ability],
-				"skill_confidence", IF(users_history[trueai_user_role_function] = "SDR", blank(),  users_history[ci_sb_closing_ability_conf]), // remove sdr 0 value
-				"is_applicable",true), // closing_ability
+				    SELECTCOLUMNS(
+				        FILTER(users_history, users_history[trueai_user_role_function] IN {"AE","AM","SDR"}),
+				        "sort", 4,
+				        "user_id", users_history[_sys_user_id],
+				        "filter_start_date", users_history[_sys_filt_start_date],
+				        "skill", "Closing Ability",
+				        "user_role_function", users_history[trueai_user_role_function],
+				        "user_full_name", RELATED(users[col.full_name]),
+				        "skill_value", users_history[ci_sb_closing_ability_num],
+				        "skill_confidence", IF(users_history[trueai_user_role_function] = "SDR", BLANK(), users_history[ci_sb_closing_ability_conf]),
+				        "is_applicable", TRUE()
+				    ),
 				
-				SELECTCOLUMNS(filter(users_history, [trueai_user_role_function]  in {"AE","AM","SDR" })  , "sort", 5, 
-				"user_id",  users_history[_sys_user_id],
-				"filter_start_date", users_history[_sys_filt_start_date],
-				 "skill", "Deal Maximizing",  
-				"user_role_function",  users_history[trueai_user_role_function], 
-				"user_full_name",  users_history[col.full_name], 
-				"skill_value", users_history[ci_sb_deal_maxing],
-				"skill_confidence", IF(users_history[trueai_user_role_function] = "SDR", blank(),  users_history[ci_sb_deal_maxing_conf]), // remove sdr 0 value
-				"is_applicable", true) // deal_maximizing
+				    SELECTCOLUMNS(
+				        FILTER(users_history, users_history[trueai_user_role_function] IN {"AE","AM","SDR"}),
+				        "sort", 5,
+				        "user_id", users_history[_sys_user_id],
+				        "filter_start_date", users_history[_sys_filt_start_date],
+				        "skill", "Deal Maximizing",
+				        "user_role_function", users_history[trueai_user_role_function],
+				        "user_full_name", RELATED(users[col.full_name]),
+				        "skill_value", users_history[ci_sb_deal_maxing_num],
+				        "skill_confidence", IF(users_history[trueai_user_role_function] = "SDR", BLANK(), users_history[ci_sb_deal_maxing_conf]),
+				        "is_applicable", TRUE()
+				    )
 				)
 				
 				

@@ -677,24 +677,6 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
-	column trueai_title_dept
-		dataType: string
-		lineageTag: 5e41973a-f27b-488c-99f6-bef5d0ef8385
-		summarizeBy: none
-		sourceColumn: trueai_title_dept
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_title_dept_conf
-		dataType: double
-		lineageTag: 27aebab2-6d8f-4760-8288-3df73c627fdb
-		summarizeBy: sum
-		sourceColumn: trueai_title_dept_conf
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	column trueai_title_seniority
 		dataType: string
 		lineageTag: 81574a25-81b7-44e1-bce3-6eb6cbb73f13
@@ -879,35 +861,6 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column trueai_prob_of_conversion_explained
-		dataType: string
-		lineageTag: ff973f85-08ce-46d5-aa9c-ba3d0433136a
-		summarizeBy: none
-		sourceColumn: trueai_prob_of_conversion_explained
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_prob_of_new_logo_win
-		dataType: double
-		lineageTag: 847c13c4-c4ab-4ee2-b686-5b3e79f3ebdc
-		summarizeBy: sum
-		sourceColumn: trueai_prob_of_new_logo_win
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column trueai_vi_lead_gen_value
-		dataType: decimal
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
-		lineageTag: 5ba5a323-432b-4705-aaa8-99e54320cf1b
-		summarizeBy: sum
-		sourceColumn: trueai_vi_lead_gen_value
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
-
 	column 'col.trueai_ssr_dupe_count' = ```
 			
 			
@@ -935,12 +888,14 @@ table leads
 		annotation SummarizationSetBy = Automatic
 
 	column trueai_test_conf
-		dataType: string
+		dataType: double
 		lineageTag: 496e5df0-0251-4d2a-8e14-e95a04ab3023
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: trueai_test_conf
 
 		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column trueai_test_rule
 		dataType: string
@@ -1159,9 +1114,10 @@ table leads
 		annotation SummarizationSetBy = Automatic
 
 	column ext_match_rule
-		dataType: string
+		dataType: int64
+		formatString: 0
 		lineageTag: b80e2573-918c-4fa4-b053-e1bac9cde673
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: ext_match_rule
 
 		annotation SummarizationSetBy = Automatic
@@ -1193,9 +1149,10 @@ table leads
 		annotation SummarizationSetBy = Automatic
 
 	column ext_year_founded
-		dataType: string
+		dataType: int64
+		formatString: 0
 		lineageTag: bd603e39-b408-47af-8595-8657afc69f53
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: ext_year_founded
 
 		annotation SummarizationSetBy = Automatic
@@ -1273,7 +1230,8 @@ table leads
 		annotation SummarizationSetBy = Automatic
 
 	column ext_self_verified
-		dataType: string
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: b818f10d-0da8-47e1-b640-220b427fed03
 		summarizeBy: none
 		sourceColumn: ext_self_verified
@@ -1281,7 +1239,8 @@ table leads
 		annotation SummarizationSetBy = Automatic
 
 	column ext_last_updated
-		dataType: string
+		dataType: dateTime
+		formatString: General Date
 		lineageTag: 25f29400-8056-4dbf-8cb2-a2c7258ef281
 		summarizeBy: none
 		sourceColumn: ext_last_updated
@@ -1304,6 +1263,24 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	column trueai_title_department
+		dataType: string
+		lineageTag: 503cc8f0-7c5b-4313-a021-312e0ea82993
+		summarizeBy: none
+		sourceColumn: trueai_title_department
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_title_department_conf
+		dataType: double
+		lineageTag: 9036ba69-f742-43f4-bb2c-5052c4c93692
+		summarizeBy: sum
+		sourceColumn: trueai_title_department_conf
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition leads-ab804a2e-0c8f-42dc-8b47-f5f542fef364 = m
 		mode: import
 		source =
@@ -1313,108 +1290,135 @@ table leads
 				
 				  dbTableTyped = Table.TransformColumnTypes(dbTable,{ // change types to what we're expecting
 				    {"_sys_as_of", type datetime},
-				    {"_sys_doc_id", type text},
-				    {"_sys_filt_end_date", type date},
-				    {"_sys_filt_start_date", type date},
-				    {"_sys_last_modified_on", type datetime},
-				    {"_sys_ssr_id", type text},
-				    {"crm_account_id", type text},
-				    {"crm_addr_city", type text},
-				    {"crm_addr_country", type text},
-				    {"crm_addr_postal_code", type text},
-				    {"crm_addr_state", type text},
-				    {"crm_addr_street", type text},
-				    {"crm_complt",  type number},
-				    {"crm_complt_contact",  type number},
-				    {"crm_complt_contact_method",  type number},
-				    {"crm_complt_custom",  type number},
-				    {"crm_complt_geo",  type number},
-				    {"crm_complt_marketing",  type number},
-				    {"crm_contact_title", type text},
-				    {"crm_converted_contact_id", type text},
-				    {"crm_converted_date", type datetime},
-				    {"crm_converted_opp_id", type text},
-				    {"crm_created_on", type datetime},
-				    {"crm_creator_id", type text},
-				    {"crm_custom_value_1", type text},
-				    {"crm_custom_value_2", type text},
-				    {"crm_custom_value_3", type text},
-				    {"crm_deep_link", type text},
-				    {"crm_email", type text},
-				    {"crm_first_name", type text},
-				    {"crm_industry", type text},
-				    {"crm_last_act_time", type datetime},
-				    {"crm_last_name", type text},
-				    {"crm_leadsource", type text},
-				    {"crm_modified_on", type datetime},
-				    {"crm_name", type text},
-				    {"crm_num_employees", Int64.Type},
-				    {"crm_owner_id", type text},
-				    {"crm_phone", type text},
-				    {"crm_status", type text},
-				    {"trueai_addr_city", type text},
-				    {"trueai_addr_country", type text},
-				    {"trueai_addr_lat",  type number},
-				    {"trueai_addr_long",  type number},
-				    {"trueai_addr_postal_code", type text},
-				    {"trueai_addr_rule", Int64.Type},
-				    {"trueai_addr_state", type text},
-				    {"trueai_addr_street", type text},
-				    {"trueai_company_dupe_conf",  type number},
-				    {"trueai_company_dupe_id", type text},
-				    {"trueai_company_size", type text},
-				    {"trueai_company_size_rule", Int64.Type},
-				    {"trueai_complt",  type number},
-				    {"trueai_complt_contact",  type number},
-				    {"trueai_complt_contact_method",  type number},
-				    {"trueai_complt_geo",  type number},
-				    {"trueai_complt_marketing",  type number},
-				    {"trueai_converted_date", type datetime},
-				    {"trueai_created_on", type datetime},
-				    {"trueai_creator_id", type text},
-				    {"trueai_dur", Int64.Type},
-				    {"trueai_first_touch", type datetime},
-				    {"trueai_industry", type text},
-				    {"trueai_industry_conf",  type number},
-				    {"trueai_industry_rule", Int64.Type},
-				    {"trueai_is_disqualified", type text},
-				    {"trueai_is_disqualified_conf",  type number},
-				    {"trueai_is_master", type logical},
-				    {"trueai_last_outcome_date", type datetime},
-				    {"trueai_last_touch", type datetime},
-				    {"trueai_lead_dupe_conf",  type number},
-				    {"trueai_lead_dupe_id", type text},
-				    {"trueai_leadsource", type text},
-				    {"trueai_leadsource_conf",  type number},
-				    {"trueai_leadsource_is_inbound", type logical},
-				    {"trueai_leadsource_rule", Int64.Type},
-				    {"trueai_owner_id", type text},
-				    {"trueai_prob_of_conversion",  type number},
-				    {"trueai_prob_of_conversion_explained", type text},
-				    {"trueai_prob_of_new_logo_win",  type number},
-				    {"trueai_qual_bucket", type text},
-				    {"trueai_qual_bucket_num", Int64.Type},
-				    {"trueai_ssr_is_master", type logical},
-				    {"trueai_title_dept", type text},
-				    {"trueai_title_dept_conf",  type number},
-				    {"trueai_title_seniority", type text},
-				    {"trueai_title_seniority_conf",  type number},
-				    {"trueai_vi_lead_gen_value",   Currency.Type},
-				    {"cust_bool1", type logical},
-				    {"cust_bool2", type logical},
-				    {"cust_num1",  type number},
-				    {"cust_num2",  type number},
-				    {"cust_num3",  type number},
-				    {"cust_num4",  type number},
-				    {"cust_num5",  type number},
-				    {"cust_num6",  type number},
-				    {"cust_num7",  type number},
-				    {"cust_text1", type text},
-				    {"cust_text2", type text},
-				    {"cust_text3", type text},
-				    {"cust_text4", type text},
-				    {"cust_text5", type text},
-				    {"ext_match_conf", type number}
+				{"_sys_doc_id", type text},
+				{"_sys_filt_end_date", type date},
+				{"_sys_filt_start_date", type date},
+				{"_sys_last_modified_on", type datetime},
+				{"_sys_ssr_id", type text},
+				{"crm_account_id", type text},
+				{"crm_addr_city", type text},
+				{"crm_addr_country", type text},
+				{"crm_addr_postal_code", type text},
+				{"crm_addr_state", type text},
+				{"crm_addr_street", type text},
+				{"crm_complt", type number},
+				{"crm_complt_contact", type number},
+				{"crm_complt_contact_method", type number},
+				{"crm_complt_custom", type number},
+				{"crm_complt_geo", type number},
+				{"crm_complt_marketing", type number},
+				{"crm_contact_title", type text},
+				{"crm_converted_contact_id", type text},
+				{"crm_converted_date", type datetime},
+				{"crm_converted_opp_id", type text},
+				{"crm_created_on", type datetime},
+				{"crm_creator_id", type text},
+				{"crm_custom_value_1", type text},
+				{"crm_custom_value_2", type text},
+				{"crm_custom_value_3", type text},
+				{"crm_deep_link", type text},
+				{"crm_email", type text},
+				{"crm_first_name", type text},
+				{"crm_industry", type text},
+				{"crm_last_act_time", type datetime},
+				{"crm_last_name", type text},
+				{"crm_leadsource", type text},
+				{"crm_modified_on", type datetime},
+				{"crm_name", type text},
+				{"crm_num_employees", Int64.Type},
+				{"crm_owner_id", type text},
+				{"crm_phone", type text},
+				{"crm_status", type text},
+				{"crm_web_url", type text},
+				{"cust_bool1", type logical},
+				{"cust_bool2", type logical},
+				{"cust_num1", type number},
+				{"cust_num2", type number},
+				{"cust_num3", type number},
+				{"cust_num4", type number},
+				{"cust_num5", type number},
+				{"cust_num6", type number},
+				{"cust_num7", type number},
+				{"cust_text1", type text},
+				{"cust_text2", type text},
+				{"cust_text3", type text},
+				{"cust_text4", type text},
+				{"cust_text5", type text},
+				{"ext_addr_city", type text},
+				{"ext_addr_country", type text},
+				{"ext_addr_postal_code", type text},
+				{"ext_addr_state", type text},
+				{"ext_addr_street", type text},
+				{"ext_debug", type text},
+				{"ext_id", type text},
+				{"ext_industry", type text},
+				{"ext_is_match", type text},
+				{"ext_last_updated", type datetime},
+				{"ext_linkedin_url", type text},
+				{"ext_match_conf", type number},
+				{"ext_match_rule", Int64.Type},
+				{"ext_name", type text},
+				{"ext_num_employees_range", type text},
+				{"ext_phone", type text},
+				{"ext_revenue_range", type text},
+				{"ext_self_verified", type logical},
+				{"ext_source", type text},
+				{"ext_web_url", type text},
+				{"ext_year_founded", Int64.Type},
+				{"trueai_addr_city", type text},
+				{"trueai_addr_country", type text},
+				{"trueai_addr_lat", type number},
+				{"trueai_addr_long", type number},
+				{"trueai_addr_postal_code", type text},
+				{"trueai_addr_rule", Int64.Type},
+				{"trueai_addr_state", type text},
+				{"trueai_addr_street", type text},
+				{"trueai_company_dupe_conf", type number},
+				{"trueai_company_dupe_id", type text},
+				{"trueai_company_size", type text},
+				{"trueai_company_size_rule", Int64.Type},
+				{"trueai_complt", type number},
+				{"trueai_complt_contact", type number},
+				{"trueai_complt_contact_method", type number},
+				{"trueai_complt_geo", type number},
+				{"trueai_complt_marketing", type number},
+				{"trueai_converted_date", type datetime},
+				{"trueai_converted_date_rule", Int64.Type},
+				{"trueai_created_on", type datetime},
+				{"trueai_creator_id", type text},
+				{"trueai_dur", Int64.Type},
+				{"trueai_first_touch", type datetime},
+				{"trueai_first_touch_rule", Int64.Type},
+				{"trueai_industry", type text},
+				{"trueai_industry_conf", type number},
+				{"trueai_industry_rule", Int64.Type},
+				{"trueai_is_disqualified", type text},
+				{"trueai_is_disqualified_conf", type number},
+				{"trueai_is_master", type logical},
+				{"trueai_last_outcome_date", type datetime},
+				{"trueai_last_outcome_date_rule", Int64.Type},
+				{"trueai_last_touch", type datetime},
+				{"trueai_last_touch_rule", Int64.Type},
+				{"trueai_lead_dupe_conf", type number},
+				{"trueai_lead_dupe_id", type text},
+				{"trueai_leadsource", type text},
+				{"trueai_leadsource_conf", type number},
+				{"trueai_leadsource_is_inbound", type logical},
+				{"trueai_leadsource_rule", Int64.Type},
+				{"trueai_owner_id", type text},
+				{"trueai_owner_id_rule", Int64.Type},
+				{"trueai_prob_of_conversion", type number},
+				{"trueai_qual_bucket", type text},
+				{"trueai_qual_bucket_num", Int64.Type},
+				{"trueai_ssr_is_master", type logical},
+				{"trueai_test", type text},
+				{"trueai_test_conf", type number},
+				{"trueai_test_debug", type text},
+				{"trueai_test_rule", type text},
+				{"trueai_title_department", type text},
+				{"trueai_title_department_conf", type number},
+				{"trueai_title_seniority", type text},
+				{"trueai_title_seniority_conf", type number}
 				
 				
 				
@@ -1428,7 +1432,7 @@ table leads
 				in
 				#"Changed Type"
 
-	annotation PBI_ResultType = Exception
+	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navigation
 
