@@ -5,7 +5,7 @@ table ssr_history_success_factors
 			
 			var _prob = CALCULATE(
 			    AVERAGE(
-			        ssr_history_success_factors[impact]        // get the average prob
+			        ssr_history_success_factors[trueai_value_impact]        // get the average prob
 			    )
 			)
 			
@@ -21,7 +21,7 @@ table ssr_history_success_factors
 
 	measure 'meas.ssr_history_success_prob_impact_positive' =
 			
-			var positiveVal = CALCULATE(MAX(ssr_history_success_factors[impact]))
+			var positiveVal = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
 			RETURN
 			IF(positiveVal > 0, positiveVal,BLANK())
 		formatString: 0%;-0%;0%
@@ -30,7 +30,7 @@ table ssr_history_success_factors
 
 	measure 'meas.ssr_history_success_prob_impact_negative' =
 			
-			var Val = CALCULATE(MAX(ssr_history_success_factors[impact]))
+			var Val = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
 			RETURN
 			IF(Val < 0, Val,BLANK())
 		formatString: 0%;-0%;0%
@@ -39,7 +39,7 @@ table ssr_history_success_factors
 
 	measure 'meas.ssr_history_success_prob_impact_neutral' =
 			
-			var positiveVal = CALCULATE(MAX(ssr_history_success_factors[impact]))
+			var positiveVal = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
 			RETURN
 			IF(positiveVal = 0, positiveVal,BLANK())
 		formatString: 0%;-0%;0%
@@ -58,7 +58,7 @@ table ssr_history_success_factors
 
 	measure 'meas.ssr_history_success_prob_factors_all_count' = ```
 			
-			var res = CALCULATE(count(ssr_history_success_factors[_sys_ssr_history_id]), ssr_history_success_factors[name] <> "aaa" &&  ssr_history_success_factors[value] <> "aaa" ) // get the count of all outside the filter
+			var res = CALCULATE(count(ssr_history_success_factors[_sys_ssr_history_id]), ssr_history_success_factors[trueai_factor_name] <> "aaa" &&  ssr_history_success_factors[trueai_value] <> "aaa" ) // get the count of all outside the filter
 			RETURN res
 			
 			```
@@ -121,7 +121,7 @@ table ssr_history_success_factors
 			CALCULATE(
 			    AVERAGEX(
 			        ssr_history_success_factors, 
-			        ssr_history_success_factors[feature_impact]        // get the average feature impact
+			        ssr_history_success_factors[trueai_factor_impact]        // get the average feature impact
 			    )
 			)
 			```
@@ -149,13 +149,13 @@ table ssr_history_success_factors
 			VAR MaxImpact = 
 			    MAXX(
 			        'ssr_history_success_factors', 
-			        'ssr_history_success_factors'[impact]
+			        'ssr_history_success_factors'[trueai_value_impact]
 			    )
 			-- Now find the corresponding name with that max impact
 			RETURN
 			CALCULATE(
-			    MAX('ssr_history_success_factors'[name]),
-			    'ssr_history_success_factors'[impact] = MaxImpact
+			    MAX('ssr_history_success_factors'[trueai_factor_name]),
+			    'ssr_history_success_factors'[trueai_value_impact] = MaxImpact
 			)
 			
 			```
@@ -178,90 +178,92 @@ table ssr_history_success_factors
 
 		annotation SummarizationSetBy = Automatic
 
-	column step_name
+	column trueai_ssr_history_name
 		dataType: string
 		lineageTag: 0a5aa9a4-f9e9-4e91-b840-87ef01567824
 		summarizeBy: none
-		sourceColumn: step_name
+		sourceColumn: trueai_ssr_history_name
 
 		annotation SummarizationSetBy = Automatic
 
-	column model
+	column trueai_model_name
 		dataType: string
 		lineageTag: 79f09f95-7f97-4047-a5ac-b15a8f77e0bf
 		summarizeBy: none
-		sourceColumn: model
+		sourceColumn: trueai_model_name
 
 		annotation SummarizationSetBy = Automatic
 
-	column value
+	column trueai_value
 		dataType: string
 		lineageTag: 54056493-5086-4eed-8225-4c96c25cdfda
 		summarizeBy: none
-		sourceColumn: value
+		sourceColumn: trueai_value
 
 		annotation SummarizationSetBy = Automatic
 
-	column sig
+	column trueai_value_impact_sign
 		dataType: string
 		lineageTag: 70f041a1-2749-4523-866e-3393830dd2ed
 		summarizeBy: none
-		sourceColumn: sig
+		sourceColumn: trueai_value_impact_sign
 
 		annotation SummarizationSetBy = Automatic
 
-	column name
+	column trueai_factor_name
 		dataType: string
 		lineageTag: b1957e1b-78c4-4fc3-a1bf-d5bf4fa364b8
 		summarizeBy: none
-		sourceColumn: name
+		sourceColumn: trueai_factor_name
 
 		annotation SummarizationSetBy = Automatic
 
-	column impact
+	column trueai_value_impact
 		dataType: double
 		lineageTag: 7eb9e59b-0ac2-4acd-87b2-e2dde8374099
 		summarizeBy: sum
-		sourceColumn: impact
+		sourceColumn: trueai_value_impact
 
 		annotation SummarizationSetBy = Automatic
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column sort
+	column trueai_sort
 		dataType: double
 		lineageTag: 6c8fbedc-c97c-480d-9c39-a7d2864e6aa6
 		summarizeBy: sum
-		sourceColumn: sort
+		sourceColumn: trueai_sort
 
 		annotation SummarizationSetBy = Automatic
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column feature_impact
+	column trueai_factor_impact
 		dataType: double
 		lineageTag: 8a7fb210-55ef-4152-9627-767e12a7e82c
 		summarizeBy: sum
-		sourceColumn: feature_impact
+		sourceColumn: trueai_factor_impact
 
 		annotation SummarizationSetBy = Automatic
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column ordering_factor
-		dataType: string
+	column trueai_ordering_factor
+		dataType: double
 		lineageTag: ac867424-720b-4775-802f-be1578d81508
-		summarizeBy: none
-		sourceColumn: ordering_factor
+		summarizeBy: sum
+		sourceColumn: trueai_ordering_factor
 
 		annotation SummarizationSetBy = Automatic
 
-	column display
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_is_significant
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 37b1f614-1a72-45e8-aa6b-fa0a617884fb
 		summarizeBy: none
-		sourceColumn: display
+		sourceColumn: trueai_is_significant
 
 		annotation SummarizationSetBy = Automatic
 
@@ -269,39 +271,28 @@ table ssr_history_success_factors
 		mode: import
 		source =
 				let
-				    // --- READ FROM DB ---
-				    dbTable = getDBTable("ssr_history_success_factors"),
+				  dbTable = getDBTable("ssr_history_success_factors"), // get the right table
 				
-				    // --- RENAME COLUMNS TO MATCH LEGACY FIELDS ---
-				    RenamedColumns = Table.RenameColumns(dbTable, {
-				        {"_sys_ssr_history_id", "_sys_ssr_history_id"},
-				        {"trueai_model_name", "model"},
-				        {"trueai_value", "value"},
-				        {"trueai_value_impact", "impact"},
-				        {"trueai_value_impact_sign", "sig"},
-				        {"trueai_factor_name", "name"},
-				        {"trueai_sort", "sort"},
-				        {"trueai_factor_impact", "feature_impact"},
-				        {"trueai_ordering_factor", "ordering_factor"},
-				        {"trueai_ssr_history_name", "step_name"},
-				        {"trueai_is_significant", "display"}
-				    }),
 				
-				    // --- SAFE TYPE CASTING ---
-				    CastedTable = Table.TransformColumns(RenamedColumns, {
-				        {"_sys_ssr_history_id", each try Text.From(_) otherwise null, type text},
-				        {"display", each try Logical.From(_) otherwise null, type logical},
-				        {"feature_impact", each try Number.From(_) otherwise null, type number},
-				        {"impact", each try Number.From(_) otherwise null, type number},
-				        {"model", each try Text.From(_) otherwise null, type text},
-				        {"name", each try Text.From(_) otherwise null, type text},
-				        {"sig", each try Text.From(_) otherwise null, type text},
-				        {"sort", each try Number.From(_) otherwise null, type number},
-				        {"step_name", each try Text.From(_) otherwise null, type text},
-				        {"value", each try Text.From(_) otherwise null, type text}
-				    })
+				  dbTableTyped = Table.TransformColumnTypes(dbTable,{ // change types to what we're expecting
+				        {"_sys_doc_id", type text},
+				        {"_sys_ssr_history_id", type text},
+				        {"trueai_factor_impact", type number},
+				        {"trueai_factor_name", type text},
+				        {"trueai_is_significant", type logical},
+				        {"trueai_model_name", type text},
+				        {"trueai_ordering_factor", type number},
+				        {"trueai_sort", type number},
+				        {"trueai_ssr_history_name", type text},
+				        {"trueai_value", type text},
+				        {"trueai_value_impact", type number},
+				        {"trueai_value_impact_sign", type text}
+				
+				
+				
+				  })
 				in
-				    CastedTable
+				    dbTableTyped
 
 	annotation PBI_ResultType = Table
 
