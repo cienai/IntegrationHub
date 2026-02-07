@@ -2140,19 +2140,6 @@ table ssr_history
 
 		changedProperty = FormatString
 
-	measure 'meas.ssr_history_rep_users_mgr_involved_percentage' = ```
-			
-			 var deals_w_mgr = CALCULATE(COUNT(ssr_history[_sys_doc_id]), ssr_history[step_mgr_involved] = True) +0
-			 var total_deals = CALCULATE(COUNT(ssr_history[_sys_doc_id]))
-			 var res = DIVIDE(deals_w_mgr , total_deals)
-			 return res
-			```
-		formatString: 0%;-0%;0%
-		displayFolder: _rep_analysis
-		lineageTag: 8bb5a079-e469-4244-af3f-9d05b8371096
-
-		changedProperty = FormatString
-
 	measure 'meas.ssr_history_pipeline_amt_user_eop_avg' =
 			
 			DIVIDE(
@@ -8336,7 +8323,7 @@ table ssr_history
 		displayFolder: _opps_detail
 		lineageTag: e4b3accf-c3b1-40c8-91fe-fa17d32d43f0
 
-	measure 'meas.stkhlds_primary_contact_title_dept' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]), ssr_history_stakeholders[trueai_stkhld_ranking]=1)
+	measure 'meas.stkhlds_primary_contact_title_department' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]), ssr_history_stakeholders[trueai_stkhld_ranking]=1)
 		displayFolder: _opps_detail
 		lineageTag: a6b9ce75-05d3-4166-9963-50a9ed6c6de7
 
@@ -8389,7 +8376,7 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	measure 'meas.stkhlds_secondary_contact_title_dept' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]), ssr_history_stakeholders[trueai_stkhld_ranking]=2)
+	measure 'meas.stkhlds_secondary_contact_title_department' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]), ssr_history_stakeholders[trueai_stkhld_ranking]=2)
 		displayFolder: _opps_detail
 		lineageTag: 1f889106-23b7-479c-ae6c-7457ad751973
 
@@ -12637,31 +12624,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.user_involvement_per_opp_avg_other' = AVERAGE(ssr_history[step_other_count_involved])
-		formatString: #,0.0
-		displayFolder: _opps_detail
-		lineageTag: 7fd6e3e5-9668-47ed-b317-3467873c9e21
-
-	measure 'meas.user_involvement_per_opp_avg_ae' = AVERAGE(ssr_history[step_ae_count_involved])
-		formatString: #,0.0
-		displayFolder: _opps_detail
-		lineageTag: 32391501-de00-433b-b0d1-859ed8090fc2
-
-	measure 'meas.user_involvement_per_opp_avg_am' = AVERAGE(ssr_history[step_am_count_involved])
-		formatString: #,0.0
-		displayFolder: _opps_detail
-		lineageTag: ae53b16f-0b85-43a4-ab06-ab376f8e7683
-
-	measure 'meas.user_involvement_per_opp_avg_mgmt' = AVERAGE(ssr_history[step_mgmt_count_involved])
-		formatString: #,0.0
-		displayFolder: _opps_detail
-		lineageTag: da875c36-a3ce-4120-a3b6-93567548d3a5
-
-	measure 'meas.user_involvement_per_opp_avg_sdr' = AVERAGE(ssr_history[step_sdr_count_involved])
-		formatString: 0.0
-		displayFolder: _opps_detail
-		lineageTag: 8ce92ae8-d725-4e00-8920-142c9dd80cb1
-
 	measure 'meas.opps_per_dur_hrs_avg_sdr' = CALCULATE ( [meas.opps_per_dur_hrs_avg], users[trueai_user_role_function] = "SDR" )
 		displayFolder: _opps_detail
 		lineageTag: da0606be-c806-4d3a-b44e-af0fd378a085
@@ -12733,75 +12695,6 @@ table ssr_history
 		formatString: #,0
 		displayFolder: _opps_detail
 		lineageTag: 7cbdd5ef-95dc-4a3f-87e8-d4146dff2d48
-
-	measure 'meas.user_involvement_per_opp_ae' = ```
-			
-			 CALCULATE(
-			    SUM( ssr_history[step_ae_count_involved] ),
-			     FILTER(
-			        VALUES(ssr_history[entity_opp_id]),
-			        NOT ISBLANK(ssr_history[entity_opp_id])
-			    )
-			)
-			```
-		displayFolder: _opps_detail
-		lineageTag: f3ec0449-b6fe-4be6-a82b-103bf57c669f
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure 'meas.user_involvement_per_opp_am' = ```
-			
-			CALCULATE(
-			    SUM( ssr_history[step_am_count_involved] ),
-			     FILTER(
-			        VALUES(ssr_history[entity_opp_id]),
-			        NOT ISBLANK(ssr_history[entity_opp_id])
-			    )
-			)
-			
-			```
-		formatString: #,0
-		displayFolder: _opps_detail
-		lineageTag: ec4c3907-8793-450a-9f3b-700da5318ab3
-
-	measure 'meas.user_involvement_per_opp_mgmt' =
-			
-			CALCULATE(
-			    SUM( ssr_history[step_mgmt_count_involved] ),
-			     FILTER(
-			        VALUES(ssr_history[entity_opp_id]),
-			        NOT ISBLANK(ssr_history[entity_opp_id])
-			    )
-			)
-		formatString: #,0
-		displayFolder: _opps_detail
-		lineageTag: dce25ffa-04b3-4dc2-80e2-e51ef84bf94b
-
-	measure 'meas.user_involvement_per_opp_sdr' =
-			
-			CALCULATE(
-			    SUM( ssr_history[step_sdr_count_involved] ),
-			     FILTER(
-			        VALUES(ssr_history[entity_opp_id]),
-			        NOT ISBLANK(ssr_history[entity_opp_id])
-			    )
-			)
-		formatString: #,0
-		displayFolder: _opps_detail
-		lineageTag: 4f24d7d6-1c7b-4ccb-a7fd-6d39aefff4f0
-
-	measure 'meas.user_involvement_per_opp_other' =
-			
-			CALCULATE(
-			    SUM( ssr_history[step_other_count_involved] ),
-			     FILTER(
-			        VALUES(ssr_history[entity_opp_id]),
-			        NOT ISBLANK(ssr_history[entity_opp_id])
-			    )
-			)
-		formatString: #,0
-		displayFolder: _opps_detail
-		lineageTag: cae7c502-1a7c-432d-bc06-9974532952f5
 
 	measure 'meas.total_opps_count_dist' =
 			
@@ -14100,24 +13993,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	column step_mgr_involved
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: cba1e772-70be-4540-8393-c233982dd2ef
-		summarizeBy: none
-		sourceColumn: step_mgr_involved
-
-		annotation SummarizationSetBy = Automatic
-
-	column step_sales_engineer_involved
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 201092fa-3d20-4be4-afd6-377dc6f00d4b
-		summarizeBy: none
-		sourceColumn: step_sales_engineer_involved
-
-		annotation SummarizationSetBy = Automatic
-
 	column 'col.step_outcome' =
 			
 			var _step_name = IF(ISBLANK(ssr_history[step_outcome]),[step_name], BLANK())
@@ -14225,60 +14100,6 @@ table ssr_history
 		lineageTag: 9f742945-cedb-479e-a901-cbcdff041223
 		summarizeBy: none
 		sourceColumn: opp_pipeline_name
-
-		annotation SummarizationSetBy = Automatic
-
-	column step_sdr_count_involved
-		dataType: int64
-		formatString: 0
-		lineageTag: 908d684b-599e-4c4a-8925-86ae25b7c676
-		summarizeBy: sum
-		sourceColumn: step_sdr_count_involved
-
-		annotation SummarizationSetBy = Automatic
-
-	column step_ae_count_involved
-		dataType: int64
-		formatString: 0
-		lineageTag: 3da6bf4d-c2f8-425f-8a79-406e804f5fb9
-		summarizeBy: sum
-		sourceColumn: step_ae_count_involved
-
-		annotation SummarizationSetBy = Automatic
-
-	column step_am_count_involved
-		dataType: int64
-		formatString: 0
-		lineageTag: 64b4e31d-96c8-4cb4-bf98-cd187ae675eb
-		summarizeBy: sum
-		sourceColumn: step_am_count_involved
-
-		annotation SummarizationSetBy = Automatic
-
-	column step_mkt_count_involved
-		dataType: int64
-		formatString: 0
-		lineageTag: fa47be53-2ca9-411e-a7ba-5e5bf7f34789
-		summarizeBy: sum
-		sourceColumn: step_mkt_count_involved
-
-		annotation SummarizationSetBy = Automatic
-
-	column step_other_count_involved
-		dataType: int64
-		formatString: 0
-		lineageTag: 15cff750-a58d-4d15-a6ae-fb998b3dc3a5
-		summarizeBy: sum
-		sourceColumn: step_other_count_involved
-
-		annotation SummarizationSetBy = Automatic
-
-	column step_mgmt_count_involved
-		dataType: int64
-		formatString: 0
-		lineageTag: 0b5c1064-4f87-485e-9827-b0bb09a8f94f
-		summarizeBy: sum
-		sourceColumn: step_mgmt_count_involved
 
 		annotation SummarizationSetBy = Automatic
 
@@ -14488,19 +14309,10 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	column entity_prospecting_restarted
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: c50aff3d-7a0d-41a2-9216-c1a0805f8bb9
-		summarizeBy: none
-		sourceColumn: entity_prospecting_restarted
-
-		annotation SummarizationSetBy = Automatic
-
 	column entity_prospecting_winback
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 6f168e99-6d78-4a46-bb3e-218ab67e0a1b
+		lineageTag: c50aff3d-7a0d-41a2-9216-c1a0805f8bb9
 		summarizeBy: none
 		sourceColumn: entity_prospecting_winback
 
@@ -14549,6 +14361,78 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
+	column entity_prospecting_restarted
+		dataType: string
+		lineageTag: 7a4403ee-503c-4a56-921c-d12aec7d0b45
+		summarizeBy: none
+		sourceColumn: entity_prospecting_restarted
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_mgr_involved
+		dataType: string
+		lineageTag: 718b143c-1362-4c30-960a-b0c7b3aa8605
+		summarizeBy: none
+		sourceColumn: step_mgr_involved
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_sales_engineer_involved
+		dataType: string
+		lineageTag: ab4abe82-f638-4636-83c6-840b77ca6f69
+		summarizeBy: none
+		sourceColumn: step_sales_engineer_involved
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_sdr_count_involved
+		dataType: string
+		lineageTag: 5653d138-0f98-4c96-818a-fd378e75159a
+		summarizeBy: none
+		sourceColumn: step_sdr_count_involved
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_ae_count_involved
+		dataType: string
+		lineageTag: b7f6df9a-bc98-436d-9c8e-95a28d3d7252
+		summarizeBy: none
+		sourceColumn: step_ae_count_involved
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_am_count_involved
+		dataType: string
+		lineageTag: 84fdf1d1-a511-4a8a-aa60-90d5600fbf91
+		summarizeBy: none
+		sourceColumn: step_am_count_involved
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_mkt_count_involved
+		dataType: string
+		lineageTag: bc8c6671-b100-4dad-817d-a0ed866d3f20
+		summarizeBy: none
+		sourceColumn: step_mkt_count_involved
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_other_count_involved
+		dataType: string
+		lineageTag: b2beb411-adfe-44c4-aca0-f7a4f22dd8c8
+		summarizeBy: none
+		sourceColumn: step_other_count_involved
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_mgmt_count_involved
+		dataType: string
+		lineageTag: acfa0f73-5aa6-4393-8155-91ee2caa0229
+		summarizeBy: none
+		sourceColumn: step_mgmt_count_involved
+
+		annotation SummarizationSetBy = Automatic
+
 	partition ssr_history-42b745a5-3afa-43a2-90f2-f7965fced67a = m
 		mode: import
 		source =
@@ -14576,7 +14460,6 @@ table ssr_history
 				    {"entity_primary_doc_id", type text},
 				    {"entity_primary_trueai_complt", type number},
 				    {"entity_prospecting_recycled", type logical},
-				    {"entity_prospecting_restarted", type logical},
 				    {"entity_prospecting_winback", type logical},
 				    {"entity_qual_bucket", type text},
 				    {"entity_qual_bucket_num", Int64.Type},
@@ -14612,8 +14495,6 @@ table ssr_history
 				    {"opp_sale_type", type text},
 				    {"opp_stage", type text},
 				    {"opp_won_amt", type number},
-				    {"step_ae_count_involved", Int64.Type},
-				    {"step_am_count_involved", Int64.Type},
 				    {"step_days_pushed_pulled", Int64.Type},
 				    {"step_end_date", type datetime},
 				    {"step_end_rule", Int64.Type},
@@ -14621,15 +14502,11 @@ table ssr_history
 				    {"step_handed_off_to_id", type text},
 				    {"step_id", type text},
 				    {"step_length_in_days", Int64.Type},
-				    {"step_mgmt_count_involved", Int64.Type},
 				    {"step_mgr_act", Int64.Type},
-				    {"step_mgr_involved", type logical},
-				    {"step_mkt_count_involved", Int64.Type},
 				    {"step_name", type text},
 				    {"step_next_qual_bucket", type text},
 				    {"step_next_qual_bucket_num", Int64.Type},
 				    {"step_next_success_prob", type number},
-				    {"step_other_count_involved", Int64.Type},
 				    {"step_outcome", type text},
 				    {"step_outcome_rule", Int64.Type},
 				    {"step_owner_act", type number},
@@ -14641,8 +14518,6 @@ table ssr_history
 				    {"step_owner_rule", Int64.Type},
 				    {"step_owner_user_role", type text},
 				    {"step_received_from_id", type text},
-				    {"step_sales_engineer_involved", type logical},
-				    {"step_sdr_count_involved", Int64.Type},
 				    {"step_sequence", Int64.Type},
 				    {"step_start_date", type datetime},
 				    {"step_sub_type", type text},
