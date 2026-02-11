@@ -1,5 +1,6 @@
 /// Reference list of definitions for all AI-generated predictive and descriptive scores, including value ranges and interpretations.
 table metadata_ai_scores
+	description: "One row per metadata_ai_score record. Source fields include System prefixes. Related to LocalDateTable_69fd8ce2-ea49-4d03-91e4-9a7d63e1ec7e (_sys_modified_on -> Date). Supports measures such as meas.ai_scores_accts_industry, meas.ai_scores_accts_leadsource."
 	lineageTag: 8c96acad-793d-4bbe-aa0a-cbaa0c12a741
 
 	/// Measure meas.ai_scores_accts_industry.
@@ -11,6 +12,7 @@ table metadata_ai_scores
 			RETURN res
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		displayFolder: _ai_scores
 		lineageTag: 39d3ccd2-4aed-49b7-b32f-ac492b682508
 
@@ -19,6 +21,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_accts_leadsource.
 	measure 'meas.ai_scores_accts_leadsource' =
 			
+			description: "TODO: provide business definition for this measure."
 			var res =  [meas.ai_scores_accts_leadsource_factor1_value] //only one factor
 			
 			RETURN res
@@ -30,6 +33,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_adj_duration' =
 			
 			
+			description: "TODO: provide business definition for this measure."
 			var res =  [meas.ai_scores_adj_duration_factor1_value] //only one factor
 			
 			RETURN res
@@ -49,6 +53,7 @@ table metadata_ai_scores
 			var res  = ((factor1 - ABS(factor1 - factor2))/factor1) + 0
 			RETURN res
 			```
+			description: "Ratio measure. Respects the current filter context."
 		displayFolder: _ai_scores
 		lineageTag: fe57f762-597f-4e7c-9903-2ed634cc1ca7
 
@@ -61,6 +66,7 @@ table metadata_ai_scores
 			RETURN res
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 1ae2915d-2f9a-429a-b17f-33652be146a2
@@ -75,6 +81,7 @@ table metadata_ai_scores
 			
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 4888116b-57c6-429e-8d22-8967a530b922
@@ -83,6 +90,7 @@ table metadata_ai_scores
 
 	/// Measure meas.ai_scores_ci_deal_maxing.
 	measure 'meas.ai_scores_ci_deal_maxing' =
+			description: "TODO: provide business definition for this measure."
 			var res = [meas.ai_scores_ci_deal_maxing_factor1_value]
 			RETURN res
 		formatString: 0
@@ -98,6 +106,7 @@ table metadata_ai_scores
 			RETURN res
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 05f956cc-5b30-4db1-b18d-36e82949a976
@@ -107,6 +116,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_ci_engagement_ability.
 	measure 'meas.ai_scores_ci_engagement_ability' =
 			
+			description: "TODO: provide business definition for this measure."
 			var res = [meas.ai_scores_ci_engagement_ability_factor1_value]
 			RETURN res
 		formatString: 0
@@ -118,6 +128,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_ci_time_alloc.
 	measure 'meas.ai_scores_ci_time_alloc' =
 			
+			description: "TODO: provide business definition for this measure."
 			var res = [meas.ai_scores_ci_time_allocation_factor1_value]
 			RETURN res
 		displayFolder: _ai_scores
@@ -127,6 +138,7 @@ table metadata_ai_scores
 
 	/// Measure meas.ai_scores_ci_time_management.
 	measure 'meas.ai_scores_ci_time_management' =
+			description: "TODO: provide business definition for this measure."
 			var res = [meas.ai_scores_ci_time_management_factor1_value]
 			RETURN res
 		formatString: 0
@@ -137,6 +149,7 @@ table metadata_ai_scores
 
 	/// Measure meas.ai_scores_ci_work_effort.
 	measure 'meas.ai_scores_ci_work_effort' =
+			description: "TODO: provide business definition for this measure."
 			var res = [meas.ai_scores_ci_work_effort_factor1_value]
 			RETURN res
 		formatString: 0
@@ -148,6 +161,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_general_score.
 	measure 'meas.ai_scores_general_score' =
 			
+			description: "TODO: provide business definition for this measure."
 			var res = [meas.ai_scores_general_score_factor1_value]            // get the factor value 1
 			
 			RETURN res
@@ -164,6 +178,7 @@ table metadata_ai_scores
 			RETURN res
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: c3045d71-e4f5-44c6-ad52-00ff64d08878
@@ -178,6 +193,7 @@ table metadata_ai_scores
 			RETURN res
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: b002e3a1-c0f2-4749-83d7-a51aeeaf582b
@@ -187,21 +203,25 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_line_items_products.
 	measure 'meas.ai_scores_line_items_products' = ```
 			
-			var _won_ratio  =  [meas.ai_scores_line_items_products_factor1_value]
-			var _lost_ratio  = [meas.ai_scores_line_items_products_factor2_value]
+			var _won_ratio_raw = [meas.ai_scores_line_items_products_factor1_value]
+			var _lost_ratio_raw = [meas.ai_scores_line_items_products_factor2_value]
 			
-			   // lost ratio
+			// Normalize if factors are already expressed as percentages
+			var _won_ratio = IF(_won_ratio_raw > 1, _won_ratio_raw / 100, _won_ratio_raw)
+			var _lost_ratio = IF(_lost_ratio_raw > 1, _lost_ratio_raw / 100, _lost_ratio_raw)
 			
 			var _won_weight = 0.70           // won weight
 			var _lost_weight = 0.30         // lost deals ratio
 			
-			var score = (_won_ratio*_won_weight) + (_lost_ratio*_lost_weight)
+			var score = (_won_ratio * _won_weight) + (_lost_ratio * _lost_weight)
+			var res = MIN(MAX(ROUND(score * 100, 0), 0), 100)
 			
-			
-			RETURN score
+			RETURN
+			res
 			
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		displayFolder: _ai_scores
 		lineageTag: 4c75bc0f-737e-476b-96b1-b0128b90af70
 
@@ -218,6 +238,7 @@ table metadata_ai_scores
 			
 			RETURN  score
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: e67aca4d-ec1b-45f3-8cbe-5d652675365b
@@ -233,6 +254,7 @@ table metadata_ai_scores
 			VAR res =  MIN(DIVIDE ( factor1, factor2, 0 ) ,1)
 			RETURN res
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0.0
 		displayFolder: _ai_scores
 		lineageTag: 32567516-5874-4226-8182-cabb1f40e3b7
@@ -245,6 +267,7 @@ table metadata_ai_scores
 			RETURN score
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 1dd141b1-c365-410b-bf6d-92c294828494
@@ -259,6 +282,7 @@ table metadata_ai_scores
 			RETURN score
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 43a832da-356c-4608-a410-ede250550799
@@ -273,6 +297,7 @@ table metadata_ai_scores
 			RETURN score
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 78a3895d-3611-4430-9285-08fd177c3411
@@ -286,6 +311,7 @@ table metadata_ai_scores
 			RETURN score
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		displayFolder: _ai_scores
 		lineageTag: 3edc768e-8bd8-4721-9657-09aca139c796
 
@@ -305,6 +331,7 @@ table metadata_ai_scores
 			RETURN score
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: a9831dbf-5682-4d58-a09e-79f6ce0ad1b2
@@ -323,6 +350,7 @@ table metadata_ai_scores
 			RETURN score
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 3ba649b8-a4e2-40c5-bf3f-1f5bb9013d4d
@@ -341,6 +369,7 @@ table metadata_ai_scores
 			RETURN score
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: a05cab4f-fb40-4494-a49f-2f96bd1b3638
@@ -359,6 +388,7 @@ table metadata_ai_scores
 			RETURN score
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: afb705db-0fbb-45c5-a1b2-b2608189e2fc
@@ -383,6 +413,7 @@ table metadata_ai_scores
 			RETURN
 			res
 			```
+			description: "Ratio of users_history[_sys_filt_start_date] to users_history[_sys_filt_start_date]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 822304c1-edef-4bc0-9017-2b3f2f278fc0
@@ -392,6 +423,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_rep_org_calibration.
 	measure 'meas.ai_scores_rep_org_calibration' =
 			
+			description: "TODO: provide business definition for this measure."
 			VAR factor1 = [meas.ai_scores_rep_org_calibration_factor1_value]
 			VAR factor2 = [meas.ai_scores_rep_org_calibration_factor2_value]
 			VAR factor3 = [meas.ai_scores_rep_org_calibration_factor3_value]
@@ -433,6 +465,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_revenue_calibration' =
 			
 			
+			description: "TODO: provide business definition for this measure."
 			var factor1 = [meas.ai_scores_revenue_calibration_factor1_value]
 			VAR factor2 = [meas.ai_scores_revenue_calibration_factor2_value]
 			var score = (factor1 - ABS(factor1 - factor2))/factor1
@@ -457,6 +490,7 @@ table metadata_ai_scores
 			RETURN 
 			_conf
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: a6abcf69-3766-4bdd-a60f-4984323b5532
@@ -467,6 +501,7 @@ table metadata_ai_scores
 			RETURN 
 			_conf
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 1d6becd4-7779-4caa-8d84-d7fdf6c1e334
@@ -489,6 +524,7 @@ table metadata_ai_scores
 			RETURN score
 			
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[di_success_prob_training_score]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: c40817e6-7a7d-4281-a04b-007ed3fc01ae
@@ -498,6 +534,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_vi.
 	measure 'meas.ai_scores_vi' =
 			
+			description: "TODO: provide business definition for this measure."
 			var factor1 = [meas.ai_scores_vi_step_diff_factor1_value]      // get the factor 1
 			var factor2 = [meas.ai_scores_vi_tuning_share_diff_factor2]         // get factor 2
 			var score = (1 - ABS(factor1+factor2)/2)
@@ -513,6 +550,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_ci_time_allocation_factor2_value.
 	measure 'meas.ai_scores_ci_time_allocation_factor2_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			BLANK()
 		formatString: 0.00
 		displayFolder: _factor2_value
@@ -528,6 +566,7 @@ table metadata_ai_scores
 			RETURN existing_cust_r2
 			
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[di_pred_existing_customer_selling_r2]. Respects the current filter context."
 		displayFolder: _factor2_value
 		lineageTag: b34ca4b8-d776-45ed-abf4-257a00ba6cb3
 
@@ -551,6 +590,7 @@ table metadata_ai_scores
 			
 			
 			```
+			description: "Ratio of opps[_sys_doc_id] to opps[trueai_is_won]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor2_value
 		lineageTag: 322eccea-e9fc-4cd4-a1b6-b6fe7ce95cc0
@@ -558,6 +598,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_list_price_items_non_default_factor2_value.
 	measure 'meas.ai_scores_list_price_items_non_default_factor2_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			var total_list_items = CALCULATE(
 			    count(opp_line_items[trueai_list_price]),      // non default list price items count
 			    opp_line_items[trueai_list_price_rule] <> 103007
@@ -576,6 +617,7 @@ table metadata_ai_scores
 			RETURN new_logo_r2
 			
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[di_pred_new_logo_r2]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor2_value
 		lineageTag: 4c4ee231-057d-4fa7-89af-0d13823b5247
@@ -588,6 +630,7 @@ table metadata_ai_scores
 			RETURN post_sales_r2
 			
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[di_pred_post_sales_r2]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor2_value
 		lineageTag: 231f7961-a090-4d9f-be9c-c8b5b2f33117
@@ -600,6 +643,7 @@ table metadata_ai_scores
 			RETURN prospect_r2
 			
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[di_pred_prospecting_r2]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor2_value
 		lineageTag: f066aabf-c00d-4d88-b0a5-6779029d7b86
@@ -614,6 +658,7 @@ table metadata_ai_scores
 			RETURN _perf+0
 			
 			```
+			description: "Ratio based on users_history[ci_perf_qtly_performance_tier_conf]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor2_value
 		lineageTag: 2efec14a-78b8-40f8-97f9-9640fb62a3b6
@@ -626,6 +671,7 @@ table metadata_ai_scores
 			RETURN valid_score
 			
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[di_success_prob_validation_score]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor2_value
 		lineageTag: 41c60942-a8ee-4d5f-9a96-1574649cd7d0
@@ -638,6 +684,7 @@ table metadata_ai_scores
 			RETURN diff2
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor2_value
 		lineageTag: 42241314-6700-4f39-8ab0-197a961b6fc8
@@ -645,6 +692,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_accts_industry_factor1_value.
 	measure 'meas.ai_scores_accts_industry_factor1_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _avg = CALCULATE(
 			    AVERAGE(ssr[trueai_industry_conf])         // get the accounts average industry conf
 			)
@@ -657,6 +705,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_accts_leadsource_factor1_value.
 	measure 'meas.ai_scores_accts_leadsource_factor1_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _avg = CALCULATE(
 			    AVERAGE(ssr[trueai_leadsource_conf])         // get the accounts average leadsource conf
 			)
@@ -684,6 +733,7 @@ table metadata_ai_scores
 			RETURN 
 			res
 			```
+			description: "Ratio of ssr_history[step_name] to ssr_history[stkhlds_all_adj_dur_rule]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 78730502-80ca-4cce-b42d-5234fd16169f
@@ -697,6 +747,7 @@ table metadata_ai_scores
 			RETURN _avg
 			
 			```
+			description: "Ratio of users_history[ci_act_capt_lvl_conf] to users[trueai_user_role_function]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 1da7cd80-ae31-496a-abfd-cdada445fdba
@@ -711,6 +762,7 @@ table metadata_ai_scores
 			RETURN res 
 			
 			```
+			description: "Ratio of users_history[ci_sb_closing_ability_conf] to users[trueai_user_role_function]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: cbcac673-2f14-4dbc-a705-37568fd63a3c
@@ -718,6 +770,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_ci_deal_maxing_factor1_value.
 	measure 'meas.ai_scores_ci_deal_maxing_factor1_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _avg = CALCULATE(
 			    AVERAGE(users_history[ci_sb_deal_maxing_conf]), users[trueai_user_role_function] in {"AM", "AE"}        // get the avg deal maximizing conf
 			)
@@ -735,6 +788,7 @@ table metadata_ai_scores
 			RETURN res 
 			
 			```
+			description: "Ratio of users_history[ci_sb_discov_skills_conf] to users[trueai_user_role_function]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 3c99cf6e-6884-423f-9b93-d1b1dd48eac0
@@ -742,6 +796,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_ci_engagement_ability_factor1_value.
 	measure 'meas.ai_scores_ci_engagement_ability_factor1_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _avg = CALCULATE(
 			    AVERAGE(users_history[ci_sb_engmt_ability_conf]),        // get the avg engagement ability conf
 			    users[trueai_user_role_function] in  {"AE", "AM", "SDR"}
@@ -762,6 +817,7 @@ table metadata_ai_scores
 			
 			
 			```
+			description: "Ratio of users_history[ci_time_alloc_conf] to users[trueai_user_role_function]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: ea5332c7-0de2-4daf-8cb7-1c2b6695ba96
@@ -776,6 +832,7 @@ table metadata_ai_scores
 			RETURN _avg
 			
 			```
+			description: "Ratio of users_history[ci_sb_time_management_conf] to users[trueai_user_role_function]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 5fdf05a9-0d69-418c-9ca9-866fcfecf9a3
@@ -788,6 +845,7 @@ table metadata_ai_scores
 			RETURN res 
 			
 			```
+			description: "Ratio of users_history[ci_sb_work_effort_conf] to users[trueai_user_role_function]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: d3d8bc69-199e-4596-bab3-1674f5efd4cb
@@ -800,6 +858,7 @@ table metadata_ai_scores
 			RETURN existing_cust_auc
 			
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[di_pred_existing_customer_selling_auc]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 95206c4e-d225-4f46-ab3d-a9ff209b1848
@@ -812,6 +871,7 @@ table metadata_ai_scores
 			RETURN  if (res = BLANK(),BLANK(),1 ) // return blank if no current data
 			
 			```
+			description: "Ratio based on ssr_history_stakeholders[_sys_doc_id]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: bcd663d2-58e2-4db4-ae3c-6ce46b4ca129
@@ -825,6 +885,7 @@ table metadata_ai_scores
 			RETURN _avg
 			
 			```
+			description: "Ratio based on ssr[trueai_industry_conf]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 08cd9b25-205a-48a8-bb2f-79b8052291e6
@@ -838,6 +899,7 @@ table metadata_ai_scores
 			RETURN _avg
 			
 			```
+			description: "Ratio based on ssr[trueai_leadsource_conf]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 39ebb921-3dc1-4a39-aa86-8581d8d29be8
@@ -856,6 +918,7 @@ table metadata_ai_scores
 			var _won_ratio = DIVIDE(_won_deals_w_line,won_deals,0)         // won ratio
 			RETURN _won_ratio
 			```
+			description: "Ratio of opps[_sys_doc_id] to opps[trueai_is_won]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 49312bdd-1105-4544-9f95-f257873fbe76
@@ -868,6 +931,7 @@ table metadata_ai_scores
 			RETURN
 			total_list_items+0
 			```
+			description: "Ratio based on opp_line_items[trueai_list_price]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 60811fc7-afd2-43dd-9e9a-2762cd8a5d74
@@ -875,6 +939,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_new_logo_selling_factor1_value.
 	measure 'meas.ai_scores_new_logo_selling_factor1_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
 			var new_logo_auc = MAXX(latest_row, companies_history[di_pred_new_logo_auc])     // get the latest auc for new_logo_selling
 			RETURN
@@ -905,6 +970,7 @@ table metadata_ai_scores
 			RETURN res
 			
 			```
+			description: "Distinct count of open_pipeline[opp_is_won]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 88220627-b28d-4a2f-a86e-a370dad00ede
@@ -918,6 +984,7 @@ table metadata_ai_scores
 			RETURN _avg
 			
 			```
+			description: "Ratio based on opps[trueai_industry_conf]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 93bc9da7-c7b8-40f5-b584-8add5eb22f45
@@ -931,6 +998,7 @@ table metadata_ai_scores
 			RETURN _avg
 			
 			```
+			description: "Ratio based on opps[trueai_leadsource_conf]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 72f92283-eb2d-4c76-9654-2f099e1c3dd3
@@ -942,6 +1010,7 @@ table metadata_ai_scores
 			RETURN perf_avg
 			
 			```
+			description: "Ratio of users_history[ci_perf_qtly_performance_tier_conf] to users[trueai_user_role_function]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: aabc3ea3-550c-4c76-8199-1a09266b4e3c
@@ -954,6 +1023,7 @@ table metadata_ai_scores
 			RETURN post_sales_auc
 			
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[di_pred_post_sales_auc]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 4174000b-df69-4da9-a282-a6b9eb96248a
@@ -961,6 +1031,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_potential_acv_factor1_value.
 	measure 'meas.ai_scores_potential_acv_factor1_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			// as we don't have some field to calculate the factor I am using here temporary variable for visualization purpose. need to apply the actual field while available
 			var temp = CALCULATE(AVERAGE(ssr[trueai_complt_all]))    // temp value for factor analysis
 			RETURN
@@ -979,6 +1050,7 @@ table metadata_ai_scores
 			RETURN prospect_auc
 			
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[di_pred_prospecting_auc]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 0972da0d-d92d-40d3-88b6-31b91bae569f
@@ -999,6 +1071,7 @@ table metadata_ai_scores
 			RETURN
 			res+0
 			```
+			description: "Ratio of users_history[_sys_filt_start_date] to users_history[_sys_filt_start_date]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 9efba05e-5ee4-4205-805d-1baca8e33807
@@ -1008,6 +1081,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_rep_org_calibration_factor1_value.
 	measure 'meas.ai_scores_rep_org_calibration_factor1_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			VAR latest_table =
 			    CALCULATETABLE(
 			        TOPN(1, companies_history, companies_history[_sys_processed_as_of], DESC),
@@ -1035,6 +1109,7 @@ table metadata_ai_scores
 			RETURN
 			_booking_amt
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: e880eab7-5c90-4b09-a777-fa47ae818adc
@@ -1048,6 +1123,7 @@ table metadata_ai_scores
 			RETURN _avg
 			
 			```
+			description: "Ratio based on ssr[trueai_industry_conf]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 90726119-0ec7-4e1e-91ee-7bbfd2da9356
@@ -1061,6 +1137,7 @@ table metadata_ai_scores
 			RETURN _avg
 			
 			```
+			description: "Ratio based on ssr[trueai_leadsource_conf]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: a4de2f14-f93d-469e-ad22-6155c5cc7c9a
@@ -1073,6 +1150,7 @@ table metadata_ai_scores
 			RETURN train_score
 			
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[di_success_prob_training_score]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: a48317f5-a775-4463-bc5c-264b79724b39
@@ -1084,6 +1162,7 @@ table metadata_ai_scores
 			RETURN diff1
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 88399f1d-a2a5-4dc6-85ab-5d9be411da54
@@ -1091,6 +1170,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_score.
 	measure 'meas.ai_score' =
 			
+			description: "TODO: provide business definition for this measure."
 			VAR score_id =
 			    MAX( metadata_ai_scores[_sys_doc_id] )
 			
@@ -1176,6 +1256,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_score_formula.
 	measure 'meas.ai_score_formula' =
 			
+			description: "TODO: provide business definition for this measure."
 			var meas_name = [meas.ai_score_measure_name]
 			var expr =
 			    MAXX(
@@ -1232,11 +1313,13 @@ table metadata_ai_scores
 			RETURN
 			res
 			```
+			description: "Ratio based on metadata_ai_scores[score_name]. Respects the current filter context."
 		lineageTag: c8ba0855-de67-44fd-a49b-64d5bee7ddc8
 
 	/// Measure meas.ai_scores_factor1_name.
 	measure 'meas.ai_scores_factor1_name' =
 			
+			description: "TODO: provide business definition for this measure."
 			var factor_name = MAX(metadata_ai_scores[factor_1_name])
 			RETURN factor_name
 		lineageTag: b59e2b3c-8a05-46b9-96ad-9ebdb059374c
@@ -1290,12 +1373,14 @@ table metadata_ai_scores
 			RETURN
 			res
 			```
+			description: "Ratio based on metadata_ai_scores[score_name]. Respects the current filter context."
 		formatString: 0.00
 		lineageTag: 822233b1-79ae-4d66-b6a1-307424c79baf
 
 	/// Measure meas.ai_scores_factor2_name.
 	measure 'meas.ai_scores_factor2_name' =
 			
+			description: "TODO: provide business definition for this measure."
 			var factor_name = MAX(metadata_ai_scores[factor_2_name])
 			RETURN factor_name
 		lineageTag: 0f4f2c54-fdd9-493c-a042-f0fbf0f14a03
@@ -1329,12 +1414,14 @@ table metadata_ai_scores
 			RETURN
 			res
 			```
+			description: "Ratio based on metadata_ai_scores[score_name]. Respects the current filter context."
 		formatString: 0.00
 		lineageTag: dbbfb553-82bb-444e-b9f9-7523d6960fe1
 
 	/// Measure meas.ai_scores_factor3_name.
 	measure 'meas.ai_scores_factor3_name' =
 			
+			description: "TODO: provide business definition for this measure."
 			var factor_name = MAX(metadata_ai_scores[factor_3_name])
 			RETURN factor_name
 		lineageTag: 2a2a1c88-f694-4c0e-9a4d-141ad9979f50
@@ -1355,6 +1442,7 @@ table metadata_ai_scores
 			RETURN
 			res
 			```
+			description: "TODO: provide business definition for this measure."
 		lineageTag: a87d35b5-2f1a-49fd-bfbb-73176fec4bcf
 
 	/// Measure meas.ai_scores_text.
@@ -1377,11 +1465,13 @@ table metadata_ai_scores
 			RETURN  score_text
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		lineageTag: 7492dfc0-7677-44be-a2c6-b97c45c16627
 
 	/// Measure meas.average_ai_score.
 	measure 'meas.average_ai_score' =
 			
+			description: "TODO: provide business definition for this measure."
 			AVERAGEX(
 			    metadata_ai_scores,
 			    [meas.ai_score]
@@ -1399,6 +1489,7 @@ table metadata_ai_scores
 			RETURN
 			_booking_amt
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0.00
 		displayFolder: _factor2_value
 		lineageTag: 2782ec74-5646-4f66-a3b1-f2a0983bfd8f
@@ -1410,6 +1501,7 @@ table metadata_ai_scores
 			var _booking_amt = MAXX(latest_table,companies_history[ttm_ref_date_bookings]) 
 			RETURN _booking_amt
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: 698f1c2b-2a28-46b9-897c-859800ef5cc5
@@ -1417,6 +1509,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_rep_org_calibration_factor2_value.
 	measure 'meas.ai_scores_rep_org_calibration_factor2_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			VAR latest_table =
 			    CALCULATETABLE(
 			        TOPN(1, companies_history, companies_history[_sys_processed_as_of], DESC),
@@ -1452,6 +1545,7 @@ table metadata_ai_scores
 			var res = 1-DIVIDE(users_match_hr_id_nd_role + users_match_hr_id_nd_group, total_users * 2 )
 			RETURN res
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[users_sales]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _factor3_value
 		lineageTag: d1d45c90-f785-41cf-bb10-2ebace480a90
@@ -1465,6 +1559,7 @@ table metadata_ai_scores
 			RETURN _won_amt
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0.00
 		displayFolder: _factor2_value
 		lineageTag: fe0ca8bb-d25a-4122-958a-cd48c5152bbd
@@ -1509,6 +1604,7 @@ table metadata_ai_scores
 			RETURN
 			matched_reps_score
 			```
+			description: "Ratio of companies_history[_sys_processed_as_of] to companies_history[users]. Respects the current filter context."
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 6e7ee0ed-34bf-446a-9ffe-e98ccb212335
 
@@ -1537,6 +1633,7 @@ table metadata_ai_scores
 			
 			return adjusted_ratio
 			```
+			description: "Ratio of ssr_history[_sys_doc_id] to ssr_history[step_owner_rule]. Respects the current filter context."
 		displayFolder: _ai_scores
 		lineageTag: bf45a0b8-077c-4b33-8150-8a029a875a9f
 
@@ -1549,6 +1646,7 @@ table metadata_ai_scores
 			RETURN res
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		displayFolder: _ai_scores
 		lineageTag: 57ff7f58-82c2-482d-b0b1-7a497dc64707
 
@@ -1558,6 +1656,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_sales_process_any_rules_count_factor1_value' =
 			
 			
+			description: "TODO: provide business definition for this measure."
 			var total_rules_applied = CALCULATE(count(ssr_history[_sys_doc_id]) )
 			var res=  If(IsBlank(total_rules_applied), 0,total_rules_applied)
 			
@@ -1586,6 +1685,7 @@ table metadata_ai_scores
 			
 			return If(IsBlank(res), 0,res)
 			```
+			description: "Ratio of ssr_history[step_owner_rule] to ssr_history[step_outcome_rule]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _factor2_value
 		lineageTag: 6463e2f9-58fc-4643-a70b-240574b500e0
@@ -1593,6 +1693,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_scores_ci_act_capt_lvl_factor1_value.
 	measure 'meas.ai_scores_ci_act_capt_lvl_factor1_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _avg = CALCULATE(
 			    AVERAGE(users_history[ci_act_capt_lvl]), users[trueai_user_role_function] in {"AM", "AE", "SDR"} )        // get the users_history average ci_act_capt_lvl
 			
@@ -1622,6 +1723,7 @@ table metadata_ai_scores
 			
 			
 			```
+			description: "Ratio of open_pipeline[opp_is_won] to open_pipeline[trueai_stage_id]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _factor2_value
 		lineageTag: fbd3245f-7c2f-401f-b3b5-6a3f19fa62ff
@@ -1631,6 +1733,7 @@ table metadata_ai_scores
 	/// Measure meas.ai_score_text_value.
 	measure 'meas.ai_score_text_value' =
 			
+			description: "TODO: provide business definition for this measure."
 			VAR _score = [meas.average_ai_score]
 			VAR _label =
 			    SWITCH(
@@ -1650,6 +1753,7 @@ table metadata_ai_scores
 
 	/// Unique AI score identifier
 	column _sys_doc_id
+		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 0553404d-2d1b-483d-8165-0cda87efe66e
 		summarizeBy: none
@@ -1659,6 +1763,7 @@ table metadata_ai_scores
 
 	/// Is Active
 	column _sys_is_active
+		description: "System: Indicates whether is active."
 		dataType: string
 		lineageTag: 3237ca1e-6587-4d4d-b895-9838a49499c0
 		summarizeBy: none
@@ -1668,6 +1773,7 @@ table metadata_ai_scores
 
 	/// Modified On Date
 	column _sys_modified_on
+		description: "System: Date/time when modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: e4929e32-cf6f-4149-93db-f3d771d03c10
@@ -1683,6 +1789,7 @@ table metadata_ai_scores
 
 	/// Category
 	column category
+		description: "Text label for category."
 		dataType: string
 		lineageTag: fb019989-fe9b-424c-8fd3-a7e7f2aae590
 		summarizeBy: none
@@ -1692,6 +1799,7 @@ table metadata_ai_scores
 
 	/// Score Name
 	column score_name
+		description: "Text label for score name."
 		dataType: string
 		lineageTag: a8567782-46a4-4de2-bc50-2652ade448ac
 		summarizeBy: none
@@ -1701,6 +1809,7 @@ table metadata_ai_scores
 
 	/// Description
 	column description
+		description: "Text label for description."
 		dataType: string
 		lineageTag: b6dd3403-84ad-4b86-a3e7-cced39219da9
 		summarizeBy: none
@@ -1710,6 +1819,7 @@ table metadata_ai_scores
 
 	/// Sort
 	column sort
+		description: "Numeric value for sort."
 		dataType: int64
 		formatString: 0
 		lineageTag: a3bb9fb1-37ee-4f8e-bf36-e15a8efb9f3f
@@ -1720,6 +1830,7 @@ table metadata_ai_scores
 
 	/// Factor 1 Name
 	column factor_1_name
+		description: "Text label for factor 1 name."
 		dataType: string
 		lineageTag: 9bfc524c-cd48-47a6-94b6-101d507330c9
 		summarizeBy: none
@@ -1729,6 +1840,7 @@ table metadata_ai_scores
 
 	/// Factor 2 Name
 	column factor_2_name
+		description: "Text label for factor 2 name."
 		dataType: string
 		lineageTag: dfae5997-5f65-44ee-93e9-bc73ea5040c0
 		summarizeBy: none
@@ -1738,6 +1850,7 @@ table metadata_ai_scores
 
 	/// Factor 3 Name
 	column factor_3_name
+		description: "Text label for factor 3 name."
 		dataType: string
 		lineageTag: a32a4896-9e4b-45df-8798-6f6e728817be
 		summarizeBy: none
@@ -1747,6 +1860,7 @@ table metadata_ai_scores
 
 	/// Notes
 	column notes
+		description: "Text label for notes."
 		dataType: string
 		lineageTag: 24d91298-91c6-46ec-96da-f286ca9607d6
 		summarizeBy: none
@@ -1756,6 +1870,7 @@ table metadata_ai_scores
 
 	/// Boost Expo
 	column boost_expo
+		description: "Numeric value for boost expo."
 		dataType: double
 		lineageTag: 7754aa79-c7fb-4e29-b06f-8bfdc3b32657
 		summarizeBy: sum
@@ -1767,6 +1882,7 @@ table metadata_ai_scores
 
 	/// Weight
 	column weight
+		description: "Numeric value for weight."
 		dataType: double
 		lineageTag: 788f39e0-5905-4e80-9abe-f87980071ba5
 		summarizeBy: sum
