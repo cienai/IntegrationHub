@@ -292,174 +292,53 @@ table cal_end_dates
 	partition cal_end_dates-c3d83cde-1612-440f-b017-358fa64b862d = calculated
 		mode: import
 		source =
-				
-				VAR MinDateRaw =
-				    CALCULATE (
-				        MIN ( ssr[_sys_filt_start_date] ),
-				        REMOVEFILTERS ( ssr )
-				    )
-				
-				VAR MaxDateRaw =
-				    CALCULATE (
-				        MAX ( ssr[_sys_as_of] ),
-				        REMOVEFILTERS ( ssr )
-				    )
-				
-				VAR min_date =
-				    MAX (
-				        DATE ( 2000, 1, 1 ),
-				        COALESCE ( MinDateRaw, DATE ( 2000, 1, 1 ) )
-				    )
-				
-				VAR max_date =
-				    COALESCE ( MaxDateRaw, DATE ( 2000, 1, 1 ) )
-				
-				VAR f_month = [meas.getFiscalYearOffset]
-				
-				VAR CurrentQuarterStart =
-				    DATE ( YEAR ( max_date ), MONTH ( max_date ) - MOD ( MONTH ( max_date ) - 1, 3 ), 1 )
-				
-				VAR FourQuartersAgo =
-				    EDATE ( CurrentQuarterStart, -9 )
-				
-				VAR cal_tbl =
-				    ADDCOLUMNS (
-				        CALENDAR ( min_date, max_date ),
-				        "date_as_integer", FORMAT ( [Date], "YYYYMMDD" ),
-				        "year", YEAR ( [Date] ),
-				        "month_number", FORMAT ( [Date], "MM" ),
-				        "year_month_number", FORMAT ( [Date], "YYYY/MM" ),
-				        "year_week_number", FORMAT ( [Date], "YYYY/0w" ),
-				        "year_day_number", FORMAT ( [Date], "YYYY/ddd" ),
-				        "year_month_short", FORMAT ( [Date], "YYYY/mmm" ),
-				        "month_name_short", FORMAT ( [Date], "mmm" ),
-				        "month_name_long", FORMAT ( [Date], "mmmm" ),
-				        "day_of_week_number", WEEKDAY ( [Date] ),
-				        "day_of_week", FORMAT ( [Date], "dddd" ),
-				        "day_of_week_short", FORMAT ( [Date], "ddd" ),
-				        "quarter", "Q" & FORMAT ( [Date], "Q" ),
-				        "year_quarter", FORMAT ( [Date], "YYYY" ) & "/Q" & FORMAT ( [Date], "Q" ),
-				        "year_quarter_num", YEAR ( [Date] ) * 4 + QUARTER ( [Date] ),
-				        "first_of_week_date", [Date] - WEEKDAY ( [Date] ) + 1,
-				        "first_of_month_date", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ),
-				        "first_of_qtr_date",
-				            DATE (
-				                YEAR ( [Date] ),
-				                SWITCH (
-				                    MONTH ( [Date] ),
-				                    1, 1,
-				                    2, 1,
-				                    3, 1,
-				                    4, 4,
-				                    5, 4,
-				                    6, 4,
-				                    7, 7,
-				                    8, 7,
-				                    9, 7,
-				                    10, 10,
-				                    11, 10,
-				                    12, 10
-				                ),
-				                1
-				            ),
-				        "is_last_4q",
-				            IF (
-				                [Date] >= FourQuartersAgo
-				                    && [Date] < EDATE ( CurrentQuarterStart, 3 ),
-				                TRUE (),
-				                FALSE ()
-				            ),
-				        "first_of_year_date", DATE ( YEAR ( [Date] ), 1, 1 ),
-				        "Fiscal Date",
-				            DATE (
-				                IF (
-				                    f_month = 0,
-				                    YEAR ( [Date] ),
-				                    IF ( MONTH ( [Date] ) >= f_month, YEAR ( [Date] ), YEAR ( [Date] ) - 1 )
-				                ),
-				                IF (
-				                    f_month = 0,
-				                    MONTH ( [Date] ),
-				                    IF (
-				                        MONTH ( [Date] ) >= f_month,
-				                        MONTH ( [Date] ) - f_month + 1,
-				                        MONTH ( [Date] ) + 12 - f_month + 1
-				                    )
-				                ),
-				                DAY ( [Date] )
-				            )
-				    )
-				
-				VAR cal_tbl2 =
-				    ADDCOLUMNS (
-				        CALENDAR ( DATE ( 2100, 1, 1 ), DATE ( 2100, 1, 1 ) ),
-				        "date_as_integer", FORMAT ( [Date], "YYYYMMDD" ),
-				        "year", YEAR ( [Date] ),
-				        "month_number", FORMAT ( [Date], "MM" ),
-				        "year_month_number", FORMAT ( [Date], "YYYY/MM" ),
-				        "year_day_number", FORMAT ( [Date], "YYYY/00d" ),
-				        "year_week_number", FORMAT ( [Date], "YYYY/ww" ),
-				        "year_month_short", FORMAT ( [Date], "YYYY/mmm" ),
-				        "month_name_short", FORMAT ( [Date], "mmm" ),
-				        "month_name_long", FORMAT ( [Date], "mmmm" ),
-				        "day_of_week_number", WEEKDAY ( [Date] ),
-				        "day_of_week", FORMAT ( [Date], "dddd" ),
-				        "day_of_week_short", FORMAT ( [Date], "ddd" ),
-				        "quarter", "Q" & FORMAT ( [Date], "Q" ),
-				        "year_quarter", FORMAT ( [Date], "YYYY" ) & "/Q" & FORMAT ( [Date], "Q" ),
-				        "year_quarter_num", YEAR ( [Date] ) * 4 + QUARTER ( [Date] ),
-				        "first_of_week_date", [Date] - WEEKDAY ( [Date] ) + 1,
-				        "first_of_month_date", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ),
-				        "first_of_qtr_date",
-				            DATE (
-				                YEAR ( [Date] ),
-				                SWITCH (
-				                    MONTH ( [Date] ),
-				                    1, 1,
-				                    2, 1,
-				                    3, 1,
-				                    4, 4,
-				                    5, 4,
-				                    6, 4,
-				                    7, 7,
-				                    8, 7,
-				                    9, 7,
-				                    10, 10,
-				                    11, 10,
-				                    12, 10
-				                ),
-				                1
-				            ),
-				        "is_last_4q",
-				            IF (
-				                [Date] >= FourQuartersAgo
-				                    && [Date] < EDATE ( CurrentQuarterStart, 3 ),
-				                TRUE (),
-				                FALSE ()
-				            ),
-				        "first_of_year_date", DATE ( YEAR ( [Date] ), 1, 1 ),
-				        "Fiscal Date",
-				            DATE (
-				                IF (
-				                    f_month = 0,
-				                    YEAR ( [Date] ),
-				                    IF ( MONTH ( [Date] ) >= f_month, YEAR ( [Date] ), YEAR ( [Date] ) - 1 )
-				                ),
-				                IF (
-				                    f_month = 0,
-				                    MONTH ( [Date] ),
-				                    IF (
-				                        MONTH ( [Date] ) >= f_month,
-				                        MONTH ( [Date] ) - f_month + 1,
-				                        MONTH ( [Date] ) + 12 - f_month + 1
-				                    )
-				                ),
-				                DAY ( [Date] )
-				            )
-				    )
-				
-				RETURN
-				    UNION ( cal_tbl, cal_tbl2 )
-
+			
+			var min_date =  MAX(date(2000,01,01) ,  min(ssr[_sys_filt_start_date])) // get the first date that we have data for but never before 2000
+			var max_date = max(ssr[_sys_as_of]) // get the last date (as _of) that we have data for
+			var f_month = [meas.getFiscalYearOffset]        // get the fiscal_year offset
+			
+			var cal_tbl  =ADDCOLUMNS (
+			CALENDAR (min_date, max_date),
+			"date_as_integer", FORMAT ( [Date], "YYYYMMDD" ),
+			"year", YEAR ( [Date] ),
+			"month_number", FORMAT ( [Date], "MM" ),
+			"year_month_number", FORMAT ( [Date], "YYYY/MM" ),
+			"year_month_short", FORMAT ( [Date], "YYYY/mmm" ),
+			"month_name_short", FORMAT ( [Date], "mmm" ),
+			"month_name_long", FORMAT ( [Date], "mmmm" ),
+			"day_of_week_number", WEEKDAY ( [Date] ),
+			"day_of_week", FORMAT ( [Date], "dddd" ),
+			"day_of_week_short", FORMAT ( [Date], "ddd" ),
+			"quarter", "Q" & FORMAT ( [Date], "Q" ),
+			"year_quarter", FORMAT ( [Date], "YYYY" ) & "/Q" & FORMAT ( [Date], "Q" ),
+			"fiscal_year", IF(
+			                f_month = 0,
+			                YEAR([Date]),
+			                IF(
+			                    MONTH([Date]) >= f_month,
+			                    YEAR([Date]) + 1,
+			                    YEAR([Date])
+			                )
+			            ),
+			"fiscal_month",IF(
+			                    f_month = 0,
+			                    month([Date]),
+			                    IF(
+			                        MONTH([Date]) >= f_month,
+			                        MONTH([Date]) - f_month + 1,
+			                        MONTH([Date]) + (12 - f_month + 1)
+			                    )
+			                ),
+			"fiscal_quarter", "Q" & IF(
+			                    f_month = 0,
+			                    FORMAT([Date], "Q" ),
+			                    IF(
+			                        MONTH([Date]) >= f_month,
+			                        CEILING((MONTH([Date]) - f_month + 1) / 3, 1),
+			                        CEILING((MONTH([Date]) + (12 - f_month + 1)) / 3, 1)
+			                    )
+			                )
+			)
+			return cal_tbl
 	annotation PBI_Id = 47fdd5fe548045698e2980cebacd82ae
 
