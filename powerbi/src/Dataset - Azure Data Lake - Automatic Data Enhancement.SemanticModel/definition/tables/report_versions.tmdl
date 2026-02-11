@@ -1,9 +1,12 @@
+/// Table report_versions.
 table report_versions
 	lineageTag: 5d2f2f16-4794-44fe-95f6-985a6fb15e7f
 
+	/// Measure meas.report_versions_current_ver.
 	measure 'meas.report_versions_current_ver' = maxx(topn(1, report_versions, report_versions[release_date] ,DESC), [version])
 		lineageTag: 1ebb5671-f76b-4904-a0e2-70027decbc86
 
+	/// Column version.
 	column version
 		dataType: string
 		lineageTag: 81c28b95-6f45-4db0-943e-f630d5f71fa6
@@ -12,6 +15,7 @@ table report_versions
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column release_date.
 	column release_date
 		dataType: dateTime
 		formatString: Long Date
@@ -34,8 +38,8 @@ table report_versions
 				let
 				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMtEz0DM2VtJRMjTSN9U3MjAyVoqNBQA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [version = _t, release_date = _t]),
 				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"version", type text}, {"release_date", type date}}),
-				    #"Replaced Value1" = Table.ReplaceValue(#"Changed Type",#date(2023, 12, 5),#date(2025, 02, 06),Replacer.ReplaceValue,{"release_date"}),
-				    #"Replaced Value" = Table.ReplaceValue(#"Replaced Value1","4.0.33","4.3.1",Replacer.ReplaceText,{"version"})
+				    #"Replaced Value1" = Table.ReplaceValue(#"Changed Type",#date(2023, 12, 5),#date(2026, 02, 11),Replacer.ReplaceValue,{"release_date"}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Replaced Value1","4.0.33","4.3.2",Replacer.ReplaceText,{"version"})
 				in
 				    #"Replaced Value"
 

@@ -1,3 +1,4 @@
+/// Table time_intelligence.
 table time_intelligence
 	lineageTag: 5d72a475-096f-4745-a732-db72d32eeafe
 
@@ -246,6 +247,91 @@ table time_intelligence
 				
 				```
 
+		calculationItem "Smart Default - Last 2 Years" = ```
+				VAR _hasDateFilter =
+				    ISFILTERED ( cal_end_dates[Date] )
+				        || ISCROSSFILTERED ( cal_end_dates[Date] )
+				
+				VAR _lastDate =
+				    [Last Data Date]
+				
+				VAR _endYearRaw =
+				    YEAR ( _lastDate )
+				
+				VAR _endYear =
+				    IF (
+				        MONTH ( _lastDate ) = 12
+				            && DAY ( _lastDate ) = 31,
+				        _endYearRaw,
+				        _endYearRaw - 1
+				    )
+				
+				VAR _startDate =
+				    DATE ( _endYear - 1, 1, 1 )
+				
+				VAR _endDate =
+				    DATE ( _endYear, 12, 31 )
+				
+				RETURN
+				IF (
+				    _hasDateFilter,
+				    SELECTEDMEASURE (),
+				    CALCULATE (
+				        SELECTEDMEASURE (),
+				        KEEPFILTERS (
+				            FILTER (
+				                ALL ( cal_end_dates[Date] ),
+				                cal_end_dates[Date] >= _startDate
+				                    && cal_end_dates[Date] <= _endDate
+				            )
+				        )
+				    )
+				)
+				```
+
+		calculationItem "Smart Default - Last Year" = ```
+				VAR _hasDateFilter =
+				    ISFILTERED ( cal_end_dates[Date] )
+				        || ISCROSSFILTERED ( cal_end_dates[Date] )
+				
+				VAR _lastDate =
+				    [Last Data Date]
+				
+				VAR _endYearRaw =
+				    YEAR ( _lastDate )
+				
+				VAR _endYear =
+				    IF (
+				        MONTH ( _lastDate ) = 12
+				            && DAY ( _lastDate ) = 31,
+				        _endYearRaw,
+				        _endYearRaw - 1
+				    )
+				
+				VAR _startDate =
+				    DATE ( _endYear, 1, 1 )
+				
+				VAR _endDate =
+				    DATE ( _endYear, 12, 31 )
+				
+				RETURN
+				IF (
+				    _hasDateFilter,
+				    SELECTEDMEASURE (),
+				    CALCULATE (
+				        SELECTEDMEASURE (),
+				        KEEPFILTERS (
+				            FILTER (
+				                ALL ( cal_end_dates[Date] ),
+				                cal_end_dates[Date] >= _startDate
+				                    && cal_end_dates[Date] <= _endDate
+				            )
+				        )
+				    )
+				)
+				```
+
+	/// Measure meas.fiscal_config_offset.
 	measure 'meas.fiscal_config_offset' =
 			
 			VAR _config = 0
@@ -255,6 +341,7 @@ table time_intelligence
 		formatString: 0
 		lineageTag: db9fb399-627b-4ad0-93db-8a5722a1e45e
 
+	/// Column filt_item.
 	column filt_item
 		dataType: string
 		lineageTag: 5a324d62-f85f-42cf-8e7d-1ea63d7011d2
@@ -264,6 +351,7 @@ table time_intelligence
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column Ordinal.
 	column Ordinal
 		dataType: int64
 		isHidden

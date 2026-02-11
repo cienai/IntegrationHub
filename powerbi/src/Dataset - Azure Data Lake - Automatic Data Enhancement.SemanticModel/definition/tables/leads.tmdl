@@ -1,6 +1,8 @@
+/// CRM entity for lead records enriched with TrueAI predictive insights.
 table leads
 	lineageTag: 25e3e4ea-0df2-46dd-992e-aac0d8b5ee40
 
+	/// Measure meas.lead_crm_converted_count.
 	measure 'meas.lead_crm_converted_count' =
 			
 			var res = ( CALCULATE(count(leads[_sys_docid]), leads[crm_converted_opp_id] <> "" ))
@@ -8,10 +10,12 @@ table leads
 		formatString: #,0
 		lineageTag: dc3fc272-4fc0-4cd3-8fba-b7a7f678c286
 
+	/// Measure meas.lead_crm_conversion_rate.
 	measure 'meas.lead_crm_conversion_rate' = [meas.lead_crm_converted_count] / CALCULATE(count(leads[_sys_docid]))
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 39248331-9a8b-40c1-b9df-e4d4341fde51
 
+	/// Measure meas.lead_crm_no_leadsource_count.
 	measure 'meas.lead_crm_no_leadsource_count' = ```
 			
 			var val = CALCULATE(count(leads[_sys_docid]), or(ISBLANK(leads[crm_leadsource]) = TRUE(),leads[crm_leadsource] = "" ))
@@ -21,18 +25,22 @@ table leads
 		formatString: #,0
 		lineageTag: c6c29d01-f327-4b4f-aea7-8b8f28c5e688
 
+	/// Measure meas.lead_crm_no_leadsource_rate.
 	measure 'meas.lead_crm_no_leadsource_rate' = [meas.lead_crm_no_leadsource_count] / CALCULATE(count(leads[_sys_docid]))
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 94c5df5a-30ec-4cfe-b8af-5e1e2c2d8f7a
 
+	/// Measure meas.lead_trueai_dupe_rate.
 	measure 'meas.lead_trueai_dupe_rate' = CALCULATE(DISTINCTCOUNT(leads[trueai_lead_dupe_id]) / CALCULATE(count(leads[_sys_docid])))
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: b828a8e6-91f0-4563-a2df-e83b275345c5
 
+	/// Measure meas.lead_trueai_company_dupe_rate.
 	measure 'meas.lead_trueai_company_dupe_rate' = CALCULATE(COUNT(leads[trueai_company_dupe_id]) / CALCULATE(count(leads[_sys_docid])))
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 43225ccc-8ed9-439b-95d1-44bcc74dee82
 
+	/// Measure meas.lead_trueai_completeness_improvement.
 	measure 'meas.lead_trueai_completeness_improvement' = ```
 			
 			var crmval = CALCULATE(AVERAGE([crm_complt]))
@@ -45,20 +53,24 @@ table leads
 		formatString: 0 %
 		lineageTag: 6a763818-4ecf-40ff-9b1b-28b75532a269
 
+	/// Measure meas.lead_trueai_dupe_counts.
 	measure 'meas.lead_trueai_dupe_counts' = calculate(COUNT(leads[trueai_lead_dupe_id]))
 		formatString: 0
 		lineageTag: 9606d997-f205-475d-ac36-7d79084cf08c
 
+	/// Measure meas.lead_trueai_non_dupe_counts.
 	measure 'meas.lead_trueai_non_dupe_counts' = calculate(COUNT(leads[_sys_docid]), leads[trueai_is_master] = true ||  ISBLANK(leads[trueai_is_master]) = true )
 		formatString: 0
 		lineageTag: 03b6db32-8906-4539-b414-5a8674d52849
 
+	/// Measure meas.leads_trueai_unique_company_count.
 	measure 'meas.leads_trueai_unique_company_count' = ```
 			calculate(DISTINCTCOUNT(leads[_sys_ssr_id])) 
 			```
 		formatString: 0
 		lineageTag: ab74326a-f655-49ee-a97a-d9df51cb6946
 
+	/// Measure meas.leads_count.
 	measure 'meas.leads_count' =
 			
 			CALCULATE(
@@ -67,6 +79,7 @@ table leads
 		formatString: #,0
 		lineageTag: 385bb1e3-0994-43d5-b273-0035f959e00d
 
+	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
 		dataType: string
 		lineageTag: d28b2a52-3f48-448d-ae13-4a669cee86d0
@@ -75,6 +88,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Link to the lead in the remote system (such as Salesforce)
 	column crm_deep_link
 		dataType: string
 		lineageTag: 41fcce8b-b179-4adf-80f5-6308223cbc6d
@@ -83,6 +97,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead name in the CRM
 	column crm_name
 		dataType: string
 		lineageTag: ade665ea-850c-437b-bb93-bd137d82dbc2
@@ -91,6 +106,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead conversion date in the CRM
 	column crm_converted_date
 		dataType: dateTime
 		formatString: General Date
@@ -105,6 +121,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's first name
 	column crm_first_name
 		dataType: string
 		lineageTag: 502d9503-e14f-463b-8901-ecfc138094be
@@ -113,6 +130,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's last name
 	column crm_last_name
 		dataType: string
 		lineageTag: 1b9c7739-0175-4c14-90e7-915b74c21593
@@ -121,6 +139,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's title in the CRM
 	column crm_contact_title
 		dataType: string
 		lineageTag: de6128ae-d115-47c9-8ee2-4cdc4583205e
@@ -129,6 +148,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's email
 	column crm_email
 		dataType: string
 		lineageTag: b8df7134-a29c-4ea3-8f9f-7338272cc359
@@ -137,6 +157,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's phone number
 	column crm_phone
 		dataType: string
 		lineageTag: c054c180-7bf4-422b-a07d-1ac255eeffd7
@@ -145,6 +166,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's lead source in the CRM
 	column crm_leadsource
 		dataType: string
 		lineageTag: e2479108-361c-4806-b4ae-50a0d689de7c
@@ -153,6 +175,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's industry in the CRM
 	column crm_industry
 		dataType: string
 		lineageTag: 180881ff-8bf4-4a91-bc2d-4910f7716ddf
@@ -161,6 +184,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's number of employees in the CRM
 	column crm_num_employees
 		dataType: int64
 		formatString: 0
@@ -170,6 +194,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's status in the CRM
 	column crm_status
 		dataType: string
 		lineageTag: 6a596f22-e3c7-4a67-aa63-73bd828c2109
@@ -178,6 +203,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the lead is the master lead in its group of duplicates
 	column trueai_is_master
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -187,6 +213,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Date when the lead was first touched
 	column trueai_first_touch
 		dataType: dateTime
 		formatString: General Date
@@ -201,6 +228,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Date when the lead was last touched
 	column trueai_last_touch
 		dataType: dateTime
 		formatString: General Date
@@ -215,6 +243,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead converted date
 	column trueai_converted_date
 		dataType: dateTime
 		formatString: General Date
@@ -229,6 +258,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized lead source
 	column trueai_leadsource
 		dataType: string
 		lineageTag: cb0fd37e-ae87-4419-b3b9-0668232c55a8
@@ -237,6 +267,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized industry
 	column trueai_industry
 		dataType: string
 		lineageTag: 41f81a01-9fd2-4606-8334-3205f848d1ae
@@ -245,6 +276,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized disqualification status
 	column trueai_is_disqualified
 		dataType: string
 		lineageTag: 3bfb8713-db43-4e9f-aa41-088d8e0e9dba
@@ -253,6 +285,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized company size
 	column trueai_company_size
 		dataType: string
 		lineageTag: de90b828-6e31-4a4c-8b53-0adfa4f998f5
@@ -261,6 +294,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Quality bucket based on the probability of conversion
 	column trueai_qual_bucket
 		dataType: string
 		lineageTag: a52c03d1-7aa7-40b2-8d01-9026ee6e5cfc
@@ -269,6 +303,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_is_non_master' = if (leads[trueai_company_dupe_id] >"0"  , True,False).
 	column 'col.trueai_is_non_master' = if (leads[trueai_company_dupe_id] >"0"  , True,False)
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 07b1d03d-5f64-43c2-85d6-79e334f49abb
@@ -276,6 +311,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized company size prediction rule
 	column trueai_company_size_rule
 		dataType: string
 		lineageTag: e0fb4384-b2b4-4fde-88fb-f5388ba77d39
@@ -284,6 +320,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized industry prediction rule
 	column trueai_industry_rule
 		dataType: string
 		lineageTag: f008ee1c-b7ba-44c7-9d5e-e5448a025fb0
@@ -292,6 +329,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized lead source prediction rule
 	column trueai_leadsource_rule
 		dataType: string
 		lineageTag: 7c4f64fd-9749-4f96-8bdd-93045d529b2f
@@ -300,6 +338,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the lead's standardized lead source is inbound
 	column trueai_leadsource_is_inbound
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -309,6 +348,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column _sys_docid.
 	column _sys_docid
 		dataType: string
 		lineageTag: 5e285844-89ce-4147-abad-68e188c9e83b
@@ -317,6 +357,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The end date of the record, stripped of time
 	column _sys_filt_end_date
 		dataType: dateTime
 		formatString: Long Date
@@ -333,6 +374,7 @@ table leads
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// The start date of the record, stripped of time
 	column _sys_filt_start_date
 		dataType: dateTime
 		formatString: Long Date
@@ -344,6 +386,7 @@ table leads
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// CRM account id of the lead
 	column crm_account_id
 		dataType: string
 		lineageTag: a2a58bef-922a-4c3c-856f-160898459a55
@@ -352,6 +395,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's city in the CRM
 	column crm_addr_city
 		dataType: string
 		lineageTag: 619bbcb9-84c7-41e9-94a4-85e5a2930fbb
@@ -360,6 +404,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's country in the CRM
 	column crm_addr_country
 		dataType: string
 		lineageTag: 0c7b3db7-8d78-4d32-94f7-279d9e54d2b1
@@ -368,6 +413,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's postal code in the CRM
 	column crm_addr_postal_code
 		dataType: string
 		lineageTag: 9a924dcb-29a2-4eee-81fa-8a4e02a3078b
@@ -376,6 +422,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's state in the CRM
 	column crm_addr_state
 		dataType: string
 		lineageTag: 5ae2b4b0-2bb9-4070-8334-e4c25871750d
@@ -384,6 +431,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's street in the CRM
 	column crm_addr_street
 		dataType: string
 		lineageTag: fea3e87f-0282-43d4-b275-fc80f0c206a2
@@ -392,6 +440,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's completeness score based on the CRM data
 	column crm_complt
 		dataType: double
 		lineageTag: 30e98893-3c5c-463a-8eec-c67adc59bd19
@@ -402,6 +451,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead's contact information completeness score based on the CRM data
 	column crm_complt_contact
 		dataType: double
 		lineageTag: c2440b28-d425-42d6-8eb2-5b6e8dc2b059
@@ -412,6 +462,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead's contact method completeness score based on the CRM data
 	column crm_complt_contact_method
 		dataType: double
 		lineageTag: f1cee544-ba8f-4024-b556-1261fe9976f2
@@ -422,6 +473,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead's location completeness score based on the CRM data
 	column crm_complt_geo
 		dataType: double
 		lineageTag: 4ea3226c-d205-4168-acce-5137b2c5b803
@@ -432,6 +484,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead's marketing completeness score based on the CRM data
 	column crm_complt_marketing
 		dataType: double
 		lineageTag: dbde7af0-03b2-4b34-9d22-fe38c24dc60e
@@ -442,6 +495,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead's contact id in the CRM
 	column crm_converted_contact_id
 		dataType: string
 		lineageTag: 0a3aa73e-2aba-4173-96bc-0d875b4aa12f
@@ -450,6 +504,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's opp id in the CRM
 	column crm_converted_opp_id
 		dataType: string
 		lineageTag: da68e49d-c827-4bab-ba68-469e7a13cb6a
@@ -458,6 +513,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead creator's id in the CRM
 	column crm_creator_id
 		dataType: string
 		lineageTag: 659604b6-0e88-43fa-9bf3-5926995b4fc8
@@ -466,6 +522,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's last activity time in the CRM
 	column crm_last_act_time
 		dataType: dateTime
 		formatString: General Date
@@ -480,6 +537,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead owner's id in the CRM
 	column crm_owner_id
 		dataType: string
 		lineageTag: 729974f2-780c-40f8-938b-ba31f251a1e3
@@ -488,6 +546,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's city
 	column trueai_addr_city
 		dataType: string
 		lineageTag: 17943753-26eb-472e-8d4e-94e4533a24d9
@@ -496,6 +555,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's country
 	column trueai_addr_country
 		dataType: string
 		lineageTag: 35c80c50-1d2d-4260-9f8b-02e54cd1fda8
@@ -504,6 +564,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's postal code
 	column trueai_addr_postal_code
 		dataType: string
 		lineageTag: 268bbd2d-6361-48b9-8aa7-8f8d3a4a8405
@@ -512,6 +573,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's address prediction rule
 	column trueai_addr_rule
 		dataType: string
 		lineageTag: 7aba7d1d-9521-4770-b88f-239029ee7c9b
@@ -520,6 +582,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's state
 	column trueai_addr_state
 		dataType: string
 		lineageTag: 7f3833e0-5dc7-4fea-89b8-863dcfc6dc0b
@@ -528,6 +591,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's street
 	column trueai_addr_street
 		dataType: string
 		lineageTag: 277e0fd4-9618-49b0-8eaf-28194906c514
@@ -536,6 +600,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's company duplication confidence
 	column trueai_company_dupe_conf
 		dataType: double
 		lineageTag: ebfcc5ed-22df-4168-bfc6-905262db2a9b
@@ -546,6 +611,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead's company duplication id
 	column trueai_company_dupe_id
 		dataType: string
 		lineageTag: 14070bfa-1943-4c3e-9776-ac24911544fa
@@ -554,6 +620,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Completeness score of the lead based on the standardized data
 	column trueai_complt
 		dataType: double
 		lineageTag: 1332edc4-103b-472c-a2ea-6e16483d77bf
@@ -564,6 +631,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Contact information completeness score of the lead based on the standardized data
 	column trueai_complt_contact
 		dataType: double
 		lineageTag: 385ede99-c567-41ff-810a-d8ab132b0466
@@ -574,6 +642,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Contact method completeness score of the lead based on the standardized data
 	column trueai_complt_contact_method
 		dataType: double
 		lineageTag: 90936daa-baca-4a3b-b53a-9bdb3ac32fd3
@@ -584,6 +653,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Location completeness score of the lead based on the standardized data
 	column trueai_complt_geo
 		dataType: double
 		lineageTag: c14500b4-f6db-4c60-9d2e-1dc77fe6cd8a
@@ -594,6 +664,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Marketing completeness score of the lead based on the standardized data
 	column trueai_complt_marketing
 		dataType: double
 		lineageTag: 35169f97-419a-422d-b2b7-685fa22690a1
@@ -604,6 +675,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead creator's id
 	column trueai_creator_id
 		dataType: string
 		lineageTag: d814a425-1a2d-484a-93d2-2298de15c0ef
@@ -612,6 +684,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Total duration of activities performed on the lead
 	column trueai_dur
 		dataType: int64
 		formatString: 0
@@ -621,6 +694,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized industry prediction confidence
 	column trueai_industry_conf
 		dataType: double
 		lineageTag: 8ed2aef3-44a5-4c03-b180-eff0f583a9b7
@@ -631,6 +705,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead's standardized disqualification status prediction confidence
 	column trueai_is_disqualified_conf
 		dataType: double
 		lineageTag: 9d2cdabb-789d-4f00-9b84-b9bf70176183
@@ -641,6 +716,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead's lead duplication confidence
 	column trueai_lead_dupe_conf
 		dataType: double
 		lineageTag: 780e9782-bef1-407c-a65d-45cc791b0bd0
@@ -651,6 +727,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead's lead duplication id
 	column trueai_lead_dupe_id
 		dataType: string
 		lineageTag: 40cb21fc-3da3-4074-97a0-b16e98a0c445
@@ -659,6 +736,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized lead source prediction confidence
 	column trueai_leadsource_conf
 		dataType: double
 		lineageTag: e9c123e5-6ea1-408e-892c-f50ee47c76e5
@@ -669,6 +747,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead owner's id
 	column trueai_owner_id
 		dataType: string
 		lineageTag: d0808c9e-a315-4cd8-acf5-ccabb6b6eb58
@@ -677,6 +756,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized seniority
 	column trueai_title_seniority
 		dataType: string
 		lineageTag: 81574a25-81b7-44e1-bce3-6eb6cbb73f13
@@ -685,6 +765,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized seniority prediction confidence
 	column trueai_title_seniority_conf
 		dataType: double
 		lineageTag: c4465a4f-c25b-454a-8dff-a0e16d7af6c2
@@ -695,6 +776,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Boolean flag that indicates whether the lead is the master lead in its group of duplicates, for leads it corresponds to the trueai_is_master flag
 	column trueai_ssr_is_master
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -704,6 +786,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable
 	column crm_custom_value_1
 		dataType: string
 		lineageTag: c978eaaf-759e-40b6-9f02-a4034e85e923
@@ -712,6 +795,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable
 	column crm_custom_value_2
 		dataType: string
 		lineageTag: 5c5876fd-df3c-40f9-89ee-6fe10823607f
@@ -720,6 +804,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable
 	column crm_custom_value_3
 		dataType: string
 		lineageTag: 7b3399c1-f9ce-45c9-8770-ccd6dfc647fb
@@ -728,6 +813,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's latitude
 	column trueai_addr_lat
 		dataType: double
 		lineageTag: bc31e456-0b24-4a5d-8ab4-af4a653f1d2d
@@ -738,6 +824,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Lead's longitude
 	column trueai_addr_long
 		dataType: double
 		lineageTag: 80f8f3cc-98f9-4f0a-874c-7a7790b9e0df
@@ -748,6 +835,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Quality bucket expressed as an integer from 1 to 5 based on the probability of conversion
 	column trueai_qual_bucket_num
 		dataType: int64
 		formatString: 0
@@ -757,6 +845,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's custom completeness score based on the CRM data
 	column crm_complt_custom
 		dataType: double
 		lineageTag: 2f950a21-9493-4c9e-93f9-8710629cbc16
@@ -767,6 +856,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Leads last outcome
 	column trueai_last_outcome_date
 		dataType: dateTime
 		formatString: General Date
@@ -781,6 +871,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The date of the last data request from the platform
 	column _sys_as_of
 		dataType: dateTime
 		formatString: General Date
@@ -795,6 +886,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The date of the last data modification in the platform
 	column _sys_last_modified_on
 		dataType: dateTime
 		formatString: General Date
@@ -809,6 +901,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead creation date in the CRM
 	column crm_created_on
 		dataType: dateTime
 		formatString: General Date
@@ -823,6 +916,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead modified on date in the CRM
 	column crm_modified_on
 		dataType: dateTime
 		formatString: General Date
@@ -837,6 +931,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead creation date
 	column trueai_created_on
 		dataType: dateTime
 		formatString: General Date
@@ -851,6 +946,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's probability of conversion
 	column trueai_prob_of_conversion
 		dataType: double
 		lineageTag: 1c6fe778-18a5-4317-b7be-5da11dd297fc
@@ -861,6 +957,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column 'col.trueai_ssr_dupe_count' = ```.
 	column 'col.trueai_ssr_dupe_count' = ```
 			
 			
@@ -879,6 +976,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Test model
 	column trueai_test
 		dataType: string
 		lineageTag: 03a17e91-7ce2-44e9-9e51-466ab4118665
@@ -887,6 +985,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Test model confidence
 	column trueai_test_conf
 		dataType: double
 		lineageTag: 496e5df0-0251-4d2a-8e14-e95a04ab3023
@@ -897,6 +996,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Test model rule
 	column trueai_test_rule
 		dataType: string
 		lineageTag: 8828c1d7-57be-4b35-9e42-fe1ca17516d4
@@ -905,6 +1005,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Test model debug information
 	column trueai_test_debug
 		dataType: string
 		lineageTag: cc1e6eae-f7c9-45fa-b661-83a969e0525e
@@ -913,6 +1014,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead converted date rule
 	column trueai_converted_date_rule
 		dataType: string
 		lineageTag: 6517c547-c46b-49f2-ad1e-c8b9754ce8e9
@@ -921,6 +1023,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Rule for date when the lead was first touched
 	column trueai_first_touch_rule
 		dataType: string
 		lineageTag: 6eb13d3b-c005-4e7d-b82d-e58e91c7e389
@@ -929,6 +1032,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Leads last outcome rule
 	column trueai_last_outcome_date_rule
 		dataType: string
 		lineageTag: 2f64c144-6595-4020-beda-a962d2b5a1eb
@@ -937,6 +1041,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Rule for date when the lead was last touched
 	column trueai_last_touch_rule
 		dataType: string
 		lineageTag: 095de152-4824-48ac-82a0-41021dd69f10
@@ -945,6 +1050,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead owner's id rule
 	column trueai_owner_id_rule
 		dataType: string
 		lineageTag: 6f4e18f5-be39-4d75-8e2e-2b757c227e9b
@@ -953,6 +1059,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text1
 	column cust_text1
 		dataType: string
 		lineageTag: 0b1d7366-0bd7-4377-b108-c65b10a4f28b
@@ -961,6 +1068,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text2
 	column cust_text2
 		dataType: string
 		lineageTag: 427b17a3-6c6c-44b7-b426-da611855bd88
@@ -969,6 +1077,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text3
 	column cust_text3
 		dataType: string
 		lineageTag: f99a7e5e-ff4d-4333-9806-7051faa29366
@@ -977,6 +1086,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text4
 	column cust_text4
 		dataType: string
 		lineageTag: 4ad9db03-4ca4-48bb-87de-bba34346a76b
@@ -985,6 +1095,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text5
 	column cust_text5
 		dataType: string
 		lineageTag: 43704b15-dc74-4298-abd9-1b30e3a3127c
@@ -993,6 +1104,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_num1
 	column cust_num1
 		dataType: double
 		lineageTag: f18df1d4-676f-4e66-9bd5-554fbe212a02
@@ -1003,6 +1115,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num2
 	column cust_num2
 		dataType: double
 		lineageTag: 6d96fe4d-e070-4bec-8f2a-38e46ec4f4c7
@@ -1013,6 +1126,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num3
 	column cust_num3
 		dataType: double
 		lineageTag: 653be5da-61d4-4c0a-9d04-b67a92f99568
@@ -1023,6 +1137,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num4
 	column cust_num4
 		dataType: double
 		lineageTag: 2504ae4b-74c0-44ac-94e1-c804f48ed0ad
@@ -1033,6 +1148,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num5
 	column cust_num5
 		dataType: double
 		lineageTag: 56c9ada6-fe7f-4066-aa25-5b4656830638
@@ -1043,6 +1159,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num6
 	column cust_num6
 		dataType: double
 		lineageTag: d39004d3-e071-42b7-a485-ff7c2140c5a8
@@ -1053,6 +1170,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num7
 	column cust_num7
 		dataType: double
 		lineageTag: dce62b71-c133-4564-b4ef-680e9ccd45b9
@@ -1063,6 +1181,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_bool1
 	column cust_bool1
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1072,6 +1191,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_bool2
 	column cust_bool2
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1081,6 +1201,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_id.
 	column ext_id
 		dataType: string
 		lineageTag: a4296bb5-a24c-4317-8e83-528405097c72
@@ -1089,6 +1210,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_source.
 	column ext_source
 		dataType: string
 		lineageTag: 405a4532-256c-4024-ad64-80c0bd2b7374
@@ -1097,6 +1219,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_name.
 	column ext_name
 		dataType: string
 		lineageTag: c3d862fb-cb73-4cef-ba64-95434133a68e
@@ -1105,6 +1228,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_is_match.
 	column ext_is_match
 		dataType: string
 		lineageTag: c7aa6db5-3a1e-4719-a17b-462358d1ef12
@@ -1113,6 +1237,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_match_rule.
 	column ext_match_rule
 		dataType: int64
 		formatString: 0
@@ -1122,6 +1247,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_match_conf.
 	column ext_match_conf
 		dataType: double
 		lineageTag: c0265a27-49fa-4836-acc0-c34eb7fc8e22
@@ -1132,6 +1258,7 @@ table leads
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column ext_num_employees_range.
 	column ext_num_employees_range
 		dataType: string
 		lineageTag: d314d264-4840-457b-8a5f-3633e1c75c14
@@ -1140,6 +1267,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_revenue_range.
 	column ext_revenue_range
 		dataType: string
 		lineageTag: ee583b2c-6d28-4797-b47d-f5181bc9a863
@@ -1148,6 +1276,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_year_founded.
 	column ext_year_founded
 		dataType: int64
 		formatString: 0
@@ -1157,6 +1286,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_industry.
 	column ext_industry
 		dataType: string
 		lineageTag: 552e5de1-8bb9-4ef7-a775-372c8cd5ce3a
@@ -1165,6 +1295,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_addr_street.
 	column ext_addr_street
 		dataType: string
 		lineageTag: 25c47f1e-faeb-4460-9986-0c8fb36f2e80
@@ -1173,6 +1304,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_addr_city.
 	column ext_addr_city
 		dataType: string
 		lineageTag: 15f25cb2-3e4d-49ee-bf29-1a00a32a4568
@@ -1181,6 +1313,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_addr_state.
 	column ext_addr_state
 		dataType: string
 		lineageTag: f4aad15b-e019-490a-86c2-c25b95841a65
@@ -1189,6 +1322,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_addr_postal_code.
 	column ext_addr_postal_code
 		dataType: string
 		lineageTag: 8e5367d5-5294-4459-9d89-bb8a07312d86
@@ -1197,6 +1331,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_addr_country.
 	column ext_addr_country
 		dataType: string
 		lineageTag: d14a6df0-1959-4122-863e-8245bb5e1ef6
@@ -1205,6 +1340,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_web_url.
 	column ext_web_url
 		dataType: string
 		lineageTag: 713726c0-345b-43ac-b58a-2fba325e27a5
@@ -1213,6 +1349,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_phone.
 	column ext_phone
 		dataType: string
 		lineageTag: 6435e337-f131-4b75-a55e-e45d8b707eec
@@ -1221,6 +1358,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_linkedin_url.
 	column ext_linkedin_url
 		dataType: string
 		lineageTag: 7252dc2c-d185-46a0-a0b7-b93b0b46cbdb
@@ -1229,6 +1367,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_self_verified.
 	column ext_self_verified
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1238,6 +1377,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_last_updated.
 	column ext_last_updated
 		dataType: dateTime
 		formatString: General Date
@@ -1247,6 +1387,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column ext_debug.
 	column ext_debug
 		dataType: string
 		lineageTag: ef911387-1bb5-4c9a-8364-e1bc737cbef3
@@ -1255,6 +1396,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's URL in the CRM
 	column crm_web_url
 		dataType: string
 		lineageTag: a90d2479-c390-43d1-8eda-d08f9f6a2a18
@@ -1263,6 +1405,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized department
 	column trueai_title_department
 		dataType: string
 		lineageTag: 503cc8f0-7c5b-4313-a021-312e0ea82993
@@ -1271,6 +1414,7 @@ table leads
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lead's standardized department prediction confidence
 	column trueai_title_department_conf
 		dataType: double
 		lineageTag: 9036ba69-f742-43f4-bb2c-5052c4c93692

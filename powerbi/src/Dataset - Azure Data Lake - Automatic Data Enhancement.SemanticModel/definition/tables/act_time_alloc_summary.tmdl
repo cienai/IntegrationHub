@@ -1,11 +1,14 @@
+/// Table act_time_alloc_summary.
 table act_time_alloc_summary
 	lineageTag: 784db851-8b49-42ca-99be-90fa56772532
 
+	/// Measure meas.act_time_alloc_reps.
 	measure 'meas.act_time_alloc_reps' = CALCULATE(DISTINCTCOUNT(act_time_alloc_summary[_sys_user_id]))
 		formatString: 0
 		displayFolder: _tl_analysis
 		lineageTag: 7b3aa411-fbb6-4366-893f-6222d570fa8f
 
+	/// Measure meas.act_time_alloc_reps_w_act_capt_level.
 	measure 'meas.act_time_alloc_reps_w_act_capt_level' = ```
 			
 			var res = Calculate([meas.act_time_alloc_reps], act_time_alloc_summary[act_capt_lvl_adjustment] > 0)
@@ -16,6 +19,7 @@ table act_time_alloc_summary
 		displayFolder: _tl_analysis
 		lineageTag: 41b390ab-c2d0-487d-8c76-f569e1464fe6
 
+	/// Measure meas.act_time_alloc_captured_durations_h.
 	measure 'meas.act_time_alloc_captured_durations_h' =
 			
 			var res = CALCULATE(Sum(act_time_alloc_summary[act_dur]) / 3600)
@@ -28,6 +32,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.act_time_alloc_adj_durations_h.
 	measure 'meas.act_time_alloc_adj_durations_h' =
 			
 			// var capt_dur_tbl = CALCULATETABLE( act_time_alloc_summary, act_time_alloc_summary[act_capt_lvl_adjustment] > 0)
@@ -49,6 +54,7 @@ table act_time_alloc_summary
 		displayFolder: _tl_analysis
 		lineageTag: a9976925-1bc8-4b96-9b93-8ad1465e02a1
 
+	/// Measure meas.act_time_alloc_avg_dur.
 	measure 'meas.act_time_alloc_avg_dur' =
 			var capt_dur_min = CALCULATE(Sum(act_time_alloc_summary[act_dur]) / 60)
 			var capt_tot  = CALCULATE(Sum(act_time_alloc_summary[act_tot_count]))
@@ -58,6 +64,7 @@ table act_time_alloc_summary
 		displayFolder: _tl_analysis
 		lineageTag: af4127e5-1a22-4bde-aa1e-9a4d03d1a80a
 
+	/// Measure meas.act_time_rep_w_act_capt_level_pct.
 	measure 'meas.act_time_rep_w_act_capt_level_pct' = ```
 			
 			var res  = DIVIDE([meas.act_time_alloc_reps_w_act_capt_level],[meas.act_time_alloc_reps])
@@ -70,6 +77,7 @@ table act_time_alloc_summary
 
 		changedProperty = FormatString
 
+	/// Measure meas.act_time_alloc_hours_weekly.
 	measure 'meas.act_time_alloc_hours_weekly' = ```
 			
 			
@@ -105,6 +113,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.act_time_alloc_user_months_w_time_alloc.
 	measure 'meas.act_time_alloc_user_months_w_time_alloc' = ```
 			
 			CALCULATE(count( act_time_alloc_summary[_sys_docid]), act_time_alloc_summary[act_capt_lvl_adjustment] > 0, act_time_alloc_summary[act_capt_lvl_adjustment] > 0)
@@ -114,6 +123,7 @@ table act_time_alloc_summary
 		displayFolder: _tl_analysis
 		lineageTag: 49d72214-dc8d-4f17-a750-cb340feba375
 
+	/// Measure meas.act_time_alloc_capture_lvl.
 	measure 'meas.act_time_alloc_capture_lvl' =
 			
 			divide(1,calculate(AVERAGE(act_time_alloc_summary[act_capt_lvl_adjustment])))
@@ -123,6 +133,7 @@ table act_time_alloc_summary
 
 		changedProperty = FormatString
 
+	/// Measure meas.act_time_rep_act_capture_value_pct.
 	measure 'meas.act_time_rep_act_capture_value_pct' = ```
 			
 			var reps = [meas.act_time_alloc_reps]
@@ -134,11 +145,13 @@ table act_time_alloc_summary
 		displayFolder: _tl_analysis
 		lineageTag: bdd26b8c-ef42-408e-8984-52b78f930c41
 
+	/// Measure meas.tot_count.
 	measure 'meas.tot_count' = CALCULATE(SUM(users_activities[trueai_count]))
 		formatString: 0
 		displayFolder: _tl_analysis
 		lineageTag: ad57e66a-3b39-4ea3-b2f6-0b6ed7e07337
 
+	/// Measure meas.act_time_alloc_hours_weekly_test.
 	measure 'meas.act_time_alloc_hours_weekly_test' =
 			
 			var _cap_dure = [meas.act_time_alloc_captured_durations_h]              // get the captured durations hrs
@@ -160,6 +173,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column sort.
 	column sort
 		formatString: 0
 		lineageTag: 4f986b40-1642-4f04-9d7c-12a316a62281
@@ -169,6 +183,7 @@ table act_time_alloc_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column _sys_docid.
 	column _sys_docid
 		lineageTag: eeee48ff-c016-4835-a6bd-7806c4218641
 		summarizeBy: none
@@ -177,6 +192,7 @@ table act_time_alloc_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column _sys_user_id.
 	column _sys_user_id
 		lineageTag: f981d8cd-8a9e-4713-829b-93acc0b3ea7d
 		summarizeBy: none
@@ -185,6 +201,7 @@ table act_time_alloc_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column _sys_filter_start_date.
 	column _sys_filter_start_date
 		formatString: Short Date
 		lineageTag: 618cc91e-d7f3-4839-9cf4-07c67ec2957d
@@ -201,6 +218,7 @@ table act_time_alloc_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column _sys_filter_end_date.
 	column _sys_filter_end_date
 		formatString: Short Date
 		lineageTag: 70ab9415-3fb5-4a0b-a031-cc8d2dbdf94c
@@ -217,6 +235,7 @@ table act_time_alloc_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column full_name.
 	column full_name
 		lineageTag: 12da8bd2-77b2-4ce2-bbb6-b031aba8fe6c
 		summarizeBy: none
@@ -225,6 +244,7 @@ table act_time_alloc_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column user_role_function.
 	column user_role_function
 		lineageTag: 88da9a9e-081e-4e8b-8006-9a3549d8cd02
 		summarizeBy: none
@@ -233,6 +253,7 @@ table act_time_alloc_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column month_to_week_adjustment.
 	column month_to_week_adjustment
 		lineageTag: 96a05d21-2d40-4eb5-9e15-1d510d78fa95
 		summarizeBy: none
@@ -243,6 +264,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column act_tot_count.
 	column act_tot_count
 		formatString: ###,###,###
 		lineageTag: 91a8b034-9d30-4c54-b13d-d7db4e0b15bc
@@ -252,6 +274,7 @@ table act_time_alloc_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column act_dur.
 	column act_dur
 		formatString: 0
 		lineageTag: 43430324-cb7f-41f2-bccf-6885bcd8ef7d
@@ -261,6 +284,7 @@ table act_time_alloc_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column act_capt_lvl_adjustment.
 	column act_capt_lvl_adjustment
 		dataType: double
 		lineageTag: b9c4444e-289e-4a0f-881a-7a2f9f71ffa7
@@ -272,6 +296,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column prep_adjustment.
 	column prep_adjustment
 		dataType: double
 		lineageTag: 498fa876-d7b3-4395-83e3-ac4e8ed639c6
@@ -283,6 +308,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_tot.
 	column time_alloc_tot
 		formatString: ###" hrs/week"
 		lineageTag: ba7cc1fc-5ae8-4b7d-84d3-4498f4bd479f
@@ -296,6 +322,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Column time_alloc_tot_eng.
 	column time_alloc_tot_eng
 		formatString: ###" hrs/week"
 		lineageTag: c16d6a2c-6eea-43fe-bc13-28658c26c246
@@ -309,6 +336,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Column time_alloc_prospecting.
 	column time_alloc_prospecting
 		dataType: double
 		lineageTag: 908fe0d0-17a3-43ea-a09e-d5406f2d34c1
@@ -322,6 +350,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_prospecting_eng.
 	column time_alloc_prospecting_eng
 		dataType: double
 		lineageTag: 4e85d559-0654-4aa7-8b42-fbae0709f78c
@@ -335,6 +364,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_new_logo.
 	column time_alloc_new_logo
 		dataType: double
 		lineageTag: a190e2ec-0365-4a27-bca1-5f849f2c8cdb
@@ -348,6 +378,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_new_logo_eng.
 	column time_alloc_new_logo_eng
 		dataType: double
 		lineageTag: 0efc2cd8-9ccf-4b6b-a90b-5589194b6495
@@ -361,6 +392,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_post_sales.
 	column time_alloc_post_sales
 		dataType: double
 		lineageTag: c6cb9fe3-d119-48d9-9c16-b732adcee8ac
@@ -374,6 +406,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_internal.
 	column time_alloc_internal
 		dataType: double
 		lineageTag: a649f48e-d68f-4b35-8fe1-798a64f5f6a3
@@ -387,6 +420,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_internal_eng.
 	column time_alloc_internal_eng
 		dataType: double
 		lineageTag: 5f22f269-6de0-493e-bb1f-6cfea0eee38d
@@ -400,6 +434,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column dd.
 	column dd
 		formatString: 0
 		lineageTag: 38a884ab-b0a1-42ba-83a9-9cc03513b575
@@ -409,6 +444,7 @@ table act_time_alloc_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column act_capt_lvl.
 	column act_capt_lvl
 		lineageTag: 65f7e5a0-9a20-4f34-9fb8-e19886eed558
 		summarizeBy: sum
@@ -419,6 +455,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column act_capt_lvl_conf.
 	column act_capt_lvl_conf
 		lineageTag: 22c745ce-16bc-481a-a298-b787823ea7d4
 		summarizeBy: sum
@@ -429,6 +466,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_tot_no_eng.
 	column time_alloc_tot_no_eng
 		formatString: ###" hrs/week"
 		lineageTag: a9d73c2d-9061-4569-8eca-c1a7be00aafd
@@ -442,6 +480,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Column time_alloc_prospecting_no_eng.
 	column time_alloc_prospecting_no_eng
 		formatString: ###" hrs/week"
 		lineageTag: 55d470df-b04a-40e9-b428-37dbee16a17b
@@ -455,6 +494,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Column time_alloc_new_logo_no_eng.
 	column time_alloc_new_logo_no_eng
 		formatString: ###" hrs/week"
 		lineageTag: 34a25b74-81af-4a11-9bd5-cb3219576e47
@@ -468,6 +508,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Column time_alloc_post_sales_eng.
 	column time_alloc_post_sales_eng
 		dataType: double
 		lineageTag: 903f38c7-0001-42b7-82e3-4f6bbc31b8cf
@@ -481,6 +522,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_post_sales_no_eng.
 	column time_alloc_post_sales_no_eng
 		formatString: ###" hrs/week"
 		lineageTag: 55664813-b416-40b3-aa7f-7eff86f7e4d3
@@ -494,6 +536,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Column time_alloc_internal_no_eng.
 	column time_alloc_internal_no_eng
 		formatString: ###" hrs/week"
 		lineageTag: 42200b84-0baa-457e-9cdd-a50014cddd37
@@ -507,6 +550,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Column 'col.act_tot_dur' =.
 	column 'col.act_tot_dur' =
 			
 			CALCULATE(SUM(users_activities[trueai_dur]))
@@ -517,6 +561,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_existing_customer_selling.
 	column time_alloc_existing_customer_selling
 		dataType: double
 		lineageTag: 30ad360e-6bda-4617-bdc3-aaa37e23008d
@@ -528,6 +573,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_existing_customer_selling_eng.
 	column time_alloc_existing_customer_selling_eng
 		dataType: double
 		lineageTag: 58f296f8-07f6-4fca-9724-14fb04402175
@@ -539,6 +585,7 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_existing_customer_selling_no_eng.
 	column time_alloc_existing_customer_selling_no_eng
 		lineageTag: b7fddcd5-5d85-494f-a05e-fe5f2735db90
 		summarizeBy: sum
@@ -553,7 +600,7 @@ table act_time_alloc_summary
 		mode: import
 		source = ```
 				
-				var year = Year(max(cal_end_dates[date]) ) -1 // get the full year prior
+				var year = Year(max('cal_end_dates'[date]) ) -1 // get the full year prior
 				var filter_date =filter(users_history,if(isblank(users_history[trueai_termination_date]), date(2100,1,1), users_history[trueai_termination_date] ) > users_history[_sys_filt_end_date] && users_history[_sys_filt_end_date] >= date(year,1,1) && users_history[_sys_filt_end_date] < date(year+1,1,1)  )  // get the 1 year filter period
 				var tbl_summary = 
 				SELECTCOLUMNS(filter_date, "sort", 1, "_sys_docid", users_history[_sys_doc_id],  "_sys_user_id", users_history[_sys_user_id],  "_sys_filter_start_date", users_history[_sys_filt_start_date],    "_sys_filter_end_date", users_history[_sys_filt_end_date],   "full_name", related(users[col.full_name]),"user_role_function", related(users[trueai_user_role_function]),
