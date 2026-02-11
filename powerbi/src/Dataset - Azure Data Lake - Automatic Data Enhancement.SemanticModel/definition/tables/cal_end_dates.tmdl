@@ -1,13 +1,15 @@
+/// Table cal_end_dates.
 table cal_end_dates
 	lineageTag: 0c87fa54-b3b7-47c2-9154-a95fcfb4b586
 
+	/// Measure meas.filter_string.
 	measure 'meas.filter_string' = ```
 			
 			
 			//var filter_start_table = topn(1, filter(cal_end_dates,[Date])) // "01/01/2010"
 			//var filter_start_val = ISFILTERED(cal_end_dates[Date]) //  min(filter_start_table[Date])
 			var max_filters =3
-			var date_str =  "Date: " & Min(cal_end_dates[Date])  & " - " &  Max(cal_end_dates[Date])
+			var date_str =  "Date: " & Min('cal_end_dates'[Date])  & " - " &  Max('cal_end_dates'[Date])
 			
 			var user_role_str = IF ( 
 			    ISFILTERED ( users[trueai_user_role]), 
@@ -38,15 +40,17 @@ table cal_end_dates
 		displayFolder: _filt_helpers
 		lineageTag: 203cf28c-7376-4634-a106-b86acd188d74
 
+	/// Measure meas.data_asof.
 	measure 'meas.data_asof' = //"Data last processed on: " & calculate(max(leads[_sys_as_of]))
 		formatString: 0
 		displayFolder: _filt_helpers
 		lineageTag: 45ef1e74-2032-4fab-8fcc-e9b422fa3e4c
 
+	/// Measure meas.last_year_full.
 	measure 'meas.last_year_full' =
 			
-			var _current_year = YEAR(MAX(cal_end_dates[date]))
-			var _last_year = YEAR(MAX(cal_end_dates[date]))-1
+			var _current_year = YEAR(MAX('cal_end_dates'[date]))
+			var _last_year = YEAR(MAX('cal_end_dates'[date]))-1
 			
 			var res = _current_year - _last_year
 			var res1 = IF(
@@ -61,20 +65,23 @@ table cal_end_dates
 		displayFolder: _filt_helpers
 		lineageTag: a32c0d45-f0d4-4361-bb6b-0b48af7d7861
 
+	/// Measure meas.context_min.
 	measure 'meas.context_min' =
 			
-			CALCULATE(MIN(cal_end_dates[date]))
+			CALCULATE(MIN('cal_end_dates'[date]))
 		formatString: General Date
 		displayFolder: _filt_helpers
 		lineageTag: 1148b606-5a63-49e5-b97e-960f5897841b
 
+	/// Measure meas.context_max.
 	measure 'meas.context_max' =
 			
-			CALCULATE(MAX(cal_end_dates[date]))
+			CALCULATE(MAX('cal_end_dates'[date]))
 		formatString: General Date
 		displayFolder: _filt_helpers
 		lineageTag: 57062494-3508-4371-b498-92dfb39f703e
 
+	/// Column date.
 	column date
 		formatString: Short Date
 		lineageTag: 86095ff3-619d-4c1f-ab71-5e768c8b7a14
@@ -83,13 +90,14 @@ table cal_end_dates
 
 		variation Variation
 			isDefault
-			relationship: c4fbd288-0f97-45fb-b981-7aaebbc0e657
+			relationship: 9636e69b-c448-4a19-af73-36f8c4b26a38
 			defaultHierarchy: LocalDateTable_bab82619-28e3-41d4-97e7-0c4cc876d812.'Date Hierarchy'
 
 		changedProperty = FormatString
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column date_as_integer.
 	column date_as_integer
 		lineageTag: dc31e7db-2c2a-4c88-8eaf-3f9f25989f77
 		summarizeBy: none
@@ -98,6 +106,7 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column year.
 	column year
 		dataType: int64
 		formatString: 0
@@ -108,6 +117,7 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column month_number.
 	column month_number
 		lineageTag: 973279c9-f2cb-47e3-b904-eb2c55e05a94
 		summarizeBy: none
@@ -116,6 +126,7 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column year_month_number.
 	column year_month_number
 		lineageTag: 36158ebe-806d-4b59-adf7-70acc7db9a47
 		summarizeBy: none
@@ -124,6 +135,7 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column year_month_short.
 	column year_month_short
 		lineageTag: d564f460-3385-4216-a2e1-c9bb73347be9
 		summarizeBy: none
@@ -132,6 +144,7 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column month_name_short.
 	column month_name_short
 		lineageTag: 026af4ac-4da3-4995-b9f5-fae59f8ec971
 		summarizeBy: none
@@ -140,6 +153,7 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column month_name_long.
 	column month_name_long
 		lineageTag: f22c6569-cb80-4917-b2de-e2aab35879c8
 		summarizeBy: none
@@ -148,6 +162,7 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column day_of_week_number.
 	column day_of_week_number
 		formatString: 0
 		lineageTag: 86142ac0-d7ba-433d-a4c0-4b3ea11830ae
@@ -157,6 +172,7 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column day_of_week.
 	column day_of_week
 		lineageTag: 687c0d7c-30a6-49fe-9057-642d2d0ba7bf
 		summarizeBy: none
@@ -165,6 +181,7 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column day_of_week_short.
 	column day_of_week_short
 		lineageTag: 83ef68a1-52ef-4b07-812b-b7efdc56c457
 		summarizeBy: none
@@ -173,6 +190,7 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column quarter.
 	column quarter
 		lineageTag: 6cb1305b-2d31-404c-87ed-5795b4692299
 		summarizeBy: none
@@ -181,6 +199,7 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column year_quarter.
 	column year_quarter
 		lineageTag: 0a907e53-7d54-4cd2-99a0-25cb602e0f15
 		summarizeBy: none
@@ -189,29 +208,84 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
-	column fiscal_year
-		formatString: 0
-		lineageTag: 88a42754-1e5f-408c-930c-ad7e3ad239a8
-		summarizeBy: sum
-		isNameInferred
-		sourceColumn: [fiscal_year]
-
-		annotation SummarizationSetBy = Automatic
-
-	column fiscal_month
-		formatString: 0
-		lineageTag: aef317a8-d813-4bd5-915b-332d1c792187
-		summarizeBy: sum
-		isNameInferred
-		sourceColumn: [fiscal_month]
-
-		annotation SummarizationSetBy = Automatic
-
-	column fiscal_quarter
-		lineageTag: 50925519-158d-4468-9b31-ed81fdfdcb16
+	/// Column year_week_number.
+	column year_week_number
+		lineageTag: faf180e6-804a-4525-b401-37fe3e1e6577
 		summarizeBy: none
 		isNameInferred
-		sourceColumn: [fiscal_quarter]
+		sourceColumn: [year_week_number]
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Column year_day_number.
+	column year_day_number
+		lineageTag: 15d54118-9d10-4199-9d57-c5c997f25c8d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [year_day_number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column year_quarter_num
+		formatString: 0
+		lineageTag: 61ba36bc-447a-40de-935e-588b6a12cdfb
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [year_quarter_num]
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_of_week_date
+		formatString: General Date
+		lineageTag: 2b4075c3-f6b1-4e05-a5e0-c395b8f30612
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [first_of_week_date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_of_month_date
+		formatString: General Date
+		lineageTag: 9ea75d3b-4960-45c8-a43d-5e81af95c82a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [first_of_month_date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_of_qtr_date
+		formatString: General Date
+		lineageTag: d4aae04e-6d93-4175-9750-3378a4044716
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [first_of_qtr_date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_last_4q
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: b93539d8-ef40-4d87-8f1e-05c0b06a1c65
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [is_last_4q]
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_of_year_date
+		formatString: General Date
+		lineageTag: dc7c1e3d-66f2-493b-984e-383d2c7868f4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [first_of_year_date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fiscal Date'
+		formatString: General Date
+		lineageTag: e35c5b50-0c2f-4d47-964d-fcde8469a530
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Fiscal Date]
 
 		annotation SummarizationSetBy = Automatic
 
@@ -219,53 +293,173 @@ table cal_end_dates
 		mode: import
 		source =
 				
-				var min_date =  MAX(date(2000,01,01) ,  min(ssr[_sys_filt_start_date])) // get the first date that we have data for but never before 2000
-				var max_date = max(ssr[_sys_as_of]) // get the last date (as _of) that we have data for
-				var f_month = [meas.getFiscalYearOffset]        // get the fiscal_year offset
+				VAR MinDateRaw =
+				    CALCULATE (
+				        MIN ( ssr[_sys_filt_start_date] ),
+				        REMOVEFILTERS ( ssr )
+				    )
 				
-				var cal_tbl  =ADDCOLUMNS (
-				CALENDAR (min_date, max_date),
-				"date_as_integer", FORMAT ( [Date], "YYYYMMDD" ),
-				"year", YEAR ( [Date] ),
-				"month_number", FORMAT ( [Date], "MM" ),
-				"year_month_number", FORMAT ( [Date], "YYYY/MM" ),
-				"year_month_short", FORMAT ( [Date], "YYYY/mmm" ),
-				"month_name_short", FORMAT ( [Date], "mmm" ),
-				"month_name_long", FORMAT ( [Date], "mmmm" ),
-				"day_of_week_number", WEEKDAY ( [Date] ),
-				"day_of_week", FORMAT ( [Date], "dddd" ),
-				"day_of_week_short", FORMAT ( [Date], "ddd" ),
-				"quarter", "Q" & FORMAT ( [Date], "Q" ),
-				"year_quarter", FORMAT ( [Date], "YYYY" ) & "/Q" & FORMAT ( [Date], "Q" ),
-				"fiscal_year", IF(
-				                f_month = 0,
-				                YEAR([Date]),
-				                IF(
-				                    MONTH([Date]) >= f_month,
-				                    YEAR([Date]) + 1,
-				                    YEAR([Date])
-				                )
+				VAR MaxDateRaw =
+				    CALCULATE (
+				        MAX ( ssr[_sys_as_of] ),
+				        REMOVEFILTERS ( ssr )
+				    )
+				
+				VAR min_date =
+				    MAX (
+				        DATE ( 2000, 1, 1 ),
+				        COALESCE ( MinDateRaw, DATE ( 2000, 1, 1 ) )
+				    )
+				
+				VAR max_date =
+				    COALESCE ( MaxDateRaw, DATE ( 2000, 1, 1 ) )
+				
+				VAR f_month = [meas.getFiscalYearOffset]
+				
+				VAR CurrentQuarterStart =
+				    DATE ( YEAR ( max_date ), MONTH ( max_date ) - MOD ( MONTH ( max_date ) - 1, 3 ), 1 )
+				
+				VAR FourQuartersAgo =
+				    EDATE ( CurrentQuarterStart, -9 )
+				
+				VAR cal_tbl =
+				    ADDCOLUMNS (
+				        CALENDAR ( min_date, max_date ),
+				        "date_as_integer", FORMAT ( [Date], "YYYYMMDD" ),
+				        "year", YEAR ( [Date] ),
+				        "month_number", FORMAT ( [Date], "MM" ),
+				        "year_month_number", FORMAT ( [Date], "YYYY/MM" ),
+				        "year_week_number", FORMAT ( [Date], "YYYY/0w" ),
+				        "year_day_number", FORMAT ( [Date], "YYYY/ddd" ),
+				        "year_month_short", FORMAT ( [Date], "YYYY/mmm" ),
+				        "month_name_short", FORMAT ( [Date], "mmm" ),
+				        "month_name_long", FORMAT ( [Date], "mmmm" ),
+				        "day_of_week_number", WEEKDAY ( [Date] ),
+				        "day_of_week", FORMAT ( [Date], "dddd" ),
+				        "day_of_week_short", FORMAT ( [Date], "ddd" ),
+				        "quarter", "Q" & FORMAT ( [Date], "Q" ),
+				        "year_quarter", FORMAT ( [Date], "YYYY" ) & "/Q" & FORMAT ( [Date], "Q" ),
+				        "year_quarter_num", YEAR ( [Date] ) * 4 + QUARTER ( [Date] ),
+				        "first_of_week_date", [Date] - WEEKDAY ( [Date] ) + 1,
+				        "first_of_month_date", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ),
+				        "first_of_qtr_date",
+				            DATE (
+				                YEAR ( [Date] ),
+				                SWITCH (
+				                    MONTH ( [Date] ),
+				                    1, 1,
+				                    2, 1,
+				                    3, 1,
+				                    4, 4,
+				                    5, 4,
+				                    6, 4,
+				                    7, 7,
+				                    8, 7,
+				                    9, 7,
+				                    10, 10,
+				                    11, 10,
+				                    12, 10
+				                ),
+				                1
 				            ),
-				"fiscal_month",IF(
+				        "is_last_4q",
+				            IF (
+				                [Date] >= FourQuartersAgo
+				                    && [Date] < EDATE ( CurrentQuarterStart, 3 ),
+				                TRUE (),
+				                FALSE ()
+				            ),
+				        "first_of_year_date", DATE ( YEAR ( [Date] ), 1, 1 ),
+				        "Fiscal Date",
+				            DATE (
+				                IF (
 				                    f_month = 0,
-				                    month([Date]),
-				                    IF(
-				                        MONTH([Date]) >= f_month,
-				                        MONTH([Date]) - f_month + 1,
-				                        MONTH([Date]) + (12 - f_month + 1)
+				                    YEAR ( [Date] ),
+				                    IF ( MONTH ( [Date] ) >= f_month, YEAR ( [Date] ), YEAR ( [Date] ) - 1 )
+				                ),
+				                IF (
+				                    f_month = 0,
+				                    MONTH ( [Date] ),
+				                    IF (
+				                        MONTH ( [Date] ) >= f_month,
+				                        MONTH ( [Date] ) - f_month + 1,
+				                        MONTH ( [Date] ) + 12 - f_month + 1
 				                    )
 				                ),
-				"fiscal_quarter", "Q" & IF(
+				                DAY ( [Date] )
+				            )
+				    )
+				
+				VAR cal_tbl2 =
+				    ADDCOLUMNS (
+				        CALENDAR ( DATE ( 2100, 1, 1 ), DATE ( 2100, 1, 1 ) ),
+				        "date_as_integer", FORMAT ( [Date], "YYYYMMDD" ),
+				        "year", YEAR ( [Date] ),
+				        "month_number", FORMAT ( [Date], "MM" ),
+				        "year_month_number", FORMAT ( [Date], "YYYY/MM" ),
+				        "year_day_number", FORMAT ( [Date], "YYYY/00d" ),
+				        "year_week_number", FORMAT ( [Date], "YYYY/ww" ),
+				        "year_month_short", FORMAT ( [Date], "YYYY/mmm" ),
+				        "month_name_short", FORMAT ( [Date], "mmm" ),
+				        "month_name_long", FORMAT ( [Date], "mmmm" ),
+				        "day_of_week_number", WEEKDAY ( [Date] ),
+				        "day_of_week", FORMAT ( [Date], "dddd" ),
+				        "day_of_week_short", FORMAT ( [Date], "ddd" ),
+				        "quarter", "Q" & FORMAT ( [Date], "Q" ),
+				        "year_quarter", FORMAT ( [Date], "YYYY" ) & "/Q" & FORMAT ( [Date], "Q" ),
+				        "year_quarter_num", YEAR ( [Date] ) * 4 + QUARTER ( [Date] ),
+				        "first_of_week_date", [Date] - WEEKDAY ( [Date] ) + 1,
+				        "first_of_month_date", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ),
+				        "first_of_qtr_date",
+				            DATE (
+				                YEAR ( [Date] ),
+				                SWITCH (
+				                    MONTH ( [Date] ),
+				                    1, 1,
+				                    2, 1,
+				                    3, 1,
+				                    4, 4,
+				                    5, 4,
+				                    6, 4,
+				                    7, 7,
+				                    8, 7,
+				                    9, 7,
+				                    10, 10,
+				                    11, 10,
+				                    12, 10
+				                ),
+				                1
+				            ),
+				        "is_last_4q",
+				            IF (
+				                [Date] >= FourQuartersAgo
+				                    && [Date] < EDATE ( CurrentQuarterStart, 3 ),
+				                TRUE (),
+				                FALSE ()
+				            ),
+				        "first_of_year_date", DATE ( YEAR ( [Date] ), 1, 1 ),
+				        "Fiscal Date",
+				            DATE (
+				                IF (
 				                    f_month = 0,
-				                    FORMAT([Date], "Q" ),
-				                    IF(
-				                        MONTH([Date]) >= f_month,
-				                        CEILING((MONTH([Date]) - f_month + 1) / 3, 1),
-				                        CEILING((MONTH([Date]) + (12 - f_month + 1)) / 3, 1)
+				                    YEAR ( [Date] ),
+				                    IF ( MONTH ( [Date] ) >= f_month, YEAR ( [Date] ), YEAR ( [Date] ) - 1 )
+				                ),
+				                IF (
+				                    f_month = 0,
+				                    MONTH ( [Date] ),
+				                    IF (
+				                        MONTH ( [Date] ) >= f_month,
+				                        MONTH ( [Date] ) - f_month + 1,
+				                        MONTH ( [Date] ) + 12 - f_month + 1
 				                    )
-				                )
-				)
-				return cal_tbl
+				                ),
+				                DAY ( [Date] )
+				            )
+				    )
+				
+				RETURN
+				    UNION ( cal_tbl, cal_tbl2 )
 
 	annotation PBI_Id = 47fdd5fe548045698e2980cebacd82ae
 

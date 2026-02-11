@@ -1,6 +1,8 @@
+/// Derived entity synthesizing Opportunities and Opportunity History. Engineered to resolve CRM history gaps to ensure a continuous, reconstructible history record for every opportunity.
 table open_pipeline
 	lineageTag: 63e68162-90ed-40cd-8e52-99f2a6d679a2
 
+	/// Measure meas.open_opps_dur_hrs.
 	measure 'meas.open_opps_dur_hrs' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -29,6 +31,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_engagement_ratio.
 	measure 'meas.open_opps_engagement_ratio' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -61,6 +64,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: d0568ec4-480e-4596-8dfa-b70cc86cc8a5
 
+	/// Measure meas.open_opps_last_eng_days.
 	measure 'meas.open_opps_last_eng_days' =
 			
 			var last_eng = CALCULATE(MAX(opps[crm_last_act_time]))            // get the last eng date
@@ -84,6 +88,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 28fc3a6b-76c7-4342-90d2-1d1ac2e41b38
 
+	/// Measure meas.open_opps_sel_date_count.
 	measure 'meas.open_opps_sel_date_count' = ```
 			
 			
@@ -115,6 +120,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: e9d52ce3-8497-4ab0-94db-791065dcd7bb
 
+	/// Measure meas.open_opp_sel_date_count_rob.
 	measure 'meas.open_opp_sel_date_count_rob' = ```
 			//*** This is the "earlier" measure sub filtere approach for TS data  - use to get a filter measure and a count only (counts can be used in pie charts etc)
 			
@@ -147,6 +153,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: e2464022-caf0-4ce8-bdf3-5bd3ae240186
 
+	/// Measure meas.open_opps_last_eng_act.
 	measure 'meas.open_opps_last_eng_act' =
 			
 			var sel_date = CALCULATE(MAX(cal_start_dates[Date]))
@@ -160,6 +167,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: eb720c10-21e8-4cd2-b827-189df4909e8e
 
+	/// Measure meas.open_opps_stkhlds_involved.
 	measure 'meas.open_opps_stkhlds_involved' =
 			
 			MAX(ssr_history[stkhlds_all_contacts_count])
@@ -167,6 +175,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 10044456-c905-4aaf-bb68-c235a7242c78
 
+	/// Measure meas.open_opps_quality_bucket.
 	measure 'meas.open_opps_quality_bucket' =
 			
 			Var res  = MAXX(opps, opps[trueai_qual_bucket] )
@@ -174,6 +183,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: a0f1fe2d-9a8c-4f78-997c-e3802c7c466d
 
+	/// Measure meas.open_opps_pipeline_current_stage.
 	measure 'meas.open_opps_pipeline_current_stage' =
 			
 			Var res  = MAXX(open_pipeline, open_pipeline[trueai_stage] )
@@ -181,6 +191,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 10887f14-fee8-45c1-9ec1-2e1f778a459c
 
+	/// Measure meas.open_opps_tbl_title.
 	measure 'meas.open_opps_tbl_title' =
 			
 			var _date = FORMAT([meas.sel_date], "MM/dd/yyyy")           // get the formatted date
@@ -193,6 +204,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 3fed2c8f-0873-44c6-8b3f-b26f87d92022
 
+	/// Measure meas.open_opps_expected_value.
 	measure 'meas.open_opps_expected_value' =
 			
 			var _pipeline_amt = [meas.open_opps_pipeline_amt]           // get the pipeline amt
@@ -206,6 +218,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.open_opps_total_expected_value.
 	measure 'meas.open_opps_total_expected_value' = ```
 			
 			var _pipeline_amt = [meas.open_opps_pipeline_amt]           // get the pipeline amt
@@ -221,6 +234,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.open_opps_total_expected_value_sply_diff.
 	measure 'meas.open_opps_total_expected_value_sply_diff' = ```
 			
 			
@@ -241,6 +255,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_avg_win_prob.
 	measure 'meas.open_opps_avg_win_prob' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -270,6 +285,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 09563c27-7a16-47f1-b1db-9b88b120a9c1
 
+	/// Measure meas.open_opps_total_expected_value_sply.
 	measure 'meas.open_opps_total_expected_value_sply' =
 			
 			var _pipeline_amt = [meas.open_opps_pipeline_amt_sply]           // get the pipeline amt
@@ -283,6 +299,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.open_opps_count.
 	measure 'meas.open_opps_count' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -312,6 +329,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 5887f433-2566-4a32-b1b4-3fce64f6b252
 
+	/// Measure meas.open_opps_count_sply.
 	measure 'meas.open_opps_count_sply' =
 			
 			CALCULATE(
@@ -323,6 +341,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 1364f987-e2fc-4a19-aa1a-6793b825a130
 
+	/// Measure meas.open_opps_count_sply_diff.
 	measure 'meas.open_opps_count_sply_diff' =
 			
 			var _current = CALCULATE([meas.open_opps_count],open_pipeline[trueai_stage] in {"Early", "Mid", "Late"})           // currently open opps count
@@ -341,6 +360,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_avg_win_prob_sply.
 	measure 'meas.open_opps_avg_win_prob_sply' =
 			
 			CALCULATE(
@@ -352,6 +372,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: bec26611-00c2-4632-a584-4ba4e1d29146
 
+	/// Measure meas.open_opps_avg_win_prob_sply_diff.
 	measure 'meas.open_opps_avg_win_prob_sply_diff' =
 			
 			var _current = CALCULATE([meas.open_opps_avg_win_prob],open_pipeline[trueai_stage] in {"Early", "Mid", "Late"})            // get the current prob
@@ -370,6 +391,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_pipeline_amt.
 	measure 'meas.open_opps_pipeline_amt' = ```
 			
 			
@@ -403,6 +425,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.open_opps_pipeline_amt_sply.
 	measure 'meas.open_opps_pipeline_amt_sply' =
 			
 			CALCULATE(
@@ -416,6 +439,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.open_opps_pushed_pulled_day.
 	measure 'meas.open_opps_pushed_pulled_day' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -445,6 +469,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_pushed_pulled_day_sply.
 	measure 'meas.open_opps_pushed_pulled_day_sply' =
 			
 			CALCULATE(
@@ -457,6 +482,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_pushed_pulled_day_sply_diff.
 	measure 'meas.open_opps_pushed_pulled_day_sply_diff' =
 			
 			var _current = [meas.open_opps_pushed_pulled_day]           // currently open opps pushed pulled day
@@ -475,6 +501,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_avg_pace_score.
 	measure 'meas.open_opps_avg_pace_score' =
 			
 			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
@@ -497,6 +524,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.open_opps_items_trueai_stage.
 	measure 'meas.open_opps_items_trueai_stage' = ```
 			
 			var opps_latest_row  = CALCULATETABLE(TOPN(1,opps, opps[_sys_as_of], DESC))  // get the most recent entries
@@ -517,6 +545,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 776d0094-a304-43f4-a8d7-79ccd778ca7c
 
+	/// Measure meas.open_opps_list_dur_hrs.
 	measure 'meas.open_opps_list_dur_hrs' =
 			
 			var dur = calculate(sum(open_pipeline[trueai_act_dur])) / 3600 // turn to hours
@@ -528,6 +557,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_avg_pace_score_sply.
 	measure 'meas.open_opps_avg_pace_score_sply' = ```
 			
 			var _sply = CALCULATE(
@@ -554,6 +584,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.open_opps_avg_pace_score_sply_diff.
 	measure 'meas.open_opps_avg_pace_score_sply_diff' = ```
 			
 			var _avg = [meas.trueai_pace_score]             /// current
@@ -577,6 +608,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_act_count.
 	measure 'meas.open_opps_act_count' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -606,6 +638,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
+	/// Measure meas.open_opps_pipeline_amt_sply_diff.
 	measure 'meas.open_opps_pipeline_amt_sply_diff' =
 			
 			var _current = CALCULATE([meas.open_opps_pipeline_amt],open_pipeline[trueai_stage] in {"Early", "Mid", "Late"})
@@ -623,6 +656,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_age_days.
 	measure 'meas.open_opps_age_days' =
 			
 			var res =  CALCULATE(MAX(opps[col.opp_age]))
@@ -635,6 +669,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_age_days_sply.
 	measure 'meas.open_opps_age_days_sply' = ```
 			
 			var res = CALCULATE(
@@ -650,6 +685,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_age_days_sply_diff.
 	measure 'meas.open_opps_age_days_sply_diff' =
 			
 			var _current = [meas.open_opps_age_days]
@@ -668,6 +704,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_initial_close_date.
 	measure 'meas.open_opps_initial_close_date' =
 			
 			CALCULATE(MAX(open_pipeline[trueai_init_close_date]))
@@ -675,6 +712,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 666cb7ed-c316-4ced-91d8-b12470cd140d
 
+	/// Measure meas.open_opps_items_all_act_count.
 	measure 'meas.open_opps_items_all_act_count' =
 			
 			CALCULATE(
@@ -684,6 +722,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 5351b99b-b4f0-4a02-8a1c-1c05896763fb
 
+	/// Measure meas.open_opps_items_all_act_eng_count.
 	measure 'meas.open_opps_items_all_act_eng_count' =
 			
 			CALCULATE(
@@ -693,6 +732,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 562e4c2a-cc4b-490a-a288-8d995335aa69
 
+	/// Measure meas.opps_detail_sale_type.
 	measure 'meas.opps_detail_sale_type' =
 			
 			CALCULATE(
@@ -701,6 +741,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 86fe027a-e93e-4386-b548-e6b4c760d472
 
+	/// Measure meas.open_opps_trueai_stage.
 	measure 'meas.open_opps_trueai_stage' =
 			
 			CALCULATE(
@@ -709,6 +750,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: c2aee211-195c-4a6d-a5b3-137bd1443ee5
 
+	/// Measure meas.open_opps_items_meeting_act_count.
 	measure 'meas.open_opps_items_meeting_act_count' =
 			
 			CALCULATE(
@@ -718,6 +760,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: ff73db87-015f-42d0-8c66-7f7b9b86f4cc
 
+	/// Measure meas.open_opps_items_meeting_act_eng_count.
 	measure 'meas.open_opps_items_meeting_act_eng_count' =
 			
 			CALCULATE(
@@ -727,6 +770,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: e284c69f-4727-47a1-8c86-d4a75cd2d286
 
+	/// Measure meas.open_opps_items_phone_act_count.
 	measure 'meas.open_opps_items_phone_act_count' =
 			
 			CALCULATE(
@@ -736,6 +780,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: ed3ac908-6a96-432a-bc09-6e6cbb6d6bc7
 
+	/// Measure meas.open_opps_items_phone_act_eng_count.
 	measure 'meas.open_opps_items_phone_act_eng_count' =
 			
 			CALCULATE(
@@ -745,6 +790,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 68a59106-ced4-4531-9692-5b9c2766f25d
 
+	/// Measure meas.open_opps_items_email_act_count.
 	measure 'meas.open_opps_items_email_act_count' =
 			
 			CALCULATE(
@@ -754,6 +800,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 5b2295a4-b13a-4594-801f-de41eb83f281
 
+	/// Measure meas.open_opps_items_email_act_eng_count.
 	measure 'meas.open_opps_items_email_act_eng_count' =
 			
 			CALCULATE(
@@ -763,6 +810,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 6925d7b9-faf4-4665-89f6-3a97c20739bd
 
+	/// Measure meas.open_opps_items_social_act_count.
 	measure 'meas.open_opps_items_social_act_count' =
 			
 			CALCULATE(
@@ -772,6 +820,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: a09784e8-3f24-46db-a1c2-6e5b74ffcc18
 
+	/// Measure meas.open_opps_items_social_act_eng_count.
 	measure 'meas.open_opps_items_social_act_eng_count' =
 			
 			CALCULATE(
@@ -781,6 +830,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: ba11a93f-9048-4bea-b2f0-6fee3754c1cf
 
+	/// Measure meas.open_opps_items_all_act-non_eng_count.
 	measure 'meas.open_opps_items_all_act-non_eng_count' = ```
 			
 			var all_count = [meas.open_opps_items_all_act_count]            // get all the counts 
@@ -794,6 +844,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 9b8f7cff-0382-4b11-bdf0-7e343e55d69f
 
+	/// Measure meas.open_opps_items_phone_act-non_eng_count.
 	measure 'meas.open_opps_items_phone_act-non_eng_count' = ```
 			
 			var all_count = [meas.open_opps_items_phone_act_count]            // get all the counts 
@@ -807,6 +858,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 49836b2b-33de-4e7b-9379-d4e695c67745
 
+	/// Measure meas.open_opps_items_email_act-non_eng_count.
 	measure 'meas.open_opps_items_email_act-non_eng_count' = ```
 			
 			var all_count = [meas.open_opps_items_email_act_count]            // get all the counts 
@@ -820,6 +872,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: f393c148-a960-480e-9a2c-393abd7eb640
 
+	/// Measure meas.open_opps_items_meeting_act-non_eng_count.
 	measure 'meas.open_opps_items_meeting_act-non_eng_count' = ```
 			
 			var all_count = [meas.open_opps_items_meeting_act_count]            // get all the counts 
@@ -833,6 +886,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 345deff2-6a35-4fa5-b7dc-9672dbd4c758
 
+	/// Measure meas.open_opps_items_social_act-non_eng_count.
 	measure 'meas.open_opps_items_social_act-non_eng_count' = ```
 			
 			var all_count = [meas.open_opps_items_social_act_count]            // get all the counts 
@@ -846,6 +900,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 6bfaea9e-b5e3-430d-9ac4-7824f78d80f6
 
+	/// Measure meas.open_opps_items_act_eng_counts.
 	measure 'meas.open_opps_items_act_eng_counts' =
 			
 			
@@ -860,6 +915,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: cb8a841a-7579-4716-997f-4d32193b4f51
 
+	/// Measure meas.open_opps_items_act_non_eng_counts.
 	measure 'meas.open_opps_items_act_non_eng_counts' =
 			
 			
@@ -874,6 +930,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 9b0454a2-e77d-45a6-acf0-2e9e84b9639a
 
+	/// Measure meas.open_opps_items_act_eng_rate.
 	measure 'meas.open_opps_items_act_eng_rate' =
 			
 			var _all_act = [meas.open_opps_items_all_act_count]         // get the all act count
@@ -886,6 +943,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: bc15b784-1974-4c5a-a31d-e5c14f89a0ef
 
+	/// Measure meas.closed_opps_age_days.
 	measure 'meas.closed_opps_age_days' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -908,10 +966,12 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.step_sub_type.
 	measure 'meas.step_sub_type' = CALCULATE(MAX(ssr_history[step_sub_type]))
 		displayFolder: _opps_details
 		lineageTag: b47a791b-611d-4c41-bed6-d76b0df5fe8c
 
+	/// Measure meas.opps_creator_name.
 	measure 'meas.opps_creator_name' =
 			CALCULATE(
 			    MAX(opps[col.creator_name])
@@ -919,6 +979,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: e8050285-8de1-458d-9c75-d7bfaa7f7806
 
+	/// Measure meas.opps_details_screen_age.
 	measure 'meas.opps_details_screen_age' = ```
 			
 			VAR SelectedDate = MAX('cal_start_dates'[Date])
@@ -946,6 +1007,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.opps_details_screen_pushed_pulled.
 	measure 'meas.opps_details_screen_pushed_pulled' =
 			
 			
@@ -969,6 +1031,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_last_eng_date_filter.
 	measure 'meas.open_opps_last_eng_date_filter' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -991,6 +1054,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.closed_opps_pushed_pulled_days.
 	measure 'meas.closed_opps_pushed_pulled_days' = CALCULATE(MAX(ssr_history[step_days_pushed_pulled]))
 		formatString: 0
 		displayFolder: _opps_details
@@ -998,6 +1062,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.opps_crm_deep_link.
 	measure 'meas.opps_crm_deep_link' =
 			
 			var res = IF(CONTAINSSTRING(MAX(opps[crm_deep_link]), "http"), "#11BDFC", "#11BDFC")
@@ -1007,6 +1072,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 78bf53a1-8293-4c3c-b17b-9476ef792ed5
 
+	/// Measure meas.opp_details_opps_rep_involved.
 	measure 'meas.opp_details_opps_rep_involved' =
 			
 			CALCULATE(
@@ -1017,6 +1083,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 87aae354-3872-4fc5-ba22-bb59bbceb983
 
+	/// Measure meas.open_opps_account_name.
 	measure 'meas.open_opps_account_name' =
 			
 			CALCULATE(
@@ -1025,6 +1092,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 3398574e-569e-43e9-b8fd-6ace23959662
 
+	/// Measure meas.opp_details_most_recent_step_outcome.
 	measure 'meas.opp_details_most_recent_step_outcome' =
 			
 			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
@@ -1047,6 +1115,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: aa15574a-fd7d-482f-a3cd-7eab0b46de95
 
+	/// Measure meas.opp_details_most_recent_step_sub_type.
 	measure 'meas.opp_details_most_recent_step_sub_type' =
 			
 			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
@@ -1061,6 +1130,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 1fbb5ddc-25e3-4ee3-ba4c-8c4ff9c461d2
 
+	/// Measure meas.open_opps_count_tbl_filter.
 	measure 'meas.open_opps_count_tbl_filter' = ```
 			
 			VAR sel_end_date =CALCULATE(MAX(cal_start_dates[Date])) // get the selected max date 
@@ -1096,12 +1166,14 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 2ca20c71-4d42-4429-98e2-916ffaec97bc
 
+	/// Measure meas.open_pipeline_concate_measure.
 	measure 'meas.open_pipeline_concate_measure' =
 			
 			MAX(open_pipeline[crm_stage_name]) & " (" & MAX(open_pipeline[trueai_stage]) & ") "
 		displayFolder: _open_opps_pipeline
 		lineageTag: 915b5124-4bd9-48e1-8943-5510c93e3cbe
 
+	/// Measure meas.open_opps_age_days_filter.
 	measure 'meas.open_opps_age_days_filter' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -1126,6 +1198,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 2c01d1ac-22ff-4dae-8709-b616872b9996
 
+	/// Measure Days Difference.
 	measure 'Days Difference' = ```
 			
 			VAR SelectedDate = MAX('cal_start_dates'[Date])
@@ -1141,11 +1214,13 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.open_opps_trueai_booking_amt.
 	measure 'meas.open_opps_trueai_booking_amt' = sum(open_pipeline[trueai_booking_amt])
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 95540529-8f00-4fa5-977f-e450852f352c
 
+	/// Measure meas.opp_details_most_recent_sales_type.
 	measure 'meas.opp_details_most_recent_sales_type' =
 			
 			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
@@ -1168,6 +1243,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: eef20aec-590d-4d8c-aaea-4ff2369b0fee
 
+	/// Measure meas.trueai_pace_score.
 	measure 'meas.trueai_pace_score' =
 			
 			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
@@ -1180,6 +1256,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_details_avg_pace_score.
 	measure 'meas.opps_details_avg_pace_score' =
 			
 			
@@ -1202,6 +1279,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.open_opps_items_trueai_booking_amt.
 	measure 'meas.open_opps_items_trueai_booking_amt' = ```
 			
 			var latest_row  = CALCULATETABLE(TOPN(1,open_pipeline, open_pipeline[_sys_as_of], DESC))  // get the most recent entries
@@ -1213,6 +1291,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: f86e3bdf-05a5-4e3a-8fe9-7889136e011e
 
+	/// Measure meas.trueai_pace_score_test.
 	measure 'meas.trueai_pace_score_test' =
 			
 			
@@ -1235,6 +1314,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.open_pipeline_stage_sort_index.
 	measure 'meas.open_pipeline_stage_sort_index' = ```
 			
 			var avg_seq = CALCULATE(AVERAGE(open_pipeline[trueai_step_sequence])) // lower avg indidctes earlier stage
@@ -1245,6 +1325,7 @@ table open_pipeline
 		formatString: 0
 		lineageTag: bfe9fd21-6834-4474-b340-ffb9829e416f
 
+	/// Measure meas.open_pipeline_avg_days_in_stage.
 	measure 'meas.open_pipeline_avg_days_in_stage' =
 			
 			var res = CALCULATE(AVERAGE(open_pipeline[trueai_days_in_stage]))
@@ -1253,6 +1334,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.open_pipeline_deals_reached_next_stage_count.
 	measure 'meas.open_pipeline_deals_reached_next_stage_count' =
 			
 			VAR raw_stage = SELECTEDVALUE(open_pipeline[trueai_avg_step_sequence])
@@ -1274,6 +1356,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 45f80dbb-99fb-49e4-a0ca-804b1a6dc6b0
 
+	/// Measure meas.open_pipeline_deals_reached_stage_count.
 	measure 'meas.open_pipeline_deals_reached_stage_count' = ```
 			
 			VAR stage_num =     SELECTEDVALUE(open_pipeline[trueai_avg_step_sequence])   // add one because we want to look at the next stage 
@@ -1285,6 +1368,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 5b76cd85-e359-444f-920b-8bccf3a3081d
 
+	/// Measure meas.open_pipeline_lost_deals_in_stage_tot_pct.
 	measure 'meas.open_pipeline_lost_deals_in_stage_tot_pct' =
 			
 			DIVIDE( [meas.open_pipeline_lost_deals_in_stage], [meas.open_pipeline_total_deals])
@@ -1292,6 +1376,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 387d7496-7688-434e-930b-dd08ae451126
 
+	/// Measure meas.open_pipeline_lost_deals_in_stage.
 	measure 'meas.open_pipeline_lost_deals_in_stage' =
 			
 			var res = [meas.open_pipeline_deals_reached_stage_count] - [meas.open_pipeline_deals_reached_next_stage_count]
@@ -1300,6 +1385,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 9ce4e60f-1a95-4b12-aedf-0822ef95bdde
 
+	/// Measure meas.open_pipeline_total_deals.
 	measure 'meas.open_pipeline_total_deals' =
 			
 							VAR stage_num = SELECTEDVALUE(open_pipeline[trueai_avg_step_sequence])
@@ -1316,51 +1402,61 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 6edf0fca-e41a-4470-9a2e-7c396135f38b
 
+	/// Measure meas.open_pipeline_lost_amt.
 	measure 'meas.open_pipeline_lost_amt' = CALCULATE(sum(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = false)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: 41ec1f6d-2ebd-499d-b232-7de1b984e328
 
+	/// Measure meas.open_pipeline_won_count.
 	measure 'meas.open_pipeline_won_count' = CALCULATE(count(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = true)
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 8f56ffd7-2b00-478e-98ab-5f9e7bd66765
 
+	/// Measure meas.open_pipeline_lost_count.
 	measure 'meas.open_pipeline_lost_count' = CALCULATE(count(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = false)
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 4a836a7c-fa82-462b-9d0f-4bd5a72bd987
 
+	/// Measure meas.open_pipeline_booking_amt.
 	measure 'meas.open_pipeline_booking_amt' = CALCULATE(sum(open_pipeline[trueai_booking_amt]))
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: a852f06f-7ef4-4074-a500-b847c05e29e6
 
+	/// Measure meas.open_pipeline_won_amt.
 	measure 'meas.open_pipeline_won_amt' = CALCULATE(sum(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = true)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: 9b11582e-23e3-4c87-b262-f2c6c548bda0
 
+	/// Measure meas.open_pipeline_booking_amt_avg.
 	measure 'meas.open_pipeline_booking_amt_avg' = CALCULATE(AVERAGE((open_pipeline[trueai_booking_amt])))
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: 461b9e80-02df-467a-a442-d4a22edefb0c
 
+	/// Measure meas.open_pipeline_count_id.
 	measure 'meas.open_pipeline_count_id' = COUNT(open_pipeline[_sys_doc_id])
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 45a2df27-31e4-4b0f-9e84-bce4843d7a29
 
+	/// Measure meas.open_pipeline_discount_id.
 	measure 'meas.open_pipeline_discount_id' = DISTINCTCOUNT(open_pipeline[_sys_doc_id])
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 1b1912dd-eaf7-4d0a-9f3c-e7837c30a89e
 
+	/// Measure meas.open_pipeline_crm_opp_id.
 	measure 'meas.open_pipeline_crm_opp_id' = CALCULATE(DISTINCTCOUNT(open_pipeline[crm_opp_id]))
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 7b6292df-4f86-40ec-a3a8-8a9126a9c3ee
 
+	/// Measure meas.open_pipeline_deals_reached_stage_count_pct.
 	measure 'meas.open_pipeline_deals_reached_stage_count_pct' =
 			
 			DIVIDE( [meas.open_pipeline_deals_reached_stage_count], [meas.open_pipeline_total_deals])
@@ -1368,6 +1464,7 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: b1343ea0-8007-4eed-aebf-3aa0716f50fa
 
+	/// Measure meas.open_pipeline_lost_deals_in_stage_pct.
 	measure 'meas.open_pipeline_lost_deals_in_stage_pct' =
 			
 			DIVIDE( [meas.open_pipeline_lost_deals_in_stage], [meas.open_pipeline_deals_reached_stage_count])
@@ -1375,11 +1472,13 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: 69c96034-6487-4773-aeb2-26c2adbde284
 
+	/// Measure meas.open_pipeline_lost_booking_amt_in_stage.
 	measure 'meas.open_pipeline_lost_booking_amt_in_stage' = [meas.opps_booking_lost_amt] - [meas.opps_booking_amt_reached_next_stage]
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 7cfad227-8096-4d3c-867e-ecb6cb164339
 
+	/// Measure meas.open_pipeline_stages_avg.
 	measure 'meas.open_pipeline_stages_avg' =
 			
 			DIVIDE(
@@ -1390,6 +1489,7 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: 10d10955-21db-49f5-9e8d-c442e26e9976
 
+	/// Measure meas.open_pipeline_deals_skip_count.
 	measure 'meas.open_pipeline_deals_skip_count' =
 			
 			CALCULATE (
@@ -1400,11 +1500,13 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: 857f871b-8f2b-4feb-9647-751d2205a62d
 
+	/// Measure meas.open_pipeline_deals_skip_pct.
 	measure 'meas.open_pipeline_deals_skip_pct' = DIVIDE([meas.open_pipeline_deals_skip_count],[meas.open_pipeline_total_deals])
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _open_pipeline
 		lineageTag: 7f9662b6-0c94-479c-a6be-031d130f7b5e
 
+	/// Measure meas.open_pipeline_win_rate.
 	measure 'meas.open_pipeline_win_rate' =
 			
 			DIVIDE (
@@ -1416,6 +1518,7 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: 331c9e02-103a-4157-8d38-3973872187be
 
+	/// Measure meas.open_pipeline_total_deals_won.
 	measure 'meas.open_pipeline_total_deals_won' =
 			
 			CALCULATE( [meas.open_pipeline_total_deals],
@@ -1424,6 +1527,7 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: d708d33c-4eb9-4961-9c8e-b3a39fd4c457
 
+	/// Measure meas.open_pipeline_deals_stage_count_won.
 	measure 'meas.open_pipeline_deals_stage_count_won' = ```
 			
 			var res = CALCULATE( open_pipeline[meas.open_pipeline_deals_reached_stage_count], opps[trueai_is_won] = TRUE()) 
@@ -1433,6 +1537,7 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: b44ee7e1-dd92-49fa-8551-420880d4e58d
 
+	/// Measure meas.ssr_history_duration_hrs_deals_accumulated.
 	measure 'meas.ssr_history_duration_hrs_deals_accumulated' = ```
 			
 			VAR CurIdx = MAX ( 'open_pipeline'[trueai_avg_step_sequence] ) RETURN SUMX ( FILTER ( ALL ( 'open_pipeline'[trueai_avg_step_sequence] ), 
@@ -1445,6 +1550,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_histories_crm_stage_names.
 	measure 'meas.opps_histories_crm_stage_names' = ```
 			
 			-- concats all the crm values for trueai value
@@ -1463,6 +1569,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_details_screen_trueai_pushed_pulled.
 	measure 'meas.opps_details_screen_trueai_pushed_pulled' =
 			
 			VAR _age =
@@ -1486,6 +1593,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.open_pipeline_sum_days_in_stage.
 	measure 'meas.open_pipeline_sum_days_in_stage' = ```
 			
 			
@@ -1495,6 +1603,7 @@ table open_pipeline
 		formatString: 0
 		lineageTag: f53163da-522b-4c02-b6f5-eb0518a27cb5
 
+	/// The date of the last data request from the platform
 	column _sys_as_of
 		dataType: dateTime
 		formatString: Short Date
@@ -1509,6 +1618,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The end date of the record, stripped of time
 	column _sys_filt_end_date
 		dataType: dateTime
 		formatString: Short Date
@@ -1525,6 +1635,7 @@ table open_pipeline
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// The start date of the record, stripped of time
 	column _sys_filt_start_date
 		dataType: dateTime
 		formatString: Short Date
@@ -1541,6 +1652,7 @@ table open_pipeline
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Opportunity's booking amount in the CRM
 	column crm_booking_amt
 		dataType: double
 		lineageTag: a7ab38e7-7bd8-45db-bb44-69c4b7610fb1
@@ -1551,6 +1663,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's close date in the CRM
 	column crm_close_date
 		dataType: dateTime
 		formatString: Short Date
@@ -1565,6 +1678,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's creation date in the CRM
 	column crm_created_on
 		dataType: dateTime
 		formatString: Short Date
@@ -1579,6 +1693,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's creator's id in the CRM
 	column crm_creator_id
 		dataType: string
 		lineageTag: 494afd3f-f2e0-4ceb-a0b9-f3443d5b5e50
@@ -1587,6 +1702,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's id in the CRM
 	column crm_opp_id
 		dataType: string
 		lineageTag: 93982bca-9859-4daf-a8ed-156b4116a9c8
@@ -1595,6 +1711,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's stage name in the CRM
 	column crm_stage_name
 		dataType: string
 		lineageTag: 39e0679f-55fa-4214-ba46-2e60c6db3f6d
@@ -1606,6 +1723,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's stage number in the CRM
 	column crm_stage_num
 		dataType: string
 		lineageTag: 7108c05b-c9ec-49e4-928b-8306a3b40ffb
@@ -1614,6 +1732,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's booking amount
 	column trueai_booking_amt
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -1623,6 +1742,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the opportunity is won
 	column trueai_is_won
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1632,6 +1752,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's normalized stage
 	column trueai_stage
 		dataType: string
 		lineageTag: c17ed2a6-cfca-487a-ac22-9503016d5f4a
@@ -1643,6 +1764,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text1
 	column cust_text1
 		dataType: string
 		lineageTag: 8f57c040-d45f-4d28-a473-b7ae83e69aac
@@ -1651,6 +1773,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text2
 	column cust_text2
 		dataType: string
 		lineageTag: d3257e95-78c9-4e2e-bfff-5d015ae5c915
@@ -1659,6 +1782,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text3
 	column cust_text3
 		dataType: string
 		lineageTag: fc4b49db-8ddc-445d-8138-675c178fa5d4
@@ -1667,6 +1791,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text4
 	column cust_text4
 		dataType: string
 		lineageTag: e9b1480c-d57a-40aa-85b0-45760008f056
@@ -1675,6 +1800,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text5
 	column cust_text5
 		dataType: string
 		lineageTag: 916899fd-466f-4c8f-80d7-fcb22780f7e3
@@ -1683,6 +1809,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_num1
 	column cust_num1
 		dataType: double
 		lineageTag: 1cf5190a-c739-410d-8672-e8ff0973aead
@@ -1693,6 +1820,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num2
 	column cust_num2
 		dataType: double
 		lineageTag: 7f1e3962-4286-4dff-95ab-40aacb3a7d26
@@ -1703,6 +1831,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num3
 	column cust_num3
 		dataType: double
 		lineageTag: 896ccf0e-7518-4c84-8a41-50098cabd965
@@ -1713,6 +1842,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num4
 	column cust_num4
 		dataType: double
 		lineageTag: 4c00df42-2f71-490c-937b-ed53235548fe
@@ -1723,6 +1853,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num5
 	column cust_num5
 		dataType: double
 		lineageTag: d863f2c3-d442-4ef5-a7f2-0e8d0979ce99
@@ -1733,6 +1864,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num6
 	column cust_num6
 		dataType: double
 		lineageTag: e6d6a9ca-43ba-4b90-8daa-2237c3d103bd
@@ -1743,6 +1875,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num7
 	column cust_num7
 		dataType: double
 		lineageTag: 28d39190-860c-438b-ab66-9181b90c5eff
@@ -1753,6 +1886,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_bool1
 	column cust_bool1
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1762,6 +1896,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_bool2
 	column cust_bool2
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1771,6 +1906,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Ordinal number based on the position of the step in the sequence
 	column trueai_step_sequence
 		dataType: int64
 		formatString: 0
@@ -1780,6 +1916,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Unique record identifier, based on the ID of the opp in the remote system (such as Salesforce ID) and date
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 7914c411-03dd-4a71-8ac6-9e3b59348131
@@ -1788,6 +1925,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Count
 	column trueai_act_count
 		dataType: int64
 		formatString: 0
@@ -1797,6 +1935,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Duration
 	column trueai_act_dur
 		dataType: double
 		lineageTag: f6face08-bd35-4899-b1b0-400d1e7326d2
@@ -1807,6 +1946,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Activities Engaged Count
 	column trueai_act_eng_count
 		dataType: int64
 		formatString: 0
@@ -1816,6 +1956,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Engaged Duration
 	column trueai_act_eng_dur
 		dataType: double
 		lineageTag: b27ae1b9-dcf3-4ae3-aa2a-d1114a7bff1e
@@ -1826,6 +1967,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column trueai_stage_num.
 	column trueai_stage_num
 		dataType: int64
 		formatString: 0
@@ -1835,6 +1977,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the record is redundant
 	column trueai_can_be_excluded
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1844,6 +1987,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Current probability of win of the opportunity
 	column trueai_current_prob_of_win
 		dataType: double
 		lineageTag: a83f703e-0b45-4cb0-85b9-e96c24ea7d01
@@ -1854,6 +1998,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Boolean flag that indicates whether the opportunity is closed
 	column trueai_is_closed
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1863,6 +2008,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Stage Owner Prep Factor
 	column trueai_owner_prep_factor
 		dataType: double
 		lineageTag: 11b787c2-dc72-4a6a-a47f-de4ddfc71b1d
@@ -1873,6 +2019,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Stage Owner Activity Capture Level
 	column trueai_owner_act_capt_lvl
 		dataType: double
 		lineageTag: 8e2b4033-afbe-4d3c-9c9f-c626065a0af2
@@ -1883,6 +2030,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Stage Owner Activity Capture Level Confidence
 	column trueai_owner_act_capt_lvl_conf
 		dataType: double
 		lineageTag: 9dc4ff5e-3bfb-4ea4-8298-55260ff334be
@@ -1893,6 +2041,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Activities Automated Email Count
 	column trueai_act_type_auto_email_count
 		dataType: int64
 		formatString: 0
@@ -1902,6 +2051,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Automated Email Duration
 	column trueai_act_type_auto_email_dur
 		dataType: double
 		lineageTag: b6aa685e-4fb6-4acb-8b15-bcd081783d05
@@ -1912,6 +2062,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Activities Automated Email Engaged Count
 	column trueai_act_type_auto_email_eng_count
 		dataType: int64
 		formatString: 0
@@ -1921,6 +2072,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Call Count
 	column trueai_act_type_call_count
 		dataType: int64
 		formatString: 0
@@ -1930,6 +2082,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Call Duration
 	column trueai_act_type_call_dur
 		dataType: double
 		lineageTag: 65e500d7-c167-407b-94ad-4522436920a4
@@ -1940,6 +2093,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Activities Call Engaged Count
 	column trueai_act_type_call_eng_count
 		dataType: int64
 		formatString: 0
@@ -1949,6 +2103,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Email Count
 	column trueai_act_type_email_count
 		dataType: int64
 		formatString: 0
@@ -1958,6 +2113,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Email Duration
 	column trueai_act_type_email_dur
 		dataType: double
 		lineageTag: 6508514d-f2d8-4515-a3b9-c7ebe949a71b
@@ -1968,6 +2124,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Activities Email Engaged Count
 	column trueai_act_type_email_eng_count
 		dataType: int64
 		formatString: 0
@@ -1977,6 +2134,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Meeting Count
 	column trueai_act_type_meeting_count
 		dataType: int64
 		formatString: 0
@@ -1986,6 +2144,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Meeting Durationuratin
 	column trueai_act_type_meeting_dur
 		dataType: double
 		lineageTag: 63fb6b62-6271-4f6c-ab69-470e671eeedc
@@ -1996,6 +2155,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Activities Meeting Engaged Count
 	column trueai_act_type_meeting_eng_count
 		dataType: int64
 		formatString: 0
@@ -2005,6 +2165,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Non Determinable Count
 	column trueai_act_type_nd_count
 		dataType: int64
 		formatString: 0
@@ -2014,6 +2175,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Non Determinable Duration
 	column trueai_act_type_nd_dur
 		dataType: double
 		lineageTag: 907ceb27-9e2e-4e04-8416-e80397279002
@@ -2024,6 +2186,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Activities Non Determinable Engaged Count
 	column trueai_act_type_nd_eng_count
 		dataType: int64
 		formatString: 0
@@ -2033,6 +2196,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities No Interaction Count
 	column trueai_act_type_no_interaction_count
 		dataType: int64
 		formatString: 0
@@ -2042,6 +2206,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities No Interaction Duration
 	column trueai_act_type_no_interaction_dur
 		dataType: double
 		lineageTag: 53d03c90-02e1-496e-8045-1001a254b42c
@@ -2052,6 +2217,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Activities No Interaction Engaged Count
 	column trueai_act_type_no_interaction_eng_count
 		dataType: int64
 		formatString: 0
@@ -2061,6 +2227,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Social Count
 	column trueai_act_type_social_count
 		dataType: int64
 		formatString: 0
@@ -2070,6 +2237,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Social Duration
 	column trueai_act_type_social_dur
 		dataType: double
 		lineageTag: 1957ea43-4d9b-4029-b171-1542dd3d214f
@@ -2080,6 +2248,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Activities Social Engaged Count
 	column trueai_act_type_social_eng_count
 		dataType: int64
 		formatString: 0
@@ -2089,6 +2258,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Adj Duration
 	column trueai_act_adj_dur
 		dataType: double
 		lineageTag: 62f8f7cc-4073-443b-8ed9-1392a213a397
@@ -2099,6 +2269,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Activities Adj Engaged Duration
 	column trueai_act_adj_eng_dur
 		dataType: double
 		lineageTag: b966ae9b-84a6-4a7a-b3ba-5d8dad58e75f
@@ -2109,6 +2280,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Activities Adj Duration Rule
 	column trueai_act_adj_dur_rule
 		dataType: int64
 		formatString: 0
@@ -2118,6 +2290,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column trueai_last_eng_act =.
 	column trueai_last_eng_act =
 			
 			var _id = [crm_opp_id]
@@ -2139,6 +2312,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's stage ID in the CRM
 	column crm_stage_id
 		dataType: string
 		lineageTag: 794cd384-506b-463d-a43d-b6b242e374f5
@@ -2147,6 +2321,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's stage ID
 	column trueai_stage_id
 		dataType: string
 		lineageTag: a22456f8-dc7e-448e-ac75-166c5ceddac5
@@ -2155,6 +2330,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's stage name
 	column trueai_stage_name
 		dataType: string
 		lineageTag: 1819dcf2-878d-4ecf-ad48-516fc28898e0
@@ -2163,6 +2339,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Pipeline name of the opportunity
 	column trueai_pipeline_name
 		dataType: string
 		lineageTag: ebdbabfd-ae67-4d27-ac0e-324d87542d91
@@ -2171,6 +2348,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Sortable ID
 	column trueai_sort_id
 		dataType: string
 		lineageTag: b5868077-1537-4949-8e9b-08f991c61b96
@@ -2179,6 +2357,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Success Probability of Opp
 	column trueai_success_prob
 		dataType: double
 		lineageTag: 44d41e39-4a3a-4227-acb5-4ba13109fe17
@@ -2189,6 +2368,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Owner ID of Opp
 	column trueai_owner_id
 		dataType: string
 		lineageTag: 38926ce8-7bd7-42a4-847b-cadfa7f02a6f
@@ -2197,6 +2377,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Days In Stage
 	column trueai_days_in_stage
 		dataType: int64
 		formatString: 0
@@ -2206,6 +2387,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Days Since Opportunity Open
 	column trueai_days_in_opp
 		dataType: int64
 		formatString: 0
@@ -2215,6 +2397,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Days In Stage
 	column trueai_pace_score_days_in_stage
 		dataType: double
 		lineageTag: 7329a950-5c17-4ea0-9167-e971631c43d8
@@ -2225,6 +2408,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Pace Score Days Since Opportunity Open
 	column trueai_pace_score_days_in_opp
 		dataType: double
 		lineageTag: b252ccb5-627f-4ff6-a989-dcdcb2da6d09
@@ -2235,6 +2419,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Pace Score
 	column trueai_pace_score
 		dataType: double
 		lineageTag: 52f2efd6-71a0-4d3b-bf9e-78a00b8fb46c
@@ -2245,6 +2430,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Pace Tier 0-5
 	column trueai_pace_tier
 		dataType: int64
 		formatString: 0
@@ -2254,6 +2440,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Activities Last Engaged
 	column trueai_act_last_eng
 		dataType: dateTime
 		formatString: General Date
@@ -2268,6 +2455,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Initial Close Date of Opp
 	column trueai_init_close_date
 		dataType: dateTime
 		formatString: General Date
@@ -2282,6 +2470,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Average Step Sequence Number Across All Opportunities
 	column trueai_avg_step_sequence
 		dataType: double
 		lineageTag: 3337e4f5-5b5f-46f0-8e61-431dd3cb9932
@@ -2292,6 +2481,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Predicted Booking Amount
 	column trueai_pred_booking_amt
 		dataType: double
 		lineageTag: 90f0aa66-a06f-4b9f-be32-3214df6c30ca
@@ -2302,6 +2492,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Predicted Close Date
 	column trueai_pred_close_date
 		dataType: dateTime
 		formatString: General Date
@@ -2316,6 +2507,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Calibrated Success Probability
 	column trueai_attention_value_success_prob
 		dataType: double
 		lineageTag: 535d8d6c-b8ba-459f-8f5d-38ccc6546908
@@ -2326,6 +2518,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Expected Success Probability
 	column trueai_attention_value_expected_success_prob
 		dataType: double
 		lineageTag: ce98edad-d7c6-419c-9a3f-b6cef978691c
@@ -2336,6 +2529,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Attention Value Score
 	column trueai_attention_value_score
 		dataType: double
 		lineageTag: 043b4fb9-fc99-4d9c-8b4e-cdce1c5ed155
@@ -2346,6 +2540,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Attention Value Text
 	column trueai_attention_value_text
 		dataType: string
 		lineageTag: ec0e3163-e5bd-4104-94f6-1f513d6485f7
@@ -2354,6 +2549,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Difference In Days Between The Opportunity Expected Close Date and The Actual Close Date
 	column trueai_days_pushed_pulled
 		dataType: int64
 		formatString: 0
@@ -2363,6 +2559,7 @@ table open_pipeline
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column opp_is_won = RELATED(opps[trueai_is_won]).
 	column opp_is_won = RELATED(opps[trueai_is_won])
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 47a775ab-0ea4-4d6e-b391-eb712fdbe590

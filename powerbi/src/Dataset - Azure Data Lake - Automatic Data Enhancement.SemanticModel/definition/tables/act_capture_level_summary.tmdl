@@ -1,6 +1,8 @@
+/// Table act_capture_level_summary.
 table act_capture_level_summary
 	lineageTag: b2717458-96a3-4785-97f7-099181ed5d0d
 
+	/// Measure meas.act_capt_act_per_step_avg.
 	measure 'meas.act_capt_act_per_step_avg' = ```
 			
 			var act_count = calculate(Sum(act_capture_level_summary[crm_activity_count]))
@@ -15,6 +17,7 @@ table act_capture_level_summary
 
 		changedProperty = FormatString
 
+	/// Measure meas.act_capt_dur_per_step_avg.
 	measure 'meas.act_capt_dur_per_step_avg' = ```
 			
 			var act_count = calculate(Sum(act_capture_level_summary[total_duration]))
@@ -32,6 +35,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.act_capt_expected_dur_per_step_avg.
 	measure 'meas.act_capt_expected_dur_per_step_avg' = ```
 			
 			var act_count = calculate(Sum(act_capture_level_summary[expected_duration]))
@@ -49,6 +53,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.act_capt_duration.
 	measure 'meas.act_capt_duration' = ```
 			
 			var act_dur = calculate(Sum(act_capture_level_summary[capped_duration]))
@@ -66,6 +71,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.act_capt_expected_duration.
 	measure 'meas.act_capt_expected_duration' = ```
 			
 			var act_dur = calculate(Sum(act_capture_level_summary[expected_duration]))
@@ -83,6 +89,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.act_capture.
 	measure 'meas.act_capture' =
 			
 			divide(SUM(act_capture_level_summary[capped_duration]),SUM(act_capture_level_summary[expected_duration]))
@@ -92,6 +99,7 @@ table act_capture_level_summary
 
 		changedProperty = FormatString
 
+	/// Measure meas.act_capt_duration_weekly_rep_avg.
 	measure 'meas.act_capt_duration_weekly_rep_avg' = ```
 			
 			// way to calculate the avg weekly rep time spent on the current "selection"
@@ -111,6 +119,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.act_capt_expected_duration_weekly_rep_avg.
 	measure 'meas.act_capt_expected_duration_weekly_rep_avg' = ```
 			
 			// way to calculate the avg weekly rep time spent on the current "selection"
@@ -129,6 +138,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.crm_act_capt_score.
 	measure 'meas.crm_act_capt_score' =
 			
 			var crm_capture_level = [meas.act_capture]
@@ -142,6 +152,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
+	/// Measure meas.crm_act_capt_score_industry_avg.
 	measure 'meas.crm_act_capt_score_industry_avg' =
 			//0.48 * 100
 			var _score = CALCULATE(
@@ -155,6 +166,7 @@ table act_capture_level_summary
 		displayFolder: _acl_scores
 		lineageTag: 25caccab-5c62-4871-8096-7c890988147a
 
+	/// Measure meas.trueai_act_capt_score.
 	measure 'meas.trueai_act_capt_score' = ```
 			
 			VAR _before = [meas.crm_act_capt_score]
@@ -190,6 +202,7 @@ table act_capture_level_summary
 
 		changedProperty = FormatString
 
+	/// Measure meas.trueai_act_capt_score_improvement.
 	measure 'meas.trueai_act_capt_score_improvement' =
 			
 			var trueai_score = ROUND([meas.trueai_act_capt_score],2)
@@ -203,6 +216,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.act_capture_adjustment_factor.
 	measure 'meas.act_capture_adjustment_factor' = divide(1, [meas.act_capture])
 		formatString: 0.0
 		displayFolder: _acl_scores
@@ -212,6 +226,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.act_capt_applicable_reps.
 	measure 'meas.act_capt_applicable_reps' = ```
 			
 			/*
@@ -231,9 +246,10 @@ table act_capture_level_summary
 
 		changedProperty = FormatString
 
+	/// Measure meas.act_capt_activity_count.
 	measure 'meas.act_capt_activity_count' = ```
 			
-			var act_count = CALCULATE(SUM(users_history[ci_time_alloc_tot_dur]), cal_end_dates[date] > date(1900,1,1) && cal_end_dates[date] > date(210,1,1) )-- override the standard date filter 
+			var act_count = CALCULATE(SUM(users_history[ci_time_alloc_tot_dur]), 'cal_end_dates'[date] > date(1900,1,1) && 'cal_end_dates'[date] > date(210,1,1) )-- override the standard date filter 
 			var res = act_count
 			return res
 			
@@ -243,6 +259,7 @@ table act_capture_level_summary
 		displayFolder: 0
 		lineageTag: ee680742-49b5-4460-aa06-85524f4fbb59
 
+	/// Measure meas.act_capt_lvl_summary_time_alloc_eng.
 	measure 'meas.act_capt_lvl_summary_time_alloc_eng' =
 			
 			CALCULATE(
@@ -256,6 +273,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.act_capt_lvl_summary_time_alloc_non_eng.
 	measure 'meas.act_capt_lvl_summary_time_alloc_non_eng' =
 			
 			CALCULATE(
@@ -269,6 +287,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.no_activities_count.
 	measure 'meas.no_activities_count' =
 			
 			var _prospect = SUM(users_history[ci_act_capt_lvl_pi_prospecting_owner_act])            // get prospecting act
@@ -282,6 +301,7 @@ table act_capture_level_summary
 		formatString: 0
 		lineageTag: b8ec6df0-1df6-41d1-b949-fcb80cb1af48
 
+	/// Column _sys_docid.
 	column _sys_docid
 		lineageTag: d4dc375b-3742-4a72-8021-282ef1deeb00
 		summarizeBy: none
@@ -290,6 +310,7 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column _sys_user_id.
 	column _sys_user_id
 		lineageTag: 54c10149-472b-49e0-bc98-6eff465482a1
 		summarizeBy: none
@@ -298,6 +319,7 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column _sys_filter_start_date.
 	column _sys_filter_start_date
 		formatString: Short Date
 		lineageTag: f4fe8b25-e5d5-47dd-9cd9-7ea34bb5a612
@@ -309,6 +331,7 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column full_name.
 	column full_name
 		lineageTag: 557fe57f-8f4b-4b3d-a10a-2200331b5872
 		summarizeBy: none
@@ -317,6 +340,7 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column user_role_function.
 	column user_role_function
 		lineageTag: 8d5e3e68-b425-469a-be69-9032ba86a953
 		summarizeBy: none
@@ -325,6 +349,7 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column step_id.
 	column step_id
 		formatString: 0
 		lineageTag: e4586870-7037-40aa-ad9c-55d2b4a8b48c
@@ -334,6 +359,7 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column step_name.
 	column step_name
 		lineageTag: 5205da11-e411-41ad-8982-86db784dcfca
 		summarizeBy: none
@@ -343,6 +369,7 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column crm_activity_count.
 	column crm_activity_count
 		formatString: 0
 		lineageTag: 779a605d-f7de-4267-9b51-953b7963ac23
@@ -352,6 +379,7 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column steps.
 	column steps
 		formatString: 0
 		lineageTag: 1b44c856-3bf4-4003-a0c8-573812a7111d
@@ -361,6 +389,7 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column total_duration.
 	column total_duration
 		formatString: #,0
 		lineageTag: 13f8154c-e727-45e5-b6a4-308dd878c4de
@@ -372,6 +401,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
+	/// Column expected_duration.
 	column expected_duration
 		formatString: #,0
 		lineageTag: f240be9c-14e0-4538-81d6-c41f5da6f591
@@ -382,6 +412,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
+	/// Column capped_duration.
 	column capped_duration
 		formatString: #,0
 		lineageTag: 709aafaa-8f1c-4039-8526-dbda8caf13b8
@@ -393,6 +424,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
+	/// Column raw_ratio.
 	column raw_ratio
 		lineageTag: 5d06fe7f-1533-4847-b8f9-68b8f34e5b82
 		summarizeBy: sum
@@ -403,6 +435,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column capped_ratio.
 	column capped_ratio
 		lineageTag: 096e607b-77c8-4671-9837-43d307a11ba1
 		summarizeBy: sum
@@ -413,6 +446,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column month_to_week_adjustment.
 	column month_to_week_adjustment
 		lineageTag: 299c10e1-f3c2-46af-954b-4d402512e379
 		summarizeBy: sum
@@ -423,6 +457,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column act_capture_level.
 	column act_capture_level
 		lineageTag: 9ce2f361-9ef8-4ca8-bc91-aaa2b6ea15e5
 		summarizeBy: sum
@@ -433,6 +468,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column _sys_filter_end_date.
 	column _sys_filter_end_date
 		formatString: Short Date
 		lineageTag: 7e414115-5480-4760-a588-77f304814187
@@ -449,6 +485,7 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column sort.
 	column sort
 		formatString: 0
 		lineageTag: f74fc398-bff8-47c6-9b04-6bac24951441
@@ -458,6 +495,7 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column time_alloc.
 	column time_alloc
 		lineageTag: 62349f31-2de6-4533-a5fe-a8b055fed5de
 		summarizeBy: sum
@@ -468,6 +506,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_eng.
 	column time_alloc_eng
 		dataType: double
 		lineageTag: a96d2a1e-cf60-492e-b381-989af87fe4f1
@@ -481,6 +520,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_no_eng.
 	column time_alloc_no_eng
 		formatString: #" hrs/week"
 		lineageTag: 2f4c9d9d-c1a8-422d-b5a2-9662b9df32cd
@@ -494,6 +534,7 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Column act_capture_level_conf.
 	column act_capture_level_conf
 		formatString: #,0.00
 		lineageTag: 3b64489a-f816-4d45-978c-462ec32d7b09
@@ -507,7 +548,7 @@ table act_capture_level_summary
 		mode: import
 		source = ```
 				
-				var year = Year(max(cal_end_dates[date]) ) -1 // get the full year prior
+				var year = Year(max('cal_end_dates'[date]) ) -1 // get the full year prior
 				var filter_date =filter(users_history, users_history[_sys_filt_end_date] >= date(year,1,1) && users_history[_sys_filt_end_date] < date(year+1,1,1)  )  // get teh 1 year filter period
 				var filt_prospecting = filter(filter_date,   users_history[ci_act_capt_lvl_pi_prospecting_expect_owner_dur] > 500 ) // get items that prospecting
 				var filt_new_logo = filter(filter_date,   users_history[ci_act_capt_lvl_pi_new_logo_expected_owner_dur] > 500 ) // get items that new_logo

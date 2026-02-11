@@ -1,6 +1,8 @@
+/// Derived entity for monthly snapshots of user-level performance. One row per user per month. Includes User metadata, Deal Intelligence (DI), Coaching Intelligence (CI), and Automatic Data Enhancement (ADE) metrics. Historical depth: 6 years retroactive.
 table users_history
 	lineageTag: d904fbb9-5121-4eb7-966a-bb236f245cbb
 
+	/// Measure meas.data_logs_user_mgr_count_eop.
 	measure 'meas.data_logs_user_mgr_count_eop' = ```
 			
 			
@@ -19,6 +21,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: b37dd8bf-3abb-4c71-b2b1-02d86db3fea8
 
+	/// Measure meas.data_logs_user_new_hires_reached_performer_within_12_months.
 	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months' = ```
 			
 			
@@ -37,6 +40,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: a2dee853-9dbc-44fa-8056-38f45ee80945
 
+	/// Measure meas.data_logs_user_new_terminations.
 	measure 'meas.data_logs_user_new_terminations' = ```
 			
 			
@@ -58,6 +62,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: bde20ead-06ce-47fd-a172-f24a25d9b9c4
 
+	/// Measure meas.data_logs_user_individual_contrib_count_eop.
 	measure 'meas.data_logs_user_individual_contrib_count_eop' = ```
 			
 			[meas.data_logs_user_count_eop_for_all_sales_roles]  - [meas.data_logs_user_count_eop_for_mgr] 
@@ -67,6 +72,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 190042ed-5ba8-4940-b3a0-4223f7d6d03b
 
+	/// Measure meas.data_logs_user_rep_mgr_ratio.
 	measure 'meas.data_logs_user_rep_mgr_ratio' =
 			//divide(users_history[meas.data_logs_user_individual_contrib_count_eop] ,users_history[meas.data_logs_user_count_eop_for_mgr])
 			
@@ -90,6 +96,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.data_logs_user_count_eop.
 	measure 'meas.data_logs_user_count_eop' = ```
 			
 			
@@ -108,6 +115,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 0d53230b-70a9-4c33-923e-97f01c07267f
 
+	/// Measure meas.data_logs_user_new_terminations_within_12_months.
 	measure 'meas.data_logs_user_new_terminations_within_12_months' = ```
 			
 			
@@ -124,6 +132,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: 1b315d56-3418-4f57-83da-95dd0f39299c
 
+	/// Measure meas.data_logs_ci_perf_tier_count.
 	measure 'meas.data_logs_ci_perf_tier_count' = ```
 			
 			var month_instances = CALCULATE(COUNT(users_history[col.ci.perf_qtly_performance_tier]))  // how many months in this perf cat
@@ -137,6 +146,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: c8771d48-9a93-446a-b576-b1cae3318ddc
 
+	/// Measure meas.data_logs_user_net_new_users.
 	measure 'meas.data_logs_user_net_new_users' = ```
 			[meas.data_logs_user_new_hires] + [meas.data_logs_user_new_terminations] 
 			```
@@ -144,6 +154,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 1103f6b8-a2c1-47f7-82b8-8f911720ebe9
 
+	/// Measure meas.data_logs_ci_perf_annual_avg_bookings.
 	measure 'meas.data_logs_ci_perf_annual_avg_bookings' = ```
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -158,6 +169,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":""}
 
+	/// Measure meas.data_logs_user_count_bop.
 	measure 'meas.data_logs_user_count_bop' = ```
 			
 			
@@ -176,6 +188,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 23c2187f-b803-4f66-a9bb-b218861c778f
 
+	/// Measure meas.data_logs_user_count_change.
 	measure 'meas.data_logs_user_count_change' = divide([meas.data_logs_user_new_hires] , [meas.data_logs_user_count_bop], BLANK())
 		formatString: +#,##0%;-#,##0%
 		displayFolder: _rep_count_analysis
@@ -183,6 +196,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.data_logs_user_new_hires.
 	measure 'meas.data_logs_user_new_hires' = ```
 			
 			
@@ -199,6 +213,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 71c8d155-d6fc-42de-b47d-f7c9060e54a1
 
+	/// Measure meas.data_logs_user_new_terminations_within_12_months_avg_tenure.
 	measure 'meas.data_logs_user_new_terminations_within_12_months_avg_tenure' = ```
 			
 			
@@ -216,6 +231,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: 75d0f25d-3377-4efe-b39e-2e5fcc6393ab
 
+	/// Measure meas.data_logs_user_new_hires_reached_performer_success_rate.
 	measure 'meas.data_logs_user_new_hires_reached_performer_success_rate' = ```
 			
 			var tot_new_hires  = [meas.data_logs_user_new_hires]
@@ -238,11 +254,13 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: c9422a55-f07e-46d0-8b7d-e7073208b629
 
+	/// Measure meas.data_logs_user_new_terminations_within_12_months_failure_rate.
 	measure 'meas.data_logs_user_new_terminations_within_12_months_failure_rate' = divide( -1 * [meas.data_logs_user_new_terminations_within_12_months],  [meas.data_logs_user_new_hires] , BLANK())
 		formatString: #,0%;-#,0%;#,0%
 		displayFolder: _ramp_analysis
 		lineageTag: 29a4c52e-0ac6-4eb5-8258-ac1cac98ccae
 
+	/// Measure meas.data_logs_user_new_hires_reached_performer_within_12_months_avg_tenure.
 	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months_avg_tenure' = ```
 			
 			VAR fromDate = [meas.context_date_min]
@@ -272,6 +290,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.data_logs_ci_perf_annual_avg_pipeline_created.
 	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created' = ```
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -288,6 +307,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.users_history_ramping_reps_count_eop.
 	measure 'meas.users_history_ramping_reps_count_eop' = ```
 			
 			
@@ -307,11 +327,13 @@ table users_history
 		displayFolder: _skills_analysis
 		lineageTag: 443a145f-8199-4a8d-bba8-a3b1556b6100
 
+	/// Measure meas.user_history_period_count.
 	measure 'meas.user_history_period_count' = CALCULATE(DISTINCTCOUNT(users_history[_sys_filt_start_date]))
 		formatString: #,0
 		displayFolder: _helper
 		lineageTag: a95dbb11-f9e5-4d93-950a-5d9a776941b0
 
+	/// Measure meas.users_history_vi_value_received_all_prior_time.
 	measure 'meas.users_history_vi_value_received_all_prior_time' =
 			
 			var max_date = CALCULATE(max(cal_end_dates[Date]))
@@ -326,6 +348,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.user_history_user_new_hires_reached_perf_in_12_month.
 	measure 'meas.user_history_user_new_hires_reached_perf_in_12_month' = ```
 			
 			
@@ -344,6 +367,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: d7c2bfef-6936-47f3-b6c3-3453a31b2971
 
+	/// Measure meas.user_history_user_new_hires_didnt_reach_perf_in_12_month.
 	measure 'meas.user_history_user_new_hires_didnt_reach_perf_in_12_month' = ```
 			
 			
@@ -362,6 +386,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: cbad2d08-9be8-4635-a80e-1fb33bbc5488
 
+	/// Measure meas.user_history_user_new_hires_terminated_in_12_month.
 	measure 'meas.user_history_user_new_hires_terminated_in_12_month' = ```
 			
 			
@@ -378,6 +403,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: 1aea2f21-f4e1-4f4d-bc08-8849f865a4c8
 
+	/// Measure meas.users_history_ci_perf_avg_attainment.
 	measure 'meas.users_history_ci_perf_avg_attainment' =
 			
 			
@@ -391,6 +417,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.data_logs_user_count_eop_for_ae.
 	measure 'meas.data_logs_user_count_eop_for_ae' = ```
 			
 			CALCULATE(
@@ -410,6 +437,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.data_logs_user_count_eop_for_am.
 	measure 'meas.data_logs_user_count_eop_for_am' = ```
 			
 			CALCULATE(
@@ -429,6 +457,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.data_logs_user_count_eop_for_sdr.
 	measure 'meas.data_logs_user_count_eop_for_sdr' = ```
 			
 			CALCULATE(
@@ -448,6 +477,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.data_logs_user_count_eop_for_all_sales_roles.
 	measure 'meas.data_logs_user_count_eop_for_all_sales_roles' = ```
 			
 			CALCULATE(
@@ -467,6 +497,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.data_logs_user_count_eop_for_mgr.
 	measure 'meas.data_logs_user_count_eop_for_mgr' = ```
 			
 			CALCULATE(
@@ -478,6 +509,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 85f4c5b8-e1fe-4183-b591-4ef4151f7ee6
 
+	/// Measure meas.data_logs_user_count_eop_for_other.
 	measure 'meas.data_logs_user_count_eop_for_other' =
 			
 			CALCULATE(
@@ -488,6 +520,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 264b9cb9-f0ce-4764-8abe-39c27f7e8175
 
+	/// Measure meas.data_logs_user_count_eop_for_dept_mkt.
 	measure 'meas.data_logs_user_count_eop_for_dept_mkt' =
 			
 			CALCULATE(
@@ -506,6 +539,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.data_logs_user_count_eop_for_dept_sales.
 	measure 'meas.data_logs_user_count_eop_for_dept_sales' =
 			
 			CALCULATE(
@@ -524,6 +558,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.data_logs_user_count_eop_for_dept_other.
 	measure 'meas.data_logs_user_count_eop_for_dept_other' =
 			
 			CALCULATE(
@@ -542,6 +577,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.data_logs_user_count_change_perc.
 	measure 'meas.data_logs_user_count_change_perc' =
 			
 			VAR __BASELINE_VALUE = [meas.data_logs_user_count_bop]
@@ -560,6 +596,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.data_logs_user_count_eop_for_nd.
 	measure 'meas.data_logs_user_count_eop_for_nd' =
 			
 			CALCULATE(
@@ -571,6 +608,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 7bcb8763-96e0-4db1-b039-349dbd1c0eec
 
+	/// Measure meas.reps_w_actlvl_pct.
 	measure 'meas.reps_w_actlvl_pct' = ```
 			
 			var reps_w_acl = [meas.reps_w_actlvl_count]
@@ -587,6 +625,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.reps_w_actlvl_count.
 	measure 'meas.reps_w_actlvl_count' =
 			
 			CALCULATE(DISTINCTCOUNT([_sys_user_id]), (users_history[ci_act_capt_lvl] > 0)
@@ -595,6 +634,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: cb1894d2-ba0e-4792-8b22-f9f580f4b5e6
 
+	/// Measure meas.reps_w_time_allocation_pct.
 	measure 'meas.reps_w_time_allocation_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_count]
@@ -614,6 +654,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.reps_w_time_allocation_count.
 	measure 'meas.reps_w_time_allocation_count' = ```
 			
 			
@@ -632,10 +673,12 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 390d2dd9-6f68-455a-a819-a36c90a9703c
 
+	/// Measure meas.users_history_row_filler.
 	measure 'meas.users_history_row_filler' = ""
 		displayFolder: _filler
 		lineageTag: 6ddcb848-f676-401c-a8b8-ee85f6065845
 
+	/// Measure meas.sys.user_id_for_am.
 	measure 'meas.sys.user_id_for_am' =
 			
 			CALCULATE(
@@ -652,6 +695,7 @@ table users_history
 				  "version": 0
 				}
 
+	/// Measure meas.di.trueai_opps_won_amt_am_avg.
 	measure 'meas.di.trueai_opps_won_amt_am_avg' =
 			
 			DIVIDE(
@@ -670,6 +714,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.sys.user_id_for_ae.
 	measure 'meas.sys.user_id_for_ae' =
 			
 			CALCULATE(
@@ -680,6 +725,7 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 443717c6-2617-4712-9ee1-236180210cdb
 
+	/// Measure meas.sys.user_id_for_sdr.
 	measure 'meas.sys.user_id_for_sdr' =
 			
 			CALCULATE(
@@ -690,6 +736,7 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: b95fcde4-0bcd-4deb-8ac0-ef02a18103d6
 
+	/// Measure meas.sys.user_id_for_nd.
 	measure 'meas.sys.user_id_for_nd' =
 			
 			CALCULATE(
@@ -700,6 +747,7 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 60ef9f77-bd16-4f97-a5b9-a3d8fd5f0927
 
+	/// Measure meas.sys.user_id_for_other.
 	measure 'meas.sys.user_id_for_other' =
 			
 			CALCULATE(
@@ -710,6 +758,7 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: a67bea40-cc9d-4b93-b763-4082390316e3
 
+	/// Measure meas.di.trueai_opps_won_amt_ae_avg.
 	measure 'meas.di.trueai_opps_won_amt_ae_avg' =
 			
 			DIVIDE(
@@ -722,6 +771,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.di.trueai_opps_won_amt_sdr_avg.
 	measure 'meas.di.trueai_opps_won_amt_sdr_avg' =
 			
 			DIVIDE(
@@ -734,6 +784,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.di.trueai_opps_won_amt_nd_avg.
 	measure 'meas.di.trueai_opps_won_amt_nd_avg' =
 			
 			DIVIDE(
@@ -745,6 +796,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.di.trueai_opps_won_amt_mgr_avg.
 	measure 'meas.di.trueai_opps_won_amt_mgr_avg' =
 			
 			DIVIDE(
@@ -756,6 +808,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.sys.user_id_for_mgr.
 	measure 'meas.sys.user_id_for_mgr' =
 			
 			CALCULATE(
@@ -766,6 +819,7 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 8421e203-c9d1-468b-affe-165f59ada1ae
 
+	/// Measure meas.di.trueai_opps_won_amt_other_avg.
 	measure 'meas.di.trueai_opps_won_amt_other_avg' =
 			
 			DIVIDE(
@@ -857,6 +911,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: be269a0b-7718-4e82-ac59-c6b6bda76360
 
+	/// Measure meas.user_history_count_dept_sales.
 	measure 'meas.user_history_count_dept_sales' =
 			
 			CALCULATE(
@@ -939,6 +994,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 32655af9-d185-476f-9a78-27fbb9ffbcb5
 
+	/// Measure meas.data_logs_user_count_eop_for_dept_support.
 	measure 'meas.data_logs_user_count_eop_for_dept_support' =
 			
 			CALCULATE(
@@ -949,6 +1005,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 1e6d0ed8-aaae-4efe-b4d3-51a8c8c2b16c
 
+	/// Measure meas.data_logs_user_count_eop_for_dept_ops.
 	measure 'meas.data_logs_user_count_eop_for_dept_ops' =
 			
 			CALCULATE(
@@ -959,6 +1016,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: e9b2eb17-1691-4b12-825c-1f151ac84361
 
+	/// Measure meas.data_logs_user_count_eop_for_dept_nd.
 	measure 'meas.data_logs_user_count_eop_for_dept_nd' =
 			
 			CALCULATE(
@@ -969,6 +1027,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: b7c20247-953b-46d0-b3ca-169b075bde67
 
+	/// Measure meas.data_logs_won_amt_user_eop_avg.
 	measure 'meas.data_logs_won_amt_user_eop_avg' =
 			
 			DIVIDE(
@@ -987,6 +1046,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.data_logs_pipeline_amt_user_eop_avg.
 	measure 'meas.data_logs_pipeline_amt_user_eop_avg' =
 			
 			DIVIDE(
@@ -1000,6 +1060,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.data_logs_won_amt_user_eop_avg_for_new_logo_selling.
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_logo_selling' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1022,6 +1083,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.data_logs_won_amt_user_eop_avg_for_existing_acv.
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_acv' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1037,6 +1099,7 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.data_logs_won_amt_user_eop_avg_for_new_acv.
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_acv' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1060,6 +1123,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.user_history_user_new_hires_terminated_in_12_month_pos.
 	measure 'meas.user_history_user_new_hires_terminated_in_12_month_pos' = ```
 			
 			
@@ -1076,6 +1140,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: 640150f5-397a-4029-bd36-e53852d020d0
 
+	/// Measure meas.data_logs_won_amt_user_eop_avg_for_existing_customer_selling.
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_customer_selling' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1090,62 +1155,77 @@ table users_history
 
 		changedProperty = FormatString
 
+	/// Measure meas.users_history_row_filler2.
 	measure 'meas.users_history_row_filler2' = ""
 		displayFolder: _filler
 		lineageTag: edeb15e2-b186-459d-8646-a21595bab838
 
+	/// Measure meas.users_history_row_filler3.
 	measure 'meas.users_history_row_filler3' = ""
 		displayFolder: _filler
 		lineageTag: fb5ce7e1-3b57-4caa-b47c-75f38cf431ca
 
+	/// Measure meas.users_history_row_filler4.
 	measure 'meas.users_history_row_filler4' = ""
 		displayFolder: _filler
 		lineageTag: 8980361f-9d0f-4b4f-a5b9-adfe40234d48
 
+	/// Measure meas.users_history_row_filler5.
 	measure 'meas.users_history_row_filler5' = ""
 		displayFolder: _filler
 		lineageTag: c1e1b654-df56-4f96-a7f2-b175c3e859ef
 
+	/// Measure meas.users_history_row_filler6.
 	measure 'meas.users_history_row_filler6' = ""
 		displayFolder: _filler
 		lineageTag: 2f5a5d5a-b880-4048-a7c5-e5d12008ee28
 
+	/// Measure meas.users_history_row_filler7.
 	measure 'meas.users_history_row_filler7' = ""
 		displayFolder: _filler
 		lineageTag: 3e1bb5f9-21ff-4763-b675-e056bebbc144
 
+	/// Measure meas.users_history_row_filler8.
 	measure 'meas.users_history_row_filler8' = ""
 		displayFolder: _filler
 		lineageTag: 7aa1bc6d-19ee-4f88-8447-c4ebd53bf512
 
+	/// Measure meas.users_history_row_filler9.
 	measure 'meas.users_history_row_filler9' = ""
 		displayFolder: _filler
 		lineageTag: 969c4058-2234-4575-ba9f-0cc3d76a47ce
 
+	/// Measure meas.users_history_row_filler10.
 	measure 'meas.users_history_row_filler10' = ""
 		displayFolder: _filler
 		lineageTag: f362c584-a411-4e49-bbf6-31cb18a66a80
 
+	/// Measure meas.users_history_row_filler11.
 	measure 'meas.users_history_row_filler11' = ""
 		displayFolder: _filler
 		lineageTag: a6884327-0fed-4df0-8827-faaeeda5986f
 
+	/// Measure meas.users_history_row_filler12.
 	measure 'meas.users_history_row_filler12' = ""
 		displayFolder: _filler
 		lineageTag: 13189c9e-d0d2-42cd-a41c-e2969b8dab74
 
+	/// Measure meas.users_history_row_filler13.
 	measure 'meas.users_history_row_filler13' = ""
 		displayFolder: _filler
 		lineageTag: 68cc992c-591e-4f1f-9386-89571ceb05af
 
+	/// Measure meas.users_history_row_filler14.
 	measure 'meas.users_history_row_filler14' = ""
 		displayFolder: _filler
 		lineageTag: 272625e7-1621-4db5-a38a-56e0f218088a
 
+	/// Measure meas.users_history_row_filler15.
 	measure 'meas.users_history_row_filler15' = ""
 		displayFolder: _filler
 		lineageTag: bce5d1d3-b76b-4858-862e-46f081a4d53b
 
+	/// Measure meas.data_logs_user_turnover_pct.
 	measure 'meas.data_logs_user_turnover_pct' =
 			
 			var res =DIVIDE(
@@ -1168,6 +1248,7 @@ table users_history
 				  "version": 0
 				}
 
+	/// Measure meas.time_allocation_total_not_eng.
 	measure 'meas.time_allocation_total_not_eng' =
 			
 			AVERAGE('users_history'[ci_time_alloc_tot]) - AVERAGE('users_history'[ci_time_alloc_tot_eng])
@@ -1184,6 +1265,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.users_history_ta_potential_vs_actual.
 	measure 'meas.users_history_ta_potential_vs_actual' = ```
 			
 			var uh_filt_tbl = CALCULATETABLE(users_history, users_history[ci_time_alloc_tot] <> blank())
@@ -1196,6 +1278,7 @@ table users_history
 		displayFolder: _ta_analysis
 		lineageTag: dd9b7816-b83c-4d60-bfb1-f374cc0531f5
 
+	/// Measure meas.data_logs_user_turnover_pct_regrettable.
 	measure 'meas.data_logs_user_turnover_pct_regrettable' =
 			
 			
@@ -1211,6 +1294,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 36204f55-92aa-45d3-846e-38ef4694b4bb
 
+	/// Measure meas.data_logs_user_new_terminations_regrettable.
 	measure 'meas.data_logs_user_new_terminations_regrettable' = ```
 			
 			var tbl_perf_users = SUMMARIZE(users_history , users_history[_sys_user_id], "months", Count(users_history[_sys_doc_id]), "avg_perf_tier_num", AVERAGE(users_history[ci_perf_qtly_performance_tier_num])+ 0)
@@ -1225,6 +1309,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 64a5d1ae-0403-49d9-b03e-a8ef509b3d19
 
+	/// Measure meas.users_history_user_role_function_concat_w_count_eop.
 	measure 'meas.users_history_user_role_function_concat_w_count_eop' = ```
 			
 			
@@ -1250,6 +1335,7 @@ table users_history
 			```
 		lineageTag: d413b1b6-88bb-4362-ba1f-b09ba6abc6ae
 
+	/// Measure meas.exp_rpts_all_avg_perf_tier.
 	measure 'meas.exp_rpts_all_avg_perf_tier' = ```
 			
 			 var calc = CALCULATE(AVERAGE(users_history[ci_perf_qtly_performance_tier_num]))
@@ -1260,30 +1346,36 @@ table users_history
 		displayFolder: _export_rpts
 		lineageTag: ae176c1b-1966-4b3d-bbf0-fa4cbe7fc464
 
+	/// Measure meas.exp_rpts_last_year_avg_perf_tier.
 	measure 'meas.exp_rpts_last_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "LAST_YEAR")
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: 4cab50c1-511d-439f-89d3-669c0173ffcc
 
+	/// Measure meas.exp_rpts_prior_to_last_year_avg_perf_tier.
 	measure 'meas.exp_rpts_prior_to_last_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "PRIOR_TO_LAST_YEAR")
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: c7aef491-020f-4a36-abf4-ec5b554a1bfa
 
+	/// Measure meas.exp_rpts_current_year_avg_perf_tier.
 	measure 'meas.exp_rpts_current_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "CURRENT_YEAR")
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: db51bd07-3023-4d79-b5df-64359d2834ba
 
+	/// Measure meas.data_logs_user_count_all.
 	measure 'meas.data_logs_user_count_all' = [meas.data_logs_user_count_eop_for_dept_mkt]+[meas.data_logs_user_count_eop_for_dept_nd]+[meas.data_logs_user_count_eop_for_dept_ops]+[meas.data_logs_user_count_eop_for_dept_other]+[meas.data_logs_user_count_eop_for_dept_sales]+[meas.data_logs_user_count_eop_for_dept_support]
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: bd7a4307-ed50-4555-bd87-089699d608ba
 
+	/// Measure meas.calibration_user_role_title.
 	measure 'meas.calibration_user_role_title' = "User Roles - " & [meas.prior_year] & " Full Calendar Year"
 		displayFolder: _rep_count_analysis
 		lineageTag: b46bd447-2ddc-4adc-a282-c0bd8c15171d
 
+	/// Measure meas.data_logs_ci_perf_annual_avg_bookings_account_executive.
 	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_executive' = ```
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -1298,6 +1390,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.data_logs_ci_perf_annual_avg_bookings_account_manager.
 	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_manager' = ```
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -1312,6 +1405,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.data_logs_ci_perf_annual_avg_pipeline_created_sdr.
 	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created_sdr' =
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -1324,18 +1418,22 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.perf_consider_mrasure.
 	measure 'meas.perf_consider_mrasure' = "To be considered a Performer, a rep needs to fall within +/- 35% of AAB / AAPC"
 		displayFolder: _perf_analysis
 		lineageTag: e36df813-494b-4999-a2d5-0c02c594db11
 
+	/// Measure meas.calibration_department_title.
 	measure 'meas.calibration_department_title' = "Department - " & [meas.prior_year] & " Full Calendar Year"
 		displayFolder: _rep_count_analysis
 		lineageTag: 6f133e82-cd13-456d-ba5f-2bb46c770268
 
+	/// Measure meas.calibration_group_title.
 	measure 'meas.calibration_group_title' = "Group - " & [meas.prior_year] & " Full Calendar Year"
 		displayFolder: _rep_count_analysis
 		lineageTag: f1b13f39-437e-469b-977e-2ef145c2c495
 
+	/// Measure meas.data_logs_ci_perf_status.
 	measure 'meas.data_logs_ci_perf_status' = ```
 			
 			
@@ -1363,6 +1461,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: a97b7deb-0320-4928-9344-62e8b0ac287e
 
+	/// Measure meas.data_logs_user_12_Mos_ci_perf_status.
 	measure 'meas.data_logs_user_12_Mos_ci_perf_status' = ```
 			
 			
@@ -1404,6 +1503,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: 7866caef-955b-4d57-9415-64d9df49695c
 
+	/// Measure meas.data_logs_user_count_rep_eop.
 	measure 'meas.data_logs_user_count_rep_eop' = ```
 			
 			
@@ -1425,10 +1525,12 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: aa4e48f7-647a-4d50-ae41-06df2fbef33f
 
+	/// Measure meas.ramping_reps_details_title.
 	measure 'meas.ramping_reps_details_title' = "Ramping Reps -   " & [meas.step_owner_user_role_aliased]
 		displayFolder: _ramp_analysis
 		lineageTag: 2ab3c61d-7f9a-43c9-9555-deafb52b42f8
 
+	/// Measure meas.reps_w_time_allocation_prospecting_count.
 	measure 'meas.reps_w_time_allocation_prospecting_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_prospecting])>0)
@@ -1436,6 +1538,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: b9a4709c-76f5-444a-93e1-043c6fba0ff5
 
+	/// Measure meas.reps_w_time_allocation_prospecting_pct.
 	measure 'meas.reps_w_time_allocation_prospecting_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_prospecting_count]
@@ -1447,6 +1550,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 95eb85ee-1b16-496a-b04a-aa3042687603
 
+	/// Measure meas.reps_w_time_allocation_new_logo_count.
 	measure 'meas.reps_w_time_allocation_new_logo_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_new_logo])>0)
@@ -1454,6 +1558,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: dff9104a-517d-4d51-b63b-64e65bacf531
 
+	/// Measure meas.reps_w_time_allocation_new_logo_pct.
 	measure 'meas.reps_w_time_allocation_new_logo_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_new_logo_count]
@@ -1465,6 +1570,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 59a3a1e0-40af-42fd-8513-123844687a12
 
+	/// Measure meas.reps_w_time_allocation_prospect_pct.
 	measure 'meas.reps_w_time_allocation_prospect_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_count]
@@ -1476,6 +1582,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: c95cc6f4-094d-425d-8174-a1e11580c6ff
 
+	/// Measure meas.reps_all_time_allocation_count.
 	measure 'meas.reps_all_time_allocation_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]))
@@ -1483,6 +1590,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: aa4c3717-11a2-45fc-b083-3d1126f1fc90
 
+	/// Measure meas.data_logs_user_rep_mgr_ratio_updated.
 	measure 'meas.data_logs_user_rep_mgr_ratio_updated' =
 			
 			VAR _total_role = CALCULATE(
@@ -1501,6 +1609,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 12898c88-6b57-432c-b8f8-c7a8c8bbb2c4
 
+	/// Measure meas.data_logs_users_tenure.
 	measure 'meas.data_logs_users_tenure' = ```
 			
 			-- get the dates
@@ -1526,6 +1635,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.data_logs_users_ramping_status.
 	measure 'meas.data_logs_users_ramping_status' = ```
 			
 			-- get the dates
@@ -1548,6 +1658,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: a73a5ff6-d27e-40cf-b459-57c7e93a4a0e
 
+	/// Measure meas.users_history_ci_time_alloca_avg_existing_cust_selling.
 	measure 'meas.users_history_ci_time_alloca_avg_existing_cust_selling' =
 			
 			CALCULATE(
@@ -1560,6 +1671,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.users_history_time_allocation_confidence.
 	measure 'meas.users_history_time_allocation_confidence' =
 			
 			var avg_value = AVERAGE(users_history[ci_time_alloc_conf])    // get the avg of ci time allocation confidence
@@ -1570,6 +1682,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.users_history_time_allocation_confidence_status.
 	measure 'meas.users_history_time_allocation_confidence_status' = ```
 			
 			
@@ -1603,6 +1716,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: ebe06221-1ce3-4e18-9db4-d9701923fee8
 
+	/// Measure meas.time_allocation_confidence.
 	measure 'meas.time_allocation_confidence' = ```
 			
 			
@@ -1635,22 +1749,27 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 30522698-ba19-4d59-a3c0-a10e54a3a4ae
 
+	/// Measure meas.peek_inside_text_supports_aab.
 	measure 'meas.peek_inside_text_supports_aab' = "AAB"
 		displayFolder: _helper
 		lineageTag: 43c5b6e1-ce31-496d-8af8-614ac968bdde
 
+	/// Measure meas.peek_inside_text_supports_aapc.
 	measure 'meas.peek_inside_text_supports_aapc' = "AAPC"
 		displayFolder: _helper
 		lineageTag: 22918bb7-2e2d-4dfd-98b3-17eb6b7a6c9b
 
+	/// Measure meas.peek_inside_text_supports_ramping_time.
 	measure 'meas.peek_inside_text_supports_ramping_time' = "Ramping Time"
 		displayFolder: _helper
 		lineageTag: ffd6401d-0cfb-4cf4-bcb1-a7739b744def
 
+	/// Measure meas.peek_inside_text_supports_trueai_reference_date.
 	measure 'meas.peek_inside_text_supports_trueai_reference_date' = "TrueAI Reference Date"
 		displayFolder: _helper
 		lineageTag: 2bda97e6-525d-43bf-9132-5dac7a60b10b
 
+	/// Measure meas.users_history_r2_bg_color.
 	measure 'meas.users_history_r2_bg_color' = ```
 			
 			var pros_r2 = [meas.quality_bucket__prospecting_r2]
@@ -1698,6 +1817,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: b9a6f5fd-0e8e-4a17-99f6-68bb6955b805
 
+	/// Measure meas.users_history_auc_bg_color.
 	measure 'meas.users_history_auc_bg_color' = ```
 			
 			var pros_auc = [meas.quality_bucket_prospecting_auc]
@@ -1745,6 +1865,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: ebc1dec3-4c25-49a1-b757-cc84b583ae72
 
+	/// Measure meas.users_history_avg_act_capt_lvl.
 	measure 'meas.users_history_avg_act_capt_lvl' = ```
 			
 			 var _min_date = [meas.context_date_min]        // get the context min date
@@ -1770,6 +1891,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.users_history_ci_time_alloca_avg_prospecting.
 	measure 'meas.users_history_ci_time_alloca_avg_prospecting' =
 			
 			CALCULATE(
@@ -1781,6 +1903,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: 363287f9-8e11-4afb-a36a-636b9f8eb0c9
 
+	/// Measure meas.users_history_ci_time_alloca_avg_new_logo_selling.
 	measure 'meas.users_history_ci_time_alloca_avg_new_logo_selling' =
 			
 			CALCULATE(
@@ -1793,6 +1916,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.users_history_ci_time_alloca_avg_post_sales_support.
 	measure 'meas.users_history_ci_time_alloca_avg_post_sales_support' =
 			
 			CALCULATE(
@@ -1805,6 +1929,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.users_history_ci_time_alloca_avg_internel.
 	measure 'meas.users_history_ci_time_alloca_avg_internel' =
 			
 			CALCULATE(
@@ -1817,6 +1942,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.reps_without_act_lvl_count.
 	measure 'meas.reps_without_act_lvl_count' =
 			
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]), users_history[ci_act_capt_lvl]=BLANK())
@@ -1826,6 +1952,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 823b6167-9d31-4002-92a5-8ef055257123
 
+	/// Measure meas.reps_without_act_lvl_pct.
 	measure 'meas.reps_without_act_lvl_pct' =
 			
 			var reps_w_acl = [meas.reps_without_act_lvl_count]
@@ -1837,6 +1964,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: b4f7597e-76a9-497e-9c04-10bad1c384ba
 
+	/// Measure meas.reps_has_ci_act_capt_lvl.
 	measure 'meas.reps_has_ci_act_capt_lvl' =
 			
 			
@@ -1851,6 +1979,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: f7c7a23d-abf3-4d19-83f8-b9268e8cd6cb
 
+	/// Measure meas.ci_act_capt_lvl_pi_owner_act.
 	measure 'meas.ci_act_capt_lvl_pi_owner_act' =
 			
 			var _prospect_count = SUM(users_history[ci_act_capt_lvl_pi_prospecting_owner_act])
@@ -1863,6 +1992,7 @@ table users_history
 		formatString: 0
 		lineageTag: a9dc1dca-80f1-4459-bf59-70b7dc8b07fe
 
+	/// Measure meas.underperformer_annual_avg.
 	measure 'meas.underperformer_annual_avg' =
 			
 			CALCULATE(
@@ -1875,6 +2005,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.performer_annual_avg.
 	measure 'meas.performer_annual_avg' =
 			
 			CALCULATE(
@@ -1887,6 +2018,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.overperformer_annual_avg.
 	measure 'meas.overperformer_annual_avg' =
 			
 			CALCULATE(
@@ -1899,6 +2031,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.min_user_role_alias.
 	measure 'meas.min_user_role_alias' =
 			
 			MINX(
@@ -1909,6 +2042,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column 'col.ci.perf_qtly_bookings_user' = ```.
 	column 'col.ci.perf_qtly_bookings_user' = ```
 			
 			
@@ -1926,6 +2060,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":""}
 
+	/// Column 'col.ci.perf_qtly_performance_tier' = ```.
 	column 'col.ci.perf_qtly_performance_tier' = ```
 			
 			
@@ -1939,6 +2074,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.user.user_role_dept' = ```.
 	column 'col.user.user_role_dept' = ```
 			
 			users_history[trueai_user_role_department]
@@ -1951,6 +2087,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.user.user_role_function' = ```.
 	column 'col.user.user_role_function' = ```
 			
 			 var res = users_history[trueai_user_role_function]
@@ -1961,6 +2098,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.ci.perf_ramping_status' = ```.
 	column 'col.ci.perf_ramping_status' = ```
 			
 			
@@ -1975,6 +2113,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.perf_date_first_reached' =.
 	column 'col.perf_date_first_reached' =
 			
 			var perf_date = related(users[trueai_performance_lvl_reached_on])
@@ -1991,6 +2130,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.ci.perf_qtly_pipeline_user' =.
 	column 'col.ci.perf_qtly_pipeline_user' =
 			
 			
@@ -2005,6 +2145,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column 'col.ci.perf_qtly_avg_pipeline_peers' = ```.
 	column 'col.ci.perf_qtly_avg_pipeline_peers' = ```
 			
 			
@@ -2021,6 +2162,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":""}
 
+	/// The ID of the document in the remote system (such as Salesforce ID)
 	column _sys_user_id
 		dataType: string
 		lineageTag: e2a62a55-5407-4e09-9f6d-dea84a660ff7
@@ -2029,6 +2171,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Average quarterly sum of the booking amounts of opportunities won by the user's peers in the period
 	column ci_perf_qtly_avg_bookings_peers
 		dataType: double
 		lineageTag: d43b5694-6d16-4043-929b-38a8b6196a44
@@ -2041,6 +2184,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average quarterly sum of the booking amounts of opportunities created by the user's peers in the period
 	column ci_perf_qtly_avg_pipeline_peers
 		dataType: double
 		lineageTag: 991fdb28-f0aa-48be-8a35-bda196ae993e
@@ -2051,6 +2195,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Quarterly sum of the booking amounts of opportunities won by the user in the period
 	column ci_perf_qtly_bookings_user
 		dataType: double
 		lineageTag: f1ce53e8-d098-44b8-b33e-73013b1b09e9
@@ -2063,6 +2208,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Quarterly sum of the booking amounts of opportunities created by the user in the period
 	column ci_perf_qtly_pipeline_user
 		dataType: double
 		lineageTag: c2ef63cf-580b-4168-9a73-6a3c93728058
@@ -2073,6 +2219,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// User's ramping status indicating whether the user's tenure is lower than 6 months
 	column ci_perf_ramping_status
 		dataType: string
 		lineageTag: 41b034b9-3dc1-46a2-a478-c5c220bf32d9
@@ -2081,6 +2228,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The Cien company ID
 	column _sys_co_id
 		dataType: string
 		lineageTag: da4b2557-1856-4ba0-81c3-058822903a05
@@ -2089,6 +2237,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID) and date
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 32589dc0-ac64-4e4e-b519-ef87934ea2f0
@@ -2097,6 +2246,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The last date of the month that the record applies to (for past months) or the last date of aggregated data (for the present month), stripped of time
 	column _sys_filt_end_date
 		dataType: dateTime
 		formatString: Short Date
@@ -2110,6 +2260,7 @@ table users_history
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// The first date of the month that the records applies to, stripped of time
 	column _sys_filt_start_date
 		dataType: dateTime
 		formatString: Short Date
@@ -2128,6 +2279,7 @@ table users_history
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// User's act_capture_level score in the period
 	column ci_act_capt_lvl
 		dataType: double
 		lineageTag: cedecab7-6c3f-48d3-9a76-031c73d3fb54
@@ -2138,6 +2290,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// User's act_capture_level score confidence in the period
 	column ci_act_capt_lvl_conf
 		dataType: double
 		lineageTag: 53283eb6-1379-4e75-9be7-51e8b28af86c
@@ -2148,6 +2301,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of owner activities performed on new logo selling steps that completed in the period
 	column ci_act_capt_lvl_pi_new_logo_owner_act
 		dataType: int64
 		formatString: 0
@@ -2157,6 +2311,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Duration of activities performed on new logo selling steps that completed in the period
 	column ci_act_capt_lvl_pi_new_logo_owner_dur
 		dataType: double
 		lineageTag: 5e8787fa-d5a8-4827-9362-51346f34a28d
@@ -2167,6 +2322,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of new logo selling steps that completed in the period
 	column ci_act_capt_lvl_pi_new_logo_steps
 		dataType: int64
 		formatString: 0
@@ -2176,6 +2332,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Expected duration of activities performed on post-sales support steps that completed in the period
 	column ci_act_capt_lvl_pi_post_sales_expect_owner_dur
 		dataType: double
 		lineageTag: 426bf139-3706-45c2-bd8f-8d8663801111
@@ -2186,6 +2343,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of owner activities performed on post-sales support steps that completed in the period
 	column ci_act_capt_lvl_pi_post_sales_owner_act
 		dataType: int64
 		formatString: 0
@@ -2195,6 +2353,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Duration of activities performed on post-sales support steps that completed in the period
 	column ci_act_capt_lvl_pi_post_sales_owner_dur
 		dataType: double
 		lineageTag: 25070f5e-4b17-4bac-aca0-254d2d7caebe
@@ -2205,6 +2364,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of post-sales support steps that completed in the period
 	column ci_act_capt_lvl_pi_post_sales_steps
 		dataType: int64
 		formatString: 0
@@ -2214,6 +2374,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Expected duration of activities performed on prospecting steps that completed in the period
 	column ci_act_capt_lvl_pi_prospecting_expect_owner_dur
 		dataType: double
 		lineageTag: de6871f6-200c-4cc5-bb3d-16279fc08302
@@ -2224,6 +2385,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of owner activities performed on prospecting steps that completed in the period
 	column ci_act_capt_lvl_pi_prospecting_owner_act
 		dataType: int64
 		formatString: 0
@@ -2233,6 +2395,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Duration of activities performed on prospecting steps that completed in the period
 	column ci_act_capt_lvl_pi_prospecting_owner_dur
 		dataType: double
 		lineageTag: 8c70edb1-c66c-46a7-ad96-b65767cc326b
@@ -2243,6 +2406,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of prospecting steps that completed in the period
 	column ci_act_capt_lvl_pi_prospecting_steps
 		dataType: int64
 		formatString: 0
@@ -2252,6 +2416,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// User's timeliness score in the period
 	column ci_act_capt_lvl_pi_timeliness
 		dataType: double
 		lineageTag: 780906d6-2f18-405e-91c2-7184cfb2cfe8
@@ -2262,6 +2427,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// act_capture_level adjustment factor to account for the user's act_capture_level score
 	column ci_time_alloc_act_capt_lvl_adjustment
 		dataType: double
 		lineageTag: 4c5900c1-713a-4bea-9722-8f3ac8fcfe89
@@ -2272,6 +2438,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// User's time allocation values confidence in the period
 	column ci_time_alloc_conf
 		dataType: double
 		lineageTag: e1d5eb9b-09a3-41b6-8662-ed5b23c90bd1
@@ -2282,6 +2449,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on internal activities in the period
 	column ci_time_alloc_internal
 		dataType: double
 		lineageTag: 13300d16-fbf5-49f7-910c-5b31a16fdb0f
@@ -2292,6 +2460,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on engaged internal activities in the period
 	column ci_time_alloc_internal_eng
 		dataType: double
 		lineageTag: 72b50157-c613-4cc3-b150-7dbb8fab9c12
@@ -2302,6 +2471,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Week adjustment factor to convert monthly to weekly
 	column ci_time_alloc_month_to_week_adjustment
 		dataType: double
 		lineageTag: 7bd82971-b7f0-4ff1-aa47-b310b7e6496f
@@ -2312,6 +2482,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on new logo selling activities in the period
 	column ci_time_alloc_new_logo
 		dataType: double
 		lineageTag: e0ba2bcc-dca3-4bac-9621-775926260a0f
@@ -2322,6 +2493,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on engaged new logo selling activities in the period
 	column ci_time_alloc_new_logo_eng
 		dataType: double
 		lineageTag: 0a57136a-61da-4153-97a6-b19ac5793f8c
@@ -2332,6 +2504,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on post-sales support activities in the period
 	column ci_time_alloc_post_sales
 		dataType: double
 		lineageTag: 117284d7-5a41-4cc5-a2b8-001980d17c32
@@ -2342,6 +2515,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on engaged post-sales support activities in the period
 	column ci_time_alloc_post_sales_eng
 		dataType: double
 		lineageTag: cdea35cd-162a-4e86-bd14-69933ffb8aeb
@@ -2352,6 +2526,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Prep adjustment factor to account for the preparation time needed apart from sales related activities
 	column ci_time_alloc_prep_adjustment
 		dataType: double
 		lineageTag: 49c90b85-68a6-4b44-88d1-2308b444e1e3
@@ -2362,6 +2537,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on prospecting activities in the period
 	column ci_time_alloc_prospecting
 		dataType: double
 		lineageTag: 9237a3a2-908e-467c-811c-f5e9c9f23b6b
@@ -2372,6 +2548,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on engaged prospecting activities in the period
 	column ci_time_alloc_prospecting_eng
 		dataType: double
 		lineageTag: f5bf03e8-8958-48a8-b728-6d8650788d04
@@ -2382,6 +2559,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on activities in the period
 	column ci_time_alloc_tot
 		dataType: double
 		lineageTag: 43a23bf6-1c7f-4abb-b4a1-d1c6a2aa3252
@@ -2392,6 +2570,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Duration of the activities the user performed in the period
 	column ci_time_alloc_tot_dur
 		dataType: double
 		lineageTag: f9f2a426-29ce-42c3-855c-ce9f8ab42b3e
@@ -2402,6 +2581,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on engaged activities in the period
 	column ci_time_alloc_tot_eng
 		dataType: double
 		lineageTag: 81e56d15-594b-4172-85ee-173338fc2986
@@ -2412,6 +2592,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Duration of the engaged activities the user performed in the period
 	column ci_time_alloc_tot_eng_dur
 		dataType: double
 		lineageTag: bca305da-8bd2-4192-8a25-7e0dc65d3fc0
@@ -2422,6 +2603,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on sales related activities in the period
 	column ci_time_alloc_tot_selling
 		dataType: double
 		lineageTag: 45f51f39-22ec-4b5d-8ffb-05b5edd17532
@@ -2432,6 +2614,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on engaged sales related activities in the period
 	column ci_time_alloc_tot_selling_eng
 		dataType: double
 		lineageTag: cdf91be9-72ba-4ca8-aba5-6b709e2f222d
@@ -2442,6 +2625,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// User's last login time in the CRM
 	column crm_last_login_time
 		dataType: dateTime
 		formatString: General Date
@@ -2456,6 +2640,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// User's group
 	column trueai_group
 		dataType: string
 		lineageTag: 36d8cda1-723e-4564-b957-bcc4935a74bf
@@ -2464,6 +2649,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// User's hire date
 	column trueai_hire_date
 		dataType: dateTime
 		formatString: Short Date
@@ -2482,6 +2668,7 @@ table users_history
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Number of months since the user's hire date
 	column trueai_tenure
 		dataType: int64
 		lineageTag: 9a92bd5f-1f5e-4c79-9e26-3622af124e95
@@ -2494,6 +2681,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// User's termination date
 	column trueai_termination_date
 		dataType: dateTime
 		formatString: Short Date
@@ -2512,6 +2700,7 @@ table users_history
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// User's standardized and combined role
 	column trueai_user_role
 		dataType: string
 		lineageTag: 9733a575-c52c-474d-854f-96a859fe558c
@@ -2520,6 +2709,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// User's function derived from the standardized and combined role
 	column trueai_user_role_function
 		dataType: string
 		lineageTag: 0fe69c05-1a3a-4e40-a4ab-1f635f7dd27e
@@ -2530,6 +2720,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// User's performance tier expressed as "underperformer", "overperformer" or "performer", based on their quarterly sum of booking amounts of won opportunities compared to their peers
 	column ci_perf_qtly_performance_tier
 		dataType: string
 		lineageTag: 67717ba0-c518-4efa-b95e-1415ae4e33d5
@@ -2538,6 +2729,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.ci_perf_qtly_performance_tier_num' = ```.
 	column 'col.ci_perf_qtly_performance_tier_num' = ```
 			SWITCH([ci_perf_qtly_performance_tier], "Overperformer", 3, "Performer", 2, "Underperformer", 1) 
 			
@@ -2548,6 +2740,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.ci.perf_annual_performance_tier_num' = ```.
 	column 'col.ci.perf_annual_performance_tier_num' = ```
 			
 			// do the filter first
@@ -2594,6 +2787,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.ci.perf_annual_performance_tier' = ```.
 	column 'col.ci.perf_annual_performance_tier' = ```
 			
 			SWITCH(users_history[col.ci.perf_annual_performance_tier_num], 3, "Overperformer", 2, "Performer", 1, "Underperformer")
@@ -2604,6 +2798,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// User's performance tier expressed as an integer from 1 to 3, based on their quarterly sum of booking amounts of won opportunities compared to their peers
 	column ci_perf_qtly_performance_tier_num
 		dataType: int64
 		formatString: 0
@@ -2613,6 +2808,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.ci_ta_potential_hours' = ```.
 	column 'col.ci_ta_potential_hours' = ```
 			
 			var hours_per_cal_day = (250 * 8)/365 // number of work days
@@ -2632,6 +2828,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
+	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_closing_ability_actual_vs_predicted
 		dataType: double
 		lineageTag: d3ef3092-a25e-45d9-85a8-9be542824dba
@@ -2642,6 +2839,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_closing_ability_conf
 		dataType: double
 		lineageTag: b372a6fb-c8c0-4024-880c-c15d4df5fa0b
@@ -2652,6 +2850,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_closing_ability_peer_actual_vs_predicted
 		dataType: double
 		lineageTag: d229fdb3-1ee0-44dc-b34d-83df64575445
@@ -2662,6 +2861,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_discov_skills_actual_vs_predicted
 		dataType: double
 		lineageTag: 6546394c-2ae3-4626-9f47-8bf8b76975c9
@@ -2672,6 +2872,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_discov_skills_conf
 		dataType: double
 		lineageTag: ab2e41ff-9e53-46b3-bb6b-bdb1a60ac16f
@@ -2682,6 +2883,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_discov_skills_peer_actual_vs_predicted
 		dataType: double
 		formatString: 0
@@ -2691,6 +2893,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_closing_ability_peer_actual_vs_pred_ratio_derived_max
 		dataType: double
 		lineageTag: f6a89d98-299d-4790-a4ca-69fe3f4fc312
@@ -2701,6 +2904,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_closing_ability_peer_actual_vs_pred_ratio_derived_min
 		dataType: double
 		lineageTag: 7ec7a725-3a35-4692-9c32-1d14e42063e2
@@ -2711,6 +2915,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_deal_maxing_conf
 		dataType: double
 		lineageTag: 2a28d51c-1917-4f8d-a5b1-b69d5b7fab81
@@ -2721,6 +2926,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Deal maximizing final score as compared to peers.
 	column ci_sb_deal_maxing_num
 		dataType: double
 		lineageTag: 03b48771-de12-4fbf-938a-c71feeead6d2
@@ -2731,6 +2937,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_engmt_ability_conf
 		dataType: double
 		lineageTag: 150917d1-51fe-44b0-8041-070e6d0d4bed
@@ -2741,6 +2948,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Engagement ability final score as compared to peers.
 	column ci_sb_engmt_ability_num
 		dataType: double
 		lineageTag: 9c50b699-18ee-48cb-9f82-f6d3a7df6dff
@@ -2751,6 +2959,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_work_effort_conf
 		dataType: double
 		lineageTag: 5f93bf7b-cb1c-44a2-a26e-193d8e55511f
@@ -2761,6 +2970,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Work effort final score as compared to peers.
 	column ci_sb_work_effort_num
 		dataType: double
 		lineageTag: f2aeccda-bde2-4b01-bc68-221712c00268
@@ -2771,6 +2981,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// The date of the last data request from the platform in UTC
 	column trueai_end_date
 		dataType: dateTime
 		formatString: Long Date
@@ -2787,6 +2998,7 @@ table users_history
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// The last date of the month that the record applies to (for past months) or the last date of aggregated data (for the present month)
 	column _sys_as_of
 		dataType: dateTime
 		formatString: Long Date
@@ -2801,6 +3013,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the record was set to inactive in the remote system
 	column _sys_is_active
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -2810,6 +3023,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the record was set to deleted in the remote system
 	column _sys_is_deleted
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -2819,6 +3033,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Expected duration of activities performed on new logo selling steps that completed in the period
 	column ci_act_capt_lvl_pi_new_logo_expected_owner_dur
 		dataType: double
 		lineageTag: 6e1ed90d-afba-47ed-91da-18baf1c4efa5
@@ -2829,6 +3044,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// User's creation date in the CRM
 	column crm_created_on
 		dataType: dateTime
 		formatString: Long Date
@@ -2843,6 +3059,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Expected duration of activities performed on existing customer selling steps that completed in the period
 	column ci_act_capt_lvl_pi_exist_cust_expect_owner_dur
 		dataType: double
 		lineageTag: e2a20ea6-6e91-417f-ac91-c9f551bf6a48
@@ -2853,6 +3070,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of owner activities performed on existing customer selling steps that completed in the period
 	column ci_act_capt_lvl_pi_exist_cust_owner_act
 		dataType: int64
 		formatString: 0
@@ -2862,6 +3080,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Duration of activities performed on existing customer selling steps that completed in the period
 	column ci_act_capt_lvl_pi_exist_cust_owner_dur
 		dataType: double
 		lineageTag: f166d551-cff6-4f73-a3f5-b860f06330c7
@@ -2872,6 +3091,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of existing customer selling steps that completed in the period
 	column ci_act_capt_lvl_pi_exist_cust_steps
 		dataType: int64
 		formatString: 0
@@ -2881,6 +3101,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Average number of weekly hours the user spent on existing customer selling activities in the period
 	column ci_time_alloc_existing_customer_selling
 		dataType: double
 		lineageTag: 48e869c0-9a0e-4e68-917f-d963b95acb5b
@@ -2891,6 +3112,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Average number of weekly hours the user spent on engaged existing customer selling activities in the period
 	column ci_time_alloc_existing_customer_selling_eng
 		dataType: double
 		lineageTag: 5f99395c-b1a3-417d-af49-9947f5066ab7
@@ -2901,6 +3123,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// User's standardized and combined role aliased
 	column trueai_user_role_alias
 		dataType: string
 		lineageTag: 24baa1ad-7363-439d-9b42-3640c9e478ef
@@ -2909,6 +3132,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// User's performance tier confidence
 	column ci_perf_qtly_performance_tier_conf
 		dataType: double
 		lineageTag: c26128f8-4661-4233-99a2-4cbe2b78fde9
@@ -2919,6 +3143,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of peers the user was compared to when determining the performance tier
 	column ci_perf_qtly_performance_peer_count
 		dataType: int64
 		formatString: 0
@@ -2928,6 +3153,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Potential number of hours a user can put in during a given month
 	column ci_time_alloc_potential
 		dataType: double
 		lineageTag: 97a8326a-5c34-41bd-bfc7-363ac8e3dff5
@@ -2938,6 +3164,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Closing ability final score tier as compared to peers.
 	column ci_sb_closing_ability_tier
 		dataType: string
 		lineageTag: cee04b62-8105-4b27-8b01-e805cf3e3fdd
@@ -2946,6 +3173,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Closing ability final score as compared to peers.
 	column ci_sb_closing_ability_num
 		dataType: double
 		lineageTag: 8ae645ff-5945-469a-9798-be6e8bbdf546
@@ -2956,6 +3184,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Deal maximizing final score tier as compared to peers.
 	column ci_sb_deal_maxing_tier
 		dataType: string
 		lineageTag: b467483f-bdc3-4217-8bcb-a4c8e547863b
@@ -2964,6 +3193,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_deal_maxing_actual_vs_predicted
 		dataType: double
 		lineageTag: 74373ae0-48ca-46f6-ae43-68a4bf90aec7
@@ -2974,6 +3204,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_deal_maxing_peer_actual_vs_pred_ratio_derived_max
 		dataType: double
 		lineageTag: 5462b376-1e86-4285-bb68-ce9957d62dbe
@@ -2984,6 +3215,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_deal_maxing_peer_actual_vs_pred_ratio_derived_min
 		dataType: double
 		lineageTag: 33826acf-38c2-4950-bca8-937ee9d7566b
@@ -2994,6 +3226,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_deal_maxing_peer_actual_vs_predicted
 		dataType: double
 		lineageTag: 5d25bd97-a20d-4630-9111-bcdcf42597dd
@@ -3004,6 +3237,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Discovery skills final score tier as compared to peers.
 	column ci_sb_discov_skills_tier
 		dataType: string
 		lineageTag: 2fe6858b-f030-4a36-846d-0a0ee15d08d5
@@ -3012,6 +3246,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Discovery skills final score as compared to peers.
 	column ci_sb_discov_skills_num
 		dataType: double
 		lineageTag: b37f90e8-7268-4131-9eb2-b981435c9c40
@@ -3022,6 +3257,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_discov_skills_peer_actual_vs_pred_ratio_derived_max
 		dataType: double
 		lineageTag: df281477-a8bc-4cd3-b54f-7288047d5bd0
@@ -3032,6 +3268,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_discov_skills_peer_actual_vs_pred_ratio_derived_min
 		dataType: double
 		lineageTag: a31d2ce7-f839-4de6-bbea-1013dfdeaf3d
@@ -3042,6 +3279,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Engagement ability final score tier as compared to peers.
 	column ci_sb_engmt_ability_tier
 		dataType: string
 		lineageTag: 13adc711-1164-4f63-b48b-f63dc6098cb1
@@ -3050,6 +3288,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_engmt_ability_actual_vs_predicted
 		dataType: double
 		lineageTag: d10358fa-989f-467a-90b9-1fc7899926ea
@@ -3060,6 +3299,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_engmt_ability_peer_actual_vs_pred_ratio_derived_max
 		dataType: double
 		lineageTag: bb9a5432-5a98-41ff-a3ed-930f05514a6a
@@ -3070,6 +3310,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_engmt_ability_peer_actual_vs_pred_ratio_derived_min
 		dataType: double
 		lineageTag: 2bbb99ab-5891-4ddb-8364-7a2549ae34f6
@@ -3080,6 +3321,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_engmt_ability_peer_actual_vs_predicted
 		dataType: double
 		lineageTag: 548d1855-29a8-49f4-9bfa-ba7598591fc3
@@ -3090,6 +3332,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Work effort final score tier as compared to peers.
 	column ci_sb_work_effort_tier
 		dataType: string
 		lineageTag: ac6f1e6f-7215-4b94-9d98-4551b8c0bb8c
@@ -3098,6 +3341,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_work_effort_actual_vs_predicted
 		dataType: double
 		lineageTag: 73991f4d-aa28-4d57-8b41-24bd3ef12050
@@ -3108,6 +3352,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_work_effort_peer_actual_vs_pred_ratio_derived_max
 		dataType: double
 		lineageTag: bacb95de-ff97-4f29-886f-43dafa9f0ebe
@@ -3118,6 +3363,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_work_effort_peer_actual_vs_pred_ratio_derived_min
 		dataType: double
 		lineageTag: 0aefc028-978f-441c-ba3a-687aba96cb1d
@@ -3128,6 +3374,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_work_effort_peer_actual_vs_predicted
 		dataType: double
 		lineageTag: d644117c-15c6-4f7b-af75-3c04f9f12af8
@@ -3138,6 +3385,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Time management final score tier as compared to peers.
 	column ci_sb_time_management_tier
 		dataType: string
 		lineageTag: 97ad7927-fbcc-43bf-ad93-2b080d4f83ad
@@ -3146,6 +3394,7 @@ table users_history
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Time management final score as compared to peers.
 	column ci_sb_time_management_num
 		dataType: double
 		lineageTag: 32d3abed-6f31-4a22-85cb-5d0c492ea5e8
@@ -3156,6 +3405,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_time_management_conf
 		dataType: double
 		lineageTag: 5430dfbe-8683-4c0a-86e6-74967889d5bc
@@ -3166,6 +3416,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_time_management_actual_vs_predicted
 		dataType: double
 		lineageTag: 88172038-9977-4b8d-ac78-47d7bf8c587d
@@ -3176,6 +3427,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_time_management_peer_actual_vs_pred_ratio_derived_max
 		dataType: double
 		lineageTag: 4fa7abae-c2f8-468a-b95a-49785f21bfaf
@@ -3186,6 +3438,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_time_management_peer_actual_vs_pred_ratio_derived_min
 		dataType: double
 		lineageTag: d467e8d8-3eeb-4bea-9646-4fd1f878cc70
@@ -3196,6 +3449,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_time_management_peer_actual_vs_predicted
 		dataType: double
 		lineageTag: c75eed9b-4045-4c70-9307-dd0a0cbe1d7c
@@ -3206,6 +3460,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// User's department derived from the standardized and combined role
 	column trueai_user_role_department
 		dataType: string
 		lineageTag: d7442e13-deda-4aa8-8fd6-ae6efe9166dd
