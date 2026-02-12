@@ -1,3 +1,5 @@
+/// Reference list of definitions for all AI-generated predictive and descriptive scores, including value ranges and interpretations.
+/// One row per metadata_ai_score record. Source fields include System prefixes. Related to LocalDateTable_fedec804-f827-40df-a95f-eafad828a8c3 (_sys_modified_on -> Date). Supports measures such as meas.ai_scores_accts_industry, meas.ai_scores_accts_industry_text.
 table metadata_ai_scores
 	lineageTag: 080d003a-73c1-4455-bdea-735e2750dd7e
 
@@ -496,8 +498,8 @@ table metadata_ai_scores
 
 	measure 'meas.ai_scores_ci_time_allocation_factor1_value' = ```
 			
-			var fromDate =MIN(cal_end_dates[date]) 
-			var toDate = MAX(cal_end_dates[date])
+			var fromDate =MIN('cal_end_dates'[date]) 
+			var toDate = MAX('cal_end_dates'[date])
 			
 			var applicable_rows_tbl = CALCULATETABLE(
 			    users_history, 
@@ -678,8 +680,8 @@ table metadata_ai_scores
 
 	measure 'meas.ai_scores_ramping_count_rate_factor1_value' = ```
 			
-			var fromDate =MIN(cal_end_dates[date])
-			var toDate = MAX(cal_end_dates[date])
+			var fromDate =MIN('cal_end_dates'[date])
+			var toDate = MAX('cal_end_dates'[date])
 			
 			var applicable_rows_tbl = CALCULATETABLE(users_history, users_history[ci_perf_ramping_status] ="Ramping" ,  LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
 			
@@ -794,8 +796,8 @@ table metadata_ai_scores
 
 	measure 'meas.ai_scores_ci_time_allocation_factor2_value' = ```
 			
-			var fromDate =MIN(cal_end_dates[date]) 
-			var toDate = MAX(cal_end_dates[date])
+			var fromDate =MIN('cal_end_dates'[date]) 
+			var toDate = MAX('cal_end_dates'[date])
 			
 			var applicable_rows_tbl = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]), users_history[trueai_user_role_function] in {"AE", "AM", "SDR"})  // get only the last entry in each filter context period (e.g. a year)
 			
@@ -913,22 +915,25 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_line_items_products_factor2_value' = ```
 			
 			
-			var lost_deals =CALCULATE(
-			    COUNT(ssr_history[_sys_doc_id]),                // get the lost deals
-			    opps[trueai_is_won]=False
-			)
+			var lost_opps =
+			    CALCULATETABLE(
+			        VALUES(opps[_sys_doc_id]),
+			        opps[trueai_is_won] = False
+			    )
+			var lost_deals = COUNTROWS(lost_opps)                // lost opps count
 			
 			
-			var _lost_deals_w_line = CALCULATE(
-			        DISTINCTCOUNT(opp_line_items[crm_opp_id]), 
-			        opps[trueai_is_won] = False,                      // get the lost deals count with line items
+			var _lost_deals_w_line =
+			    CALCULATE(
+			        DISTINCTCOUNT(opp_line_items[crm_opp_id]),
+			        TREATAS(lost_opps, opp_line_items[crm_opp_id]),
 			        FILTER(opp_line_items, NOT(ISBLANK(opp_line_items[crm_opp_id])))
 			    )
 			
-			var _lost_ratio = DIVIDE(_lost_deals_w_line,lost_deals,0)          // lost ratio
-			
-			RETURN
-			_lost_ratio
+			var _lost_ratio = DIVIDE(_lost_deals_w_line, lost_deals, 0)          // lost ratio
+				
+				RETURN
+				_lost_ratio
 			```
 		displayFolder: _factor_value2
 		lineageTag: 5b7eb313-9450-4a50-8103-51c7e5223bca
@@ -1290,8 +1295,8 @@ table metadata_ai_scores
 
 	measure 'meas.ai_scores_ci_time_alloc' = ```
 			
-			var fromDate =MIN(cal_end_dates[date]) 
-			var toDate = MAX(cal_end_dates[date])
+			var fromDate =MIN('cal_end_dates'[date]) 
+			var toDate = MAX('cal_end_dates'[date])
 			
 			var applicable_rows_tbl = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
 			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) >=  toDate && users_history[ci_time_alloc_tot] >0 ) // make sure we only include reps that are in the active  and user having time allocation greater than 0
@@ -1503,42 +1508,23 @@ table metadata_ai_scores
 		displayFolder: _ai_scores
 		lineageTag: 247a14d2-b631-42c8-a378-c6ab3b58de86
 
-	measure 'meas.ai_scores_line_items_products' = ```
+	measure 'meas.ai_scores_line_items_products' =
 			
-			var won_deals = CALCULATE(
-			    COUNT(ssr_history[_sys_doc_id]),                // get the won deals
-			    opps[trueai_is_won]=True
-			)
-			VAR _won_deals_w_line = CALCULATE(
-			        DISTINCTCOUNT(opp_line_items[crm_opp_id]), 
-			        opps[trueai_is_won] = True,                      // get the won deals count with line items
-			        FILTER(opp_line_items, NOT(ISBLANK(opp_line_items[crm_opp_id])))
-			    )
+			var _won_ratio_raw = [meas.ai_scores_line_items_products_factor1_value]
+			var _lost_ratio_raw = [meas.ai_scores_line_items_products_factor2_value]
 			
-			var _won_ratio = DIVIDE(_won_deals_w_line,won_deals,0)         // won ratio
-			
-			var lost_deals =CALCULATE(
-			    COUNT(ssr_history[_sys_doc_id]),                // get the lost deals
-			    opps[trueai_is_won]=False
-			)
-			
-			var _lost_deals_w_line = CALCULATE(
-			        DISTINCTCOUNT(opp_line_items[crm_opp_id]), 
-			        opps[trueai_is_won] = False,                      // get the lost deals count with line items
-			        FILTER(opp_line_items, NOT(ISBLANK(opp_line_items[crm_opp_id])))
-			    )
-			
-			var _lost_ratio = DIVIDE(_lost_deals_w_line,lost_deals,0)          // lost ratio
+			// Normalize if factors are already expressed as percentages
+			var _won_ratio = IF(_won_ratio_raw > 1, _won_ratio_raw / 100, _won_ratio_raw)
+			var _lost_ratio = IF(_lost_ratio_raw > 1, _lost_ratio_raw / 100, _lost_ratio_raw)
 			
 			var _won_weight = 0.70           // won weight
 			var _lost_weight = 0.30         // lost deals ratio
 			
-			var score = (_won_ratio*_won_weight+_lost_ratio*_lost_weight)
-			var res = ROUND(score*100,0)
+			var score = (_won_ratio * _won_weight) + (_lost_ratio * _lost_weight)
+			var res = MIN(MAX(ROUND(score * 100, 0), 0), 100)
 			
 			RETURN
 			res
-			```
 		displayFolder: _ai_scores
 		lineageTag: c41207d5-c4f9-4445-966b-a2af3558fe48
 
@@ -1546,25 +1532,28 @@ table metadata_ai_scores
 
 	measure 'meas.ai_scores_line_items_products_factor1_value' = ```
 			
-			var won_deals = CALCULATE(
-			    COUNT(ssr_history[_sys_doc_id]),                // get the won deals
-			    opps[trueai_is_won]=True
-			)
+			var won_opps =
+			    CALCULATETABLE(
+			        VALUES(opps[_sys_doc_id]),
+			        opps[trueai_is_won] = True
+			    )
+			var won_deals = COUNTROWS(won_opps)                // won opps count
 			
-			VAR _won_deals_w_line = CALCULATE(
-			        DISTINCTCOUNT(opp_line_items[crm_opp_id]), 
-			        opps[trueai_is_won] = True,                      // get the won deals count with line items
+			VAR _won_deals_w_line =
+			    CALCULATE(
+			        DISTINCTCOUNT(opp_line_items[crm_opp_id]),
+			        TREATAS(won_opps, opp_line_items[crm_opp_id]),
 			        FILTER(opp_line_items, NOT(ISBLANK(opp_line_items[crm_opp_id])))
 			    )
 			
-			var _won_ratio = DIVIDE(_won_deals_w_line,won_deals,0)         // won ratio
-			
-			// var _won_weight = 0.70           // won weight
-			// var _lost_weight = 0.30         // lost deals ratio
-			
-			
-			RETURN
-			_won_ratio
+			var _won_ratio = DIVIDE(_won_deals_w_line, won_deals, 0)         // won ratio
+				
+				// var _won_weight = 0.70           // won weight
+				// var _lost_weight = 0.30         // lost deals ratio
+				
+				
+				RETURN
+				_won_ratio
 			```
 		displayFolder: _factor_value1
 		lineageTag: 2d1f8053-c685-415a-bf0b-77fc6299b82a
@@ -2004,8 +1993,8 @@ table metadata_ai_scores
 
 	measure 'meas.ai_scores_ramping' = ```
 			
-			var fromDate = MIN(cal_end_dates[date]) 
-			var toDate = MAX(cal_end_dates[date])
+			var fromDate = MIN('cal_end_dates'[date]) 
+			var toDate = MAX('cal_end_dates'[date])
 			
 			var applicable_rows_tbl = CALCULATETABLE(users_history, users_history[ci_perf_ramping_status] ="Ramping" ,  LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
 			
@@ -2052,42 +2041,45 @@ table metadata_ai_scores
 
 	measure 'meas.ai_scores_rep_org_calibration' = ```
 			
-			var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC))       // grt the most latest row
-			var _total_users = MAXX(latest_table,companies_history[users])          // total users
-			
-			var users_match_hr_id = MAXX(latest_table, [users_match_hr_id])         // total matched reps
-			var users_hr_file = MAXX(latest_table, companies_history[users_hr_file])           // reps in hr file
-			
-			var users_non_match_hr_id_won_deals = MAXX(latest_table, companies_history[users_non_match_hr_id_won_deals])            // non match won deals reps
-			var users_non_match_hr_id_pipeline = MAXX(latest_table, companies_history[users_non_match_hr_id_pipeline])          // non match pipeline gen reps
-			var users_non_match_hr_id_leads = MAXX(latest_table, companies_history[users_non_match_hr_id_leads])          // non match lead gen reps count
-			var users_match_hr_id_nd_role = MAXX(latest_table, companies_history[users_match_hr_id_nd_role])                  // non match reps with role
-			var users_match_hr_id_nd_group = 0
-			
-			var matched_reps_score = DIVIDE(users_match_hr_id,users_hr_file,0)
-			var won_deals_score = (1 - DIVIDE(users_non_match_hr_id_won_deals, _total_users, 0))
-			var pipeline_gen_score = (1 - DIVIDE(users_non_match_hr_id_pipeline, _total_users, 0))
-			var lead_gen_score = (1 - DIVIDE(users_non_match_hr_id_leads, _total_users, 0))               //raw score calculation for each
-			var reps_w_role_score = (1 - DIVIDE(users_match_hr_id_nd_role,users_hr_file,0))
-			//var reps_w_group_ratio = DIVIDE(reps_group,_hr_file_users,0)
-			
-			VAR Row1 = ROW ( "Value", matched_reps_score, "Weight", 3 )
-			VAR Row2 = ROW ( "Value", won_deals_score, "Weight", 2 )
-			VAR Row3 = ROW ( "Value", pipeline_gen_score, "Weight", 1 )          //raw score and weight  added in the table  for each reps count
-			VAR Row4 = ROW ( "Value", lead_gen_score, "Weight", 1 )
-			VAR Row5 = ROW ( "Value", reps_w_role_score, "Weight", 2 )
-			VAR temp_tbl =
-			    UNION ( Row1, Row2, Row3, Row4, Row5 )          //creating the table
-			
-			var _adj_calib = SUMX(temp_tbl, [Value]*[Weight])           // get the adjusted raw score
-			var _importance = SUMX(temp_tbl, [Weight])                  // sum of the total weight
-			var raw_score = DIVIDE(_adj_calib, _importance,0)                 // get the score
-			
-			var boost_expo = 0.9            // we use this to get the closer one value
-			var score = raw_score^boost_expo     // boosting the actual 
-			var res = MIN(MAX(ROUND(score*100,0),0),100)
-			RETURN
-			res
+				var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC))       // grt the most latest row
+				var _total_users = MAXX(latest_table,companies_history[users])          // total users
+				
+				var users_match_hr_id = MAXX(latest_table, [users_match_hr_id])         // total matched reps
+				var users_hr_file = MAXX(latest_table, companies_history[users_hr_file])           // reps in hr file
+				
+				var users_non_match_hr_id_won_deals = MAXX(latest_table, companies_history[users_non_match_hr_id_won_deals])            // non match won deals reps
+				var users_match_hr_id_nd_role = MAXX(latest_table, companies_history[users_match_hr_id_nd_role])                  // non match reps with role
+				var users_match_hr_id_nd_group = 0
+				
+				var factor1 = DIVIDE(users_match_hr_id, users_hr_file, 0)
+				var factor2_bad = DIVIDE(users_non_match_hr_id_won_deals, _total_users, 0)
+				var factor2 = 1 - factor2_bad
+				var factor3 = 1 - DIVIDE(users_match_hr_id_nd_role + users_match_hr_id_nd_group, users_hr_file, 0)
+				
+				VAR w = 2
+				VAR temp_tbl =
+				    FILTER (
+				        SELECTCOLUMNS (
+				            {
+				                (factor1, w),
+				                (factor2, w),
+				                (factor3, w)
+				            },
+				            "Value", [Value1],
+				            "Weight", [Value2]
+				        ),
+				        NOT ISBLANK ( [Value] )
+				    )
+				
+				var _adj_calib = SUMX(temp_tbl, [Value]*[Weight])           // get the adjusted raw score
+				var _importance = SUMX(temp_tbl, [Weight])                  // sum of the total weight
+				var raw_score = DIVIDE(_adj_calib, _importance,0)                 // get the score
+				
+				var boost_expo = 0.9            // we use this to get the closer one value
+				var score = raw_score^boost_expo     // boosting the actual 
+				var res = MIN(MAX(ROUND(score*100,0),0),100)
+				RETURN
+				res
 			```
 		displayFolder: _ai_scores
 		lineageTag: 7d6d7790-5bbc-4ae0-8506-5f1b9894526e
@@ -2368,10 +2360,12 @@ table metadata_ai_scores
 
 	measure 'meas.average_ai_score' =
 			
-			AVERAGEX(
-			    metadata_ai_scores,
-			    [meas.ai_score]
-			)
+			var avg_score =
+			    AVERAGEX(
+			        metadata_ai_scores,
+			        [meas.ai_score]
+			    )
+			RETURN MIN(MAX(avg_score, 0), 100)
 		formatString: 0
 		lineageTag: b12cdcbf-d399-4855-b356-3f9402c5215c
 
@@ -2414,6 +2408,8 @@ table metadata_ai_scores
 		displayFolder: _ai_scores
 		lineageTag: 14326d25-cac6-4c9e-a345-8e91845e18c9
 
+	/// Category
+	/// Text label for category.
 	column category
 		dataType: string
 		lineageTag: c2d5cb78-f46a-493e-b40a-b1914ab2548b
@@ -2422,6 +2418,8 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Score Name
+	/// Text label for score name.
 	column score_name
 		dataType: string
 		lineageTag: 249a4a1c-f955-4815-b788-90b9bd64857a
@@ -2430,6 +2428,8 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Description
+	/// Text label for description.
 	column description
 		dataType: string
 		lineageTag: 76cc6dda-d8f7-4c66-b491-85d761b65121
@@ -2438,6 +2438,8 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Factor 1 Name
+	/// Text label for factor 1 name.
 	column factor_1_name
 		dataType: string
 		lineageTag: 2ba59f9b-5d9b-4899-aa0f-9d902cd09588
@@ -2446,6 +2448,8 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Factor 2 Name
+	/// Text label for factor 2 name.
 	column factor_2_name
 		dataType: string
 		lineageTag: 0c19c675-11d3-4059-8c22-5afb6fd4e672
@@ -2454,6 +2458,8 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Factor 3 Name
+	/// Text label for factor 3 name.
 	column factor_3_name
 		dataType: string
 		lineageTag: 53bf93f5-328a-48da-b6e9-306a9af9a9bc
@@ -2462,6 +2468,8 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Unique AI score identifier
+	/// System: Identifier for doc.
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 6bbc64a9-bb3c-4d6e-a1b1-52474b2c531e
@@ -2470,6 +2478,8 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Is Active
+	/// System: Indicates whether is active.
 	column _sys_is_active
 		dataType: string
 		lineageTag: 6989f60d-d162-4a6c-88ae-4709e680d73e
@@ -2478,6 +2488,8 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Modified On Date
+	/// System: Date/time when modified on.
 	column _sys_modified_on
 		dataType: dateTime
 		formatString: General Date
@@ -2492,6 +2504,8 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Sort
+	/// Numeric value for sort.
 	column sort
 		dataType: int64
 		formatString: 0
@@ -2501,6 +2515,8 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Notes
+	/// Text label for notes.
 	column notes
 		dataType: string
 		lineageTag: e23e3b09-25e8-4d82-8925-57be1c64304e
@@ -2509,6 +2525,8 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boost Expo
+	/// Numeric value for boost expo.
 	column boost_expo
 		dataType: double
 		lineageTag: 4a28a566-df03-4764-b5c8-388b3689913f
@@ -2519,6 +2537,8 @@ table metadata_ai_scores
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Weight
+	/// Numeric value for weight.
 	column weight
 		dataType: double
 		lineageTag: e842acab-771b-4c59-ab36-a672b3f2754c

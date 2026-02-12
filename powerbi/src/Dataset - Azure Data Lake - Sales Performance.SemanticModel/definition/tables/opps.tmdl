@@ -1,11 +1,14 @@
+/// CRM entity for opportunity records enriched with TrueAI predictive insights.
 table opps
 	lineageTag: 94b5d4f0-c14b-4b61-8e6f-fc611c85e6de
 
+	/// Measure meas.opps_count.
 	measure 'meas.opps_count' = CALCULATE(Count(opps[_sys_doc_id]))  // count of opportunity
 		formatString: #,0
 		displayFolder: _success_metrics
 		lineageTag: 2cc843ff-f70c-4756-bc7f-55b6fe32f6b0
 
+	/// Measure meas.opps_won_amt.
 	measure 'meas.opps_won_amt' = CALCULATE(SUM(opps[trueai_booking_amt]),opps[trueai_is_won] = True ) // get the won opps  booking amount
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
@@ -13,16 +16,19 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":""}
 
+	/// Measure meas.opps_won_count.
 	measure 'meas.opps_won_count' = CALCULATE(Count(opps[_sys_doc_id]),opps[trueai_is_won] = True )// count of won opps
 		formatString: #,0
 		displayFolder: _success_metrics
 		lineageTag: d06a26ea-8130-4af3-99b3-4a9e2d505033
 
+	/// Measure meas.opps_lost_count.
 	measure 'meas.opps_lost_count' = CALCULATE(Count(opps[_sys_doc_id]),opps[trueai_is_won] = False ) // get the lost opps count
 		formatString: #,0
 		displayFolder: _success_metrics
 		lineageTag: 8a99d981-2d57-4959-a3a1-1438b9c03dc9
 
+	/// Measure meas.opps_won_new_logo_existing_cust_count.
 	measure 'meas.opps_won_new_logo_existing_cust_count' = ```
 			
 			CALCULATE(
@@ -35,6 +41,7 @@ table opps
 		displayFolder: _success_metrics
 		lineageTag: d581aaf4-aff3-4ab8-ac67-5e6ec53b0421
 
+	/// Measure meas.opps_new_logo_existing_customer_selling_won_amt.
 	measure 'meas.opps_new_logo_existing_customer_selling_won_amt' = ```
 			
 			CALCULATE(
@@ -49,6 +56,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.opps_existing_customer_selling_won_amt.
 	measure 'meas.opps_existing_customer_selling_won_amt' = ```
 			
 			CALCULATE(
@@ -63,6 +71,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.opps_new_logo_selling_won_amt.
 	measure 'meas.opps_new_logo_selling_won_amt' = ```
 			
 			CALCULATE(
@@ -77,6 +86,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.opps_post_sales_support_won_amt.
 	measure 'meas.opps_post_sales_support_won_amt' = ```
 			
 			CALCULATE(
@@ -91,6 +101,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.opps_prospecting_won_amt.
 	measure 'meas.opps_prospecting_won_amt' = ```
 			
 			CALCULATE(
@@ -105,6 +116,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.opps_all_step_won_amt.
 	measure 'meas.opps_all_step_won_amt' = ```
 			
 			CALCULATE(
@@ -119,6 +131,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.opps_trueai_booking_amt.
 	measure 'meas.opps_trueai_booking_amt' = ```
 			
 			
@@ -137,6 +150,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.opp_line_items_trueai_booking_amt.
 	measure 'meas.opp_line_items_trueai_booking_amt' =
 			
 			CALCULATE(
@@ -149,6 +163,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.opp_book_amt_opp_line_book_amt_diff.
 	measure 'meas.opp_book_amt_opp_line_book_amt_diff' =
 			
 			var opps_amt = [meas.opps_trueai_booking_amt]   // get the opps booking amt
@@ -163,6 +178,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.opps_crm_booking_amt.
 	measure 'meas.opps_crm_booking_amt' =
 			
 			CALCULATE(
@@ -174,6 +190,7 @@ table opps
 		displayFolder: _success_metrics
 		lineageTag: 3c033b02-a215-4b6c-a54f-4391f82c7cb0
 
+	/// Measure meas.open_opps_is_open.
 	measure 'meas.open_opps_is_open' = ```
 			
 			var  asof_date = date(2024,1,1) // the "current" date
@@ -189,6 +206,7 @@ table opps
 		displayFolder: _open_opps_pipeline
 		lineageTag: 386df656-540e-4d43-90bf-29fe8a75c043
 
+	/// Measure meas.open_opps_order.
 	measure 'meas.open_opps_order' = ```
 			
 			
@@ -224,6 +242,7 @@ table opps
 		displayFolder: _open_opps_pipeline
 		lineageTag: f94ab53f-b321-4774-ade9-7010b94d9687
 
+	/// Measure meas.open_opps_rec.
 	measure 'meas.open_opps_rec' = ```
 			
 				var  asof_date = date(2024,1,1) // the "current" date
@@ -240,6 +259,7 @@ table opps
 		displayFolder: _open_opps_pipeline
 		lineageTag: 8896c5d8-5860-4419-9167-539af4c288e4
 
+	/// Measure meas.open_opps_step_by_step.
 	measure 'meas.open_opps_step_by_step' = ```
 			
 			
@@ -278,6 +298,7 @@ table opps
 		displayFolder: _open_opps_pipeline
 		lineageTag: 5c8c0dc1-4e98-4864-84aa-d8e220345f38
 
+	/// Measure meas.open_opps_step_by_step_amt.
 	measure 'meas.open_opps_step_by_step_amt' =
 			
 			
@@ -292,6 +313,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.open_opps_step_by_step_slicer.
 	measure 'meas.open_opps_step_by_step_slicer' = ```
 			
 			
@@ -329,6 +351,7 @@ table opps
 		displayFolder: _open_opps_pipeline
 		lineageTag: d6a78e90-d5b6-4c05-8a4a-81b5971753f0
 
+	/// Measure meas.ssr_history_opps_is_open.
 	measure 'meas.ssr_history_opps_is_open' = ```
 			
 			var  asof_date = [meas.sel_date] // the "current" date
@@ -344,17 +367,20 @@ table opps
 		displayFolder: _opps
 		lineageTag: 10a98a67-885b-4ca7-aa63-5dd5d2e57d1b
 
+	/// Measure meas.total_opp_count.
 	measure 'meas.total_opp_count' = count(opps[_sys_doc_id])
 		formatString: 0
 		displayFolder: _opps
 		lineageTag: d17e8206-08e5-44bc-bc7a-e2ebbf39d72c
 
+	/// Measure meas.opps_name.
 	measure 'meas.opps_name' =
 			CALCULATE(
 			    MAX(opps[crm_name])
 			)
 		lineageTag: ca7bd717-4604-47eb-963c-306b7343bb15
 
+	/// Measure meas.opps_booking_lost_amt.
 	measure 'meas.opps_booking_lost_amt' = CALCULATE(SUM(opps[trueai_booking_amt]),opps[trueai_is_won] = False ) // get the lost opps  booking amount
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
@@ -362,6 +388,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.opps_avg_deal_size_amt.
 	measure 'meas.opps_avg_deal_size_amt' = CALCULATE(Average(opps[trueai_booking_amt]), opps[trueai_booking_amt] > 0 )
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
@@ -369,12 +396,14 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Measure meas.count_of_crm_deep_link.
 	measure 'meas.count_of_crm_deep_link' =
 			
 			DISTINCTCOUNT(opps[crm_deep_link])
 		formatString: 0
 		lineageTag: 212bd76d-4e51-41b4-ba2f-ea7b7160fc31
 
+	/// Measure meas.opps_cust_num1.
 	measure 'meas.opps_cust_num1' =
 			
 			SUM(opps[cust_num1])
@@ -383,6 +412,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_cust_num2.
 	measure 'meas.opps_cust_num2' =
 			
 			SUM(opps[cust_num2])
@@ -391,6 +421,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_cust_num3.
 	measure 'meas.opps_cust_num3' =
 			
 			SUM(opps[cust_num3])
@@ -399,6 +430,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_cust_num4.
 	measure 'meas.opps_cust_num4' =
 			
 			SUM(opps[cust_num4])
@@ -407,6 +439,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_cust_num5.
 	measure 'meas.opps_cust_num5' =
 			
 			SUM(opps[cust_num5])
@@ -415,6 +448,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_cust_num6.
 	measure 'meas.opps_cust_num6' =
 			
 			SUM(opps[cust_num6])
@@ -423,6 +457,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_cust_num7.
 	measure 'meas.opps_cust_num7' =
 			
 			SUM(opps[cust_num7])
@@ -431,16 +466,19 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.won_amt.
 	measure 'meas.won_amt' = CALCULATE(sum(opps[trueai_booking_amt]), opps[trueai_is_won] = true)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 79ef7551-1b06-4a8a-8b63-141ca9196a8c
 
+	/// Measure meas.won_count.
 	measure 'meas.won_count' = CALCULATE(count(opps[trueai_booking_amt]), opps[trueai_is_won] = true)
 		formatString: #,0
 		displayFolder: _opps
 		lineageTag: ec154535-f996-4fb0-a39a-ee15e2abb37c
 
+	/// Measure meas.opps_booking_amt_total.
 	measure 'meas.opps_booking_amt_total' = ```
 			
 			CALCULATE(
@@ -453,16 +491,19 @@ table opps
 		displayFolder: _opps
 		lineageTag: 3e4fd190-bb25-4c89-a94b-61cc9b045123
 
+	/// Measure meas.lost_count.
 	measure 'meas.lost_count' = CALCULATE(count(opps[trueai_booking_amt]), opps[trueai_is_won] = false)
 		formatString: #,0
 		displayFolder: _opps
 		lineageTag: 00e5941e-43c3-4a97-92c3-a7760510aba7
 
+	/// Measure meas.opps_booking_amt_avg.
 	measure 'meas.opps_booking_amt_avg' = CALCULATE(AVERAGE((opps[trueai_booking_amt])))
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 4a249f2a-182f-4d9d-a156-f5a27543751b
 
+	/// Measure meas.opps_sales_cycle_avg_days.
 	measure 'meas.opps_sales_cycle_avg_days' = ```
 			
 			var res = CALCULATE(AVERAGE(opps[col.trueai_days]))
@@ -474,26 +515,31 @@ table opps
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.lost_amt.
 	measure 'meas.lost_amt' = CALCULATE(sum(opps[trueai_booking_amt]), opps[trueai_is_won] = false)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: bf734b04-1e82-434c-8912-c972ddb30ac3
 
+	/// Measure meas.opps_lost_amt_in_stage_pct.
 	measure 'meas.opps_lost_amt_in_stage_pct' = DIVIDE([meas.opps_booking_lost_amt],[meas.opps_booking_amt])
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _success_metrics
 		lineageTag: 8ade373a-56e3-49bd-8f59-3c84379ba6f8
 
+	/// Measure meas.opps_booking_amt.
 	measure 'meas.opps_booking_amt' = CALCULATE( sum(opps[trueai_booking_amt]))
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 4529b0ce-1347-4c49-81c8-a51245ee0275
 
+	/// Measure meas.opps_booking_lost_amt_pct.
 	measure 'meas.opps_booking_lost_amt_pct' = DIVIDE([meas.opps_booking_lost_amt], [meas.opps_booking_amt_total])
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _success_metrics
 		lineageTag: 585994fc-6fc1-4e21-bae3-2ee24c6e8902
 
+	/// Measure meas.opps_max_stages.
 	measure 'meas.opps_max_stages' =
 			
 			SUMX(
@@ -507,11 +553,13 @@ table opps
 		displayFolder: _success_metrics
 		lineageTag: 40d5b9b3-a8b1-495b-95bb-dd379d53e138
 
+	/// Measure meas.opps_win_rate_value.
 	measure 'meas.opps_win_rate_value' = DIVIDE([meas.won_amt],[meas.opps_booking_amt_total])
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _success_metrics
 		lineageTag: a94c7b43-59b3-4861-97be-92d7b828c957
 
+	/// Measure meas.opps_booking_amt_stage.
 	measure 'meas.opps_booking_amt_stage' = ```
 			[meas.opps_booking_amt_total] - [meas.opps_booking_amt] 
 			```
@@ -519,6 +567,7 @@ table opps
 		displayFolder: _opps
 		lineageTag: 04beffda-c477-4ae0-8bee-c4cf2fa5db12
 
+	/// Measure meas.opps_booking_amt_reached_next_stage.
 	measure 'meas.opps_booking_amt_reached_next_stage' = ```
 			
 			VAR curIdx =
@@ -555,11 +604,13 @@ table opps
 		displayFolder: _success_metrics
 		lineageTag: aa23b27a-3667-4817-9d76-eca8052fa0b2
 
+	/// Measure meas.opps_total_crm_booking_amt.
 	measure 'meas.opps_total_crm_booking_amt' = SUM(opps[crm_booking_amt])
 		lineageTag: 9f546c8e-a727-4045-b9a7-e88973fb9cd1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_optimal_disc_level.
 	measure 'meas.opps_optimal_disc_level' =
 			
 			VAR TierStats =
@@ -607,6 +658,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_optimal_discount_deal_count_pct.
 	measure 'meas.opps_optimal_discount_deal_count_pct' =
 			
 			-- Step 1: Get the result from your existing "Optimal Discount Level" measure
@@ -632,6 +684,7 @@ table opps
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 4088315a-082d-4abf-93a2-2fafde065533
 
+	/// Measure meas.opps_over_discounted_deal_pct.
 	measure 'meas.opps_over_discounted_deal_pct' =
 			
 			-- Step 1: Get the optimal discount tier (e.g. "30-40%" or "40%+")
@@ -697,6 +750,7 @@ table opps
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 63b0aff0-9501-46ad-a241-5c4d4be19b7d
 
+	/// Measure meas.opps_no_discount_count.
 	measure 'meas.opps_no_discount_count' =
 			
 			CALCULATE(
@@ -707,6 +761,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_over_discount_deal_count.
 	measure 'meas.opps_over_discount_deal_count' =
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
@@ -732,6 +787,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_optimal_discount_deal_count.
 	measure 'meas.opps_optimal_discount_deal_count' =
 			
 			VAR BestTier = [meas.opps_optimal_disc_level]
@@ -743,6 +799,7 @@ table opps
 		formatString: 0
 		lineageTag: 3df4757a-4c6f-4c6e-b5a8-fb9c558fe44f
 
+	/// Measure meas.opps_no_discount_pct.
 	measure 'meas.opps_no_discount_pct' =
 			
 			VAR NoDiscDeals =
@@ -761,6 +818,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_under_discount_deal_count.
 	measure 'meas.opps_under_discount_deal_count' =
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
@@ -786,6 +844,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_under_discount_deal_pct.
 	measure 'meas.opps_under_discount_deal_pct' =
 			
 			VAR UnderCount = [meas.opps_under_discount_deal_count]
@@ -800,6 +859,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.optimal_discount_tier_background.
 	measure 'meas.optimal_discount_tier_background' =
 			
 			VAR OptimalSortKey =
@@ -826,6 +886,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_optimal_discount_pct.
 	measure 'meas.opps_optimal_discount_pct' =
 			
 			-- Get the optimal discount tier text (e.g. "30-40%")
@@ -863,6 +924,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_over_discount_amount.
 	measure 'meas.opps_over_discount_amount' =
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
@@ -888,6 +950,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_under_discount_amount.
 	measure 'meas.opps_under_discount_amount' =
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
@@ -912,6 +975,7 @@ table opps
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 3b0c2120-0320-4b5f-b0ee-169487a43ba8
 
+	/// Measure meas.opps_discount_avg_pct.
 	measure 'meas.opps_discount_avg_pct' =
 			
 			AVERAGEX(
@@ -931,6 +995,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.trueai_discount_avg_pct.
 	measure 'meas.trueai_discount_avg_pct' = ```
 			
 			VAR list_price = CALCULATE(SUM (opps[col.trueai_list_price_amt])) 
@@ -941,6 +1006,7 @@ table opps
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 6e72aa0a-1689-423c-a601-75d453bd1b16
 
+	/// Measure meas.opps_avg_discount_pct.
 	measure 'meas.opps_avg_discount_pct' = ```
 			
 			AVERAGE('opps'[trueai_discount_pct]) 
@@ -949,6 +1015,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas._diagnostic_delta_test.
 	measure 'meas._diagnostic_delta_test' =
 			
 			VAR SuccessRate = CALCULATE([meas.ssr_history_success_rate], KEEPFILTERS(opps))
@@ -959,6 +1026,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_over_discounted_total.
 	measure 'meas.opps_over_discounted_total' =
 			
 			CALCULATE(
@@ -974,12 +1042,14 @@ table opps
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 49d051de-1b3e-4ab6-82a4-f958870a76bf
 
+	/// Measure meas.trueai_disc_avg_pct.
 	measure 'meas.trueai_disc_avg_pct' =
 			
 			AVERAGE(opps[trueai_discount_pct])
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: b02b6b3e-be61-49ab-bceb-67e1d3616691
 
+	/// Measure meas.opp_valid_amount.
 	measure 'meas.opp_valid_amount' =
 			
 			IF (
@@ -991,6 +1061,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_optimal_disc_label.
 	measure 'meas.opps_optimal_disc_label' =
 			
 			VAR BestSortKey =
@@ -1007,6 +1078,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_deals_in_optimal_tier.
 	measure 'meas.opps_deals_in_optimal_tier' =
 			
 			VAR BestSortKey =
@@ -1037,6 +1109,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_excess_over_discount_amount.
 	measure 'meas.opps_excess_over_discount_amount' =
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
@@ -1066,6 +1139,7 @@ table opps
 			)
 		lineageTag: 69403608-0911-41c1-8e07-1730d51bcb9a
 
+	/// Measure meas.optimal_discount_pct_midpoint.
 	measure 'meas.optimal_discount_pct_midpoint' =
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
@@ -1078,6 +1152,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_excess_over_discount_amount_by_tier.
 	measure 'meas.opps_excess_over_discount_amount_by_tier' =
 			
 			VAR BestSortKey =
@@ -1110,6 +1185,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opp_nd_amt.
 	measure 'meas.opp_nd_amt' =
 			
 			SUM ( opps[trueai_nd_amt] )
@@ -1117,6 +1193,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opp_nnb_amt.
 	measure 'meas.opp_nnb_amt' = ```
 			
 			SUM ( opps[trueai_nnb_amt] )
@@ -1126,6 +1203,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opp_downgrade_amt.
 	measure 'meas.opp_downgrade_amt' =
 			
 			SUM ( opps[trueai_downgrade_amt] )
@@ -1133,6 +1211,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opp_cross_sale_amt.
 	measure 'meas.opp_cross_sale_amt' =
 			
 			SUM ( opps[trueai_cross_sale_amt] )
@@ -1140,6 +1219,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opp_renewal_amt.
 	measure 'meas.opp_renewal_amt' =
 			
 			SUM ( opps[trueai_renewal_amt] )
@@ -1147,6 +1227,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opp_arr_amt.
 	measure 'meas.opp_arr_amt' =
 			
 			SUM ( opps[trueai_arr_amt] )
@@ -1154,6 +1235,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opp_one_time_amt.
 	measure 'meas.opp_one_time_amt' =
 			
 			SUM ( opps[trueai_one_time_amt] )
@@ -1161,6 +1243,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opp_mrr_amt.
 	measure 'meas.opp_mrr_amt' =
 			
 			DIVIDE( [meas.opp_arr_amt], 12 )
@@ -1168,6 +1251,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opp_expansion_amt.
 	measure 'meas.opp_expansion_amt' =
 			
 			SUM ( opps[trueai_expansion_amt] )
@@ -1175,6 +1259,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.opps_non_nnb_amt.
 	measure 'meas.opps_non_nnb_amt' =
 			
 			[meas.opps_booking_amt] - [meas.opp_nnb_amt]
@@ -1182,6 +1267,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 88fcbd55-d718-43f8-9717-ccc01592c495
@@ -1190,6 +1276,7 @@ table opps
 
 		annotation SummarizationSetBy = User
 
+	/// The end date of the record, stripped of time
 	column _sys_filt_end_date
 		dataType: dateTime
 		formatString: Short Date
@@ -1206,6 +1293,7 @@ table opps
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// The start date of the record, stripped of time
 	column _sys_filt_start_date
 		dataType: dateTime
 		formatString: Short Date
@@ -1222,6 +1310,7 @@ table opps
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
 		dataType: string
 		lineageTag: f55be3c2-25bd-49a6-954e-d1f0612cf4c6
@@ -1230,6 +1319,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable on the account
 	column crm_account_custom_value_1
 		dataType: string
 		lineageTag: 539d75b9-5ab4-4caa-b2f8-bf8d77f44b89
@@ -1238,6 +1328,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable on the account
 	column crm_account_custom_value_2
 		dataType: string
 		lineageTag: 06fad6ce-b10b-4c5e-84de-67a29f9e9823
@@ -1246,6 +1337,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable on the account
 	column crm_account_custom_value_3
 		dataType: string
 		lineageTag: 06c8997d-4a29-4ce3-8b8b-66395e2e2dfb
@@ -1254,6 +1346,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// CRM account id of the opportunity
 	column crm_account_id
 		dataType: string
 		lineageTag: 3b3bbf19-5963-4e2c-99cc-2dc675dee1fb
@@ -1262,6 +1355,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's booking amount in the CRM
 	column crm_booking_amt
 		dataType: double
 		lineageTag: d4c3d431-20a1-4523-a30f-6ee2253ba7f0
@@ -1272,6 +1366,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's close date in the CRM
 	column crm_close_date
 		dataType: dateTime
 		formatString: mm/dd/yyyy
@@ -1288,6 +1383,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Opportunity's completeness score based on the CRM data
 	column crm_complt
 		dataType: double
 		lineageTag: 301775ce-0f4e-4462-8146-aab775558b0a
@@ -1298,6 +1394,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's contact information completeness score based on the CRM data
 	column crm_complt_contact
 		dataType: double
 		lineageTag: eade5a58-25b1-468d-85b1-85a314c26af2
@@ -1308,6 +1405,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's marketing completeness score based on the CRM data
 	column crm_complt_marketing
 		dataType: double
 		formatString: 0
@@ -1317,6 +1415,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity creator's id in the CRM
 	column crm_creator_id
 		dataType: string
 		lineageTag: 613e63ab-3957-4d55-97e3-dd80ae42582e
@@ -1325,6 +1424,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's currency in the CRM
 	column crm_currency
 		dataType: string
 		lineageTag: 354b9eed-4b20-4502-914c-6be919b3e8a7
@@ -1333,6 +1433,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable
 	column crm_custom_value_1
 		dataType: string
 		lineageTag: b325e3f8-159a-4139-80c2-f4ea62659ec9
@@ -1341,6 +1442,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable
 	column crm_custom_value_2
 		dataType: string
 		lineageTag: fb20b56e-f861-4804-8b00-9d04b3f5b9ac
@@ -1349,6 +1451,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable
 	column crm_custom_value_3
 		dataType: string
 		lineageTag: 5f5e1f09-00dc-4c26-a98c-c4d46b1a625a
@@ -1357,6 +1460,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Link to the opportunity in the remote system (such as Salesforce)
 	column crm_deep_link
 		dataType: string
 		lineageTag: 05cfe5dc-9176-41d2-bc8f-d8e3ed614fae
@@ -1366,6 +1470,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's last activity time in the CRM
 	column crm_last_act_time
 		dataType: dateTime
 		formatString: Short Date
@@ -1380,6 +1485,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's lead source in the CRM
 	column crm_leadsource
 		dataType: string
 		lineageTag: b6507793-1bf2-4c7d-a00d-b28b7913bff4
@@ -1388,6 +1494,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Name of the opportunity
 	column crm_name
 		dataType: string
 		lineageTag: 79e788de-2051-412d-8200-cf3df4ee4551
@@ -1396,6 +1503,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity owner's id in the CRM
 	column crm_owner_id
 		dataType: string
 		lineageTag: bd6b991f-9561-4de2-be85-0bee8e163bd1
@@ -1404,6 +1512,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's stage name in the CRM
 	column crm_stage_name
 		dataType: string
 		lineageTag: e4656938-bbe9-46ad-aadb-956c45e34181
@@ -1412,6 +1521,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's stage number in the CRM
 	column crm_stage_num
 		dataType: int64
 		formatString: 0
@@ -1421,6 +1531,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's type in the CRM
 	column crm_type
 		dataType: string
 		lineageTag: 430a5fb9-2142-4084-a963-b6339dcee13b
@@ -1429,6 +1540,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's city
 	column trueai_addr_city
 		dataType: string
 		lineageTag: e40d7176-d074-4d0c-ae30-b94c5758edb2
@@ -1437,6 +1549,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's country
 	column trueai_addr_country
 		dataType: string
 		lineageTag: ca9a4f05-9adf-4b2a-aa5f-30564d36e24e
@@ -1445,6 +1558,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's latitude
 	column trueai_addr_lat
 		dataType: double
 		lineageTag: 982db127-41e6-4eb1-945f-6df7d988b7f1
@@ -1455,6 +1569,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's longitude
 	column trueai_addr_long
 		dataType: double
 		lineageTag: 088de29a-5fe4-4f25-9e10-53f6a5d20733
@@ -1465,6 +1580,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's postal code
 	column trueai_addr_postal_code
 		dataType: string
 		lineageTag: 7299d1a8-1541-455d-aceb-02fb839dabc5
@@ -1473,6 +1589,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's address prediction rule
 	column trueai_addr_rule
 		dataType: int64
 		formatString: 0
@@ -1482,6 +1599,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's state
 	column trueai_addr_state
 		dataType: string
 		lineageTag: 29ad86e7-f924-4bce-89de-c9564e3cc600
@@ -1490,6 +1608,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's street
 	column trueai_addr_street
 		dataType: string
 		lineageTag: 25418c07-50cc-4637-835c-135aee79b467
@@ -1498,6 +1617,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's booking amount
 	column trueai_booking_amt
 		dataType: double
 		formatString: \$#,0;(\$#,0);\$#,0
@@ -1507,6 +1627,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's booking amount rule related to the presence or absence of opp line items and custom mappings
 	column trueai_booking_amt_rule
 		dataType: int64
 		formatString: 0
@@ -1516,6 +1637,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's close date
 	column trueai_close_date
 		dataType: dateTime
 		formatString: General Date
@@ -1530,6 +1652,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's standardized company size
 	column trueai_company_size
 		dataType: string
 		lineageTag: 268a37ef-e827-4ce9-b4a7-c43329dc0152
@@ -1538,6 +1661,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's standardized company size prediction rule
 	column trueai_company_size_rule
 		dataType: int64
 		formatString: 0
@@ -1547,6 +1671,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Completeness score of the opportunity based on the standardized data
 	column trueai_complt
 		dataType: double
 		lineageTag: 05b2a018-d2f5-46bd-984e-8c1d7d0f506b
@@ -1557,6 +1682,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Contact information completeness score of the opportunity based on the standardized data
 	column trueai_complt_contact
 		dataType: double
 		lineageTag: 3f30935c-ee61-4310-b564-1af485ae9b22
@@ -1567,6 +1693,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Marketing completeness score of the opportunity based on the standardized data
 	column trueai_complt_marketing
 		dataType: double
 		formatString: 0
@@ -1576,6 +1703,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity creator's id
 	column trueai_creator_id
 		dataType: string
 		lineageTag: 54cf8b74-c048-47ef-af1b-aa98afdfdb39
@@ -1584,6 +1712,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Total duration of activities performed on the opportunity
 	column trueai_dur
 		dataType: int64
 		formatString: 0
@@ -1593,6 +1722,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's standardized industry
 	column trueai_industry
 		dataType: string
 		lineageTag: 35410a22-5548-4df5-8dc1-fba4ff93f30e
@@ -1601,6 +1731,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's standardized industry prediction confidence
 	column trueai_industry_conf
 		dataType: double
 		lineageTag: 219a06c1-7dfe-4f51-8bf4-424a3991d64b
@@ -1611,6 +1742,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's standardized industry prediction rule
 	column trueai_industry_rule
 		dataType: int64
 		formatString: 0
@@ -1620,6 +1752,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the opportunity is a new logo
 	column trueai_is_new_logo
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1629,6 +1762,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's standardized lead source
 	column trueai_leadsource
 		dataType: string
 		lineageTag: abda2696-27f8-4d81-b78f-caeab4af7e96
@@ -1637,6 +1771,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's standardized lead source prediction confidence
 	column trueai_leadsource_conf
 		dataType: double
 		lineageTag: 3215f56d-0c96-4264-8a78-1abe5702f7f3
@@ -1647,6 +1782,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's standardized lead source prediction rule
 	column trueai_leadsource_rule
 		dataType: int64
 		formatString: 0
@@ -1656,6 +1792,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Date when the opportunity entered the late stage
 	column trueai_opp_stage_late_date
 		dataType: dateTime
 		formatString: General Date
@@ -1670,6 +1807,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Date when the opportunity entered the middle stage
 	column trueai_opp_stage_mid_date
 		dataType: dateTime
 		formatString: General Date
@@ -1684,6 +1822,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity owner's id
 	column trueai_owner_id
 		dataType: string
 		lineageTag: d7eae22d-928e-4b5b-95d5-afa5e71416b2
@@ -1692,6 +1831,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Quality bucket based on the probability of win
 	column trueai_qual_bucket
 		dataType: string
 		lineageTag: f9ca256f-982f-4e74-8ba4-bb9073321080
@@ -1703,6 +1843,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Quality bucket expressed as an integer from 1 to 5 based on the probability of win
 	column trueai_qual_bucket_num
 		dataType: int64
 		formatString: 0
@@ -1712,6 +1853,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's sale type
 	column trueai_sale_type
 		dataType: string
 		lineageTag: 07005dac-4d02-4068-91fd-dc61de938357
@@ -1723,6 +1865,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's sale type prediction confidence
 	column trueai_sale_type_conf
 		dataType: double
 		lineageTag: 215ed405-cde1-4f5c-a9a3-6cb3b58cde6e
@@ -1733,6 +1876,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's custom completeness score based on the CRM data
 	column crm_complt_custom
 		dataType: double
 		lineageTag: 5999492c-d926-4832-98ab-554786c282fd
@@ -1743,6 +1887,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// The date of the last data request from the platform
 	column _sys_as_of
 		dataType: dateTime
 		formatString: Long Date
@@ -1757,6 +1902,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the opportunity is active
 	column _sys_is_active
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1766,6 +1912,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The date of the last data modification in the platform
 	column _sys_last_modified_on
 		dataType: dateTime
 		formatString: General Date
@@ -1780,6 +1927,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity creation date in the CRM
 	column crm_created_on
 		dataType: dateTime
 		formatString: mm/dd/yyyy
@@ -1796,6 +1944,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Boolean flag that indicates whether the opportunity is closed in the CRM
 	column crm_is_closed
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1805,6 +1954,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the opportunity is won in the CRM
 	column crm_is_won
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1814,6 +1964,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity modified on date in the CRM
 	column crm_modified_on
 		dataType: dateTime
 		formatString: General Date
@@ -1828,6 +1979,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's prospecting entity
 	column trueai_created_from_entity
 		dataType: string
 		lineageTag: 742606d0-e93f-4ebc-8d08-c078da19668d
@@ -1836,6 +1988,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's prospecting object's id
 	column trueai_created_from_id
 		dataType: string
 		lineageTag: aa27386e-90e5-4f08-9ca3-51edf081d66a
@@ -1844,6 +1997,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity creation date
 	column trueai_created_on
 		dataType: dateTime
 		formatString: Short Date
@@ -1858,6 +2012,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the opportunity is won
 	column trueai_is_won
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1867,6 +2022,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's normalized stage
 	column trueai_stage
 		dataType: string
 		lineageTag: 6d231412-b655-416f-85f6-fcd506b75399
@@ -1875,6 +2031,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Probability of win
 	column trueai_prob_of_win
 		dataType: double
 		lineageTag: e96f5ead-faa8-42cb-a0c4-25e6e468cd04
@@ -1885,6 +2042,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity discount amount
 	column trueai_discount_amt
 		dataType: double
 		lineageTag: dd9afbc5-9311-4dbb-90fd-76e9c3596e80
@@ -1895,6 +2053,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity discount percentage
 	column trueai_discount_pct
 		dataType: double
 		lineageTag: d298504b-9662-4b09-9aab-80a719e715be
@@ -1905,6 +2064,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's booking amount currency conversion rule
 	column trueai_booking_amt_currency_rule
 		dataType: int64
 		formatString: 0
@@ -1914,6 +2074,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag indicating whether the opportunity should be treated as an order instead.
 	column trueai_is_erp
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1923,6 +2084,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's account id
 	column trueai_account_id
 		dataType: string
 		lineageTag: 38aace67-e071-4e69-8e17-bfe4b3611c6b
@@ -1931,6 +2093,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's account id rule
 	column trueai_account_id_rule
 		dataType: int64
 		formatString: 0
@@ -1940,6 +2103,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's account id confidence
 	column trueai_account_id_conf
 		dataType: double
 		lineageTag: 47a16c39-3029-4312-8b23-238b97b72a29
@@ -1950,6 +2114,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Test model
 	column trueai_test
 		dataType: string
 		lineageTag: 8235a218-47c3-488d-94b6-f0fc6734df6a
@@ -1958,6 +2123,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Test model confidence
 	column trueai_test_conf
 		dataType: double
 		lineageTag: c26bab90-9678-4bff-a19d-3c932528c7de
@@ -1968,6 +2134,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Test model rule
 	column trueai_test_rule
 		dataType: string
 		lineageTag: bb9e0b1e-408f-4af7-8170-f562456c840b
@@ -1976,6 +2143,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Test model debug information
 	column trueai_test_debug
 		dataType: string
 		lineageTag: b2c5a489-baa2-4e76-9490-72ff85b96c81
@@ -1984,6 +2152,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's close date rule
 	column trueai_close_date_rule
 		dataType: int64
 		formatString: 0
@@ -1993,6 +2162,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's start date rule
 	column trueai_start_date_rule
 		dataType: int64
 		formatString: 0
@@ -2002,6 +2172,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity creation date rule
 	column trueai_created_on_rule
 		dataType: int64
 		formatString: 0
@@ -2011,6 +2182,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity creator's id rule
 	column trueai_creator_id_rule
 		dataType: int64
 		formatString: 0
@@ -2020,6 +2192,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity owner's id rule
 	column trueai_owner_id_rule
 		dataType: int64
 		formatString: 0
@@ -2029,6 +2202,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text1
 	column cust_text1
 		dataType: string
 		lineageTag: e48fcd0a-3356-4007-a9e6-6d394a682b00
@@ -2037,6 +2211,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text2
 	column cust_text2
 		dataType: string
 		lineageTag: 5ebbaece-ef39-4c52-b8ff-6172a75cae84
@@ -2045,6 +2220,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text3
 	column cust_text3
 		dataType: string
 		lineageTag: c6437621-96ff-47ba-bcf9-194ddadcc939
@@ -2053,6 +2229,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text4
 	column cust_text4
 		dataType: string
 		lineageTag: d5b944c2-4b57-4489-9bd4-46eedae481f3
@@ -2061,6 +2238,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_text5
 	column cust_text5
 		dataType: string
 		lineageTag: c0b6e9c7-8274-4915-8d1c-de54e2859974
@@ -2069,6 +2247,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_num1
 	column cust_num1
 		dataType: double
 		lineageTag: 1703943b-4f7a-4ea8-9e41-044d05ba67e3
@@ -2079,6 +2258,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num2
 	column cust_num2
 		dataType: double
 		lineageTag: 158a4065-a0b1-43e1-987b-408d2b323a9c
@@ -2089,6 +2269,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num3
 	column cust_num3
 		dataType: double
 		lineageTag: a955c0ad-aad2-4b12-9e60-bdbbcf47ff30
@@ -2099,6 +2280,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num4
 	column cust_num4
 		dataType: double
 		lineageTag: 253ab445-e75c-43eb-8931-0406d3bf798a
@@ -2109,6 +2291,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num5
 	column cust_num5
 		dataType: double
 		lineageTag: f8ea7d53-c480-4f9a-aa20-8c84078f9998
@@ -2119,6 +2302,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num6
 	column cust_num6
 		dataType: double
 		lineageTag: 75d92bbc-8a2a-4892-b6f6-92c3a246fff8
@@ -2129,6 +2313,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_num7
 	column cust_num7
 		dataType: double
 		lineageTag: ed3a4644-5693-4232-820a-d8a7914af484
@@ -2139,6 +2324,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// cust_bool1
 	column cust_bool1
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -2148,6 +2334,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// cust_bool2
 	column cust_bool2
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -2157,6 +2344,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column trueai_sale_type_num.
 	column trueai_sale_type_num
 		dataType: int64
 		formatString: 0
@@ -2166,6 +2354,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.opp_age' =.
 	column 'col.opp_age' =
 			
 			var _current_date = TODAY()
@@ -2181,6 +2370,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Column 'col.trueai_opp_stages_recorded' = ```.
 	column 'col.trueai_opp_stages_recorded' = ```
 			
 			var opp_id = opps[_sys_doc_id] // get the opp i
@@ -2193,6 +2383,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_days' = ```.
 	column 'col.trueai_days' = ```
 			
 			 var days = [_sys_filt_end_date] - [_sys_filt_start_date] // get days 
@@ -2210,6 +2401,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Opportunity's loss reason in the CRM
 	column crm_loss_reason
 		dataType: string
 		lineageTag: 1d8edd5f-2f0e-403b-8819-4223be800caa
@@ -2218,6 +2410,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// CRM pipeline id of the opportunity
 	column crm_pipeline_id
 		dataType: string
 		lineageTag: b68cd95a-ec03-4a4d-a7c2-84a9db8377e5
@@ -2226,6 +2419,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// CRM pipeline name of the opportunity
 	column crm_pipeline_name
 		dataType: string
 		lineageTag: 098a82b7-496c-47ac-b6d3-f8daea0efa57
@@ -2234,6 +2428,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's loss reason
 	column trueai_loss_reason
 		dataType: string
 		lineageTag: 2227ec9d-5ce9-418c-b27a-316c37be4cbb
@@ -2242,6 +2437,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's stage ID in the CRM
 	column crm_stage_id
 		dataType: string
 		lineageTag: b2fe47bb-23b0-42c2-964a-1654c44a999d
@@ -2250,6 +2446,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's stage ID
 	column trueai_stage_id
 		dataType: string
 		lineageTag: 4ca57c41-1c46-41de-89ed-fc4817a0d140
@@ -2258,6 +2455,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's stage name
 	column trueai_stage_name
 		dataType: string
 		lineageTag: 0dabd22b-ac43-4dd5-af35-1eeb3d0925ae
@@ -2266,6 +2464,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Pipeline name of the opportunity
 	column trueai_pipeline_name
 		dataType: string
 		lineageTag: 9627b322-883d-45f4-8178-4b9ab26ce3d4
@@ -2274,6 +2473,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity Age
 	column trueai_age
 		dataType: int64
 		formatString: 0
@@ -2283,6 +2483,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity discount percentage tier
 	column trueai_discount_pct_tier
 		dataType: string
 		lineageTag: d5d56924-c4f6-4819-ab08-6cca48c59b9f
@@ -2291,6 +2492,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's NNB amount
 	column trueai_nnb_amt
 		dataType: double
 		lineageTag: e9f6bc83-15bd-48c0-91ec-d57c3a73a98b
@@ -2301,6 +2503,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's downgrade amount
 	column trueai_downgrade_amt
 		dataType: double
 		lineageTag: bd379382-b3be-4dd3-8ef7-189895232667
@@ -2311,6 +2514,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's Cross-Sale amount
 	column trueai_cross_sale_amt
 		dataType: double
 		lineageTag: a2b152b4-9691-4e96-8d53-7cac21ea41fe
@@ -2321,6 +2525,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's renewal amount
 	column trueai_renewal_amt
 		dataType: double
 		lineageTag: 5130b759-05ac-429f-b8d6-b640da10ec5c
@@ -2331,6 +2536,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's expansion amount
 	column trueai_expansion_amt
 		dataType: double
 		lineageTag: 2aa9029e-00e5-4143-b125-ff4976f53cd7
@@ -2341,6 +2547,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's one time amount
 	column trueai_one_time_amt
 		dataType: double
 		lineageTag: 89b7956b-1362-4c1b-b5b3-94b83d51344b
@@ -2351,6 +2558,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's non determinable amount
 	column trueai_nd_amt
 		dataType: double
 		lineageTag: 0ebcb086-8b02-4f52-8347-ba15c0ad5583
@@ -2361,6 +2569,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Opportunity's ARR amount
 	column trueai_arr_amt
 		dataType: double
 		lineageTag: 1093cd30-1cdd-48a7-8902-022cc75af8cb
@@ -2371,6 +2580,7 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column 'col.trueai_list_price_amt' = ```.
 	column 'col.trueai_list_price_amt' = ```
 			
 			[trueai_booking_amt]-[trueai_discount_amt]
@@ -2382,6 +2592,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's last crm stage, before it was lost
 	column trueai_lost_crm_stage
 		dataType: string
 		lineageTag: 4658f8e3-0042-4231-b182-53675d8cb4a2
@@ -2390,6 +2601,7 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Opportunity's Initial Subscription amount
 	column trueai_initial_subscription_amt
 		dataType: double
 		lineageTag: 30ddaf79-4844-4d47-bc28-72376f6f0d3e
@@ -2399,6 +2611,38 @@ table opps
 		annotation SummarizationSetBy = Automatic
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_pred_booking_amt
+		dataType: string
+		lineageTag: be8c29d5-414a-45f7-9080-c92691b06859
+		summarizeBy: none
+		sourceColumn: trueai_pred_booking_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_pred_close_date
+		dataType: string
+		lineageTag: ba1e2de3-123b-4bba-9662-49a2bb9f0af9
+		summarizeBy: none
+		sourceColumn: trueai_pred_close_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_pred_close_date_if_won
+		dataType: string
+		lineageTag: 1c29cddb-7aa3-47f6-ba9e-74298cc1897d
+		summarizeBy: none
+		sourceColumn: trueai_pred_close_date_if_won
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_pred_close_date_if_lost
+		dataType: string
+		lineageTag: 1f16ad66-2a7a-48ad-b1c9-1523b76c79fb
+		summarizeBy: none
+		sourceColumn: trueai_pred_close_date_if_lost
+
+		annotation SummarizationSetBy = Automatic
 
 	partition opps-844b2383-8abc-4f81-b4fd-92ba5ff8a92a = m
 		mode: import
