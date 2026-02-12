@@ -2,7 +2,6 @@
 table dupe_summary
 	lineageTag: f7b99aab-df1a-410a-affa-c6c31f68180a
 
-	/// Measure meas.crm_dupe_score.
 	measure 'meas.crm_dupe_score' = ```
 			
 			//calculate ratio
@@ -36,7 +35,6 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.crm_dupe_score_industry_avg_display.
 	measure 'meas.crm_dupe_score_industry_avg_display' =
 			//0.55 * 100
 			var _score = CALCULATE(
@@ -50,7 +48,6 @@ table dupe_summary
 		displayFolder: _dupe_score
 		lineageTag: d0e5e2bd-776d-4c12-bb76-0981cde94199
 
-	/// Measure meas.trueai_dupe_score.
 	measure 'meas.trueai_dupe_score' = ```
 			
 			var all_recs =  [meas.crm_records]
@@ -72,7 +69,6 @@ table dupe_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.trueai_dupe_score_improvement.
 	measure 'meas.trueai_dupe_score_improvement' = ```
 			
 			var trueai_score = ROUND([meas.trueai_dupe_score_display],2)      // get the trueai dupe score
@@ -87,7 +83,6 @@ table dupe_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.crm_dupe_problem_records.
 	measure 'meas.crm_dupe_problem_records' =
 			
 			var _count = CALCULATE(COUNT(dupe_summary[_sys_docid]), dupe_summary[is_dupe] = true)
@@ -105,7 +100,6 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.crm_dupe_problem_records_pct.
 	measure 'meas.crm_dupe_problem_records_pct' =
 			
 			var res = divide ([meas.crm_dupe_problem_records], [meas.crm_records] )
@@ -120,7 +114,6 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.crm_records.
 	measure 'meas.crm_records' =
 			
 			var _count = CALCULATE(COUNT(dupe_summary[_sys_docid]))
@@ -139,7 +132,6 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.trueai_corrected_records.
 	measure 'meas.trueai_corrected_records' =
 			
 			var _count = CALCULATE(count(dupe_summary[_sys_docid]), dupe_summary[is_master] = true)
@@ -157,7 +149,6 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.crm_dupe_score_display.
 	measure 'meas.crm_dupe_score_display' = [meas.crm_dupe_score] * 100
 		formatString: 0
 		displayFolder: _dupe_score
@@ -165,7 +156,6 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.trueai_dupe_score_display.
 	measure 'meas.trueai_dupe_score_display' =
 			
 			var _crm_score = [meas.crm_dupe_score_display]              // get the crm sciore(before)

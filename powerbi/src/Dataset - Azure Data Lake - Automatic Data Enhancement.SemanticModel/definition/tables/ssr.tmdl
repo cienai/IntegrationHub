@@ -2,7 +2,6 @@
 table ssr
 	lineageTag: cb48d9a8-ea61-48bb-845c-67eb596f90f7
 
-	/// Measure meas.ssr_trueai_conversion_rate.
 	measure 'meas.ssr_trueai_conversion_rate' = ```
 			
 			var total =CALCULATE(DISTINCTCount(ssr_history[_sys_ssr_id])  )  +0
@@ -14,7 +13,6 @@ table ssr
 		displayFolder: _ssr_analysis
 		lineageTag: a946bddd-5ee9-4adf-a031-0bb4bbb7b204
 
-	/// Measure meas.ssr_trueai_converted_count.
 	measure 'meas.ssr_trueai_converted_count' = ```
 			
 			 var res =CALCULATE(DISTINCTCount(ssr_history[_sys_ssr_id]), ssr_history[step_success] = True && ssr_history[step_name] = "Prospecting")  +0
@@ -24,7 +22,6 @@ table ssr
 		displayFolder: _ssr_analysis
 		lineageTag: f64fb9f1-a6d6-4e35-ade9-42652b127317
 
-	/// Measure meas.ssr_trueai_no_leadsource_count.
 	measure 'meas.ssr_trueai_no_leadsource_count' = ```
 			
 			var val = CALCULATE(count(ssr[_sys_doc_id]), or(ISBLANK(ssr[trueai_leadsource]) = TRUE(),ssr[trueai_leadsource]= "ND" && ssr[crm_lead_count] >0 ))
@@ -35,13 +32,11 @@ table ssr
 		displayFolder: _ssr_analysis
 		lineageTag: 9ff987e5-24d2-453a-8420-d58519669d3c
 
-	/// Measure meas.ssr_trueai_no_leadsource_rate.
 	measure 'meas.ssr_trueai_no_leadsource_rate' = [meas.ssr_trueai_no_leadsource_count] / CALCULATE(count(ssr[_sys_doc_id]),  ssr[crm_lead_count] >0 ) // only include the ones w/ leads
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: _ssr_analysis
 		lineageTag: 688b74be-7bd5-49c2-ac7d-734bc28f3627
 
-	/// Measure meas.crm_has_leads_and_accounts_count.
 	measure 'meas.crm_has_leads_and_accounts_count' =
 			
 			var res = CALCULATE(Count(ssr[_sys_doc_id]), ssr[col.crm_has_accounts] = TRUE() && ssr[col.crm_has_leads] = TRUE())
@@ -50,7 +45,6 @@ table ssr
 		displayFolder: _ssr_analysis
 		lineageTag: e2098939-2a9f-4d2e-9dd5-292cfef21a57
 
-	/// Measure meas.ssr_unique_with_only_accounts.
 	measure 'meas.ssr_unique_with_only_accounts' = ```
 			
 			 var res = CALCULATE(COUNT(ssr[_sys_doc_id]), ssr[col.crm_has_leads] = False && (ssr[trueai_account_is_master] = True || isblank(ssr[trueai_account_is_master]) = True))
@@ -60,7 +54,6 @@ table ssr
 		displayFolder: _ssr_analysis
 		lineageTag: 95b81281-f2e6-4de1-8655-2037de1db979
 
-	/// Measure meas.ssr_non_unique_with_only_accounts.
 	measure 'meas.ssr_non_unique_with_only_accounts' =
 			
 			var res =CALCULATE(COUNT(ssr[_sys_doc_id]), ssr[col.crm_has_leads] = False && (ssr[trueai_account_is_master] = False || ssr[trueai_account_is_master] = True || isblank(ssr[trueai_account_is_master]) = True))
@@ -69,7 +62,6 @@ table ssr
 		displayFolder: _ssr_analysis
 		lineageTag: 716b3cc6-253d-4225-9134-518a3c569eab
 
-	/// Measure meas.ssr_leads_accts_counts.
 	measure 'meas.ssr_leads_accts_counts' = ```
 			
 			CALCULATE(
@@ -79,7 +71,6 @@ table ssr
 		formatString: #,0
 		lineageTag: fe308ad8-fcd9-4cbb-806a-29492fd84183
 
-	/// Measure Last Data Date.
 	measure 'Last Data Date' =
 			
 			CALCULATE(
