@@ -2,7 +2,6 @@
 table cal_end_dates
 	lineageTag: 0c87fa54-b3b7-47c2-9154-a95fcfb4b586
 
-	/// Measure meas.filter_string.
 	measure 'meas.filter_string' = ```
 			
 			
@@ -40,13 +39,11 @@ table cal_end_dates
 		displayFolder: _filt_helpers
 		lineageTag: 203cf28c-7376-4634-a106-b86acd188d74
 
-	/// Measure meas.data_asof.
 	measure 'meas.data_asof' = //"Data last processed on: " & calculate(max(leads[_sys_as_of]))
 		formatString: 0
 		displayFolder: _filt_helpers
 		lineageTag: 45ef1e74-2032-4fab-8fcc-e9b422fa3e4c
 
-	/// Measure meas.last_year_full.
 	measure 'meas.last_year_full' =
 			
 			var _current_year = YEAR(MAX('cal_end_dates'[date]))
@@ -65,7 +62,6 @@ table cal_end_dates
 		displayFolder: _filt_helpers
 		lineageTag: a32c0d45-f0d4-4361-bb6b-0b48af7d7861
 
-	/// Measure meas.context_min.
 	measure 'meas.context_min' =
 			
 			CALCULATE(MIN('cal_end_dates'[date]))
@@ -73,7 +69,6 @@ table cal_end_dates
 		displayFolder: _filt_helpers
 		lineageTag: 1148b606-5a63-49e5-b97e-960f5897841b
 
-	/// Measure meas.context_max.
 	measure 'meas.context_max' =
 			
 			CALCULATE(MAX('cal_end_dates'[date]))
@@ -208,137 +203,72 @@ table cal_end_dates
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column year_week_number.
-	column year_week_number
-		lineageTag: faf180e6-804a-4525-b401-37fe3e1e6577
-		summarizeBy: none
+	column fiscal_year
+		lineageTag: 0ffec087-3cad-4c61-b553-3786d1fac3ca
 		isNameInferred
-		sourceColumn: [year_week_number]
+		sourceColumn: [fiscal_year]
 
-		annotation SummarizationSetBy = Automatic
-
-	/// Column year_day_number.
-	column year_day_number
-		lineageTag: 15d54118-9d10-4199-9d57-c5c997f25c8d
-		summarizeBy: none
+	column fiscal_month
+		lineageTag: 79f4b5f4-d37c-4a39-8381-d05897207cd1
 		isNameInferred
-		sourceColumn: [year_day_number]
+		sourceColumn: [fiscal_month]
 
-		annotation SummarizationSetBy = Automatic
-
-	column year_quarter_num
-		formatString: 0
-		lineageTag: 61ba36bc-447a-40de-935e-588b6a12cdfb
-		summarizeBy: sum
+	column fiscal_quarter
+		lineageTag: 9dac8ee2-2eba-4abf-b614-3c48f5e0d6b4
 		isNameInferred
-		sourceColumn: [year_quarter_num]
-
-		annotation SummarizationSetBy = Automatic
-
-	column first_of_week_date
-		formatString: General Date
-		lineageTag: 2b4075c3-f6b1-4e05-a5e0-c395b8f30612
-		summarizeBy: none
-		isNameInferred
-		sourceColumn: [first_of_week_date]
-
-		annotation SummarizationSetBy = Automatic
-
-	column first_of_month_date
-		formatString: General Date
-		lineageTag: 9ea75d3b-4960-45c8-a43d-5e81af95c82a
-		summarizeBy: none
-		isNameInferred
-		sourceColumn: [first_of_month_date]
-
-		annotation SummarizationSetBy = Automatic
-
-	column first_of_qtr_date
-		formatString: General Date
-		lineageTag: d4aae04e-6d93-4175-9750-3378a4044716
-		summarizeBy: none
-		isNameInferred
-		sourceColumn: [first_of_qtr_date]
-
-		annotation SummarizationSetBy = Automatic
-
-	column is_last_4q
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: b93539d8-ef40-4d87-8f1e-05c0b06a1c65
-		summarizeBy: none
-		isNameInferred
-		sourceColumn: [is_last_4q]
-
-		annotation SummarizationSetBy = Automatic
-
-	column first_of_year_date
-		formatString: General Date
-		lineageTag: dc7c1e3d-66f2-493b-984e-383d2c7868f4
-		summarizeBy: none
-		isNameInferred
-		sourceColumn: [first_of_year_date]
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'Fiscal Date'
-		formatString: General Date
-		lineageTag: e35c5b50-0c2f-4d47-964d-fcde8469a530
-		summarizeBy: none
-		isNameInferred
-		sourceColumn: [Fiscal Date]
-
-		annotation SummarizationSetBy = Automatic
+		sourceColumn: [fiscal_quarter]
 
 	partition cal_end_dates-c3d83cde-1612-440f-b017-358fa64b862d = calculated
 		mode: import
 		source =
-			
-			var min_date =  MAX(date(2000,01,01) ,  min(ssr[_sys_filt_start_date])) // get the first date that we have data for but never before 2000
-			var max_date = max(ssr[_sys_as_of]) // get the last date (as _of) that we have data for
-			var f_month = [meas.getFiscalYearOffset]        // get the fiscal_year offset
-			
-			var cal_tbl  =ADDCOLUMNS (
-			CALENDAR (min_date, max_date),
-			"date_as_integer", FORMAT ( [Date], "YYYYMMDD" ),
-			"year", YEAR ( [Date] ),
-			"month_number", FORMAT ( [Date], "MM" ),
-			"year_month_number", FORMAT ( [Date], "YYYY/MM" ),
-			"year_month_short", FORMAT ( [Date], "YYYY/mmm" ),
-			"month_name_short", FORMAT ( [Date], "mmm" ),
-			"month_name_long", FORMAT ( [Date], "mmmm" ),
-			"day_of_week_number", WEEKDAY ( [Date] ),
-			"day_of_week", FORMAT ( [Date], "dddd" ),
-			"day_of_week_short", FORMAT ( [Date], "ddd" ),
-			"quarter", "Q" & FORMAT ( [Date], "Q" ),
-			"year_quarter", FORMAT ( [Date], "YYYY" ) & "/Q" & FORMAT ( [Date], "Q" ),
-			"fiscal_year", IF(
-			                f_month = 0,
-			                YEAR([Date]),
-			                IF(
-			                    MONTH([Date]) >= f_month,
-			                    YEAR([Date]) + 1,
-			                    YEAR([Date])
-			                )
-			            ),
-			"fiscal_month",IF(
-			                    f_month = 0,
-			                    month([Date]),
-			                    IF(
-			                        MONTH([Date]) >= f_month,
-			                        MONTH([Date]) - f_month + 1,
-			                        MONTH([Date]) + (12 - f_month + 1)
-			                    )
-			                ),
-			"fiscal_quarter", "Q" & IF(
-			                    f_month = 0,
-			                    FORMAT([Date], "Q" ),
-			                    IF(
-			                        MONTH([Date]) >= f_month,
-			                        CEILING((MONTH([Date]) - f_month + 1) / 3, 1),
-			                        CEILING((MONTH([Date]) + (12 - f_month + 1)) / 3, 1)
-			                    )
-			                )
-			)
-			return cal_tbl
+				
+				var min_date =  MAX(date(2000,01,01) ,  min(ssr[_sys_filt_start_date])) // get the first date that we have data for but never before 2000
+				var max_date = max(ssr[_sys_as_of]) // get the last date (as _of) that we have data for
+				var f_month = [meas.getFiscalYearOffset]        // get the fiscal_year offset
+				
+				var cal_tbl  =ADDCOLUMNS (
+				CALENDAR (min_date, max_date),
+				"date_as_integer", FORMAT ( [Date], "YYYYMMDD" ),
+				"year", YEAR ( [Date] ),
+				"month_number", FORMAT ( [Date], "MM" ),
+				"year_month_number", FORMAT ( [Date], "YYYY/MM" ),
+				"year_month_short", FORMAT ( [Date], "YYYY/mmm" ),
+				"month_name_short", FORMAT ( [Date], "mmm" ),
+				"month_name_long", FORMAT ( [Date], "mmmm" ),
+				"day_of_week_number", WEEKDAY ( [Date] ),
+				"day_of_week", FORMAT ( [Date], "dddd" ),
+				"day_of_week_short", FORMAT ( [Date], "ddd" ),
+				"quarter", "Q" & FORMAT ( [Date], "Q" ),
+				"year_quarter", FORMAT ( [Date], "YYYY" ) & "/Q" & FORMAT ( [Date], "Q" ),
+				"fiscal_year", IF(
+				                f_month = 0,
+				                YEAR([Date]),
+				                IF(
+				                    MONTH([Date]) >= f_month,
+				                    YEAR([Date]) + 1,
+				                    YEAR([Date])
+				                )
+				            ),
+				"fiscal_month",IF(
+				                    f_month = 0,
+				                    month([Date]),
+				                    IF(
+				                        MONTH([Date]) >= f_month,
+				                        MONTH([Date]) - f_month + 1,
+				                        MONTH([Date]) + (12 - f_month + 1)
+				                    )
+				                ),
+				"fiscal_quarter", "Q" & IF(
+				                    f_month = 0,
+				                    FORMAT([Date], "Q" ),
+				                    IF(
+				                        MONTH([Date]) >= f_month,
+				                        CEILING((MONTH([Date]) - f_month + 1) / 3, 1),
+				                        CEILING((MONTH([Date]) + (12 - f_month + 1)) / 3, 1)
+				                    )
+				                )
+				)
+				return cal_tbl
+
 	annotation PBI_Id = 47fdd5fe548045698e2980cebacd82ae
 
