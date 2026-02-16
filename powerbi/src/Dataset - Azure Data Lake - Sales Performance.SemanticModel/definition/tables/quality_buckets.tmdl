@@ -19,7 +19,7 @@ table quality_buckets
 		lineageTag: 804c34d9-baa9-4dec-9223-5c86c07029e6
 
 	/// Measure meas.quality_buckets_step_name.
-	measure 'meas.quality_buckets_step_name' = CALCULATE(MAX(quality_buckets[step_name]))     // get the quality bucket step name
+	measure 'meas.quality_buckets_step_name' = CALCULATE(MAX(quality_buckets[step_name]))     // get the propensity step name
 		displayFolder: _quality_measures
 		lineageTag: 46d3abd7-9013-430f-8f05-1db9082e79d7
 
@@ -117,7 +117,7 @@ table quality_buckets
 	/// Measure meas.quality_buckets_bucket_name.
 	measure 'meas.quality_buckets_bucket_name' =
 			
-			CALCULATE(MAX(quality_buckets[bucket]))   // get the quality bucket
+			CALCULATE(MAX(quality_buckets[bucket]))   // get the propensity
 		displayFolder: _quality_measures
 		lineageTag: 7bc22605-1491-40ef-ad18-3d7d51fb3b73
 
@@ -143,7 +143,7 @@ table quality_buckets
 			
 			var cnt = CALCULATE(
 			    [meas.ssr_history_success_count_lead_gen],
-			    ssr_history[entity_qual_bucket_num] in {1,2,3,4,5}      // count of lead gen filtering with entity_qual-bucket-num
+			    ssr_history[entity_propensity_num] in {1,2,3,4,5}      // count of lead gen filtering with entity_qual-bucket-num
 			)
 			RETURN
 			cnt
@@ -382,12 +382,12 @@ table quality_buckets
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.qual_bucket_min_max_tier' = ```.
-	column 'col.qual_bucket_min_max_tier' = ```
+	/// Column 'col.propensity_min_max_tier' = ```.
+	column 'col.propensity_min_max_tier' = ```
 			
 			var bucket = CALCULATE(
 			    MAX(
-			        quality_buckets[bucket]  // get the quality bucket
+			        quality_buckets[bucket]  // get the propensity
 			    )
 			)
 			
@@ -422,26 +422,26 @@ table quality_buckets
 				    Source = companies_history,
 				    #"Sorted Rows" = Table.Sort(Source,{{"_sys_processed_as_of", Order.Descending}}),
 				    #"Kept First Rows" = Table.FirstN(#"Sorted Rows",1),
-				    newTable = Table.SelectColumns(#"Kept First Rows", {"_sys_doc_id", "di_pred_post_sales_qual_bucket_tiers", "di_pred_prospecting_qual_bucket_tiers", "di_pred_new_logo_qual_bucket_tiers", "di_pred_existing_customer_qual_bucket_tiers"}),
-				    dbTableNoNull = Table.SelectRows(newTable, each [di_pred_post_sales_qual_bucket_tiers] <> null),
-				    Parsed_JSON = Table.TransformColumns(dbTableNoNull,{{"di_pred_post_sales_qual_bucket_tiers", Json.Document}, {"di_pred_prospecting_qual_bucket_tiers", Json.Document}, {"di_pred_new_logo_qual_bucket_tiers", Json.Document}, {"di_pred_existing_customer_qual_bucket_tiers", Json.Document}}),
+				    newTable = Table.SelectColumns(#"Kept First Rows", {"_sys_doc_id", "di_pred_post_sales_propensity_tiers", "di_pred_prospecting_propensity_tiers", "di_pred_new_logo_propensity_tiers", "di_pred_existing_customer_propensity_tiers"}),
+				    dbTableNoNull = Table.SelectRows(newTable, each [di_pred_post_sales_propensity_tiers] <> null),
+				    Parsed_JSON = Table.TransformColumns(dbTableNoNull,{{"di_pred_post_sales_propensity_tiers", Json.Document}, {"di_pred_prospecting_propensity_tiers", Json.Document}, {"di_pred_new_logo_propensity_tiers", Json.Document}, {"di_pred_existing_customer_propensity_tiers", Json.Document}}),
 				
 				
-				    postsalesTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_post_sales_qual_bucket_tiers"}),
+				    postsalesTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_post_sales_propensity_tiers"}),
 				    postSalesAddCol = Table.AddColumn(postsalesTable, "direction", each "Post-Sales Support"),
-				    postSalesExpanded = Table.ExpandRecordColumn(postSalesAddCol, "di_pred_post_sales_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    postSalesExpanded = Table.ExpandRecordColumn(postSalesAddCol, "di_pred_post_sales_propensity_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
-				    ProsTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_prospecting_qual_bucket_tiers"}),
+				    ProsTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_prospecting_propensity_tiers"}),
 				    ProsAddCol = Table.AddColumn(ProsTable, "direction", each "Prospecting"),
-				    ProsExpanded = Table.ExpandRecordColumn(ProsAddCol, "di_pred_prospecting_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    ProsExpanded = Table.ExpandRecordColumn(ProsAddCol, "di_pred_prospecting_propensity_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
-				    NewLogoTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_new_logo_qual_bucket_tiers"}),
+				    NewLogoTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_new_logo_propensity_tiers"}),
 				    NewLogoAddCol = Table.AddColumn(NewLogoTable, "direction", each "New Logo Selling"),
-				    NewLogoExpanded = Table.ExpandRecordColumn(NewLogoAddCol, "di_pred_new_logo_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    NewLogoExpanded = Table.ExpandRecordColumn(NewLogoAddCol, "di_pred_new_logo_propensity_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
-				    UpsellingTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_existing_customer_qual_bucket_tiers"}),
+				    UpsellingTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_existing_customer_propensity_tiers"}),
 				    UpsellingAddCol = Table.AddColumn(UpsellingTable, "direction", each "Existing Customer Selling"),
-				    UpsellingExpanded = Table.ExpandRecordColumn(UpsellingAddCol, "di_pred_existing_customer_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    UpsellingExpanded = Table.ExpandRecordColumn(UpsellingAddCol, "di_pred_existing_customer_propensity_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
 				    combinedTable = Table.Combine({postSalesExpanded, ProsExpanded, NewLogoExpanded, UpsellingExpanded}),
 				
