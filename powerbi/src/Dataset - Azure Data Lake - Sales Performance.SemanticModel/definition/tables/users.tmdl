@@ -16,7 +16,6 @@ table users
 			var res = str_crm_vals -- output string
 			return res
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (tbl_summarized, str_crm_vals, res) used later in the expression. Dependencies: Columns: users[_sys_doc_id], users[trueai_user_role] | Measures: [count].\nDynamic Behavior: Alters filter context via context-modifying functions.\nFormat/Type: Not specified."
 		displayFolder: user_role_concats
 		lineageTag: 2e4a5f18-741d-4c16-9371-62736ec5de95
 
@@ -34,7 +33,6 @@ table users
 			var res = str_crm_vals -- output string
 			return res
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (tbl_summarized, str_crm_vals, res) used later in the expression. Dependencies: Columns: users[_sys_doc_id], users[trueai_user_role_alias] | Measures: [count].\nDynamic Behavior: Alters filter context via context-modifying functions.\nFormat/Type: Not specified."
 		displayFolder: user_role_concats
 		lineageTag: 90265a0f-91d1-49cd-876f-f521314ce19b
 
@@ -54,7 +52,6 @@ table users
 			var res = str_crm_vals -- output string
 			return res
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (applicable_rows_tbl, tbl_summarized, str_crm_vals, res) used later in the expression. Dependencies: Columns: users[_sys_doc_id], users[trueai_user_role_alias], users_history[_sys_filt_start_date] | Measures: [count].\nDynamic Behavior: Alters filter context via context-modifying functions.\nFormat/Type: Not specified."
 		displayFolder: user_role_concats
 		lineageTag: e77c169f-e8d6-48e8-ab2e-87441d66a83b
 
@@ -72,20 +69,17 @@ table users
 			var res = str_crm_vals -- output string
 			return res
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (tbl_summarized, str_crm_vals, res) used later in the expression. Dependencies: Columns: users[_sys_doc_id], users[trueai_user_role_alias], users[trueai_user_role_function] | Measures: [count].\nDynamic Behavior: Alters filter context via context-modifying functions.\nFormat/Type: Not specified."
 		displayFolder: user_role_concats
 		lineageTag: cf2e5ac8-6558-41ec-8060-fff13bff2cbd
 
 	/// Measure meas.users_rep_stats_bookings.
 	measure 'meas.users_rep_stats_bookings' = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] in {"New Logo Selling" , "Existing Customer Selling"})
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[opp_won_amt], ssr_history[step_name].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: \$#,0;(\$#,0);\$#,0"
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: rep_stats
 		lineageTag: 98abfde2-24b2-45d4-bff2-09d94f91f1aa
 
 	/// Measure meas.users_rep_stats_bookings 1.
 	measure 'meas.users_rep_stats_bookings 1' =
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: \$#,0;(\$#,0);\$#,0"
 			var start_date = date(2020,1,1)
 			var end_date = date(2021,1,1)
 			var res = CALCULATE([meas.users_rep_stats_bookings], ssr_history[_sys_filt_end_date] >= start_date &&  ssr_history[_sys_filt_end_date] < end_date )
@@ -96,7 +90,6 @@ table users
 
 	/// Measure meas.users_table_row_count.
 	measure 'meas.users_table_row_count' =
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0"
 			
 			COUNTROWS(Users)
 		formatString: 0
@@ -104,7 +97,6 @@ table users
 
 	/// Measure meas.users_is_active.
 	measure 'meas.users_is_active' =
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0"
 			
 			// var curr_date = CALCULATE(MAX(cal_end_dates[Date]))  // get  the current maximum date
 			// var user_end_date = CALCULATE(MAX(users[_sys_filt_end_date]))  // get the user end date
@@ -122,7 +114,6 @@ table users
 
 	/// Measure meas.user_overview_title.
 	measure 'meas.user_overview_title' = "Active Users Overview"
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: Not specified."
 		displayFolder: _active_user_overview
 		lineageTag: db75255d-25c7-45bb-8d82-f23f4ca2fedc
 
@@ -169,7 +160,6 @@ table users
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			return res+0
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, success_filt_tbl, total_filt_tbl, total_steps, success_steps, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[_sys_doc_id], ssr_history[step_name], ssr_history[step_success].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 310a8955-0807-4928-a59d-3c8abc9da526
@@ -219,7 +209,6 @@ table users
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			RETURN res+0
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, success_filt_tbl, total_filt_tbl, total_steps, success_steps, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[_sys_doc_id], ssr_history[step_name], ssr_history[step_success].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: ebc4d37a-ed87-42fa-ae20-94ae49a81b47
@@ -269,7 +258,6 @@ table users
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			RETURN res+0
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, success_filt_tbl, total_filt_tbl, total_steps, success_steps, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[_sys_doc_id], ssr_history[step_name], ssr_history[step_success].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 0fed3d7e-4822-429b-80b1-b6d73792eabe
@@ -319,7 +307,6 @@ table users
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			return res+0
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, success_filt_tbl, total_filt_tbl, total_steps, success_steps, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[_sys_doc_id], ssr_history[step_name], ssr_history[step_success].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: eb3379cf-b461-48f9-9595-960b3626535f
@@ -336,7 +323,6 @@ table users
 			    res
 			)
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.users_overview_win_rate_mtd], [meas.users_overview_win_rate_mtd_sply].\nDynamic Behavior: Uses IF for conditional branching.\nFormat/Type: +0%;-0%;\"-\""
 		formatString: +0%;-0%;"-"
 		displayFolder: _active_user_overview
 		lineageTag: 5a68121d-2018-4772-a757-0b8cd65ef3ed
@@ -388,14 +374,12 @@ table users
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			RETURN res+0
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, success_filt_tbl, total_filt_tbl, total_steps, success_steps, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[_sys_doc_id], ssr_history[step_name], ssr_history[step_success].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 3f8bd10b-3cc4-4760-a4b5-8e732adaee1d
 
 	/// Measure meas.users_overview_win_rate_qtd_sply_diff.
 	measure 'meas.users_overview_win_rate_qtd_sply_diff' =
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: +0%;-0%;\"-\""
 			
 			var res = DIVIDE([meas.users_overview_win_rate_qtd] - [meas.users_overview_win_rate_qtd_sply], [meas.users_overview_win_rate_qtd])
 			// get the delta
@@ -457,7 +441,6 @@ table users
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			RETURN res+0
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, success_filt_tbl, total_filt_tbl, total_steps, success_steps, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[_sys_doc_id], ssr_history[step_name], ssr_history[step_success].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 07e8a5e9-84ce-4495-8914-7d40a27a3b10
@@ -476,7 +459,6 @@ table users
 			    res
 			)
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.users_overview_win_rate_ytd], [meas.users_overview_win_rate_ytd_sply].\nDynamic Behavior: Uses IF for conditional branching.\nFormat/Type: +0%;-0%;\"-\""
 		formatString: +0%;-0%;"-"
 		displayFolder: _active_user_overview
 		lineageTag: 1a8f810c-0797-490a-bcbc-d31a32001c74
@@ -516,7 +498,6 @@ table users
 			
 			RETURN res+0
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, filt_tbl, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 948eb230-a8c7-4ff6-bcc4-06359fe0ba6d
@@ -554,7 +535,6 @@ table users
 			
 			RETURN res
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, filt_tbl, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 7d964627-3956-4dbf-a6e3-d9d7bcfc2bf5
@@ -570,7 +550,6 @@ table users
 			    res
 			)
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.users_overview_avg_pred_conv_rate_mtd], [meas.users_overview_avg_pred_conv_rate_mtd_sply].\nDynamic Behavior: Uses IF for conditional branching.\nFormat/Type: +0%;-0%;\"-\""
 		formatString: +0%;-0%;"-"
 		displayFolder: _active_user_overview
 		lineageTag: 8832b4c5-b603-428b-9ca7-9b20cfaaa3b2
@@ -610,7 +589,6 @@ table users
 			
 			RETURN res
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, filt_tbl, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 7703ba0a-e9d0-4a81-ba9d-781cf350d54e
@@ -648,7 +626,6 @@ table users
 			
 			RETURN res
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, filt_tbl, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 91dd19a6-1fa4-42e5-968a-db02bf828f0e
@@ -664,7 +641,6 @@ table users
 			    res
 			)
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.users_overview_avg_pred_conv_rate_qtd], [meas.users_overview_avg_pred_conv_rate_qtd_sply].\nDynamic Behavior: Uses IF for conditional branching.\nFormat/Type: +0%;-0%;\"-\""
 		formatString: +0%;-0%;"-"
 		displayFolder: _active_user_overview
 		lineageTag: 4fc18d35-811b-4d17-8a2b-75517ba44e70
@@ -704,7 +680,6 @@ table users
 			
 			RETURN res
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, filt_tbl, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: e3eece90-6448-45ce-9ea9-a89ed47c6414
@@ -742,7 +717,6 @@ table users
 			
 			RETURN res
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (curr_date, end_date, end_date_sply, start_year, start_qtr_month, start_month, start_date_ytd, start_date_ytd_sply, start_date_qtd, start_date_qtd_sply, start_date_mtd, start_date_mtd_sply, dates_tbl, filt_tbl, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 92cb3110-77ea-42c3-b92b-6f1ebb40254a
@@ -758,7 +732,6 @@ table users
 			    res
 			)
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.users_overview_avg_pred_conv_rate_ytd], [meas.users_overview_avg_pred_conv_rate_ytd_sply].\nDynamic Behavior: Uses IF for conditional branching.\nFormat/Type: +0%;-0%;\"-\""
 		formatString: +0%;-0%;"-"
 		displayFolder: _active_user_overview
 		lineageTag: ddbc5fa2-1c77-47d1-b6ff-eba18233148a
@@ -791,14 +764,12 @@ table users
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			return res+0
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (success_filt_tbl, total_steps, success_steps, res) used later in the expression. Dependencies: Columns: ssr_history[_sys_doc_id], ssr_history[step_success].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: b697679b-3c93-4420-86f1-f25eb146002f
 
 	/// Measure meas.users_trueai_full_name.
 	measure 'meas.users_trueai_full_name' =
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: Not specified."
 			
 			SELECTEDVALUE(users[trueai_full_name])
 		lineageTag: 31d53d83-f813-4c59-a312-df48ed52ef39

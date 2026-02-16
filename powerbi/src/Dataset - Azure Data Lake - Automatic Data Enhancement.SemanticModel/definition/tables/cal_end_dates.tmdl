@@ -2,6 +2,10 @@
 table cal_end_dates
 	lineageTag: 0c87fa54-b3b7-47c2-9154-a95fcfb4b586
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (filter_start_table, filter_start_val, max_filters, date_str, user_role_str, ___f, ___r, ___t, ___d, ___x, group_str, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], filter_start_table[Date], users[trueai_group], users[trueai_user_role] | Measures: [\" & ___r & \" items selected].
+	/// Dynamic Behavior: Uses IF for conditional branching. Uses filter/slicer state functions to drive logic.
+	/// Format/Type: Not specified.
 	measure 'meas.filter_string' = ```
 			
 			
@@ -36,18 +40,23 @@ table cal_end_dates
 			var res =  date_str & "  |  " & user_role_str & " | "  &  group_str
 			return res
 			```
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (filter_start_table, filter_start_val, max_filters, date_str, user_role_str, ___f, ___r, ___t, ___d, ___x, group_str, res) used later in the expression. Dependencies: Columns: cal_end_dates[Date], filter_start_table[Date], users[trueai_group], users[trueai_user_role] | Measures: [\" & ___r & \" items selected].\nDynamic Behavior: Uses IF for conditional branching. Uses filter/slicer state functions to drive logic.\nFormat/Type: Not specified."
 		displayFolder: _filt_helpers
 		lineageTag: 203cf28c-7376-4634-a106-b86acd188d74
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: Columns: leads[_sys_as_of].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: 0
 	measure 'meas.data_asof' = //"Data last processed on: " & calculate(max(leads[_sys_as_of]))
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: Columns: leads[_sys_as_of].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0"
 		formatString: 0
 		displayFolder: _filt_helpers
 		lineageTag: 45ef1e74-2032-4fab-8fcc-e9b422fa3e4c
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: 0
 	measure 'meas.last_year_full' =
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0"
 			
 			var _current_year = YEAR(MAX('cal_end_dates'[date]))
 			var _last_year = YEAR(MAX('cal_end_dates'[date]))-1
@@ -65,16 +74,22 @@ table cal_end_dates
 		displayFolder: _filt_helpers
 		lineageTag: a32c0d45-f0d4-4361-bb6b-0b48af7d7861
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: General Date
 	measure 'meas.context_min' =
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: General Date"
 			
 			CALCULATE(MIN('cal_end_dates'[date]))
 		formatString: General Date
 		displayFolder: _filt_helpers
 		lineageTag: 1148b606-5a63-49e5-b97e-960f5897841b
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: General Date
 	measure 'meas.context_max' =
-		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: General Date"
 			
 			CALCULATE(MAX('cal_end_dates'[date]))
 		formatString: General Date
