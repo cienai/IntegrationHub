@@ -9,6 +9,7 @@ table ssr
 			
 			return res 
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (total, res) used later in the expression. Dependencies: Columns: ssr_history[_sys_ssr_id] | Measures: [meas.ssr_trueai_converted_count].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0.0%;-0.0%;0.0%"
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: _ssr_analysis
 		lineageTag: a946bddd-5ee9-4adf-a031-0bb4bbb7b204
@@ -18,6 +19,7 @@ table ssr
 			 var res =CALCULATE(DISTINCTCount(ssr_history[_sys_ssr_id]), ssr_history[step_success] = True && ssr_history[step_name] = "Prospecting")  +0
 			 return IF(ISBLANK(res), 0,res)
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_name], ssr_history[step_success].\nDynamic Behavior: Uses IF for conditional branching.\nFormat/Type: #,0"
 		formatString: #,0
 		displayFolder: _ssr_analysis
 		lineageTag: f64fb9f1-a6d6-4e35-ade9-42652b127317
@@ -28,16 +30,19 @@ table ssr
 			return if(ISBLANK(val), 0, val)
 			
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (val) used later in the expression. Dependencies: Columns: ssr[_sys_doc_id], ssr[crm_lead_count], ssr[trueai_leadsource].\nDynamic Behavior: Uses IF for conditional branching.\nFormat/Type: 0"
 		formatString: 0
 		displayFolder: _ssr_analysis
 		lineageTag: 9ff987e5-24d2-453a-8420-d58519669d3c
 
 	measure 'meas.ssr_trueai_no_leadsource_rate' = [meas.ssr_trueai_no_leadsource_count] / CALCULATE(count(ssr[_sys_doc_id]),  ssr[crm_lead_count] >0 ) // only include the ones w/ leads
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: Columns: ssr[_sys_doc_id], ssr[crm_lead_count] | Measures: [meas.ssr_trueai_no_leadsource_count].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0.0%;-0.0%;0.0%"
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: _ssr_analysis
 		lineageTag: 688b74be-7bd5-49c2-ac7d-734bc28f3627
 
 	measure 'meas.crm_has_leads_and_accounts_count' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0"
 			
 			var res = CALCULATE(Count(ssr[_sys_doc_id]), ssr[col.crm_has_accounts] = TRUE() && ssr[col.crm_has_leads] = TRUE())
 			return IF(ISBLANK(res), 0,res)
@@ -50,11 +55,13 @@ table ssr
 			 var res = CALCULATE(COUNT(ssr[_sys_doc_id]), ssr[col.crm_has_leads] = False && (ssr[trueai_account_is_master] = True || isblank(ssr[trueai_account_is_master]) = True))
 			 return if(ISBLANK(res), 0, res)
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Columns: ssr[_sys_doc_id], ssr[col.crm_has_leads], ssr[trueai_account_is_master].\nDynamic Behavior: Uses IF for conditional branching.\nFormat/Type: 0"
 		formatString: 0
 		displayFolder: _ssr_analysis
 		lineageTag: 95b81281-f2e6-4de1-8655-2037de1db979
 
 	measure 'meas.ssr_non_unique_with_only_accounts' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0"
 			
 			var res =CALCULATE(COUNT(ssr[_sys_doc_id]), ssr[col.crm_has_leads] = False && (ssr[trueai_account_is_master] = False || ssr[trueai_account_is_master] = True || isblank(ssr[trueai_account_is_master]) = True))
 			return if(ISBLANK(res), 0, res)
@@ -68,10 +75,12 @@ table ssr
 			    COUNT(ssr[_sys_doc_id])     // get the count of the ssr doc id count as leads_accts_counts 
 			)
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: Columns: ssr[_sys_doc_id].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: #,0"
 		formatString: #,0
 		lineageTag: fe308ad8-fcd9-4cbb-806a-29492fd84183
 
 	measure 'Last Data Date' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: General Date"
 			
 			CALCULATE(
 			    MAX(ssr[_sys_as_of]),

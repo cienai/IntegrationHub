@@ -3,6 +3,7 @@ table users_history
 	lineageTag: 44776101-2806-4700-a1fe-2ddb9f44c42c
 
 	measure 'meas.users_history_duration_hrs' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: ###,###,###  hrs"
 			
 			var dur = CALCULATE(sum(users_history[ci_time_alloc_tot_dur]))
 			var res =  dur / 3600
@@ -26,6 +27,7 @@ table users_history
 			// act_tot_dur 
 			// act_tot_count --> ci_time_alloc_tot
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (dur, act, res) used later in the expression. Dependencies: Columns: users_history[ci_time_alloc_tot], users_history[ci_time_alloc_tot_dur].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: ###  min"
 		formatString: ###  min
 		displayFolder: _users_history_analysis
 		lineageTag: 6a291487-586f-4a27-872b-622feaa62c57
@@ -35,6 +37,7 @@ table users_history
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	measure 'meas.users_history_duration_adjusted_hrs' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: ###,###,###  hrs"
 			
 			var dur = CALCULATE(sum(users_history[ci_time_alloc_tot_dur]))
 			var prep = CALCULATE(average(users_history[ci_time_alloc_prep_adjustment]))
@@ -59,6 +62,7 @@ table users_history
 			var reps =  divide(COUNTROWS(periods_tbl) , periods) // get the avg number of "active" reps per period
 			return  reps
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (periods_tbl, reps_tbl, periods, reps) used later in the expression. Dependencies: Columns: users_history[_sys_filt_start_date], users_history[_sys_user_id].\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0.0"
 		formatString: 0.0
 		displayFolder: _users_history_analysis
 		lineageTag: ecb23497-da79-4ea3-89dd-235cfeda7437

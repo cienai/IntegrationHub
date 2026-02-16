@@ -5,11 +5,13 @@ table ssr_history
 	measure 'meas.ssr_history_success_count' = ```
 			CALCULATE(count(ssr_history[_sys_doc_id]),ssr_history[step_success] = true)  
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[_sys_doc_id], ssr_history[step_success].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0"
 		formatString: 0
 		displayFolder: _ssr_history_analyis
 		lineageTag: fbf78099-2fdd-4373-9016-2af11cc5f240
 
 	measure 'meas.ssr_history_success_rate' = DIVIDE([meas.ssr_history_success_count], count(ssr_history[_sys_doc_id]))
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[_sys_doc_id] | Measures: [meas.ssr_history_success_count].\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0.00%;-0.00%;0.00%"
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _ssr_history_analyis
 		lineageTag: cda20e0e-69cf-402d-9516-347d9e518aa3
@@ -18,15 +20,18 @@ table ssr_history
 			// get the step owner user role
 			CALCULATE(MAX(ssr_history[step_owner_user_role])) 
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[step_owner_user_role].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: Not specified."
 		displayFolder: _ssr_history_analyis
 		lineageTag: 6abc5488-273b-4e5d-b362-1ba28618566c
 
 	measure 'meas.ssr_history_touched_accounts' = CALCULATE(DISTINCTCOUNT(ssr_history[_sys_ssr_id]), ssr_history[step_name] ="Prospecting")
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_name].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0"
 		formatString: 0
 		displayFolder: _ssr_history_analyis
 		lineageTag: 3ed7eb07-019d-4902-b108-7fddffd138fd
 
 	measure 'meas.ssr_history_adj_dur_conf' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0.00"
 			// this comment is for check the github  version check
 			
 			VAR temp_tbl = CALCULATETABLE(ssr_history, ssr_history[step_name] in {"Prospecing", "New Logo Selling", "Post-Sales Support","Existing Customer Selling"}) // Get the current table context but exclude the unthcouded stage etc
@@ -63,7 +68,7 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Propensity based on the probability of success
+	/// Quality bucket based on the probability of success
 	column entity_propensity
 		dataType: string
 		lineageTag: 579230fa-0af4-417b-8716-1fe876b243f7
@@ -989,7 +994,7 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Propensity expressed as an integer from 1 to 5 based on the probability of success
+	/// Quality bucket expressed as an integer from 1 to 5 based on the probability of success
 	column entity_propensity_num
 		dataType: int64
 		formatString: 0
@@ -1459,7 +1464,7 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Propensity of the next step based on the probability of success
+	/// Quality bucket of the next step based on the probability of success
 	column step_next_propensity
 		dataType: string
 		lineageTag: 2e92057e-6c79-4ee3-bdff-ef287c8bd150
@@ -1468,7 +1473,7 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Propensity of the next step expressed as an integer from 1 to 5 based on the probability of success
+	/// Quality bucket of the next step expressed as an integer from 1 to 5 based on the probability of success
 	column step_next_propensity_num
 		dataType: int64
 		formatString: 0

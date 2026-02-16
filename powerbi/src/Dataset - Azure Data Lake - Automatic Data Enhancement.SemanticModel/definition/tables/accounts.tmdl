@@ -3,6 +3,7 @@ table accounts
 	lineageTag: a6327903-d2c7-49aa-94b9-d45c52607f22
 
 	measure 'meas.account_trueai_dupe_rate' = CALCULATE(DISTINCTCOUNT(accounts[trueai_account_dupe_id]) / CALCULATE(count(accounts[_sys_docid])))
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: Columns: accounts[_sys_docid], accounts[trueai_account_dupe_id].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0.00%;-0.00%;0.00%"
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 78562b48-eb24-4c22-9628-a15da188859a
 
@@ -15,6 +16,7 @@ table accounts
 			return res 
 			
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_complt], [trueai_complt].\nDynamic Behavior: Uses IF for conditional branching.\nFormat/Type: 0 %"
 		formatString: 0 %
 		lineageTag: 8e3a434f-82f7-400f-88ee-ac2551a93985
 
@@ -47,6 +49,7 @@ table accounts
 			
 			return res
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Columns: accounts[_sys_docid], accounts[trueai_is_master].\nDynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.\nFormat/Type: 0"
 		formatString: 0
 		lineageTag: ef16364d-0133-48cc-bbbf-e0b706ffe258
 
@@ -211,7 +214,7 @@ table accounts
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Propensity based on the probability of conversion
+	/// Quality bucket based on the probability of conversion
 	column trueai_propensity
 		dataType: string
 		lineageTag: 14404f74-c540-4b2c-a116-40d601550b7c
@@ -690,7 +693,7 @@ table accounts
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Propensity expressed as an integer from 1 to 5 based on the probability of conversion
+	/// Quality bucket expressed as an integer from 1 to 5 based on the probability of conversion
 	column trueai_propensity_num
 		dataType: int64
 		formatString: 0

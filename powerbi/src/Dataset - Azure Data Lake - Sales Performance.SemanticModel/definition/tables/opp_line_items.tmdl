@@ -9,6 +9,7 @@ table opp_line_items
 			RETURN
 			res
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.opp_line_item_total_price_before_discount], [meas.opp_line_item_total_price_after_discount].\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: -$#,##0;-$#,##0;$0"
 		formatString: -$#,##0;-$#,##0;$0
 		displayFolder: discount opp
 		lineageTag: c58a9bec-10b0-4753-95d5-905afcfe0653
@@ -17,6 +18,7 @@ table opp_line_items
 
 	/// Measure meas.opp_line_item_discount_pct.
 	measure 'meas.opp_line_item_discount_pct' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0%;-0%;0%"
 			
 			
 			var res = DIVIDE(([meas.opp_line_item_discount_amt]*-1), [meas.opp_line_item_total_price_before_discount]) // the diff / original. Turn discount back positive
@@ -29,6 +31,7 @@ table opp_line_items
 
 	/// Measure meas.discount_line_opps.
 	measure 'meas.discount_line_opps' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0"
 			
 			IF([meas.opp_line_item_discount_pct] = 0, 0,BLANK())
 		formatString: 0
@@ -37,6 +40,7 @@ table opp_line_items
 
 	/// Measure meas.opp_line_item_dis_pct.
 	measure 'meas.opp_line_item_dis_pct' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0%;-0%;0%"
 			
 			var orig_cost = SUMX(opp_line_items, [trueai_list_price]*[trueai_qty])              // get the original cost
 			var actual_cost = SUMX(opp_line_items, [trueai_unit_price]*[trueai_qty])            // get the actual cost
@@ -48,6 +52,7 @@ table opp_line_items
 
 	/// Measure meas.opp_line_item_total_price_after_discount.
 	measure 'meas.opp_line_item_total_price_after_discount' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: \$#,0;(\$#,0);\$#,0"
 			
 			
 			var tbl = CALCULATETABLE(opp_line_items)        // get the calculatd table
@@ -68,6 +73,7 @@ table opp_line_items
 			var res = DIVIDE(actual_cost - orig_cost, orig_cost)        // get the pct 
 			RETURN ABS(res)
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (tbl, orig_cost, actual_cost, res) used later in the expression. Dependencies: Measures: [col.trueai_list_price], [crm_qty], [col.trueai_unit_price].\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0%;-0%;0%"
 		formatString: 0%;-0%;0%
 		displayFolder: discount opp
 		lineageTag: 92f502aa-be60-41d1-a075-d98ed0682e74
@@ -81,6 +87,7 @@ table opp_line_items
 			var res = wonAmt * pct
 			RETURN res
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (wonAmt, pct, res) used later in the expression. Dependencies: Measures: [meas.ssr_history_won_amt], [meas.opps_delta_expected_pct].\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: \$#,0;(\$#,0);\$#,0"
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: fdd8ec9f-4d49-4be5-9806-37f53f5183ba
@@ -89,6 +96,7 @@ table opp_line_items
 
 	/// Measure meas.opps_average_discount_pct.
 	measure 'meas.opps_average_discount_pct' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: Not specified."
 			
 			ABS(CALCULATE(AVERAGE(opps[trueai_discount_pct])))     // get the abs of avg discount pct
 		displayFolder: discount opp
@@ -98,6 +106,7 @@ table opp_line_items
 
 	/// Measure meas.opps_avg_deals_amt.
 	measure 'meas.opps_avg_deals_amt' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############"
 			
 			var Amt = [meas.ssr_history_won_amt] - [meas.opps_deal_discount_amt]        // get the difference amt
 			var totdeals = [meas.ssr_history_step_count]            // total deals count
@@ -123,12 +132,14 @@ table opp_line_items
 			RETURN disAmt
 			
 			```
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: VAR blocks define intermediate values (pct, wonAmt, disAmt) used later in the expression. Dependencies: Measures: [meas.opps_average_discount_pct], [meas.ssr_history_won_amt], [meas.opp_line_item_discount_pct].\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: \$#,0;(\$#,0);\$#,0"
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: a7e40876-f224-4016-b137-855d4e4bb99c
 
 	/// Measure meas.opps_deals_pct.
 	measure 'meas.opps_deals_pct' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0%;-0%;0%"
 			
 			var stepCount = [meas.ssr_history_step_count]       // calculating the step count
 			var disdeals = CALCULATE(count(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK())  // gt the count of opps that has discount tier
@@ -142,6 +153,7 @@ table opp_line_items
 
 	/// Measure meas.opps_delta_expected_pct.
 	measure 'meas.opps_delta_expected_pct' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0%;-0%;0%"
 			
 			VAR SuccessRate =
 			    CALCULATE(
@@ -161,6 +173,7 @@ table opp_line_items
 
 	/// Measure meas.opps_tot_deals.
 	measure 'meas.opps_tot_deals' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: 0"
 			
 			CALCULATE(COUNT(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK()) // get the total deals count
 		formatString: 0
@@ -169,6 +182,7 @@ table opp_line_items
 
 	/// Measure meas.opp_line_items_avg_discount_pct.
 	measure 'meas.opp_line_items_avg_discount_pct' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: Not specified."
 			CALCULATE(
 			    AVERAGE(
 			        opps[trueai_discount_pct]      // get the average discount pct
@@ -181,6 +195,7 @@ table opp_line_items
 
 	/// Measure meas.opp_line_item_total_price_before_discount.
 	measure 'meas.opp_line_item_total_price_before_discount' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: \$#,0;(\$#,0);\$#,0"
 			
 			var tbl = CALCULATETABLE(opp_line_items)        // get the calculatd table
 			var orig_cost = SUMX(tbl, [trueai_list_price] * [trueai_qty])  // calculating the original price
@@ -193,6 +208,7 @@ table opp_line_items
 
 	/// Measure meas.opp_line_items_trueai_list_price.
 	measure 'meas.opp_line_items_trueai_list_price' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: \$#,0;(\$#,0);\$#,0"
 			
 			CALCULATE(
 			    MAX(opp_line_items[trueai_list_price])
@@ -205,6 +221,7 @@ table opp_line_items
 
 	/// Measure meas.avg_discount_pct_change.
 	measure 'meas.avg_discount_pct_change' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: Not specified."
 			
 			VAR MinVisibleDate =
 			    CALCULATE(
@@ -237,6 +254,7 @@ table opp_line_items
 
 	/// Measure meas.opp_line_items_trueai_total_price.
 	measure 'meas.opp_line_items_trueai_total_price' =
+		description: "Purpose: Compute the measure result from the DAX expression and current filter context.\nCalculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..\nDynamic Behavior: No explicit conditional branching detected.\nFormat/Type: Not specified."
 			
 			CALCULATE(
 			    SUM ( opp_line_items[trueai_total_price] )
