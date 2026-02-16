@@ -2,11 +2,19 @@
 table act_time_alloc_summary
 	lineageTag: 784db851-8b49-42ca-99be-90fa56772532
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: Columns: act_time_alloc_summary[_sys_user_id].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: 0
 	measure 'meas.act_time_alloc_reps' = CALCULATE(DISTINCTCOUNT(act_time_alloc_summary[_sys_user_id]))
 		formatString: 0
 		displayFolder: _tl_analysis
 		lineageTag: 7b3aa411-fbb6-4366-893f-6222d570fa8f
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Columns: act_time_alloc_summary[act_capt_lvl_adjustment] | Measures: [meas.act_time_alloc_reps].
+	/// Dynamic Behavior: Uses IF for conditional branching.
+	/// Format/Type: 0
 	measure 'meas.act_time_alloc_reps_w_act_capt_level' = ```
 			
 			var res = Calculate([meas.act_time_alloc_reps], act_time_alloc_summary[act_capt_lvl_adjustment] > 0)
@@ -17,6 +25,10 @@ table act_time_alloc_summary
 		displayFolder: _tl_analysis
 		lineageTag: 41b390ab-c2d0-487d-8c76-f569e1464fe6
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: ###,###,###0.0\" hrs\"
 	measure 'meas.act_time_alloc_captured_durations_h' =
 			
 			var res = CALCULATE(Sum(act_time_alloc_summary[act_dur]) / 3600)
@@ -29,6 +41,10 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: ###,###,###\" hrs\"
 	measure 'meas.act_time_alloc_adj_durations_h' =
 			
 			// var capt_dur_tbl = CALCULATETABLE( act_time_alloc_summary, act_time_alloc_summary[act_capt_lvl_adjustment] > 0)
@@ -50,6 +66,10 @@ table act_time_alloc_summary
 		displayFolder: _tl_analysis
 		lineageTag: a9976925-1bc8-4b96-9b93-8ad1465e02a1
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: ###,###,###\" min\"
 	measure 'meas.act_time_alloc_avg_dur' =
 			var capt_dur_min = CALCULATE(Sum(act_time_alloc_summary[act_dur]) / 60)
 			var capt_tot  = CALCULATE(Sum(act_time_alloc_summary[act_tot_count]))
@@ -59,6 +79,10 @@ table act_time_alloc_summary
 		displayFolder: _tl_analysis
 		lineageTag: af4127e5-1a22-4bde-aa1e-9a4d03d1a80a
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.act_time_alloc_reps_w_act_capt_level], [meas.act_time_alloc_reps].
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.act_time_rep_w_act_capt_level_pct' = ```
 			
 			var res  = DIVIDE([meas.act_time_alloc_reps_w_act_capt_level],[meas.act_time_alloc_reps])
@@ -71,6 +95,10 @@ table act_time_alloc_summary
 
 		changedProperty = FormatString
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (time, count_months, week_adj, res, _cap_dure, adj_factor, prep_factor, _total_duration, _min_date, _max_date, week_count, _reps_w_ta) used later in the expression. Dependencies: Columns: act_time_alloc_summary[_sys_filter_end_date], act_time_alloc_summary[_sys_filter_start_date], act_time_alloc_summary[act_capt_lvl_adjustment], act_time_alloc_summary[month_to_week_adjustment], act_time_alloc_summary[prep_adjustment] | Measures: [meas.act_time_alloc_adj_durations_h], [meas.act_time_alloc_user_months_w_time_alloc], [meas.act_time_alloc_captured_durations_h], [meas.act_time_alloc_reps_w_act_capt_level].
+	/// Dynamic Behavior: Uses IF for conditional branching.
+	/// Format/Type: ###,###,###\"  hrs/week\"
 	measure 'meas.act_time_alloc_hours_weekly' = ```
 			
 			
@@ -106,6 +134,10 @@ table act_time_alloc_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: Columns: act_time_alloc_summary[_sys_docid], act_time_alloc_summary[act_capt_lvl_adjustment].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: 0
 	measure 'meas.act_time_alloc_user_months_w_time_alloc' = ```
 			
 			CALCULATE(count( act_time_alloc_summary[_sys_docid]), act_time_alloc_summary[act_capt_lvl_adjustment] > 0, act_time_alloc_summary[act_capt_lvl_adjustment] > 0)
@@ -115,6 +147,10 @@ table act_time_alloc_summary
 		displayFolder: _tl_analysis
 		lineageTag: 49d72214-dc8d-4f17-a750-cb340feba375
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.act_time_alloc_capture_lvl' =
 			
 			divide(1,calculate(AVERAGE(act_time_alloc_summary[act_capt_lvl_adjustment])))
@@ -124,6 +160,10 @@ table act_time_alloc_summary
 
 		changedProperty = FormatString
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (reps, reps_act_capture, res) used later in the expression. Dependencies: Columns: act_time_alloc_summary[act_capt_lvl] | Measures: [meas.act_time_alloc_reps].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: 0.00%;-0.00%;0.00%
 	measure 'meas.act_time_rep_act_capture_value_pct' = ```
 			
 			var reps = [meas.act_time_alloc_reps]
@@ -135,11 +175,19 @@ table act_time_alloc_summary
 		displayFolder: _tl_analysis
 		lineageTag: bdd26b8c-ef42-408e-8984-52b78f930c41
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: Columns: users_activities[trueai_count].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: 0
 	measure 'meas.tot_count' = CALCULATE(SUM(users_activities[trueai_count]))
 		formatString: 0
 		displayFolder: _tl_analysis
 		lineageTag: ad57e66a-3b39-4ea3-b2f6-0b6ed7e07337
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: Not specified.
 	measure 'meas.act_time_alloc_hours_weekly_test' =
 			
 			var _cap_dure = [meas.act_time_alloc_captured_durations_h]              // get the captured durations hrs
