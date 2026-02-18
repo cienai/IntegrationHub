@@ -2,6 +2,10 @@
 table act_capture_level_summary
 	lineageTag: b2717458-96a3-4785-97f7-099181ed5d0d
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (act_count, step_count, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[crm_activity_count], act_capture_level_summary[steps].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: 0
 	measure 'meas.act_capt_act_per_step_avg' = ```
 			
 			var act_count = calculate(Sum(act_capture_level_summary[crm_activity_count]))
@@ -16,6 +20,10 @@ table act_capture_level_summary
 
 		changedProperty = FormatString
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (act_count, step_count, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[steps], act_capture_level_summary[total_duration].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: 0.0\"  hrs\"
 	measure 'meas.act_capt_dur_per_step_avg' = ```
 			
 			var act_count = calculate(Sum(act_capture_level_summary[total_duration]))
@@ -33,6 +41,10 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (act_count, step_count, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[expected_duration], act_capture_level_summary[steps].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: 0.0\"  hrs\"
 	measure 'meas.act_capt_expected_dur_per_step_avg' = ```
 			
 			var act_count = calculate(Sum(act_capture_level_summary[expected_duration]))
@@ -50,6 +62,10 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (act_dur, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[capped_duration].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: 0\"  hrs\"
 	measure 'meas.act_capt_duration' = ```
 			
 			var act_dur = calculate(Sum(act_capture_level_summary[capped_duration]))
@@ -67,6 +83,10 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (act_dur, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[expected_duration].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: 0\"  hrs\"
 	measure 'meas.act_capt_expected_duration' = ```
 			
 			var act_dur = calculate(Sum(act_capture_level_summary[expected_duration]))
@@ -84,6 +104,10 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: #,0.00
 	measure 'meas.act_capture' =
 			
 			divide(SUM(act_capture_level_summary[capped_duration]),SUM(act_capture_level_summary[expected_duration]))
@@ -93,6 +117,10 @@ table act_capture_level_summary
 
 		changedProperty = FormatString
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (dur, months, weeks, reps, val, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[_sys_filter_start_date], act_capture_level_summary[capped_duration], act_capture_level_summary[month_to_week_adjustment] | Measures: [meas.act_capt_applicable_reps].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: #.0\" hrs\"
 	measure 'meas.act_capt_duration_weekly_rep_avg' = ```
 			
 			// way to calculate the avg weekly rep time spent on the current "selection"
@@ -112,6 +140,10 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (dur, months, weeks, reps, val, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[_sys_filter_start_date], act_capture_level_summary[expected_duration], act_capture_level_summary[month_to_week_adjustment] | Measures: [meas.act_capt_applicable_reps].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: Not specified.
 	measure 'meas.act_capt_expected_duration_weekly_rep_avg' = ```
 			
 			// way to calculate the avg weekly rep time spent on the current "selection"
@@ -130,6 +162,10 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: 0
 	measure 'meas.crm_act_capt_score' =
 			
 			var crm_capture_level = [meas.act_capture]
@@ -143,6 +179,10 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: 0
 	measure 'meas.crm_act_capt_score_industry_avg' =
 			//0.48 * 100
 			var _score = CALCULATE(
@@ -156,6 +196,10 @@ table act_capture_level_summary
 		displayFolder: _acl_scores
 		lineageTag: 25caccab-5c62-4871-8096-7c890988147a
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (_before, temp_tbl, score_res, _after, res) used later in the expression. Dependencies: Columns: ssr_history[step_name], ssr_history[stkhlds_all_adj_dur_rule] | Measures: [meas.crm_act_capt_score].
+	/// Dynamic Behavior: Uses SWITCH for conditional branching. Uses IF for conditional branching.
+	/// Format/Type: 0
 	measure 'meas.trueai_act_capt_score' = ```
 			
 			VAR _before = [meas.crm_act_capt_score]
@@ -191,6 +235,10 @@ table act_capture_level_summary
 
 		changedProperty = FormatString
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: +#%;-#%;0%
 	measure 'meas.trueai_act_capt_score_improvement' =
 			
 			var trueai_score = ROUND([meas.trueai_act_capt_score],2)
@@ -204,6 +252,10 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: Measures: [meas.act_capture].
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: 0.0
 	measure 'meas.act_capture_adjustment_factor' = divide(1, [meas.act_capture])
 		formatString: 0.0
 		displayFolder: _acl_scores
@@ -213,6 +265,10 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (periods_tbl, reps_tbl, reps, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[_sys_filter_start_date], act_capture_level_summary[_sys_user_id].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: _acl_scores
 	measure 'meas.act_capt_applicable_reps' = ```
 			
 			/*
@@ -232,6 +288,10 @@ table act_capture_level_summary
 
 		changedProperty = FormatString
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (act_count, res) used later in the expression. Dependencies: Columns: users_history[ci_time_alloc_tot_dur] | Measures: [date].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: _acl_scores
 	measure 'meas.act_capt_activity_count' = ```
 			
 			var act_count = CALCULATE(SUM(users_history[ci_time_alloc_tot_dur]), 'cal_end_dates'[date] > date(1900,1,1) && 'cal_end_dates'[date] > date(210,1,1) )-- override the standard date filter 
@@ -244,6 +304,10 @@ table act_capture_level_summary
 		displayFolder: 0
 		lineageTag: ee680742-49b5-4460-aa06-85524f4fbb59
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: #\" hrs/week\"
 	measure 'meas.act_capt_lvl_summary_time_alloc_eng' =
 			
 			CALCULATE(
@@ -257,6 +321,10 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: #\" hrs/week\"
 	measure 'meas.act_capt_lvl_summary_time_alloc_non_eng' =
 			
 			CALCULATE(
@@ -270,6 +338,10 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: 0
 	measure 'meas.no_activities_count' =
 			
 			var _prospect = SUM(users_history[ci_act_capt_lvl_pi_prospecting_owner_act])            // get prospecting act

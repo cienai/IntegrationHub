@@ -266,7 +266,7 @@ table metadata_heatmap_items
 	measure 'meas.calc_hyp12_kpi1_denominator' =
 			
 			CALCULATE(
-			    DISTINCTCOUNT(ssr_history[_sys_doc_id]),
+			    COUNTROWS(ssr_history),
 			    ssr_history[step_name]="Post-Sales Support"
 			)
 		formatString: 0
@@ -277,20 +277,15 @@ table metadata_heatmap_items
 	measure 'meas.calc_hyp12_kpi1_nominator' =
 			
 			var _max_date = [meas.context_date_max]
-			var rept_tbl = CALCULATETABLE(
-			    ssr,
-			    KEEPFILTERS(ssr[trueai_churned_on]=BLANK() || ssr[trueai_churned_on] >= DATE(YEAR(_max_date)+1,01,01)),
-			    KEEPFILTERS(ssr[trueai_churned_on]=BLANK()),
-			    ssr_history[step_name]="Existing Customer Selling",     // keep the date filter and ignore the context filter and get the attempted cross sale count
-			    ssr_history[opp_existing_customer_selling_cross_sale]=TRUE(),
-			    ALL(cal_end_dates)
-			)
-			var res = CALCULATE(
-			    COUNTROWS(rept_tbl)
-			)
-			
 			RETURN
-			res
+			    CALCULATE(
+			        DISTINCTCOUNT(ssr[_sys_doc_id]),
+			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK() || ssr[trueai_churned_on] >= DATE(YEAR(_max_date)+1,01,01)),
+			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK()),
+			        ssr_history[step_name]="Existing Customer Selling",     // keep the date filter and ignore the context filter and get the attempted cross sale count
+			        ssr_history[opp_existing_customer_selling_cross_sale]=TRUE(),
+			        ALL(cal_end_dates)
+			    )
 		formatString: 0
 		displayFolder: heatmap_kpis
 		lineageTag: 0a79c4ce-7c0d-4ca1-b49a-fafc90e62ef5
@@ -298,21 +293,16 @@ table metadata_heatmap_items
 	/// Measure meas.calc_hyp12_kpi2_denominator.
 	measure 'meas.calc_hyp12_kpi2_denominator' =
 			
-			var _min_date =  MAX(date(2000,01,01) ,  min(ssr[_sys_filt_start_date]))            // get the coid min date
-			var _max_date = [meas.context_date_max]             //. get the context max date
-			
-			var rept_tbl = CALCULATETABLE(
-			    ssr,
-			    KEEPFILTERS(ssr[trueai_first_purchase] >= _min_date  && ssr[trueai_first_purchase] < DATE(YEAR(_max_date)+1,1,1)),
-			    KEEPFILTERS(ssr[trueai_churned_on]=BLANK() || ssr[trueai_churned_on] >= DATE(YEAR(_max_date)+1,01,01)),     // count of attempted cross sale filtered by the not inculding the churn and first purchase as per discussed logic
-			    ALL(cal_end_dates)
-			)
-			var res = CALCULATE(
-			    COUNTROWS(rept_tbl)
-			)
-			
+			var _max_date = [meas.context_date_max]
 			RETURN
-			res
+			    CALCULATE(
+			        DISTINCTCOUNT(ssr[_sys_doc_id]),
+			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK() || ssr[trueai_churned_on] >= DATE(YEAR(_max_date)+1,01,01)),
+			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK()),
+			        ssr_history[step_name]="Existing Customer Selling",     // keep the date filter and ignore the context filter and get the attempted cross sale count
+			        ssr_history[opp_existing_customer_selling_cross_sale]=TRUE(),
+			        ALL(cal_end_dates)
+			    )
 		formatString: 0
 		displayFolder: heatmap_kpis
 		lineageTag: 2c03f897-4cef-4821-bf3e-51b93a1f2b33
@@ -321,20 +311,15 @@ table metadata_heatmap_items
 	measure 'meas.calc_hyp12_kpi2_nominator' =
 			
 			var _max_date = [meas.context_date_max]
-			var rept_tbl = CALCULATETABLE(
-			    ssr,
-			    KEEPFILTERS(ssr[trueai_churned_on]=BLANK() || ssr[trueai_churned_on] >= DATE(YEAR(_max_date)+1,01,01)),
-			    KEEPFILTERS(ssr[trueai_churned_on]=BLANK()),
-			    ssr_history[step_name]="Existing Customer Selling",     // keep the date filter and ignore the context filter and get the attempted cross sale count
-			    ssr_history[opp_existing_customer_selling_cross_sale]=TRUE(),
-			    ALL(cal_end_dates)
-			)
-			var res = CALCULATE(
-			    COUNTROWS(rept_tbl)
-			)
-			
 			RETURN
-			res
+			    CALCULATE(
+			        DISTINCTCOUNT(ssr[_sys_doc_id]),
+			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK() || ssr[trueai_churned_on] >= DATE(YEAR(_max_date)+1,01,01)),
+			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK()),
+			        ssr_history[step_name]="Existing Customer Selling",
+			        ssr_history[opp_existing_customer_selling_cross_sale_won]=TRUE(),
+			        ALL(cal_end_dates)
+			    )
 		formatString: 0
 		displayFolder: heatmap_kpis
 		lineageTag: 4c7ac747-8024-4d3c-a408-41770d0a8626

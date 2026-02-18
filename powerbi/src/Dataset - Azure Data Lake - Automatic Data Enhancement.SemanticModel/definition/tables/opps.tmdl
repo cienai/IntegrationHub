@@ -2,6 +2,10 @@
 table opps
 	lineageTag: 4277295b-2fd7-47a1-b82b-5de4b447fb12
 
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_complt], [trueai_complt].
+	/// Dynamic Behavior: Uses IF for conditional branching.
+	/// Format/Type: 0 %
 	measure 'meas.opp_trueai_completeness_improvement' = ```
 			
 			var crmval = CALCULATE(AVERAGE([crm_complt]))
@@ -216,11 +220,11 @@ table opps
 		annotation SummarizationSetBy = Automatic
 
 	/// Quality bucket based on the probability of win
-	column trueai_qual_bucket
+	column trueai_propensity
 		dataType: string
 		lineageTag: 33dacbdb-aa27-4569-842d-a68d5df4b162
 		summarizeBy: none
-		sourceColumn: trueai_qual_bucket
+		sourceColumn: trueai_propensity
 
 		annotation SummarizationSetBy = Automatic
 
@@ -606,12 +610,12 @@ table opps
 		annotation SummarizationSetBy = Automatic
 
 	/// Quality bucket expressed as an integer from 1 to 5 based on the probability of win
-	column trueai_qual_bucket_num
+	column trueai_propensity_num
 		dataType: int64
 		formatString: 0
 		lineageTag: 0bafe83f-36cb-485e-a258-c4c53cb803a6
 		summarizeBy: sum
-		sourceColumn: trueai_qual_bucket_num
+		sourceColumn: trueai_propensity_num
 
 		annotation SummarizationSetBy = Automatic
 
@@ -1394,8 +1398,8 @@ table opps
 				{"trueai_owner_id_rule", Int64.Type},
 				{"trueai_pipeline_name", type text},
 				{"trueai_prob_of_win", type number},
-				{"trueai_qual_bucket", type text},
-				{"trueai_qual_bucket_num", Int64.Type},
+				{"trueai_propensity", type text},
+				{"trueai_propensity_num", Int64.Type},
 				{"trueai_renewal_amt", type number},
 				{"trueai_sale_type", type text},
 				{"trueai_sale_type_conf", type number},
