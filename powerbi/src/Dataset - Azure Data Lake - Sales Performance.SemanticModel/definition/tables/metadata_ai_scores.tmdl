@@ -298,8 +298,8 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_pred_existing_customer_selling' = ```
 			
 			
-			var factor1 = [meas.ai_scores_existing_customer_selling_factor1_value]
-			var factor2 =  [meas.ai_scores_existing_customer_selling_factor2_value]
+			var factor1 = COALESCE([meas.ai_scores_existing_customer_selling_factor1_value], 0)
+			var factor2 =  COALESCE([meas.ai_scores_existing_customer_selling_factor2_value], 0)
 			var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
 			var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
 			var score  = ((normalized_factor2 + factor1)/2) 
@@ -316,8 +316,8 @@ table metadata_ai_scores
 
 	/// Measure meas.ai_scores_pred_new_logo_selling.
 	measure 'meas.ai_scores_pred_new_logo_selling' = ```
-			var factor1 = [meas.ai_scores_new_logo_selling_factor1_value]
-			var factor2 =  [meas.ai_scores_new_logo_selling_factor2_value]
+			var factor1 = COALESCE([meas.ai_scores_new_logo_selling_factor1_value], 0)
+			var factor2 = COALESCE([meas.ai_scores_new_logo_selling_factor2_value], 0)
 			var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
 			var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
 			var score  = ((normalized_factor2 + factor1)/2) 
@@ -334,8 +334,8 @@ table metadata_ai_scores
 
 	/// Measure meas.ai_scores_pred_post_sales_support.
 	measure 'meas.ai_scores_pred_post_sales_support' = ```
-			var factor1 = [meas.ai_scores_post_sales_support_factor1_value]
-			var factor2 =  [meas.ai_scores_post_sales_support_factor2_value]
+			var factor1 = COALESCE([meas.ai_scores_post_sales_support_factor1_value], 0)
+			var factor2 =  COALESCE([meas.ai_scores_post_sales_support_factor2_value], 0)
 			var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
 			var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
 			var score  = ((normalized_factor2 + factor1)/2) 
@@ -352,8 +352,8 @@ table metadata_ai_scores
 
 	/// Measure meas.ai_scores_pred_prospecting.
 	measure 'meas.ai_scores_pred_prospecting' = ```
-			var factor1 = [meas.ai_scores_prospecting_factor1_value]
-			var factor2 =  [meas.ai_scores_prospecting_factor2_value]
+			var factor1 = COALESCE([meas.ai_scores_prospecting_factor1_value], 0)
+			var factor2 =  COALESCE([meas.ai_scores_prospecting_factor2_value], 0)
 			var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
 			var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
 			var score  = ((normalized_factor2 + factor1)/2) 
@@ -881,7 +881,7 @@ table metadata_ai_scores
 			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
 			var new_logo_auc = MAXX(latest_row, companies_history[di_pred_new_logo_auc])     // get the latest auc for new_logo_selling
 			RETURN
-			FORMAT(new_logo_auc, "0.00")
+			new_logo_auc
 		formatString: 0.00
 		displayFolder: _factor1_value
 		lineageTag: e12ed20f-f892-45c4-aad8-7bcf1b703801
