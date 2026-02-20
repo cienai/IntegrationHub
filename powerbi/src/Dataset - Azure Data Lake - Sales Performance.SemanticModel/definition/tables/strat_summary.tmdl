@@ -27,6 +27,11 @@ table strat_summary
 		changedProperty = FormatString
 
 	/// Measure meas.strat_summary_score.
+		annotation AgentPurpose = "Tracks strat summary delta prev period."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min], [meas.context_prev_period_max], [meas.context_prev_period_min]; Columns: strat_summary[key_metric_value], cal_end_dates[Date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.strat_summary_score' = ```
 			
 			--var max_date = cal_end_dates[meas.context_date_max] -- get the last date
@@ -48,6 +53,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.strat_summary_trend_score.
+		annotation AgentPurpose = "Tracks strat summary score."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_metric_value]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_trend_score' = ```
 			
 			
@@ -65,6 +75,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.strat_summary_display_score.
+		annotation AgentPurpose = "Tracks strat summary trend score."
+		annotation AgentLogic = "Averages strat_summary[key_metric_trend_coeff] under filters."
+		annotation AgentDependencies = "Measures: [meas.strat_summary_delta_prev_period]; Columns: strat_summary[key_metric_trend_coeff]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_display_score' = ```
 			strat_summary[meas.strat_summary_score] * 100
 			
@@ -75,6 +90,11 @@ table strat_summary
 		changedProperty = FormatString
 
 	/// Measure meas.strat_summary_display_key_metric_pct.
+		annotation AgentPurpose = "Tracks strat summary display score."
+		annotation AgentLogic = "Sums strat_summary[meas.strat_summary_score] under filters."
+		annotation AgentDependencies = "Measures: [meas.strat_summary_score]; Columns: strat_summary[meas.strat_summary_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.strat_summary_display_key_metric_pct' =
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_value]) )
@@ -84,6 +104,11 @@ table strat_summary
 		changedProperty = FormatString
 
 	/// Measure meas.strat_summary_score_display_eop.
+		annotation AgentPurpose = "Tracks strat summary display key metric percentage."
+		annotation AgentLogic = "Averages strat_summary[key_metric_value] under filters."
+		annotation AgentDependencies = "Columns: strat_summary[key_metric_value]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.strat_summary_score_display_eop' = ```
 			
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
@@ -107,6 +132,11 @@ table strat_summary
 		changedProperty = FormatString
 
 	/// Measure meas.strat_summary_key_metric_display_pct_eop.
+		annotation AgentPurpose = "Tracks strat summary score display eop."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_metric_value]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.strat_summary_key_metric_display_pct_eop' =
 			
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
@@ -120,6 +150,11 @@ table strat_summary
 		changedProperty = FormatString
 
 	/// Measure meas.strat_summary_display_reference_pct.
+		annotation AgentPurpose = "Tracks strat summary key metric display percentage eop."
+		annotation AgentLogic = "Averages cal_end_dates[meas.context_date_max] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_metric_value]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.strat_summary_display_reference_pct' =
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
@@ -129,6 +164,11 @@ table strat_summary
 		changedProperty = FormatString
 
 	/// Measure meas.strat_summary_delta_12mo_eop.
+		annotation AgentPurpose = "Tracks strat summary display reference percentage."
+		annotation AgentLogic = "Averages strat_summary[key_metric_reference] under filters."
+		annotation AgentDependencies = "Columns: strat_summary[key_metric_reference]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.strat_summary_delta_12mo_eop' = ```
 			
 			
@@ -153,6 +193,11 @@ table strat_summary
 		changedProperty = FormatString
 
 	/// Measure meas.strat_summary_key_metric_display_ratio_eop.
+		annotation AgentPurpose = "Tracks strat summary delta 12mo eop."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max]; Columns: strat_summary[key_metric_value], cal_end_dates[Date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.strat_summary_key_metric_display_ratio_eop' =
 			
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
@@ -168,6 +213,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.strat_summary_display_reference_ratio.
+		annotation AgentPurpose = "Tracks strat summary key metric display ratio eop."
+		annotation AgentLogic = "Averages cal_end_dates[meas.context_date_max] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_metric_value]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_display_reference_ratio' =
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
@@ -177,6 +227,11 @@ table strat_summary
 		changedProperty = FormatString
 
 	/// Measure meas.strat_summary_concern_score.
+		annotation AgentPurpose = "Tracks strat summary display reference ratio."
+		annotation AgentLogic = "Averages strat_summary[key_metric_reference] under filters."
+		annotation AgentDependencies = "Columns: strat_summary[key_metric_reference]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.strat_summary_concern_score' = ```
 			
 			var val_score = strat_summary[meas.strat_summary_score]
@@ -190,6 +245,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.strat_summary_concern_score_display.
+		annotation AgentPurpose = "Tracks strat summary concern score."
+		annotation AgentLogic = "Sums strat_summary[meas.strat_summary_score] under filters."
+		annotation AgentDependencies = "Measures: [meas.strat_summary_score], [meas.strat_summary_trend_score]; Columns: strat_summary[meas.strat_summary_score], strat_summary[meas.strat_summary_trend_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_concern_score_display' =
 			
 			var res = IF([meas.strat_summary_concern_score] > 0.66, "Low", IF([meas.strat_summary_concern_score] > 0.33, "Medium", "High"))
@@ -197,6 +257,11 @@ table strat_summary
 		lineageTag: e8d32342-6ef1-4d93-88c4-986a1f524e93
 
 	/// Measure meas.strat_summary_trend_display.
+		annotation AgentPurpose = "Tracks strat summary concern score display."
+		annotation AgentLogic = "Sums values under filters."
+		annotation AgentDependencies = "Measures: [meas.strat_summary_concern_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_trend_display' =
 			
 			var res = IF([meas.strat_summary_trend_score] > 0.66, "Improving", IF([meas.strat_summary_trend_score] > 0.33, "Steady", "Declining"))
@@ -204,11 +269,21 @@ table strat_summary
 		lineageTag: 9432771d-5fb2-467d-924b-fa9d6c1041b4
 
 	/// Measure measure.strat_summary_industry_score_display.
+		annotation AgentPurpose = "Tracks strat summary trend display."
+		annotation AgentLogic = "Sums values under filters."
+		annotation AgentDependencies = "Measures: [meas.strat_summary_trend_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'measure.strat_summary_industry_score_display' = 52
 		formatString: 0
 		lineageTag: 18b3dd43-84ac-49f4-8cd7-d2283175eed2
 
 	/// Measure meas.strat_summary_key_metric_display_hrs_eop.
+		annotation AgentPurpose = "Tracks measure strat summary industry score display."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.strat_summary_key_metric_display_hrs_eop' =
 			
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
@@ -224,6 +299,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.strat_summary_key_metric_display_decimal_eop.
+		annotation AgentPurpose = "Tracks strat summary key metric display hrs eop."
+		annotation AgentLogic = "Averages cal_end_dates[meas.context_date_max] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_metric_value]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_key_metric_display_decimal_eop' =
 			
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
@@ -239,6 +319,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.strat_summary_display_reference_hrs.
+		annotation AgentPurpose = "Tracks strat summary key metric display decimal eop."
+		annotation AgentLogic = "Averages cal_end_dates[meas.context_date_max] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_metric_value]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_display_reference_hrs' =
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
@@ -248,6 +333,11 @@ table strat_summary
 		changedProperty = FormatString
 
 	/// Measure meas.strat_summary_display_reference_decimal.
+		annotation AgentPurpose = "Tracks strat summary display reference hrs."
+		annotation AgentLogic = "Averages strat_summary[key_metric_reference] under filters."
+		annotation AgentDependencies = "Columns: strat_summary[key_metric_reference]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_display_reference_decimal' =
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
@@ -257,6 +347,11 @@ table strat_summary
 		changedProperty = FormatString
 
 	/// Measure meas.strat_summary_score_display_eop_existing_cust_exp.
+		annotation AgentPurpose = "Tracks strat summary display reference decimal."
+		annotation AgentLogic = "Averages strat_summary[key_metric_reference] under filters."
+		annotation AgentDependencies = "Columns: strat_summary[key_metric_reference]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_score_display_eop_existing_cust_exp' = ```
 			
 			CALCULATE(
@@ -270,6 +365,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.strat_summary_score_display_eop_for_new_logo_sales.
+		annotation AgentPurpose = "Tracks strat summary score display eop existing customer exp."
+		annotation AgentLogic = "Sums 'strat_summary'[summary_cat] under filters."
+		annotation AgentDependencies = "Measures: [meas.strat_summary_score_display_eop]; Columns: 'strat_summary'[summary_cat]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_score_display_eop_for_new_logo_sales' = ```
 			
 			CALCULATE(
@@ -283,6 +383,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.strat_summary_score_display_eop_for_rep_perf.
+		annotation AgentPurpose = "Tracks strat summary score display eop for new logo sales."
+		annotation AgentLogic = "Sums 'strat_summary'[summary_cat] under filters."
+		annotation AgentDependencies = "Measures: [meas.strat_summary_score_display_eop]; Columns: 'strat_summary'[summary_cat]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_score_display_eop_for_rep_perf' = ```
 			
 			CALCULATE(
@@ -296,6 +401,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.strat_summary_score_display_eop_for_sales_and_market.
+		annotation AgentPurpose = "Tracks strat summary score display eop for rep perf."
+		annotation AgentLogic = "Sums 'strat_summary'[summary_cat] under filters."
+		annotation AgentDependencies = "Measures: [meas.strat_summary_score_display_eop]; Columns: 'strat_summary'[summary_cat]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_score_display_eop_for_sales_and_market' = ```
 			
 			CALCULATE(
@@ -310,6 +420,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.strat_summary_score_display_eop_for_target_and_segment.
+		annotation AgentPurpose = "Tracks strat summary score display eop for sales and market."
+		annotation AgentLogic = "Sums 'strat_summary'[summary_cat] under filters."
+		annotation AgentDependencies = "Measures: [meas.strat_summary_score_display_eop]; Columns: 'strat_summary'[summary_cat]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_score_display_eop_for_target_and_segment' = ```
 			
 			CALCULATE(
@@ -323,6 +438,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.strat_summary_all_score.
+		annotation AgentPurpose = "Tracks strat summary score display eop for target and segment."
+		annotation AgentLogic = "Sums 'strat_summary'[summary_cat] under filters."
+		annotation AgentDependencies = "Measures: [meas.strat_summary_score_display_eop]; Columns: 'strat_summary'[summary_cat]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.strat_summary_all_score' = ```
 			
 			var score = (strat_summary[meas.strat_summary_score_display_eop_existing_cust_exp] + strat_summary[meas.strat_summary_score_display_eop_for_new_logo_sales] 
@@ -340,6 +460,11 @@ table strat_summary
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Column _sys_docid.
+		annotation AgentPurpose = "Tracks strat summary all score."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.strat_summary_score_display_eop_existing_cust_exp], [meas.strat_summary_score_display_eop_for_new_logo_sales], [meas.strat_summary_score_display_eop_for_rep_perf], [meas.strat_summa..."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	column _sys_docid
 		lineageTag: 776d91c0-dc9d-47f5-9187-626563359320
 		summarizeBy: none

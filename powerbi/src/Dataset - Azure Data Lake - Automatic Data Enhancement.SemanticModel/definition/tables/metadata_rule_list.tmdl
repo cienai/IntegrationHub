@@ -21,6 +21,11 @@ table metadata_rule_list
 	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks rules list std CRM owner rule applied count."
+		annotation AgentLogic = "Counts rows using ssr_history[_sys_doc_id] under filters."
+		annotation AgentDependencies = "Columns: ssr_history[_sys_doc_id], metadata_rule_list[col.rule_is_std_crm]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.rules_list_non_crm_owner_rule_applied_count' = ```
 			
 			var res = calculate(count(ssr_history[_sys_doc_id]), metadata_rule_list[col.rule_is_std_crm]=false) // determine how many non standard 
@@ -33,6 +38,11 @@ table metadata_rule_list
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks rules list non CRM owner rule applied count."
+		annotation AgentLogic = "Counts rows using ssr_history[_sys_doc_id] under filters."
+		annotation AgentDependencies = "Columns: ssr_history[_sys_doc_id], metadata_rule_list[col.rule_is_std_crm]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.rules_list_total_crm_owner_rule_applied_count' =
 			
 			var res = calculate(count(ssr_history[_sys_doc_id])) // determine how many total
@@ -41,6 +51,11 @@ table metadata_rule_list
 		lineageTag: a70a9129-28a1-4fb2-81c7-e111212684eb
 
 	/// Column model.
+		annotation AgentPurpose = "Tracks rules list total CRM owner rule applied count."
+		annotation AgentLogic = "Counts rows using ssr_history[_sys_doc_id] under filters."
+		annotation AgentDependencies = "Columns: ssr_history[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	column model
 		dataType: string
 		lineageTag: 0d8ae1f8-45ad-4f77-a4fb-4757760ef4b5

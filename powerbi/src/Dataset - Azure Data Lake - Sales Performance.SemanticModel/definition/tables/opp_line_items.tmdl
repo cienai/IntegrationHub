@@ -16,6 +16,11 @@ table opp_line_items
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.opp_line_item_discount_pct.
+		annotation AgentPurpose = "Tracks opportunity line item discount amount."
+		annotation AgentLogic = "Counts rows under filters."
+		annotation AgentDependencies = "Measures: [meas.opp_line_item_total_price_after_discount], [meas.opp_line_item_total_price_before_discount]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.opp_line_item_discount_pct' =
 			
 			
@@ -28,6 +33,11 @@ table opp_line_items
 		lineageTag: dd1dba57-2410-444e-b287-68ada1efc23c
 
 	/// Measure meas.discount_line_opps.
+		annotation AgentPurpose = "Tracks opportunity line item discount percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.opp_line_item_discount_amt], [meas.opp_line_item_total_price_before_discount]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.discount_line_opps' =
 			
 			IF([meas.opp_line_item_discount_pct] = 0, 0,BLANK())
@@ -36,6 +46,11 @@ table opp_line_items
 		lineageTag: 55bd8ea0-eb11-461f-b799-99a4f1e6e0ac
 
 	/// Measure meas.opp_line_item_dis_pct.
+		annotation AgentPurpose = "Tracks discount line opportunities."
+		annotation AgentLogic = "Counts rows under filters."
+		annotation AgentDependencies = "Measures: [meas.opp_line_item_discount_pct]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.opp_line_item_dis_pct' =
 			
 			var orig_cost = SUMX(opp_line_items, [trueai_list_price]*[trueai_qty])              // get the original cost
@@ -47,6 +62,11 @@ table opp_line_items
 		lineageTag: b5f83928-e12e-4884-aa64-e29f8c0e2b70
 
 	/// Measure meas.opp_line_item_total_price_after_discount.
+		annotation AgentPurpose = "Tracks opportunity line item dis percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.opp_line_item_total_price_after_discount' =
 			
 			
@@ -59,6 +79,11 @@ table opp_line_items
 		lineageTag: 982b866e-1a68-4089-9f0b-fff63419a571
 
 	/// Measure meas.opp_lines_item_discount_pct.
+		annotation AgentPurpose = "Tracks opportunity line item total price after discount."
+		annotation AgentLogic = "Sums values under filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.opp_lines_item_discount_pct' = ```
 			
 			
@@ -73,6 +98,11 @@ table opp_line_items
 		lineageTag: 92f502aa-be60-41d1-a075-d98ed0682e74
 
 	/// Measure meas.delta_expected_booking_amt.
+		annotation AgentPurpose = "Tracks opportunity lines item discount percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.delta_expected_booking_amt' = ```
 			
 			var wonAmt = [meas.ssr_history_won_amt]     // get the won amt 
@@ -88,6 +118,11 @@ table opp_line_items
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.opps_average_discount_pct.
+		annotation AgentPurpose = "Tracks delta expected booking amount."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.opps_delta_expected_pct], [meas.ssr_history_won_amt]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.opps_average_discount_pct' =
 			
 			ABS(CALCULATE(AVERAGE(opps[trueai_discount_pct])))     // get the abs of avg discount pct
@@ -97,6 +132,11 @@ table opp_line_items
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.opps_avg_deals_amt.
+		annotation AgentPurpose = "Tracks opportunities average discount percentage."
+		annotation AgentLogic = "Counts rows using opps[trueai_discount_pct] under filters."
+		annotation AgentDependencies = "Columns: opps[trueai_discount_pct]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.opps_avg_deals_amt' =
 			
 			var Amt = [meas.ssr_history_won_amt] - [meas.opps_deal_discount_amt]        // get the difference amt
@@ -110,6 +150,11 @@ table opp_line_items
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.opps_deal_discount_amt.
+		annotation AgentPurpose = "Tracks opportunities average deals amount."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.opps_deal_discount_amt], [meas.ssr_history_step_count], [meas.ssr_history_won_amt]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.opps_deal_discount_amt' = ```
 			
 			// var pct = ABS([meas.opps_average_discount_pct])
@@ -128,6 +173,11 @@ table opp_line_items
 		lineageTag: a7e40876-f224-4016-b137-855d4e4bb99c
 
 	/// Measure meas.opps_deals_pct.
+		annotation AgentPurpose = "Tracks opportunities deal discount amount."
+		annotation AgentLogic = "Counts rows under filters."
+		annotation AgentDependencies = "Measures: [meas.opp_line_item_discount_pct], [meas.opps_average_discount_pct], [meas.ssr_history_won_amt]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.opps_deals_pct' =
 			
 			var stepCount = [meas.ssr_history_step_count]       // calculating the step count
@@ -141,6 +191,11 @@ table opp_line_items
 		lineageTag: c7df8b8f-3864-41d9-94e5-b44b2836158f
 
 	/// Measure meas.opps_delta_expected_pct.
+		annotation AgentPurpose = "Tracks opportunities deals percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.ssr_history_step_count]; Columns: opps[_sys_doc_id], opps[trueai_discount_pct_tier]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.opps_delta_expected_pct' =
 			
 			VAR SuccessRate =
@@ -160,6 +215,11 @@ table opp_line_items
 		lineageTag: 9d875de2-fc0a-47b4-86e6-f717b75bf26f
 
 	/// Measure meas.opps_tot_deals.
+		annotation AgentPurpose = "Tracks opportunities delta expected percentage."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.ssr_history_success_prob_avg], [meas.ssr_history_success_rate]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.opps_tot_deals' =
 			
 			CALCULATE(COUNT(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK()) // get the total deals count
@@ -168,6 +228,11 @@ table opp_line_items
 		lineageTag: ba127637-f77b-4fbe-8646-8ee9fea3c6a3
 
 	/// Measure meas.opp_line_items_avg_discount_pct.
+		annotation AgentPurpose = "Tracks opportunities tot deals."
+		annotation AgentLogic = "Counts rows using opps[_sys_doc_id] under filters."
+		annotation AgentDependencies = "Columns: opps[_sys_doc_id], opps[trueai_discount_pct_tier]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.opp_line_items_avg_discount_pct' =
 			CALCULATE(
 			    AVERAGE(
@@ -180,6 +245,11 @@ table opp_line_items
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.opp_line_item_total_price_before_discount.
+		annotation AgentPurpose = "Tracks opportunity line items average discount percentage."
+		annotation AgentLogic = "Counts rows using opps[trueai_discount_pct] under filters."
+		annotation AgentDependencies = "Columns: opps[trueai_discount_pct]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.opp_line_item_total_price_before_discount' =
 			
 			var tbl = CALCULATETABLE(opp_line_items)        // get the calculatd table
@@ -192,6 +262,11 @@ table opp_line_items
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.opp_line_items_trueai_list_price.
+		annotation AgentPurpose = "Tracks opportunity line item total price before discount."
+		annotation AgentLogic = "Sums values under filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.opp_line_items_trueai_list_price' =
 			
 			CALCULATE(
@@ -204,6 +279,11 @@ table opp_line_items
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.avg_discount_pct_change.
+		annotation AgentPurpose = "Tracks opportunity line items trueai list price."
+		annotation AgentLogic = "Returns an extreme value from opp_line_items[trueai_list_price] under filters."
+		annotation AgentDependencies = "Columns: opp_line_items[trueai_list_price]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.avg_discount_pct_change' =
 			
 			VAR MinVisibleDate =
@@ -236,6 +316,11 @@ table opp_line_items
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.opp_line_items_trueai_total_price.
+		annotation AgentPurpose = "Tracks average discount percentage change."
+		annotation AgentLogic = "Counts rows using 'cal_end_dates'[Date] under filters."
+		annotation AgentDependencies = "Measures: [meas.opp_line_items_avg_discount_pct]; Columns: 'cal_end_dates'[Date], 'cal_end_dates'[Date], 'cal_end_dates'[Date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.opp_line_items_trueai_total_price' =
 			
 			CALCULATE(
@@ -246,6 +331,11 @@ table opp_line_items
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
+		annotation AgentPurpose = "Tracks opportunity line items trueai total price."
+		annotation AgentLogic = "Sums opp_line_items[trueai_total_price] under filters."
+		annotation AgentDependencies = "Columns: opp_line_items[trueai_total_price]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 2343c249-79f2-4cdb-bda4-9d09f792ce18

@@ -23,6 +23,11 @@ table ai_conf_nlp_summary
 	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.nlp_classified_records], [meas.nlp_total_records].
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0%;-0%;0%
+		annotation AgentPurpose = "Tracks NLP average confidence."
+		annotation AgentLogic = "Averages 'ai_conf_nlp_summary'[trueai_conf] under filters."
+		annotation AgentDependencies = "Columns: 'ai_conf_nlp_summary'[trueai_conf], 'ai_conf_nlp_summary'[trueai_conf]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.nlp_classfied_ratio' = ```
 			
 			var res = divide('ai_conf_nlp_summary'[meas.nlp_classified_records],'ai_conf_nlp_summary'[meas.nlp_total_records] )
@@ -38,6 +43,11 @@ table ai_conf_nlp_summary
 	/// Calculation Logic: VAR blocks define intermediate values (cnt, res) used later in the expression. Dependencies: Measures: [trueai_value].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks NLP classfied ratio."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.nlp_classified_records], [meas.nlp_total_records]; Columns: 'ai_conf_nlp_summary'[meas.nlp_classified_records], 'ai_conf_nlp_summary'[meas.nlp_total_records]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.nlp_classified_records' = ```
 			
 			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]), 'ai_conf_nlp_summary'[trueai_value] <> "ND")
@@ -53,6 +63,11 @@ table ai_conf_nlp_summary
 	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.nlp_not_classified_records_due_to_ambiguity], [meas.nlp_total_records].
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0%;-0%;0%
+		annotation AgentPurpose = "Tracks NLP classified records."
+		annotation AgentLogic = "Counts rows using 'ai_conf_nlp_summary'[trueai_value] under filters."
+		annotation AgentDependencies = "Columns: 'ai_conf_nlp_summary'[trueai_value], 'ai_conf_nlp_summary'[trueai_value]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.nlp_not_classified_due_to_ambiguity_ratio' = ```
 			
 			var res = divide('ai_conf_nlp_summary'[meas.nlp_not_classified_records_due_to_ambiguity],'ai_conf_nlp_summary'[meas.nlp_total_records] )
@@ -68,6 +83,11 @@ table ai_conf_nlp_summary
 	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.nlp_not_classified_records_due_to_missing], [meas.nlp_total_records].
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0%;-0%;0%
+		annotation AgentPurpose = "Tracks NLP not classified due to ambiguity ratio."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.nlp_not_classified_records_due_to_ambiguity], [meas.nlp_total_records]; Columns: 'ai_conf_nlp_summary'[meas.nlp_not_classified_records_due_to_ambiguity], 'ai_conf_nlp_summary'[meas...."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.nlp_not_classified_due_to_missing_ratio' = ```
 			
 			var res = divide('ai_conf_nlp_summary'[meas.nlp_not_classified_records_due_to_missing],'ai_conf_nlp_summary'[meas.nlp_total_records] )
@@ -83,6 +103,11 @@ table ai_conf_nlp_summary
 	/// Calculation Logic: VAR blocks define intermediate values (cnt, res) used later in the expression. Dependencies: Measures: [trueai_value], [trueai_conf].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks NLP not classified due to missing ratio."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.nlp_not_classified_records_due_to_missing], [meas.nlp_total_records]; Columns: 'ai_conf_nlp_summary'[meas.nlp_not_classified_records_due_to_missing], 'ai_conf_nlp_summary'[meas.nlp_..."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.nlp_not_classified_records_due_to_ambiguity' = ```
 			
 			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]), 'ai_conf_nlp_summary'[trueai_value] = "ND" && 'ai_conf_nlp_summary'[trueai_conf] > 0)
@@ -98,6 +123,11 @@ table ai_conf_nlp_summary
 	/// Calculation Logic: VAR blocks define intermediate values (cnt, res) used later in the expression. Dependencies: Measures: [trueai_value], [trueai_conf].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks NLP not classified records due to ambiguity."
+		annotation AgentLogic = "Counts rows using 'ai_conf_nlp_summary'[trueai_value] under filters."
+		annotation AgentDependencies = "Columns: 'ai_conf_nlp_summary'[trueai_value], 'ai_conf_nlp_summary'[trueai_value], 'ai_conf_nlp_summary'[trueai_conf]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.nlp_not_classified_records_due_to_missing' = ```
 			
 			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]), 'ai_conf_nlp_summary'[trueai_conf] = 0)
@@ -113,6 +143,11 @@ table ai_conf_nlp_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks NLP not classified records due to missing."
+		annotation AgentLogic = "Counts rows using 'ai_conf_nlp_summary'[trueai_value] under filters."
+		annotation AgentDependencies = "Columns: 'ai_conf_nlp_summary'[trueai_value], 'ai_conf_nlp_summary'[trueai_conf]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.nlp_score' =
 			
 			var res = 'ai_conf_nlp_summary'[meas.nlp_avg_confidence] * 100
@@ -129,6 +164,11 @@ table ai_conf_nlp_summary
 	/// Calculation Logic: VAR blocks define intermediate values (score, res) used later in the expression. Dependencies: Measures: [meas.nlp_score].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
+		annotation AgentPurpose = "Tracks NLP score."
+		annotation AgentLogic = "Sums 'ai_conf_nlp_summary'[meas.nlp_avg_confidence] under filters."
+		annotation AgentDependencies = "Measures: [meas.nlp_avg_confidence]; Columns: 'ai_conf_nlp_summary'[meas.nlp_avg_confidence]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.nlp_score_text' = ```
 			
 			var score = 'ai_conf_nlp_summary'[meas.nlp_score]
@@ -142,6 +182,11 @@ table ai_conf_nlp_summary
 	/// Calculation Logic: VAR blocks define intermediate values (cnt, res) used later in the expression. Dependencies: Measures: [trueai_value].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks NLP score text."
+		annotation AgentLogic = "Sums 'ai_conf_nlp_summary'[meas.nlp_score] under filters."
+		annotation AgentDependencies = "Measures: [meas.nlp_score]; Columns: 'ai_conf_nlp_summary'[meas.nlp_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.nlp_total_records' = ```
 			
 			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]))
@@ -154,6 +199,11 @@ table ai_conf_nlp_summary
 		lineageTag: fbeb6f9b-281b-489a-b65a-227188a13f88
 
 	/// Column sort.
+		annotation AgentPurpose = "Tracks NLP total records."
+		annotation AgentLogic = "Counts rows using 'ai_conf_nlp_summary'[trueai_value] under filters."
+		annotation AgentDependencies = "Columns: 'ai_conf_nlp_summary'[trueai_value]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	column sort
 		formatString: 0
 		lineageTag: ae65e043-8c63-442d-914d-b48628efedb8

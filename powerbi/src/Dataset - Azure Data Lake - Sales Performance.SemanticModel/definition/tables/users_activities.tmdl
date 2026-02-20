@@ -27,6 +27,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isDecimal":true}
 
 	/// Measure meas.act_capt_lvl_reps_all_count.
+		annotation AgentPurpose = "Tracks act capt lvl adjusted total eng duration hr."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_adj_eng_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.act_capt_lvl_reps_all_count' =
 			CALCULATE(
 			    COUNT(
@@ -38,6 +43,11 @@ table users_activities
 		lineageTag: 3aec840e-5730-46b3-a256-0725ff6e0d42
 
 	/// Measure meas.act_capt_lvl_reps_count.
+		annotation AgentPurpose = "Tracks act capt lvl reps all count."
+		annotation AgentLogic = "Counts rows using users_activities[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: users_activities[_sys_user_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.act_capt_lvl_reps_count' = ```
 			
 			var res = CALCULATE(
@@ -52,6 +62,11 @@ table users_activities
 		lineageTag: b1d73a7c-accc-49b5-bcb8-b555e0f014a1
 
 	/// Measure meas.act_capt_lvl_adj_dur_per_reps.
+		annotation AgentPurpose = "Tracks act capt lvl reps count."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_owner_act_capt_lvl] under filters."
+		annotation AgentDependencies = "Measures: [meas.act_capt_lvl_reps_all_count]; Columns: users_activities[trueai_owner_act_capt_lvl]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.act_capt_lvl_adj_dur_per_reps' =
 			
 			var reps_count = [meas.act_capt_lvl_reps_count]
@@ -69,6 +84,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_adj_eng_dur_per_reps.
+		annotation AgentPurpose = "Tracks act capt lvl adjusted duration per reps."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.act_capt_lvl_adj_total_dur_hr], [meas.act_capt_lvl_reps_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_lvl_adj_eng_dur_per_reps' =
 			
 			var reps_count = [meas.act_capt_lvl_reps_count]
@@ -86,6 +106,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_adj_non_eng_dur_per_reps.
+		annotation AgentPurpose = "Tracks act capt lvl adjusted eng duration per reps."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.act_capt_lvl_adj_total_eng_dur_hr], [meas.act_capt_lvl_reps_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_lvl_adj_non_eng_dur_per_reps' =
 			
 			var _adjtot_dur = [meas.act_capt_lvl_adj_dur_per_reps]
@@ -104,6 +129,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_adj_total_non_eng_dur_hr.
+		annotation AgentPurpose = "Tracks act capt lvl adjusted non eng duration per reps."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.act_capt_lvl_adj_dur_per_reps], [meas.act_capt_lvl_adj_eng_dur_per_reps]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_lvl_adj_total_non_eng_dur_hr' = ```
 			
 			
@@ -120,6 +150,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isDecimal":true}
 
 	/// Measure meas.act_capt_lvl_reps_count_pct.
+		annotation AgentPurpose = "Tracks act capt lvl adjusted total non eng duration hr."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.act_capt_lvl_adj_total_dur_hr], [meas.act_capt_lvl_adj_total_eng_dur_hr]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.act_capt_lvl_reps_count_pct' =
 			
 			var _tot_reps_count = [meas.act_capt_lvl_reps_all_count]        // get the all reps/users count
@@ -136,6 +171,11 @@ table users_activities
 		lineageTag: fe446259-6784-46e4-bee3-43279a4ee0be
 
 	/// Measure meas.act_capt_lvl_trueai_total_dur_hr.
+		annotation AgentPurpose = "Tracks act capt lvl reps count percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.act_capt_lvl_reps_all_count], [meas.act_capt_lvl_reps_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.act_capt_lvl_trueai_total_dur_hr' = ```
 			
 			
@@ -159,6 +199,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_trueai_dur_per_reps.
+		annotation AgentPurpose = "Tracks act capt lvl trueai total duration hr."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_lvl_trueai_dur_per_reps' = ```
 			
 			var reps_count = [meas.act_capt_lvl_reps_count]     // get the reps/users count act_capt_lvl greater than 0.4
@@ -177,6 +222,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_avg_capture_adj_factor.
+		annotation AgentPurpose = "Tracks act capt lvl trueai duration per reps."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.act_capt_lvl_reps_count], [meas.act_capt_lvl_trueai_total_dur_hr]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_lvl_avg_capture_adj_factor' =
 			
 			CALCULATE(
@@ -190,6 +240,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_avg_prep_factor.
+		annotation AgentPurpose = "Tracks act capt lvl average capture adjusted factor."
+		annotation AgentLogic = "Averages users_activities[trueai_owner_act_capt_lvl] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_owner_act_capt_lvl]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_lvl_avg_prep_factor' =
 			
 			CALCULATE(
@@ -203,6 +258,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_adj_total_dur_hr.
+		annotation AgentPurpose = "Tracks act capt lvl average prep factor."
+		annotation AgentLogic = "Averages users_activities[trueai_owner_prep_factor] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_owner_prep_factor]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_lvl_adj_total_dur_hr' = ```
 			
 			
@@ -227,6 +287,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isDecimal":true}
 
 	/// Measure meas.act_capt_lvl_bar_date_filter.
+		annotation AgentPurpose = "Tracks act capt lvl adjusted total duration hr."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_adj_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.act_capt_lvl_bar_date_filter' =
 			
 			var _min_date = [meas.context_date_min]         // get the screen min date from slicer
@@ -246,6 +311,11 @@ table users_activities
 		lineageTag: 76b901f4-e8d2-426f-9790-a30d3e7a2717
 
 	/// Measure meas.act_capt_lvl_reps_all_distinct_count.
+		annotation AgentPurpose = "Tracks act capt lvl bar date filter."
+		annotation AgentLogic = "Returns an extreme value from users_activities[_sys_filt_end_date] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_activities[_sys_filt_end_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.act_capt_lvl_reps_all_distinct_count' =
 			CALCULATE(
 			    DISTINCTCOUNT(
@@ -257,6 +327,11 @@ table users_activities
 		lineageTag: 6cebb7de-b574-496d-aa40-cc0140e390bd
 
 	/// Measure meas.act_capt_lvl_reps_distinct_count.
+		annotation AgentPurpose = "Tracks act capt lvl reps all distinct count."
+		annotation AgentLogic = "Counts distinct values in users_activities[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: users_activities[_sys_user_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.act_capt_lvl_reps_distinct_count' =
 			CALCULATE(
 			    DISTINCTCOUNT(
@@ -269,6 +344,11 @@ table users_activities
 		lineageTag: 90d9e0c7-f44d-4bbd-af85-06d9abf127ce
 
 	/// Measure meas.users_activities_trueai_email_count.
+		annotation AgentPurpose = "Tracks act capt lvl reps distinct count."
+		annotation AgentLogic = "Counts distinct values in users_activities[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: users_activities[_sys_user_id], users_activities[trueai_owner_act_capt_lvl]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_activities_trueai_email_count' =
 			
 			CALCULATE(
@@ -279,6 +359,11 @@ table users_activities
 		lineageTag: 14a0bbf4-0d9b-4108-b92a-8b501be0c185
 
 	/// Measure meas.users_activities_trueai_email_dur.
+		annotation AgentPurpose = "Tracks users activities trueai email count."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_type_auto_email_count] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_type_auto_email_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_activities_trueai_email_dur' =
 			
 			
@@ -296,6 +381,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_call_count.
+		annotation AgentPurpose = "Tracks users activities trueai email duration."
+		annotation AgentLogic = "Sums users_activities[trueai_type_auto_email_dur] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_type_auto_email_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_activities_trueai_call_count' =
 			
 			CALCULATE(
@@ -306,6 +396,11 @@ table users_activities
 		lineageTag: 583a0940-97a3-43cc-8626-a6a72e3668c0
 
 	/// Measure meas.users_activities_trueai_call_dur.
+		annotation AgentPurpose = "Tracks users activities trueai call count."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_type_call_count] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_type_call_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_activities_trueai_call_dur' =
 			
 			
@@ -323,6 +418,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_social_count.
+		annotation AgentPurpose = "Tracks users activities trueai call duration."
+		annotation AgentLogic = "Sums users_activities[trueai_type_call_dur] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_type_call_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_activities_trueai_social_count' =
 			
 			CALCULATE(
@@ -333,6 +433,11 @@ table users_activities
 		lineageTag: ac7f3891-0901-4135-8ecc-e0dade833dfb
 
 	/// Measure meas.users_activities_trueai_social_dur.
+		annotation AgentPurpose = "Tracks users activities trueai social count."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_type_social_count] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_type_social_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_activities_trueai_social_dur' =
 			
 			
@@ -350,6 +455,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_history_ci_act_capt_lvl_latest_month.
+		annotation AgentPurpose = "Tracks users activities trueai social duration."
+		annotation AgentLogic = "Sums users_activities[trueai_type_social_dur] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_type_social_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_history_ci_act_capt_lvl_latest_month' = ```
 			
 			var latest_row  = CALCULATETABLE(TOPN(1,users_history, users_history[_sys_filt_end_date], DESC))  // get the latest row
@@ -373,6 +483,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_history_ci_act_capt_lvl_most_latest_previous.
+		annotation AgentPurpose = "Tracks users history ci act capt lvl latest month."
+		annotation AgentLogic = "Averages users_history[_sys_filt_end_date] under filters."
+		annotation AgentDependencies = "Columns: users_history[_sys_filt_end_date], users_history[ci_act_capt_lvl]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_ci_act_capt_lvl_most_latest_previous' = ```
 			
 			VAR latest_row = CALCULATETABLE(TOPN(1, users_history, users_history[_sys_filt_end_date], DESC))  // Get the latest row
@@ -401,6 +516,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_history_avg_ci_act_capt_lvl.
+		annotation AgentPurpose = "Tracks users history ci act capt lvl most latest previous."
+		annotation AgentLogic = "Averages users_history[_sys_filt_end_date] under filters."
+		annotation AgentDependencies = "Columns: users_history[_sys_filt_end_date], users_history[ci_act_capt_lvl]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_avg_ci_act_capt_lvl' =
 			
 			var res = CALCULATE(
@@ -413,6 +533,11 @@ table users_activities
 		lineageTag: 09188a3f-50bd-4b1c-bfba-66ef796ac30c
 
 	/// Measure meas.users_history_ci_act_capt_lvl_latest_previous_diff.
+		annotation AgentPurpose = "Tracks users history average ci act capt lvl."
+		annotation AgentLogic = "Averages users_history[ci_act_capt_lvl] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_act_capt_lvl]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_history_ci_act_capt_lvl_latest_previous_diff' =
 			
 			var latest = [meas.users_history_ci_act_capt_lvl_latest_month]          // get the latest ci_act_capt_lvl
@@ -427,6 +552,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_activities_trueai_call_dur_weekly.
+		annotation AgentPurpose = "Tracks users history ci act capt lvl latest previous diff."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.users_history_ci_act_capt_lvl_latest_month], [meas.users_history_ci_act_capt_lvl_most_latest_previous]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_activities_trueai_call_dur_weekly' = ```
 			
 			var _min_date = [meas.context_date_min]             // get the context min date
@@ -448,6 +578,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_email_dur_weekly.
+		annotation AgentPurpose = "Tracks users activities trueai call duration weekly."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_type_call_dur] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_activities[trueai_type_call_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_activities_trueai_email_dur_weekly' = ```
 			
 			
@@ -470,6 +605,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_social_dur_weekly.
+		annotation AgentPurpose = "Tracks users activities trueai email duration weekly."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_type_auto_email_dur] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_activities[trueai_type_auto_email_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_activities_trueai_social_dur_weekly' = ```
 			
 			
@@ -492,6 +632,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_meeting_count.
+		annotation AgentPurpose = "Tracks users activities trueai social duration weekly."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_type_social_dur] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_activities[trueai_type_social_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_activities_trueai_meeting_count' =
 			
 			CALCULATE(
@@ -502,6 +647,11 @@ table users_activities
 		lineageTag: 95b895ec-9000-41b5-99a1-c6c36f471dc0
 
 	/// Measure meas.users_activities_trueai_meeting_dur.
+		annotation AgentPurpose = "Tracks users activities trueai meeting count."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_type_meeting_count] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_type_meeting_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_activities_trueai_meeting_dur' =
 			
 			
@@ -519,6 +669,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_meeting_dur_weekly.
+		annotation AgentPurpose = "Tracks users activities trueai meeting duration."
+		annotation AgentLogic = "Sums users_activities[trueai_type_meeting_dur] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_type_meeting_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_activities_trueai_meeting_dur_weekly' = ```
 			
 			
@@ -541,6 +696,11 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_prospecting_count.
+		annotation AgentPurpose = "Tracks users activities trueai meeting duration weekly."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_type_meeting_dur] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_activities[trueai_type_meeting_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_activities_prospecting_count' =
 			
 			CALCULATE(
@@ -551,6 +711,11 @@ table users_activities
 		lineageTag: 5e7edb4a-4fde-4263-b9aa-7fd3957cbe38
 
 	/// Measure meas.users_activities_new_logo_count.
+		annotation AgentPurpose = "Tracks users activities prospecting count."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_purpose_prospecting_count] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_purpose_prospecting_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_activities_new_logo_count' =
 			
 			CALCULATE(
@@ -561,6 +726,11 @@ table users_activities
 		lineageTag: 9fb93954-0da2-4918-a58d-a247c88c8085
 
 	/// Measure meas.users_activities_post_sales_count.
+		annotation AgentPurpose = "Tracks users activities new logo count."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_purpose_new_logo_count] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_purpose_new_logo_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_activities_post_sales_count' =
 			
 			CALCULATE(
@@ -571,6 +741,11 @@ table users_activities
 		lineageTag: c3005fc1-3c14-43c1-8df1-5724c8a97233
 
 	/// Measure meas.users_activities_existing_customer_count.
+		annotation AgentPurpose = "Tracks users activities post sales count."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_purpose_post_sales_count] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_purpose_post_sales_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_activities_existing_customer_count' =
 			
 			CALCULATE(
@@ -581,6 +756,11 @@ table users_activities
 		lineageTag: f3e51cac-e237-45bd-a998-a7e1b91b94bc
 
 	/// Measure meas.users_activities_internal_count.
+		annotation AgentPurpose = "Tracks users activities existing customer count."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_purpose_exist_cust_selling_count] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_purpose_exist_cust_selling_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_activities_internal_count' =
 			
 			CALCULATE(
@@ -591,6 +771,11 @@ table users_activities
 		lineageTag: 511529c4-a270-4137-a221-a9bd209ad403
 
 	/// The ID of the document in the remote system (such as Salesforce ID)
+		annotation AgentPurpose = "Tracks users activities internal count."
+		annotation AgentLogic = "Counts rows using users_activities[trueai_purpose_internal_count] under filters."
+		annotation AgentDependencies = "Columns: users_activities[trueai_purpose_internal_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	column _sys_user_id
 		dataType: string
 		lineageTag: 3cd7e0d5-077d-43a7-a02a-714059e71dbc

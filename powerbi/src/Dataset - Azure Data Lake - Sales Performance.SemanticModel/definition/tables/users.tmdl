@@ -20,6 +20,11 @@ table users
 		lineageTag: 2e4a5f18-741d-4c16-9371-62736ec5de95
 
 	/// Measure meas.users_user_roles_concat_w_count.
+		annotation AgentPurpose = "Tracks users user roles concat."
+		annotation AgentLogic = "Counts rows using users[trueai_user_role] under filters."
+		annotation AgentDependencies = "Columns: users[trueai_user_role], users[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_user_roles_concat_w_count' = ```
 			
 			-- concats all the crm values for trueai value
@@ -37,6 +42,11 @@ table users
 		lineageTag: 90265a0f-91d1-49cd-876f-f521314ce19b
 
 	/// Measure meas.users_user_roles_concat_w_count_eop.
+		annotation AgentPurpose = "Tracks users user roles concat w count."
+		annotation AgentLogic = "Counts rows using users[trueai_user_role_alias] under filters."
+		annotation AgentDependencies = "Columns: users[trueai_user_role_alias], users[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_user_roles_concat_w_count_eop' = ```
 			
 			-- concats all the crm values for trueai value for eop
@@ -56,6 +66,11 @@ table users
 		lineageTag: e77c169f-e8d6-48e8-ab2e-87441d66a83b
 
 	/// Measure meas.users_user_roles_function_concat_w_count.
+		annotation AgentPurpose = "Tracks users user roles concat w count eop."
+		annotation AgentLogic = "Counts rows using users_history[_sys_filt_start_date] under filters."
+		annotation AgentDependencies = "Columns: users_history[_sys_filt_start_date], users[trueai_user_role_alias], users[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_user_roles_function_concat_w_count' = ```
 			
 			-- concats all the crm values for trueai value
@@ -73,12 +88,22 @@ table users
 		lineageTag: cf2e5ac8-6558-41ec-8060-fff13bff2cbd
 
 	/// Measure meas.users_rep_stats_bookings.
+		annotation AgentPurpose = "Tracks users user roles function concat w count."
+		annotation AgentLogic = "Counts rows using users[trueai_user_role_function] under filters."
+		annotation AgentDependencies = "Columns: users[trueai_user_role_function], users[trueai_user_role_alias], users[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_rep_stats_bookings' = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] in {"New Logo Selling" , "Existing Customer Selling"})
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: rep_stats
 		lineageTag: 98abfde2-24b2-45d4-bff2-09d94f91f1aa
 
 	/// Measure meas.users_rep_stats_bookings 1.
+		annotation AgentPurpose = "Tracks users rep stats bookings."
+		annotation AgentLogic = "Sums ssr_history[opp_won_amt] under filters."
+		annotation AgentDependencies = "Columns: ssr_history[opp_won_amt], ssr_history[step_name]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_rep_stats_bookings 1' =
 			var start_date = date(2020,1,1)
 			var end_date = date(2021,1,1)
@@ -89,6 +114,11 @@ table users
 		lineageTag: 8359b751-d9bd-4138-80cc-d97135f2e6c8
 
 	/// Measure meas.users_table_row_count.
+		annotation AgentPurpose = "Tracks users rep stats bookings 1."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.users_rep_stats_bookings]; Columns: ssr_history[_sys_filt_end_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_table_row_count' =
 			
 			COUNTROWS(Users)
@@ -96,6 +126,11 @@ table users
 		lineageTag: 59d6070a-cbdb-4359-9c06-41be235e091e
 
 	/// Measure meas.users_is_active.
+		annotation AgentPurpose = "Tracks users table row count."
+		annotation AgentLogic = "Counts rows under filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_is_active' =
 			
 			// var curr_date = CALCULATE(MAX(cal_end_dates[Date]))  // get  the current maximum date
@@ -113,11 +148,21 @@ table users
 		lineageTag: 1431c953-2044-4fbb-97c2-b353ce241402
 
 	/// Measure meas.user_overview_title.
+		annotation AgentPurpose = "Tracks users is active."
+		annotation AgentLogic = "Returns an extreme value from cal_end_dates[Date] under filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], users[_sys_filt_end_date], users[trueai_termination_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.user_overview_title' = "Active Users Overview"
 		displayFolder: _active_user_overview
 		lineageTag: db75255d-25c7-45bb-8d82-f23f4ca2fedc
 
 	/// Measure meas.users_overview_win_rate_mtd.
+		annotation AgentPurpose = "Tracks user overview title."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_overview_win_rate_mtd' = ```
 			
 			
@@ -165,6 +210,11 @@ table users
 		lineageTag: 310a8955-0807-4928-a59d-3c8abc9da526
 
 	/// Measure meas.users_overview_win_rate_qtd.
+		annotation AgentPurpose = "Tracks users overview win rate mtd."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_success], ssr_history[step_name]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_win_rate_qtd' = ```
 			
 			
@@ -214,6 +264,11 @@ table users
 		lineageTag: ebc4d37a-ed87-42fa-ae20-94ae49a81b47
 
 	/// Measure meas.users_overview_win_rate_ytd.
+		annotation AgentPurpose = "Tracks users overview win rate qtd."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_success], ssr_history[step_name]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_win_rate_ytd' = ```
 			
 			
@@ -263,6 +318,11 @@ table users
 		lineageTag: 0fed3d7e-4822-429b-80b1-b6d73792eabe
 
 	/// Measure meas.users_overview_win_rate_mtd_sply.
+		annotation AgentPurpose = "Tracks users overview win rate ytd."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_success], ssr_history[step_name]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_win_rate_mtd_sply' = ```
 			
 			
@@ -312,6 +372,11 @@ table users
 		lineageTag: eb3379cf-b461-48f9-9595-960b3626535f
 
 	/// Measure meas.users_overview_win_rate_mtd_sply_diff.
+		annotation AgentPurpose = "Tracks users overview win rate mtd sply."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_success], ssr_history[step_name]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_win_rate_mtd_sply_diff' = ```
 			
 			var res = DIVIDE([meas.users_overview_win_rate_mtd] - [meas.users_overview_win_rate_mtd_sply], [meas.users_overview_win_rate_mtd])
@@ -330,6 +395,11 @@ table users
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_overview_win_rate_qtd_sply.
+		annotation AgentPurpose = "Tracks users overview win rate mtd sply diff."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.users_overview_win_rate_mtd], [meas.users_overview_win_rate_mtd_sply]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_win_rate_qtd_sply' = ```
 			
 			
@@ -379,6 +449,11 @@ table users
 		lineageTag: 3f8bd10b-3cc4-4760-a4b5-8e732adaee1d
 
 	/// Measure meas.users_overview_win_rate_qtd_sply_diff.
+		annotation AgentPurpose = "Tracks users overview win rate qtd sply."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_success], ssr_history[step_name]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_win_rate_qtd_sply_diff' =
 			
 			var res = DIVIDE([meas.users_overview_win_rate_qtd] - [meas.users_overview_win_rate_qtd_sply], [meas.users_overview_win_rate_qtd])
@@ -397,6 +472,11 @@ table users
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_overview_win_rate_ytd_sply.
+		annotation AgentPurpose = "Tracks users overview win rate qtd sply diff."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.users_overview_win_rate_qtd], [meas.users_overview_win_rate_qtd_sply]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_win_rate_ytd_sply' = ```
 			
 			
@@ -446,6 +526,11 @@ table users
 		lineageTag: 07e8a5e9-84ce-4495-8914-7d40a27a3b10
 
 	/// Measure meas.users_overview_win_rate_ytd_sply_diff.
+		annotation AgentPurpose = "Tracks users overview win rate ytd sply."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_success], ssr_history[step_name]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_win_rate_ytd_sply_diff' = ```
 			
 			var res = DIVIDE(([meas.users_overview_win_rate_ytd]-[meas.users_overview_win_rate_ytd_sply]), [meas.users_overview_win_rate_ytd])
@@ -466,6 +551,11 @@ table users
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_overview_avg_pred_conv_rate_mtd.
+		annotation AgentPurpose = "Tracks users overview win rate ytd sply diff."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.users_overview_win_rate_ytd], [meas.users_overview_win_rate_ytd_sply]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_avg_pred_conv_rate_mtd' = ```
 			
 			
@@ -503,6 +593,11 @@ table users
 		lineageTag: 948eb230-a8c7-4ff6-bcc4-06359fe0ba6d
 
 	/// Measure meas.users_overview_avg_pred_conv_rate_mtd_sply.
+		annotation AgentPurpose = "Tracks users overview average pred conversion rate mtd."
+		annotation AgentLogic = "Averages cal_end_dates[Date] under filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_avg_pred_conv_rate_mtd_sply' = ```
 			
 			
@@ -540,6 +635,11 @@ table users
 		lineageTag: 7d964627-3956-4dbf-a6e3-d9d7bcfc2bf5
 
 	/// Measure meas.users_overview_avg_pred_conv_mtd_sply_diff.
+		annotation AgentPurpose = "Tracks users overview average pred conversion rate mtd sply."
+		annotation AgentLogic = "Averages cal_end_dates[Date] under filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_avg_pred_conv_mtd_sply_diff' = ```
 			
 			var res = DIVIDE([meas.users_overview_avg_pred_conv_rate_mtd] - [meas.users_overview_avg_pred_conv_rate_mtd_sply], [meas.users_overview_avg_pred_conv_rate_mtd])
@@ -557,6 +657,11 @@ table users
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_overview_avg_pred_conv_rate_qtd.
+		annotation AgentPurpose = "Tracks users overview average pred conversion mtd sply diff."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.users_overview_avg_pred_conv_rate_mtd], [meas.users_overview_avg_pred_conv_rate_mtd_sply]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_avg_pred_conv_rate_qtd' = ```
 			
 			
@@ -594,6 +699,11 @@ table users
 		lineageTag: 7703ba0a-e9d0-4a81-ba9d-781cf350d54e
 
 	/// Measure meas.users_overview_avg_pred_conv_rate_qtd_sply.
+		annotation AgentPurpose = "Tracks users overview average pred conversion rate qtd."
+		annotation AgentLogic = "Averages cal_end_dates[Date] under filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_avg_pred_conv_rate_qtd_sply' = ```
 			
 			
@@ -631,6 +741,11 @@ table users
 		lineageTag: 91dd19a6-1fa4-42e5-968a-db02bf828f0e
 
 	/// Measure meas.users_overview_avg_pred_conv_qtd_sply_diff.
+		annotation AgentPurpose = "Tracks users overview average pred conversion rate qtd sply."
+		annotation AgentLogic = "Averages cal_end_dates[Date] under filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_avg_pred_conv_qtd_sply_diff' = ```
 			
 			var res = DIVIDE([meas.users_overview_avg_pred_conv_rate_qtd] - [meas.users_overview_avg_pred_conv_rate_qtd_sply], [meas.users_overview_avg_pred_conv_rate_qtd])
@@ -648,6 +763,11 @@ table users
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_overview_avg_pred_conv_rate_ytd.
+		annotation AgentPurpose = "Tracks users overview average pred conversion qtd sply diff."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.users_overview_avg_pred_conv_rate_qtd], [meas.users_overview_avg_pred_conv_rate_qtd_sply]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_avg_pred_conv_rate_ytd' = ```
 			
 			
@@ -685,6 +805,11 @@ table users
 		lineageTag: e3eece90-6448-45ce-9ea9-a89ed47c6414
 
 	/// Measure meas.users_overview_avg_pred_conv_rate_ytd_sply.
+		annotation AgentPurpose = "Tracks users overview average pred conversion rate ytd."
+		annotation AgentLogic = "Averages cal_end_dates[Date] under filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_avg_pred_conv_rate_ytd_sply' = ```
 			
 			
@@ -722,6 +847,11 @@ table users
 		lineageTag: 92cb3110-77ea-42c3-b92b-6f1ebb40254a
 
 	/// Measure meas.users_overview_avg_pred_conv_ytd_sply_diff.
+		annotation AgentPurpose = "Tracks users overview average pred conversion rate ytd sply."
+		annotation AgentLogic = "Averages cal_end_dates[Date] under filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], ssr_history[step_name], ssr_history[step_success_prob]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_overview_avg_pred_conv_ytd_sply_diff' = ```
 			
 			var res = DIVIDE([meas.users_overview_avg_pred_conv_rate_ytd] - [meas.users_overview_avg_pred_conv_rate_ytd_sply], [meas.users_overview_avg_pred_conv_rate_ytd])       // get the delta
@@ -739,6 +869,11 @@ table users
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.ssr_history_actual_win_rate.
+		annotation AgentPurpose = "Tracks users overview average pred conversion ytd sply diff."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.users_overview_avg_pred_conv_rate_ytd], [meas.users_overview_avg_pred_conv_rate_ytd_sply]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.ssr_history_actual_win_rate' = ```
 			
 			
@@ -769,6 +904,11 @@ table users
 		lineageTag: b697679b-3c93-4420-86f1-f25eb146002f
 
 	/// Measure meas.users_trueai_full_name.
+		annotation AgentPurpose = "Tracks SSR history actual win rate."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: ssr_history[step_success], ssr_history[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.users_trueai_full_name' =
 			
 			SELECTEDVALUE(users[trueai_full_name])
@@ -777,6 +917,11 @@ table users
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// User's division in the CRM
+		annotation AgentPurpose = "Tracks users trueai full name."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Columns: users[trueai_full_name]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Boolean"
 	column crm_division
 		dataType: string
 		lineageTag: 33550b93-126b-487d-9e30-5ec88ff36709

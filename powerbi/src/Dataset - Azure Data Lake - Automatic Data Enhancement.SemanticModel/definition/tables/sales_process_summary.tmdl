@@ -20,6 +20,11 @@ table sales_process_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks CRM sales process score display."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.crm_sales_process_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.crm_sales_process_score_industry_avg' =
 			//47
 			var _score = CALCULATE(
@@ -37,6 +42,11 @@ table sales_process_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks CRM sales process score industry average."
+		annotation AgentLogic = "Returns an extreme value from metadata_reference_values[value] under filters."
+		annotation AgentDependencies = "Columns: metadata_reference_values[value], metadata_reference_values[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.trueai_sales_process_score_display' =
 			
 			var _before = [meas.crm_sales_process_score_display]                    // get the before score
@@ -57,6 +67,11 @@ table sales_process_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: +#%;-#%;0%
+		annotation AgentPurpose = "Tracks trueai sales process score display."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.crm_sales_process_score_display], [meas.trueai_sales_process_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.trueai_sales_process_score_improvement' =
 			
 			var trueai_score = ROUND([meas.trueai_sales_process_score_display],2)
@@ -74,6 +89,11 @@ table sales_process_summary
 	/// Calculation Logic: VAR blocks define intermediate values (score, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[meas.crm_act_capt_score], completeness_summary[meas.crm_completeness_score_display], consistency_summary[meas.crm_consistency_score_display], dupe_summary[meas.crm_dupe_score_display], sales_process_summary[meas.crm_sales_process_score_display].
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks trueai sales process score improvement."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.crm_sales_process_score_display], [meas.trueai_sales_process_score_display]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.crm_all_ade_score_display' = ```
 			
 			var score = (dupe_summary[meas.crm_dupe_score_display] + completeness_summary[meas.crm_completeness_score_display] + consistency_summary[meas.crm_consistency_score_display] + sales_process_summary[meas.crm_sales_process_score_display] + act_capture_level_summary[meas.crm_act_capt_score]
@@ -91,6 +111,11 @@ table sales_process_summary
 	/// Calculation Logic: VAR blocks define intermediate values (score, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[meas.crm_act_capt_score_industry_avg], completeness_summary[meas.crm_completeness_score_industry_avg], consistency_summary[meas.crm_consistency_score_industry_avg], dupe_summary[meas.crm_dupe_score_industry_avg_display], sales_process_summary[meas.crm_sales_process_score_industry_avg].
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks CRM all ade score display."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.crm_act_capt_score], [meas.crm_completeness_score_display], [meas.crm_consistency_score_display], [meas.crm_dupe_score_display], [meas.crm_sales_process_score_display]; Columns: dup..."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.crm_all_ade_score_industry_avg' = ```
 			
 			var score = (dupe_summary[meas.crm_dupe_score_industry_avg_display] + completeness_summary[meas.crm_completeness_score_industry_avg] + consistency_summary[meas.crm_consistency_score_industry_avg] 
@@ -110,6 +135,11 @@ table sales_process_summary
 	/// Calculation Logic: VAR blocks define intermediate values (score, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[meas.trueai_act_capt_score], ai_conf_pred_qual_summary[meas.ai_conf_overall_score], completeness_summary[meas.trueai_completeness_score], consistency_summary[meas.trueai_consistency_score_display], dupe_summary[meas.trueai_dupe_score_display], sales_process_summary[meas.trueai_sales_process_score_display].
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks CRM all ade score industry average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.crm_act_capt_score_industry_avg], [meas.crm_completeness_score_industry_avg], [meas.crm_consistency_score_industry_avg], [meas.crm_dupe_score_industry_avg_display], [meas.crm_sales_..."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.trueai_all_ade_score_display' = ```
 			
 			var score = (dupe_summary[meas.trueai_dupe_score_display] + completeness_summary[meas.trueai_completeness_score] 
@@ -135,6 +165,11 @@ table sales_process_summary
 	/// Calculation Logic: VAR blocks define intermediate values (trueai_score, crm_score, imp, res) used later in the expression. Dependencies: Measures: [meas.trueai_all_ade_score_display], [meas.crm_all_ade_score_display].
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: +#%;-#%;0%
+		annotation AgentPurpose = "Tracks trueai all ade score display."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.ai_conf_overall_score], [meas.trueai_act_capt_score], [meas.trueai_completeness_score], [meas.trueai_consistency_score_display], [meas.trueai_dupe_score_display]; Columns: dupe_summ..."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.trueai_all_ade_score_improvement' = ```
 			
 			var trueai_score = ROUND([meas.trueai_all_ade_score_display],2)
@@ -155,6 +190,11 @@ table sales_process_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
+		annotation AgentPurpose = "Tracks trueai all ade score improvement."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.crm_all_ade_score_display], [meas.trueai_all_ade_score_display]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.crm_sales_process_score' =
 			
 			
@@ -173,6 +213,11 @@ table sales_process_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0.00
+		annotation AgentPurpose = "Tracks CRM sales process score."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.crm_sales_process_any_rules_count], [meas.crm_sales_process_any_rules_std_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.trueai_sales_process_score' =
 			
 			
@@ -193,6 +238,11 @@ table sales_process_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
+		annotation AgentPurpose = "Tracks trueai sales process score."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.crm_sales_process_any_rules_count], [meas.crm_sales_process_any_rules_std_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.crm_sales_process_any_rules_count' =
 			
 			
@@ -208,6 +258,11 @@ table sales_process_summary
 	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, std_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_owner_rule].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
+		annotation AgentPurpose = "Tracks CRM sales process any rules count."
+		annotation AgentLogic = "Counts rows using ssr_history[_sys_doc_id] under filters."
+		annotation AgentDependencies = "Columns: ssr_history[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.crm_sales_process_ownership_rules_std_count' = ```
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
@@ -226,6 +281,11 @@ table sales_process_summary
 	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, sdt_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_owner_rule].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks CRM sales process ownership rules std count."
+		annotation AgentLogic = "Counts rows using metadata_rule_list[col.rule_is_std_crm] under filters."
+		annotation AgentDependencies = "Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[step_owner_rule], ssr_history[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.crm_sales_process_ownership_rules_non_std_count' = ```
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
@@ -243,6 +303,11 @@ table sales_process_summary
 	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, sdt_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_end_rule].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks CRM sales process ownership rules non std count."
+		annotation AgentLogic = "Counts rows using metadata_rule_list[col.rule_is_std_crm] under filters."
+		annotation AgentDependencies = "Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[step_owner_rule], ssr_history[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.crm_sales_process_end_rules_non_std_count' = ```
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
@@ -260,6 +325,11 @@ table sales_process_summary
 	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, std_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_end_rule].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
+		annotation AgentPurpose = "Tracks CRM sales process end rules non std count."
+		annotation AgentLogic = "Counts rows using metadata_rule_list[col.rule_is_std_crm] under filters."
+		annotation AgentDependencies = "Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[step_end_rule], ssr_history[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.crm_sales_process_end_rules_std_count ' = ```
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
@@ -278,6 +348,11 @@ table sales_process_summary
 	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, sdt_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_outcome_rule].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks CRM sales process end rules std count."
+		annotation AgentLogic = "Counts rows using metadata_rule_list[col.rule_is_std_crm] under filters."
+		annotation AgentDependencies = "Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[step_end_rule], ssr_history[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.crm_sales_process_outcome_rules_non_std_count' = ```
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
@@ -295,6 +370,11 @@ table sales_process_summary
 	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, std_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_outcome_rule].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
+		annotation AgentPurpose = "Tracks CRM sales process outcome rules non std count."
+		annotation AgentLogic = "Counts rows using metadata_rule_list[col.rule_is_std_crm] under filters."
+		annotation AgentDependencies = "Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[step_outcome_rule], ssr_history[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.crm_sales_process_outcome_rules_std_count' = ```
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
@@ -313,6 +393,11 @@ table sales_process_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks CRM sales process outcome rules std count."
+		annotation AgentLogic = "Counts rows using metadata_rule_list[col.rule_is_std_crm] under filters."
+		annotation AgentDependencies = "Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[step_outcome_rule], ssr_history[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.crm_sales_process_any_rules_non_std_count' =
 			
 			var res = sales_process_summary[meas.crm_sales_process_any_rules_count] - sales_process_summary[meas.crm_sales_process_any_rules_std_count] // just get the diff
@@ -325,6 +410,11 @@ table sales_process_summary
 	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, sdt_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_end_rule], ssr_history[step_outcome_rule], ssr_history[step_owner_rule].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks CRM sales process any rules non std count."
+		annotation AgentLogic = "Counts rows using sales_process_summary[meas.crm_sales_process_any_rules_count] under filters."
+		annotation AgentDependencies = "Measures: [meas.crm_sales_process_any_rules_count], [meas.crm_sales_process_any_rules_std_count]; Columns: sales_process_summary[meas.crm_sales_process_any_rules_count], sales_process_summary[meas...."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.crm_sales_process_any_rules_std_count' = ```
 			
 			
@@ -348,6 +438,11 @@ table sales_process_summary
 		lineageTag: ed668400-4a42-436c-9090-ddde1589f0a7
 
 	/// Column row.
+		annotation AgentPurpose = "Tracks CRM sales process any rules std count."
+		annotation AgentLogic = "Counts rows using metadata_rule_list[col.rule_is_std_crm] under filters."
+		annotation AgentDependencies = "Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[step_owner_rule], ssr_history[step_outcome_rule]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	column row
 		formatString: 0
 		lineageTag: 8fbab856-5f4b-4af8-9508-f59c541c8fa2
