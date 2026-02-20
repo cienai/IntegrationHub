@@ -2,33 +2,39 @@
 table strat_summary
 	lineageTag: ed1b27bf-eb0f-4e9b-b221-10ffd26ab22c
 
-	/// Measure meas.strat_summary_delta_prev_period.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.strat_summary_delta_prev_period' = ```
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			var prev_fromDate =[meas.context_prev_period_min] 
-			var prev_toDate = [meas.context_prev_period_max] 
-			
-			
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+			var prev_fromDate =[meas.context_prev_period_min]
+			var prev_toDate = [meas.context_prev_period_max]
+
+
 			var curr_period_avg = CALCULATE(AVERAGE(strat_summary[key_metric_value]))
 			var prev_period_avg = CALCULATE(AVERAGE(strat_summary[key_metric_value]) ,  cal_end_dates[Date] >= prev_fromDate &&     cal_end_dates[Date] <= prev_toDate)
-			           
-			var res =  DIVIDE(curr_period_avg - prev_period_avg, prev_period_avg) 
-			
-			return res 
-			
-			
-			```
+
+			var res =  DIVIDE(curr_period_avg - prev_period_avg, prev_period_avg)
+
+			return res
+
+
+	```
 		formatString: +0%;-0%;0%
 		lineageTag: 82e43cdd-6fc2-467b-bb4c-7674b260c804
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_score.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.strat_summary_score' = ```
-			
+
 			--var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			--var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -365) -- create a filter that applies last year
 			var actual_val = CALCULATE(AVERAGE(strat_summary[key_metric_value])) -- get the avg key metric w/ the filter if applicable
@@ -37,45 +43,54 @@ table strat_summary
 			var coeff =  If(isBlank(CALCULATE(MAX(strat_summary[key_metric_coeff]))),1,CALCULATE(MAX(strat_summary[key_metric_coeff]))) -- get the approprirate cofff
 			var score =(divide(actual_val,ref_val) ^ coeff) - 0.5 -- calculate a relative score compared to the reference value that's centered on 0.5
 			var capped_score = MIN(0.95,MAX(0.05,score )) -- make sure the score never goes over/under 0-1
-			var res =  if (inverse, 1 - capped_score, capped_score) // invert if needed 
-			
+			var res =  if (inverse, 1 - capped_score, capped_score) // invert if needed
+
 			return   if(ISBLANK(actual_val), blank(), res )
-			
-			
-			```
+
+
+	```
 		lineageTag: d24f1d2f-3b43-4850-a366-3df70aa26def
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_trend_score.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.strat_summary_trend_score' = ```
-			
-			
-			 var delta =  [meas.strat_summary_delta_prev_period]
-			 var delta_coeff = .6-- CALCULATE(AVERAGE(strat_summary[key_metric_trend_coeff]))
-			 var score =  ((delta + 1 ) ^ delta_coeff) - 0.5
-			 var capped_score =  MAX(0.05, MIN(0.95, score))
-			 var res = capped_score
-			 return res
-			
-			
-			```
+
+
+			var delta =  [meas.strat_summary_delta_prev_period]
+			var delta_coeff = .6-- CALCULATE(AVERAGE(strat_summary[key_metric_trend_coeff]))
+			var score =  ((delta + 1 ) ^ delta_coeff) - 0.5
+			var capped_score =  MAX(0.05, MIN(0.95, score))
+			var res = capped_score
+			return res
+
+
+	```
 		lineageTag: 3d5b6690-0192-4c58-9bb5-4bdd921b2202
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_display_score.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.strat_summary_display_score' = ```
 			strat_summary[meas.strat_summary_score] * 100
-			
-			```
+
+	```
 		formatString: 0
 		lineageTag: 900adbfe-b098-46b6-9e52-d2c67154d556
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_display_key_metric_pct.
-	measure 'meas.strat_summary_display_key_metric_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.strat_summary_display_key_metric_pct' = 
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_value]) )
 		formatString: 0.0%;-0.0%;0.0%
@@ -83,9 +98,12 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_score_display_eop.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.strat_summary_score_display_eop' = ```
-			
+
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -1) -- create a filter that applies last year
 			var actual_val = CALCULATE(AVERAGE(strat_summary[key_metric_value]), filt) -- get the avg key metric w/ the filter if applicable
@@ -94,20 +112,23 @@ table strat_summary
 			var coeff =  If(isBlank(CALCULATE(MAX(strat_summary[key_metric_coeff]))),1,CALCULATE(MAX(strat_summary[key_metric_coeff]))) -- get the approprirate cofff
 			var score =(divide(actual_val,ref_val) ^ coeff) - 0.5 -- calculate a relative score compared to the reference value that's centered on 0.5
 			var capped_score = MIN(0.95,MAX(0.05,score )) -- make sure the score never goes over/under 0-1
-			var res =  if (inverse, 1 - capped_score, capped_score) // invert if needed 
-			
+			var res =  if (inverse, 1 - capped_score, capped_score) // invert if needed
+
 			return   if(ISBLANK(actual_val), blank(), res ) * 100
-			
-			
-			
-			```
+
+
+
+	```
 		formatString: 0
 		lineageTag: e2526f51-ac84-4165-94ac-3bafd28f860a
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_key_metric_display_pct_eop.
-	measure 'meas.strat_summary_key_metric_display_pct_eop' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.strat_summary_key_metric_display_pct_eop' = 
 			
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
@@ -119,8 +140,11 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_display_reference_pct.
-	measure 'meas.strat_summary_display_reference_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.strat_summary_display_reference_pct' = 
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: 0%;-0%;0%
@@ -128,32 +152,38 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_delta_12mo_eop.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.strat_summary_delta_12mo_eop' = ```
-			
-			
+
+
 			var fromDate =[meas.context_date_max] - 90
-			var toDate = [meas.context_date_max] 
+			var toDate = [meas.context_date_max]
 			var prev_fromDate = [meas.context_date_max] - 90 - 365
 			var prev_toDate = [meas.context_date_max] - 365
-			
-			
+
+
 			var curr_period_avg = CALCULATE(AVERAGE(strat_summary[key_metric_value]) ,  cal_end_dates[Date] >= fromDate &&     cal_end_dates[Date] <= toDate)
 			var prev_period_avg = CALCULATE(AVERAGE(strat_summary[key_metric_value]) ,  cal_end_dates[Date] >= prev_fromDate &&     cal_end_dates[Date] <= prev_toDate)
-			           
-			var res =  DIVIDE(curr_period_avg - prev_period_avg, prev_period_avg) 
-			
-			return res 
-			
-			
-			```
+
+			var res =  DIVIDE(curr_period_avg - prev_period_avg, prev_period_avg)
+
+			return res
+
+
+	```
 		formatString: +0%;-0%;0%
 		lineageTag: d15bb079-82a5-4e6b-a51b-bf25c3739dc5
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_key_metric_display_ratio_eop.
-	measure 'meas.strat_summary_key_metric_display_ratio_eop' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.strat_summary_key_metric_display_ratio_eop' = 
 			
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
@@ -167,8 +197,11 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.strat_summary_display_reference_ratio.
-	measure 'meas.strat_summary_display_reference_ratio' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.strat_summary_display_reference_ratio' = 
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: 0":1"
@@ -176,40 +209,55 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_concern_score.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.strat_summary_concern_score' = ```
-			
+
 			var val_score = strat_summary[meas.strat_summary_score]
 			var val_trend_score = strat_summary[meas.strat_summary_trend_score]
-			
-			var res = (val_score * val_trend_score ) ^ 0.5  
+
+			var res = (val_score * val_trend_score ) ^ 0.5
 			return res
-			```
+	```
 		lineageTag: 4fe7cef8-6834-4cd2-afde-02df60c2998a
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_concern_score_display.
-	measure 'meas.strat_summary_concern_score_display' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.strat_summary_concern_score_display' = 
 			
 			var res = IF([meas.strat_summary_concern_score] > 0.66, "Low", IF([meas.strat_summary_concern_score] > 0.33, "Medium", "High"))
 			return res
 		lineageTag: e8d32342-6ef1-4d93-88c4-986a1f524e93
 
-	/// Measure meas.strat_summary_trend_display.
-	measure 'meas.strat_summary_trend_display' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.strat_summary_trend_display' = 
 			
 			var res = IF([meas.strat_summary_trend_score] > 0.66, "Improving", IF([meas.strat_summary_trend_score] > 0.33, "Steady", "Declining"))
 			return res
 		lineageTag: 9432771d-5fb2-467d-924b-fa9d6c1041b4
 
-	/// Measure measure.strat_summary_industry_score_display.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'measure.strat_summary_industry_score_display' = 52
 		formatString: 0
 		lineageTag: 18b3dd43-84ac-49f4-8cd7-d2283175eed2
 
-	/// Measure meas.strat_summary_key_metric_display_hrs_eop.
-	measure 'meas.strat_summary_key_metric_display_hrs_eop' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.strat_summary_key_metric_display_hrs_eop' = 
 			
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
@@ -223,8 +271,11 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.strat_summary_key_metric_display_decimal_eop.
-	measure 'meas.strat_summary_key_metric_display_decimal_eop' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.strat_summary_key_metric_display_decimal_eop' = 
 			
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
@@ -238,8 +289,11 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.strat_summary_display_reference_hrs.
-	measure 'meas.strat_summary_display_reference_hrs' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.strat_summary_display_reference_hrs' = 
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: #,##0.0" hrs"
@@ -247,8 +301,11 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_display_reference_decimal.
-	measure 'meas.strat_summary_display_reference_decimal' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.strat_summary_display_reference_decimal' = 
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: #,##0.0
@@ -256,85 +313,103 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_score_display_eop_existing_cust_exp.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: strat_summary
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.strat_summary_score_display_eop_existing_cust_exp' = ```
-			
+
 			CALCULATE(
-				[meas.strat_summary_score_display_eop],
-				'strat_summary'[summary_cat] IN { "Existing Customer Revenue" }
+			[meas.strat_summary_score_display_eop],
+			'strat_summary'[summary_cat] IN { "Existing Customer Revenue" }
 			)
-			
-			```
+
+	```
 		lineageTag: 33430290-9c5e-405b-84e7-3d2a0a289077
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_score_display_eop_for_new_logo_sales.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: strat_summary
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.strat_summary_score_display_eop_for_new_logo_sales' = ```
-			
+
 			CALCULATE(
-				[meas.strat_summary_score_display_eop],
-				'strat_summary'[summary_cat] IN { "New Logo Sales" }
+			[meas.strat_summary_score_display_eop],
+			'strat_summary'[summary_cat] IN { "New Logo Sales" }
 			)
-			
-			```
+
+	```
 		lineageTag: e4fcb2ff-37fa-470d-8456-9a2498a9ffa7
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_score_display_eop_for_rep_perf.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: strat_summary
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.strat_summary_score_display_eop_for_rep_perf' = ```
-			
+
 			CALCULATE(
-				[meas.strat_summary_score_display_eop],
-				'strat_summary'[summary_cat] IN { "Rep Performance" }
+			[meas.strat_summary_score_display_eop],
+			'strat_summary'[summary_cat] IN { "Rep Performance" }
 			)
-			
-			```
+
+	```
 		lineageTag: 54bad410-5b58-49e4-b157-b94643407276
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_score_display_eop_for_sales_and_market.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: strat_summary
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.strat_summary_score_display_eop_for_sales_and_market' = ```
-			
+
 			CALCULATE(
-				[meas.strat_summary_score_display_eop],
-				'strat_summary'[summary_cat]
-					IN { "Sales & Marketing Alignment" }
+			[meas.strat_summary_score_display_eop],
+			'strat_summary'[summary_cat]
+			IN { "Sales & Marketing Alignment" }
 			)
-			
-			```
+
+	```
 		lineageTag: b0a32b4e-3082-45c3-89da-dd1861e01461
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_score_display_eop_for_target_and_segment.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: strat_summary
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.strat_summary_score_display_eop_for_target_and_segment' = ```
-			
+
 			CALCULATE(
-				[meas.strat_summary_score_display_eop],
-				'strat_summary'[summary_cat] IN { "Targeting & Segmenting" }
+			[meas.strat_summary_score_display_eop],
+			'strat_summary'[summary_cat] IN { "Targeting & Segmenting" }
 			)
-			
-			```
+
+	```
 		lineageTag: 9dcc1a6a-d26e-4dee-b408-a3f118fc332b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_all_score.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.strat_summary_all_score' = ```
-			
-			var score = (strat_summary[meas.strat_summary_score_display_eop_existing_cust_exp] + strat_summary[meas.strat_summary_score_display_eop_for_new_logo_sales] 
-			+ strat_summary[meas.strat_summary_score_display_eop_for_rep_perf] 
+
+			var score = (strat_summary[meas.strat_summary_score_display_eop_existing_cust_exp] + strat_summary[meas.strat_summary_score_display_eop_for_new_logo_sales]
+			+ strat_summary[meas.strat_summary_score_display_eop_for_rep_perf]
 			+ strat_summary[meas.strat_summary_score_display_eop_for_sales_and_market]
 			+ strat_summary[meas.strat_summary_score_display_eop_for_target_and_segment]
-			) / 5 
-			
+			) / 5
+
 			var res = round(score, 0)
 			return res
-			
-			```
+
+	```
 		lineageTag: 7d990357-1036-46de-b650-2b9a15e8103f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}

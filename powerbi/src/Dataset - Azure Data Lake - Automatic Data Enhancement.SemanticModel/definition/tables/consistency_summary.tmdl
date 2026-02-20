@@ -2,11 +2,11 @@
 table consistency_summary
 	lineageTag: 5f7d346c-d097-4fee-b748-c946478a0dc7
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.crm_consistency_count_address_city' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.crm_consistency_count_address_city' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([crm_addr_city]), consistency_summary[crm_addr_city] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -15,11 +15,11 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: b2f66e5b-e2bd-4a12-acc7-57ebef2b3a3f
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.crm_consistency_count_address_country' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.crm_consistency_count_address_country' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([crm_addr_country]), consistency_summary[crm_addr_country] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -28,11 +28,11 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: fddf49aa-3f1e-4060-a815-6c1c214cf480
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: #,0
-	measure 'meas.crm_consistency_count_address_state' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.crm_consistency_count_address_state' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([crm_addr_state]), consistency_summary[crm_addr_state] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -41,11 +41,11 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: 0e43b5bf-d05a-441a-b050-f8506e5685ee
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.crm_consistency_count_industry' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.crm_consistency_count_industry' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([crm_industry]), consistency_summary[crm_industry] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -54,11 +54,11 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: 02a0e393-6924-461a-9d23-a2fdfea3092e
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.crm_consistency_count_leadsource' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.crm_consistency_count_leadsource' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([crm_leadsource]), consistency_summary[crm_leadsource] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -67,11 +67,11 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: e8be4735-db38-4312-b8ec-7f8cb2a36e7a
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.crm_consistency_count_title' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.crm_consistency_count_title' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([crm_title]), consistency_summary[crm_title] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -80,45 +80,45 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: 76dd37d6-6a50-4281-a779-d751e29e2864
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (coeff, max_date, min_date, ls_count, ls_optimal_count, ls_score, ind_count, ind_optimal_count, ind_score, countScore, res) used later in the expression. Dependencies: Columns: cal_start_dates[Date] | Measures: [crm_leadsource], [crm_industry].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0.00
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: cal_end_dates
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.crm_consistency_score' = ```
-			
+
 			var coeff = 0.6 // make the ratio less drastic so it takes longer to get to 0
 			var max_date = CALCULATE(MAX('cal_end_dates'[Date])  )
 			var min_date =  DATE(2000,1,1) //FILTERS(cal_start_dates[Date])
-			
+
 			// leadsource
 			var ls_count = CALCULATE(DISTINCTCOUNT([crm_leadsource]))
-			
+
 			var ls_optimal_count = 30
-			var ls_score =  if(ls_count <2 , blank(), If(ls_count < ls_optimal_count, 1,  (ls_optimal_count/ls_count) ^ coeff)) // no data = blank, unique count < ideal count = 1, otherwise do the ratio and sqaure it 
-			
+			var ls_score =  if(ls_count <2 , blank(), If(ls_count < ls_optimal_count, 1,  (ls_optimal_count/ls_count) ^ coeff)) // no data = blank, unique count < ideal count = 1, otherwise do the ratio and sqaure it
+
 			// industry
 			var ind_count = CALCULATE(DISTINCTCOUNT([crm_industry]))
 			var ind_optimal_count = 50
-			var ind_score =  if(ind_count <2 , blank(), If(ind_count < ind_optimal_count, 1,  (ind_optimal_count/ind_count) ^ coeff)) // no data = blank, unique count < ideal count = 1, otherwise do the ratio and 
-			
-			var countScore =  IF(ISBLANK( ls_score), 0, 1) +  IF(ISBLANK( ind_score), 0, 1) 
-			
-			
-			var res = divide(If(isBLANK(ls_score), 0,ls_score) + If(isBLANK(ind_score), 0,ind_score)  , countScore, blank()) 
-			
+			var ind_score =  if(ind_count <2 , blank(), If(ind_count < ind_optimal_count, 1,  (ind_optimal_count/ind_count) ^ coeff)) // no data = blank, unique count < ideal count = 1, otherwise do the ratio and
+
+			var countScore =  IF(ISBLANK( ls_score), 0, 1) +  IF(ISBLANK( ind_score), 0, 1)
+
+
+			var res = divide(If(isBLANK(ls_score), 0,ls_score) + If(isBLANK(ind_score), 0,ind_score)  , countScore, blank())
+
 			return res
-			```
+	```
 		formatString: 0.00
 		displayFolder: _consistancy_score
 		lineageTag: d9e1bcfa-3f3c-4392-9c91-9dfbff1dd779
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.crm_consistency_score_industry_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.crm_consistency_score_industry_avg' = 
 			//68
 			var _score = CALCULATE(
 			    MAX(metadata_reference_values[value]),
@@ -131,11 +131,11 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: ad84e61a-dca2-4efb-a8a8-f6aed2e396e8
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.trueai_consistency_count_address_city' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.trueai_consistency_count_address_city' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([trueai_addr_city]), consistency_summary[trueai_addr_city] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -144,11 +144,11 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: 6afb1038-d72c-4856-9f93-a38e5c3be21f
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.trueai_consistency_count_address_country' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.trueai_consistency_count_address_country' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([trueai_addr_country]), consistency_summary[trueai_addr_country] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -157,11 +157,11 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: d053adf7-cdb7-43d1-9b0b-3f3c38024496
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: #,0
-	measure 'meas.trueai_consistency_count_address_state' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.trueai_consistency_count_address_state' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([trueai_addr_state]), consistency_summary[trueai_addr_state] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -170,11 +170,11 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: b252c2ab-cbcd-4e94-a08e-02aa8ccb97fe
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.trueai_consistency_count_industry' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.trueai_consistency_count_industry' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([trueai_industry]), consistency_summary[trueai_industry] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -183,11 +183,11 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: 5200942a-36fe-4f17-bd48-09441851a736
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.trueai_consistency_count_leadsource' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.trueai_consistency_count_leadsource' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([trueai_leadsource]), consistency_summary[trueai_leadsource] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -196,11 +196,11 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: 59cc3869-fd60-4307-bd80-a994d9821119
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.trueai_consistency_count_title_concat' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.trueai_consistency_count_title_concat' = 
 			
 			var cnt = CALCULATE(DISTINCTCOUNT([trueai_title_concat]), consistency_summary[trueai_title_concat] <> BLANK())  //count all non blanks
 			var res = cnt
@@ -209,112 +209,112 @@ table consistency_summary
 		displayFolder: _consistancy_score
 		lineageTag: eed2043e-325f-4c87-9a8a-4c179bc4bd2a
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crm_count, ai_count, ratio, res) used later in the expression. Dependencies: Columns: consistency_summary[crm_addr_country], consistency_summary[trueai_addr_country].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.trueai_consistency_improvement_country' = ```
-			
+
 			var crm_count = CALCULATE(DISTINCTCOUNT([crm_addr_country]), consistency_summary[crm_addr_country] <> BLANK())
 			var ai_count =  CALCULATE(DISTINCTCOUNT([trueai_addr_country]), consistency_summary[trueai_addr_country] <> BLANK())
 			var ratio =  round(divide(crm_count , ai_count,BLANK()),0)
 			var res  = If(isblank(ratio), "Country not consolidated", "Country - " & ratio & "X Consolidation" )
-			return res 
-			
-			
-			```
+			return res
+
+
+	```
 		displayFolder: _consistancy_score
 		lineageTag: 214c6ede-747e-465d-ba51-105e91f6a1a3
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crm_count, ai_count, ratio, res) used later in the expression. Dependencies: Columns: consistency_summary[crm_industry], consistency_summary[trueai_industry].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.trueai_consistency_improvement_industry' = ```
-			
+
 			var crm_count = CALCULATE(DISTINCTCOUNT([crm_industry]), consistency_summary[crm_industry] <> BLANK())
 			var ai_count =  CALCULATE(DISTINCTCOUNT([trueai_industry]), consistency_summary[trueai_industry] <> BLANK())
 			var ratio =  round(divide(crm_count , ai_count,BLANK()),0)
 			var res  = If(isblank(ratio), "Industry not consolidated", "Industry - " & ratio & "X Consolidation" )
-			return res 
-			
-			
-			```
+			return res
+
+
+	```
 		displayFolder: _consistancy_score
 		lineageTag: 87fcd8b0-0afc-4825-a40d-bfec76c1ce38
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crm_count, ai_count, ratio, res) used later in the expression. Dependencies: Columns: consistency_summary[crm_leadsource], consistency_summary[trueai_leadsource].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.trueai_consistency_improvement_leadsource' = ```
-			
+
 			var crm_count = CALCULATE(DISTINCTCOUNT([crm_leadsource]), consistency_summary[crm_leadsource] <> BLANK())
 			var ai_count =  CALCULATE(DISTINCTCOUNT([trueai_leadsource]), consistency_summary[trueai_leadsource] <> BLANK())
 			var ratio =  round(divide(crm_count , ai_count,BLANK()),0)
 			var res  = If(isblank(ratio), "Leadsource not consolidated", "Leadsource - " & ratio & "X Consolidation" )
-			return res 
-			
-			
-			```
+			return res
+
+
+	```
 		displayFolder: _consistancy_score
 		lineageTag: 60a16077-4e1f-4bc5-a21b-04224e2df6cc
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crm_count, ai_count, ratio, res) used later in the expression. Dependencies: Columns: consistency_summary[crm_title], consistency_summary[trueai_title_concat].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.trueai_consistency_improvement_title' = ```
-			
+
 			var crm_count = CALCULATE(DISTINCTCOUNT([crm_title]), consistency_summary[crm_title] <> BLANK())
 			var ai_count =  CALCULATE(DISTINCTCOUNT([trueai_title_concat]), consistency_summary[trueai_title_concat] <> BLANK())
 			var ratio =  round(divide(crm_count , ai_count,BLANK()),0)
 			var res  = If(isblank(ratio), "Title not consolidated", "Title - " & ratio & "X Consolidation" )
-			return res 
-			
-			
-			```
+			return res
+
+
+	```
 		displayFolder: _consistancy_score
 		lineageTag: 27638655-fbbe-438d-a504-b456e9d2041d
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (industry_conf_raw, industry_conf, industry_count, leadsource_conf_raw, leadsource_conf, leadsource_count, res) used later in the expression. Dependencies: Columns: consistency_summary[crm_industry], consistency_summary[crm_leadsource], consistency_summary[trueai_industry_conf], consistency_summary[trueai_leadsource_conf].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: Not specified.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.trueai_consistency_score' = ```
-			
+
 			var industry_conf_raw = CALCULATE(
-			    average(consistency_summary[trueai_industry_conf]), 
-			    consistency_summary[crm_industry] <> "" 
-			    && isblank(consistency_summary[crm_industry]) =false 
+			average(consistency_summary[trueai_industry_conf]),
+			consistency_summary[crm_industry] <> ""
+			&& isblank(consistency_summary[crm_industry]) =false
 			) + 0
-			
+
 			VAR industry_conf = POWER(industry_conf_raw, 0.4)
-			
-			
+
+
 			var industry_count = CALCULATE(
-			    count(consistency_summary[trueai_industry_conf]), 
-			    consistency_summary[crm_industry] <> "" 
-			    && isblank(consistency_summary[crm_industry]) =false 
+			count(consistency_summary[trueai_industry_conf]),
+			consistency_summary[crm_industry] <> ""
+			&& isblank(consistency_summary[crm_industry]) =false
 			) + 0
 			var leadsource_conf_raw = CALCULATE(
-			    average(consistency_summary[trueai_leadsource_conf]), 
-			    consistency_summary[crm_leadsource] <> "" 
-			    && isblank(consistency_summary[crm_leadsource]) = false
+			average(consistency_summary[trueai_leadsource_conf]),
+			consistency_summary[crm_leadsource] <> ""
+			&& isblank(consistency_summary[crm_leadsource]) = false
 			) + 0
-			
+
 			VAR leadsource_conf = POWER(leadsource_conf_raw, 0.4)
-			
+
 			var leadsource_count = CALCULATE(
-			    count(consistency_summary[trueai_leadsource_conf]), 
-			    consistency_summary[crm_leadsource] <> "" 
-			    && isblank(consistency_summary[crm_leadsource]) = false
-			) +0 
-			
+			count(consistency_summary[trueai_leadsource_conf]),
+			consistency_summary[crm_leadsource] <> ""
+			&& isblank(consistency_summary[crm_leadsource]) = false
+			) +0
+
 			var res  =  Divide((industry_conf * industry_count) + (leadsource_conf * leadsource_count) , industry_count + leadsource_count)
 			return res
-			
-			```
+
+	```
 		displayFolder: _consistancy_score
 		lineageTag: 9752bf98-83c9-487b-a234-92b6fe82db9a
 
@@ -322,11 +322,11 @@ table consistency_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: +#%;-#%;0%
-	measure 'meas.trueai_consistency_score_improvement' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.trueai_consistency_score_improvement' = 
 			
 			var trueai_score = ROUND([meas.trueai_consistency_score_display],2)     // get the trueai consistency score
 			var crm_score = ROUND([meas.crm_consistency_score_display],2)           // crm consistency score
@@ -339,10 +339,10 @@ table consistency_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Measures: [meas.crm_consistency_score].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.crm_consistency_score_display' = [meas.crm_consistency_score] * 100
 		formatString: 0
 		displayFolder: _consistancy_score
@@ -350,11 +350,11 @@ table consistency_summary
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.trueai_consistency_score_display' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.trueai_consistency_score_display' = 
 			
 			var _before_score = [meas.crm_consistency_score_display]                // get the before score
 			var _after_score = [meas.trueai_consistency_score] * 100                // get the after score

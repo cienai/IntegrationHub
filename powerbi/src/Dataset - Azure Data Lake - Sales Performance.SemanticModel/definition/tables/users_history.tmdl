@@ -2,78 +2,93 @@
 table users_history
 	lineageTag: d904fbb9-5121-4eb7-966a-bb236f245cbb
 
-	/// Measure meas.data_logs_user_mgr_count_eop.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_mgr_count_eop' = ```
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
 			var applicable_rows_tbl = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-			
-			var active_users_tbl =  filter(applicable_rows_tbl,  [col.user.user_role_function] = "MGR" &&  [trueai_hire_date] <  toDate   && if(isblank([trueai_termination_date]), date(2100,1,1),[trueai_termination_date]) >=  toDate) // make sure we only include reps that are in the active 
-			
-			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
-			
+
+			var active_users_tbl =  filter(applicable_rows_tbl,  [col.user.user_role_function] = "MGR" &&  [trueai_hire_date] <  toDate   && if(isblank([trueai_termination_date]), date(2100,1,1),[trueai_termination_date]) >=  toDate) // make sure we only include reps that are in the active
+
+			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context
+
 			return res // return the res :)
-			```
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: b37dd8bf-3abb-4c71-b2b1-02d86db3fea8
 
-	/// Measure meas.data_logs_user_new_hires_reached_performer_within_12_months.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months' = ```
-			
-			
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
-			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate, 
-			           If(isblank(users_history[col.perf_date_first_reached]) = true, date(2100,1,1), users_history[col.perf_date_first_reached]) <  (users_history[trueai_hire_date] + 365) 
+
+
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
+			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]),
+			users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate,
+			If(isblank(users_history[col.perf_date_first_reached]) = true, date(2100,1,1), users_history[col.perf_date_first_reached]) <  (users_history[trueai_hire_date] + 365)
 			)
 			return If(isblank( res), 0, res)
-			```
+	```
 		formatString: +0
 		displayFolder: _perf_analysis
 		lineageTag: a2dee853-9dbc-44fa-8056-38f45ee80945
 
-	/// Measure meas.data_logs_user_new_terminations.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_new_terminations' = ```
-			
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
-			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_termination_date] >= fromDate &&     users_history[trueai_termination_date]  <= toDate 
+
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
+			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]),
+			users_history[trueai_termination_date] >= fromDate &&     users_history[trueai_termination_date]  <= toDate
 			)
-			return 
+			return
 			IF(
-			    res = BLANK(), 
-			    0,                  // putting the condition to show 0 instead of blank
-			    res * -1
+			res = BLANK(),
+			0,                  // putting the condition to show 0 instead of blank
+			res * -1
 			)
-			```
+	```
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: bde20ead-06ce-47fd-a172-f24a25d9b9c4
 
-	/// Measure meas.data_logs_user_individual_contrib_count_eop.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_individual_contrib_count_eop' = ```
-			
-			[meas.data_logs_user_count_eop_for_all_sales_roles]  - [meas.data_logs_user_count_eop_for_mgr] 
-			
-			```
+
+			[meas.data_logs_user_count_eop_for_all_sales_roles]  - [meas.data_logs_user_count_eop_for_mgr]
+
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 190042ed-5ba8-4940-b3a0-4223f7d6d03b
 
-	/// Measure meas.data_logs_user_rep_mgr_ratio.
-	measure 'meas.data_logs_user_rep_mgr_ratio' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.data_logs_user_rep_mgr_ratio' = 
 			//divide(users_history[meas.data_logs_user_individual_contrib_count_eop] ,users_history[meas.data_logs_user_count_eop_for_mgr])
 			
 			VAR _total_role = CALCULATE(
@@ -96,99 +111,120 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_user_count_eop.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_count_eop' = ```
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
 			var applicable_rows_tbl = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-			
-			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) >=  toDate) // make sure we only include reps that are in the active 
-			
-			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
-			
+
+			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) >=  toDate) // make sure we only include reps that are in the active
+
+			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context
+
 			return res // return the res :)
-			```
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 0d53230b-70a9-4c33-923e-97f01c07267f
 
-	/// Measure meas.data_logs_user_new_terminations_within_12_months.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_new_terminations_within_12_months' = ```
-			
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
-			
-			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_termination_date] >= fromDate &&  users_history[trueai_termination_date]  <= toDate  && users_history[trueai_tenure] < 13)
+
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
+
+			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]),
+			users_history[trueai_termination_date] >= fromDate &&  users_history[trueai_termination_date]  <= toDate  && users_history[trueai_tenure] < 13)
 			return res * -1
-			```
+	```
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: 1b315d56-3418-4f57-83da-95dd0f39299c
 
-	/// Measure meas.data_logs_ci_perf_tier_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_ci_perf_tier_count' = ```
-			
+
 			var month_instances = CALCULATE(COUNT(users_history[col.ci.perf_qtly_performance_tier]))  // how many months in this perf cat
 			Var total_months = CALCULATE(count(users_history[col.ci.perf_qtly_performance_tier]), users_history[col.ci.perf_qtly_performance_tier] <> "XX") // how many months in total? (per cate not equal anything
-			Var total_users = CALCULATE(distinctcount(users_history[_sys_user_id]), users_history[col.ci.perf_qtly_performance_tier] <> "XX")  // total unique users 
+			Var total_users = CALCULATE(distinctcount(users_history[_sys_user_id]), users_history[col.ci.perf_qtly_performance_tier] <> "XX")  // total unique users
 			var users_in_perf_tier_dec = total_users * (month_instances) / total_months
-			var res = Round(users_in_perf_tier_dec ,0) 
+			var res = Round(users_in_perf_tier_dec ,0)
 			return res
-			```
+	```
 		formatString: 0
 		displayFolder: _perf_analysis
 		lineageTag: c8771d48-9a93-446a-b576-b1cae3318ddc
 
-	/// Measure meas.data_logs_user_net_new_users.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_net_new_users' = ```
-			[meas.data_logs_user_new_hires] + [meas.data_logs_user_new_terminations] 
-			```
+			[meas.data_logs_user_new_hires] + [meas.data_logs_user_new_terminations]
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 1103f6b8-a2c1-47f7-82b8-8f911720ebe9
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_bookings.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.data_logs_ci_perf_annual_avg_bookings' = ```
-			
+
 			var end_date =   [meas.companies_history_reference_date]
 			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
 			var res =  CALCULATE(AVERAGE(users_history[ci_perf_qtly_avg_bookings_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date) // qtly number
 			return res * 4 // annual number
-			
-			```
+
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _perf_analysis
 		lineageTag: e8d0ba55-4ac1-4b2d-9735-21fbf43528cc
 
 		annotation PBI_FormatHint = {"currencyCulture":""}
 
-	/// Measure meas.data_logs_user_count_bop.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_count_bop' = ```
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
 			var applicable_rows_tbl = CALCULATETABLE(users_history, FIRSTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the first entry in each filter context period (e.g. a year)
-			
-			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <=  fromDate   && if(isblank([trueai_termination_date]), date(2100,1,1),[trueai_termination_date]) >  fromDate) // make sure we only include reps that are in the active 
-			
-			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
-			
+
+			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <=  fromDate   && if(isblank([trueai_termination_date]), date(2100,1,1),[trueai_termination_date]) >  fromDate) // make sure we only include reps that are in the active
+
+			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context
+
 			return res // return the res :)
-			```
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 23c2187f-b803-4f66-a9bb-b218861c778f
 
-	/// Measure meas.data_logs_user_count_change.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
 	measure 'meas.data_logs_user_count_change' = divide([meas.data_logs_user_new_hires] , [meas.data_logs_user_count_bop], BLANK())
 		formatString: +#,##0%;-#,##0%
 		displayFolder: _rep_count_analysis
@@ -196,92 +232,107 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_user_new_hires.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_new_hires' = ```
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
-			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate)
-			
-			           
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
+			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]),
+			users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate)
+
+
 			return if(isblank(res), 0, res)
-			```
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 71c8d155-d6fc-42de-b47d-f7c9060e54a1
 
-	/// Measure meas.data_logs_user_new_terminations_within_12_months_avg_tenure.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.data_logs_user_new_terminations_within_12_months_avg_tenure' = ```
-			
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
-			
-			var res = CALCULATE(AVERAGEX(users_history, (users_history[trueai_termination_date]  - users_history[trueai_hire_date]) /30  ), 
-			           users_history[trueai_termination_date] >= fromDate &&  users_history[trueai_termination_date]  <= toDate  && users_history[trueai_tenure] < 13)
-			
+
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
+
+			var res = CALCULATE(AVERAGEX(users_history, (users_history[trueai_termination_date]  - users_history[trueai_hire_date]) /30  ),
+			users_history[trueai_termination_date] >= fromDate &&  users_history[trueai_termination_date]  <= toDate  && users_history[trueai_tenure] < 13)
+
 			return res
-			```
+	```
 		formatString: 0.0
 		displayFolder: _ramp_analysis
 		lineageTag: 75d0f25d-3377-4efe-b39e-2e5fcc6393ab
 
-	/// Measure meas.data_logs_user_new_hires_reached_performer_success_rate.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
 	measure 'meas.data_logs_user_new_hires_reached_performer_success_rate' = ```
-			
+
 			var tot_new_hires  = [meas.data_logs_user_new_hires]
-			
+
 			var _reached_reps = [meas.user_history_user_new_hires_reached_perf_in_12_month]
-			
+
 			var res = DIVIDE(
-			    _reached_reps,
-			    tot_new_hires,
-			    0
+			_reached_reps,
+			tot_new_hires,
+			0
 			)
 			RETURN
 			IF(
-			    res=BLANK(),
-			    0,                      // putting the condition to 0% instead of blank if there is blank 
-			    res
+			res=BLANK(),
+			0,                      // putting the condition to 0% instead of blank if there is blank
+			res
 			)
-			```
+	```
 		formatString: 0%;-0%;0%
 		displayFolder: _perf_analysis
 		lineageTag: c9422a55-f07e-46d0-8b7d-e7073208b629
 
-	/// Measure meas.data_logs_user_new_terminations_within_12_months_failure_rate.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
 	measure 'meas.data_logs_user_new_terminations_within_12_months_failure_rate' = divide( -1 * [meas.data_logs_user_new_terminations_within_12_months],  [meas.data_logs_user_new_hires] , BLANK())
 		formatString: #,0%;-#,0%;#,0%
 		displayFolder: _ramp_analysis
 		lineageTag: 29a4c52e-0ac6-4eb5-8258-ac1cac98ccae
 
-	/// Measure meas.data_logs_user_new_hires_reached_performer_within_12_months_avg_tenure.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months_avg_tenure' = ```
-			
+
 			VAR fromDate = [meas.context_date_min]
 			VAR toDate = [meas.context_date_max]
-			
+
 			VAR res =
-			    CALCULATE(
-			        AVERAGEX(
-			            users_history,
-			            MAX(0, DATEDIFF(users_history[trueai_hire_date], users_history[col.perf_date_first_reached], DAY))
-			        ),
-			        users_history[trueai_hire_date] >= fromDate &&
-			        users_history[trueai_hire_date] <= toDate &&
-			
-			        NOT(ISBLANK(users_history[col.perf_date_first_reached])) &&
-			        users_history[col.perf_date_first_reached] <= users_history[trueai_hire_date] + 365
-			    ) / 30 
-			
+			CALCULATE(
+			AVERAGEX(
+			users_history,
+			MAX(0, DATEDIFF(users_history[trueai_hire_date], users_history[col.perf_date_first_reached], DAY))
+			),
+			users_history[trueai_hire_date] >= fromDate &&
+			users_history[trueai_hire_date] <= toDate &&
+
+			NOT(ISBLANK(users_history[col.perf_date_first_reached])) &&
+			users_history[col.perf_date_first_reached] <= users_history[trueai_hire_date] + 365
+			) / 30
+
 			RETURN
 			IF(res = BLANK(), "-", res)
-			```
+	```
 		formatString: #,##0.0" Mos."
 		displayFolder: _perf_analysis
 		lineageTag: 13df22da-2a25-4c0d-beca-5c550610123e
@@ -290,51 +341,63 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_pipeline_created.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created' = ```
-			
+
 			var end_date =   [meas.companies_history_reference_date]
 			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
 			var res =  CALCULATE(AVERAGE(users_history[col.ci.perf_qtly_avg_pipeline_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date) // qtly number
 			return res * 4 // annual number
-			
-			
-			
-			```
+
+
+
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _perf_analysis
 		lineageTag: a71bba55-020c-4658-b8f1-53fffc283958
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.users_history_ramping_reps_count_eop.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.users_history_ramping_reps_count_eop' = ```
-			
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
+
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
 			var applicable_rows_tbl = CALCULATETABLE(users_history, users_history[col.ci.perf_ramping_status] ="Ramping" ,  LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-			
-			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <  toDate   && if(isblank([trueai_termination_date]), date(2100,1,1),[trueai_termination_date]) >=  toDate) // make sure we only include reps that are in the active 
-			
-			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, users_history[_sys_user_id]))) // get a disctinct count of users from that filter context 
-			
+
+			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <  toDate   && if(isblank([trueai_termination_date]), date(2100,1,1),[trueai_termination_date]) >=  toDate) // make sure we only include reps that are in the active
+
+			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, users_history[_sys_user_id]))) // get a disctinct count of users from that filter context
+
 			return res // return the res :)
-			```
+	```
 		formatString: #,0
 		displayFolder: _skills_analysis
 		lineageTag: 443a145f-8199-4a8d-bba8-a3b1556b6100
 
-	/// Measure meas.user_history_period_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.user_history_period_count' = CALCULATE(DISTINCTCOUNT(users_history[_sys_filt_start_date]))
 		formatString: #,0
 		displayFolder: _helper
 		lineageTag: a95dbb11-f9e5-4d93-950a-5d9a776941b0
 
-	/// Measure meas.users_history_vi_value_received_all_prior_time.
-	measure 'meas.users_history_vi_value_received_all_prior_time' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_history_vi_value_received_all_prior_time' = 
 			
 			var max_date = CALCULATE(max(cal_end_dates[Date]))
 			var val_all_time = CALCULATE(Sum(users_history[vi_value_received_tot]),cal_end_dates[Date] > Date(1900,1,1) && cal_end_dates[Date] <= max_date) // override all prior time until max date
@@ -348,63 +411,75 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.user_history_user_new_hires_reached_perf_in_12_month.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.user_history_user_new_hires_reached_perf_in_12_month' = ```
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			var perf_reps = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&    users_history[trueai_hire_date]  <= toDate -- hired this year
-			           && users_history[col.perf_date_first_reached]  <  users_history[trueai_hire_date] +365  -- did reach perf within a year 
-			           && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) > users_history[trueai_hire_date] +365 -- did not get terminated within a year
-			           )
-			
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+			var perf_reps = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]),
+			users_history[trueai_hire_date] >= fromDate &&    users_history[trueai_hire_date]  <= toDate -- hired this year
+			&& users_history[col.perf_date_first_reached]  <  users_history[trueai_hire_date] +365  -- did reach perf within a year
+			&& if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) > users_history[trueai_hire_date] +365 -- did not get terminated within a year
+			)
+
 			var res = if(ISBLANK(perf_reps), 0, perf_reps)
 			return res
-			```
+	```
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: d7c2bfef-6936-47f3-b6c3-3453a31b2971
 
-	/// Measure meas.user_history_user_new_hires_didnt_reach_perf_in_12_month.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.user_history_user_new_hires_didnt_reach_perf_in_12_month' = ```
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			var perf_reps = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year
-			           && users_history[col.perf_date_first_reached]   > users_history[trueai_hire_date] +365 -- did not reach perf level in a year
-			           && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) > users_history[trueai_hire_date] +365 -- was not terminated
-			           )
-			
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+			var perf_reps = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]),
+			users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year
+			&& users_history[col.perf_date_first_reached]   > users_history[trueai_hire_date] +365 -- did not reach perf level in a year
+			&& if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) > users_history[trueai_hire_date] +365 -- was not terminated
+			)
+
 			var res = if(ISBLANK(perf_reps), 0, perf_reps)
 			return res
-			```
+	```
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: cbad2d08-9be8-4635-a80e-1fb33bbc5488
 
-	/// Measure meas.user_history_user_new_hires_terminated_in_12_month.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.user_history_user_new_hires_terminated_in_12_month' = ```
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			var termed_within12 = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year
-			           && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) < users_history[trueai_hire_date] +365) -- terminated within a year
-			
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+			var termed_within12 = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]),
+			users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year
+			&& if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) < users_history[trueai_hire_date] +365) -- terminated within a year
+
 			var res = if(isblank(termed_within12),0,termed_within12 )
 			return res * -1
-			```
+	```
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: 1aea2f21-f4e1-4f4d-bc08-8849f865a4c8
 
-	/// Measure meas.users_history_ci_perf_avg_attainment.
-	measure 'meas.users_history_ci_perf_avg_attainment' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.users_history_ci_perf_avg_attainment' = 
 			
 			
 			var tbl_reps = SUMMARIZE(CALCULATETABLE(users_history,users_history[ci_perf_qtly_avg_bookings_peers] > 1 ), users_history[_sys_user_id],  "rep_sum",  sum(users_history[col.ci.perf_qtly_bookings_user]), "peer_sum",  sum(users_history[ci_perf_qtly_avg_bookings_peers]))
@@ -417,14 +492,17 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_ae.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_count_eop_for_ae' = ```
-			
+
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "AE" 
+			[meas.data_logs_user_count_eop]+0,
+			users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "AE"
 			)
-			```
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 0f5821e3-d7cc-4ce4-ae7f-9f760cba5013
@@ -437,14 +515,17 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_am.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_count_eop_for_am' = ```
-			
+
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "AM" 
+			[meas.data_logs_user_count_eop]+0,
+			users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "AM"
 			)
-			```
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 851eef1a-e954-4e31-91a7-0aaf4d2959b1
@@ -457,14 +538,17 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_sdr.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_count_eop_for_sdr' = ```
-			
+
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "SDR" 
+			[meas.data_logs_user_count_eop]+0,
+			users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "SDR"
 			)
-			```
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: bc734f70-1e1a-414c-8344-0db6935738ea
@@ -477,14 +561,17 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_all_sales_roles.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_count_eop_for_all_sales_roles' = ```
-			
+
 			CALCULATE(
-			    [meas.data_logs_user_count_eop],
-			    users_history[trueai_user_role_department] = "SALES" 
+			[meas.data_logs_user_count_eop],
+			users_history[trueai_user_role_department] = "SALES"
 			)
-			```
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 5e4e7b8f-4fec-4aef-aad0-58359508545c
@@ -497,20 +584,26 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_mgr.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_count_eop_for_mgr' = ```
-			
+
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "MGMT" 
-			        )
-			```
+			[meas.data_logs_user_count_eop]+0,
+			users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "MGMT"
+			)
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 85f4c5b8-e1fe-4183-b591-4ef4151f7ee6
 
-	/// Measure meas.data_logs_user_count_eop_for_other.
-	measure 'meas.data_logs_user_count_eop_for_other' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.data_logs_user_count_eop_for_other' = 
 			
 			CALCULATE(
 			    [meas.data_logs_user_count_eop]+0,
@@ -520,8 +613,11 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 264b9cb9-f0ce-4764-8abe-39c27f7e8175
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_mkt.
-	measure 'meas.data_logs_user_count_eop_for_dept_mkt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.data_logs_user_count_eop_for_dept_mkt' = 
 			
 			CALCULATE(
 			    [meas.data_logs_user_count_eop],
@@ -539,8 +635,11 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_sales.
-	measure 'meas.data_logs_user_count_eop_for_dept_sales' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.data_logs_user_count_eop_for_dept_sales' = 
 			
 			CALCULATE(
 			    [meas.data_logs_user_count_eop]+0,
@@ -558,8 +657,11 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_other.
-	measure 'meas.data_logs_user_count_eop_for_dept_other' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.data_logs_user_count_eop_for_dept_other' = 
 			
 			CALCULATE(
 			    [meas.data_logs_user_count_eop]+0,
@@ -577,8 +679,11 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_change_perc.
-	measure 'meas.data_logs_user_count_change_perc' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.data_logs_user_count_change_perc' = 
 			
 			VAR __BASELINE_VALUE = [meas.data_logs_user_count_bop]
 			VAR __VALUE_TO_COMPARE = [meas.data_logs_user_count_eop]
@@ -596,8 +701,11 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_nd.
-	measure 'meas.data_logs_user_count_eop_for_nd' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.data_logs_user_count_eop_for_nd' = 
 			
 			CALCULATE(
 			    [meas.data_logs_user_count_eop]+0,
@@ -608,25 +716,31 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 7bcb8763-96e0-4db1-b039-349dbd1c0eec
 
-	/// Measure meas.reps_w_actlvl_pct.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.reps_w_actlvl_pct' = ```
-			
+
 			var reps_w_acl = [meas.reps_w_actlvl_count]
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]))
-			
+
 			var res = DIVIDE(reps_w_acl, reps_tot)
 			return res
-			
-			
-			```
+
+
+	```
 		formatString: 0%;-0%;0%
 		displayFolder: _acl_ta_analysis
 		lineageTag: a812b715-d8de-41ae-bfc8-aa462a01927b
 
 		changedProperty = FormatString
 
-	/// Measure meas.reps_w_actlvl_count.
-	measure 'meas.reps_w_actlvl_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.reps_w_actlvl_count' = 
 			
 			CALCULATE(DISTINCTCOUNT([_sys_user_id]), (users_history[ci_act_capt_lvl] > 0)
 			)
@@ -634,8 +748,11 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: cb1894d2-ba0e-4792-8b22-f9f580f4b5e6
 
-	/// Measure meas.reps_w_time_allocation_pct.
-	measure 'meas.reps_w_time_allocation_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.reps_w_time_allocation_pct' = 
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_count]
 			var reps_tot = [meas.data_logs_user_count_eop]
@@ -654,32 +771,41 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.reps_w_time_allocation_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.reps_w_time_allocation_count' = ```
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
 			var applicable_rows_tbl = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-			
+
 			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) >=  toDate && users_history[ci_time_alloc_tot] >0 ) // make sure we only include reps that are in the active  and user having time allocation greater than 0
-			
-			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
-			
+
+			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context
+
 			return res // return the res :)
-			```
+	```
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: 390d2dd9-6f68-455a-a819-a36c90a9703c
 
-	/// Measure meas.users_history_row_filler.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler' = ""
 		displayFolder: _filler
 		lineageTag: 6ddcb848-f676-401c-a8b8-ee85f6065845
 
-	/// Measure meas.sys.user_id_for_am.
-	measure 'meas.sys.user_id_for_am' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.sys.user_id_for_am' = 
 			
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
@@ -695,8 +821,11 @@ table users_history
 				  "version": 0
 				}
 
-	/// Measure meas.di.trueai_opps_won_amt_am_avg.
-	measure 'meas.di.trueai_opps_won_amt_am_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.di.trueai_opps_won_amt_am_avg' = 
 			
 			DIVIDE(
 			    SUM(ssr_history[opp_won_amt])+0,
@@ -714,8 +843,11 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.sys.user_id_for_ae.
-	measure 'meas.sys.user_id_for_ae' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.sys.user_id_for_ae' = 
 			
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
@@ -725,8 +857,11 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 443717c6-2617-4712-9ee1-236180210cdb
 
-	/// Measure meas.sys.user_id_for_sdr.
-	measure 'meas.sys.user_id_for_sdr' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.sys.user_id_for_sdr' = 
 			
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
@@ -736,8 +871,11 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: b95fcde4-0bcd-4deb-8ac0-ef02a18103d6
 
-	/// Measure meas.sys.user_id_for_nd.
-	measure 'meas.sys.user_id_for_nd' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.sys.user_id_for_nd' = 
 			
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
@@ -747,8 +885,11 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 60ef9f77-bd16-4f97-a5b9-a3d8fd5f0927
 
-	/// Measure meas.sys.user_id_for_other.
-	measure 'meas.sys.user_id_for_other' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.sys.user_id_for_other' = 
 			
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
@@ -758,8 +899,11 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: a67bea40-cc9d-4b93-b763-4082390316e3
 
-	/// Measure meas.di.trueai_opps_won_amt_ae_avg.
-	measure 'meas.di.trueai_opps_won_amt_ae_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.di.trueai_opps_won_amt_ae_avg' = 
 			
 			DIVIDE(
 			    SUM(ssr_history[opp_won_amt])+0,
@@ -771,8 +915,11 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.di.trueai_opps_won_amt_sdr_avg.
-	measure 'meas.di.trueai_opps_won_amt_sdr_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.di.trueai_opps_won_amt_sdr_avg' = 
 			
 			DIVIDE(
 			    SUM(ssr_history[opp_won_amt])+0,
@@ -784,8 +931,11 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.di.trueai_opps_won_amt_nd_avg.
-	measure 'meas.di.trueai_opps_won_amt_nd_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.di.trueai_opps_won_amt_nd_avg' = 
 			
 			DIVIDE(
 			    SUM(ssr_history[opp_won_amt])+0,
@@ -796,8 +946,11 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.di.trueai_opps_won_amt_mgr_avg.
-	measure 'meas.di.trueai_opps_won_amt_mgr_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.di.trueai_opps_won_amt_mgr_avg' = 
 			
 			DIVIDE(
 			    SUM(ssr_history[opp_won_amt])+0,
@@ -808,8 +961,11 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.sys.user_id_for_mgr.
-	measure 'meas.sys.user_id_for_mgr' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.sys.user_id_for_mgr' = 
 			
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
@@ -819,8 +975,11 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 8421e203-c9d1-468b-affe-165f59ada1ae
 
-	/// Measure meas.di.trueai_opps_won_amt_other_avg.
-	measure 'meas.di.trueai_opps_won_amt_other_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.di.trueai_opps_won_amt_other_avg' = 
 			
 			DIVIDE(
 			    SUM(ssr_history[opp_won_amt])+0,
@@ -832,87 +991,105 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// _rep
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.count_trueai_user_role_account_executive' = ```
-			
+
 			var min_date = [meas.context_date_min]
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date)
-			
+
 			var res = CALCULATE(
-			    DISTINCTCOUNT(users_history[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "Account Executive"  },user_filt
+			DISTINCTCOUNT(users_history[_sys_user_id])+0,
+			users_history[trueai_user_role] IN { "Account Executive"  },user_filt
 			)
-			return res 
-			```
+			return res
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: f9380111-412f-4044-b400-0d2ca99a2968
 
-	/// _rep
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: users_history
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.count_trueai_user_role_account_manager' = ```
-			
+
 			var min_date = [meas.context_date_min]
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date)
-			
+
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "Account Manager"  },user_filt
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,
+			users_history[trueai_user_role] IN { "Account Manager"  },user_filt
 			)
-			return res 
-			```
+			return res
+	```
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: 5569d550-425e-4fd9-99b5-14bb55a3efff
 
-	/// _rep
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: users_history
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.count_trueai_user_role_sales_manager' = ```
-			
+
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
-			
+
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "Sales Manager"  },user_filt
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,
+			users_history[trueai_user_role] IN { "Sales Manager"  },user_filt
 			)
-			return res 
-			```
+			return res
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: b6ac59ea-d721-4ef6-8c5b-230bf0de8e09
 
-	/// _rep
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: users_history
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.count_trueai_user_role_nd' = ```
-			
+
 			var min_date = [meas.context_date_min]
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date)
-			
+
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "ND"  },user_filt
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,
+			users_history[trueai_user_role] IN { "ND"  },user_filt
 			)
-			return res 
-			```
+			return res
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 42d75b4a-4848-4708-8151-7a0816e02c31
 
-	/// _rep
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: users_history
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.count_trueai_user_role_sales_development_rep' = ```
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
-			
+
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "Sales Development Rep"  },user_filt
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,
+			users_history[trueai_user_role] IN { "Sales Development Rep"  },user_filt
 			)
-			return res 
-			```
+			return res
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: be269a0b-7718-4e82-ac59-c6b6bda76360
 
-	/// Measure meas.user_history_count_dept_sales.
-	measure 'meas.user_history_count_dept_sales' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.user_history_count_dept_sales' = 
 			
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
@@ -928,8 +1105,11 @@ table users_history
 				  "version": 0
 				}
 
-	/// _rep
-	measure 'meas.count_trueai_user_role_account_executive_in_group_nd' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.count_trueai_user_role_account_executive_in_group_nd' = 
 			
 			CALCULATE(
 			    [meas.count_trueai_user_role_account_executive],
@@ -947,55 +1127,67 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// _rep
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: users_history
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.count_trueai_user_role_all_salesteam' = ```
 			var min_date = [meas.context_date_min]
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date)
-			
+
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "Account Executive", "Account Manager", "Sales Development Rep", "Sales Manager", "ND", "Other", "Sales Executive"  },user_filt
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,
+			users_history[trueai_user_role] IN { "Account Executive", "Account Manager", "Sales Development Rep", "Sales Manager", "ND", "Other", "Sales Executive"  },user_filt
 			)
-			return res 
-			
-			```
+			return res
+
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 5ba6ff62-c218-4a8c-a401-b26f5bbba04f
 
-	/// _rep
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: users_history
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.count_trueai_user_role_other' = ```
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
-			
+
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role_function] IN { "OTHER ROLES"  },user_filt
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,
+			users_history[trueai_user_role_function] IN { "OTHER ROLES"  },user_filt
 			)
-			return res 
-			```
+			return res
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 2096bd64-ff8b-4b2f-8629-80b6e89051cb
 
-	/// _rep
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: users_history
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.count_trueai_user_role_sales_executive' = ```
-			
+
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
-			
+
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN {"Sales Executive"},user_filt
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,
+			users_history[trueai_user_role] IN {"Sales Executive"},user_filt
 			)
-			return res 
-			```
+			return res
+	```
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 32655af9-d185-476f-9a78-27fbb9ffbcb5
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_support.
-	measure 'meas.data_logs_user_count_eop_for_dept_support' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.data_logs_user_count_eop_for_dept_support' = 
 			
 			CALCULATE(
 			    [meas.data_logs_user_count_eop]+0,
@@ -1005,8 +1197,11 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 1e6d0ed8-aaae-4efe-b4d3-51a8c8c2b16c
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_ops.
-	measure 'meas.data_logs_user_count_eop_for_dept_ops' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.data_logs_user_count_eop_for_dept_ops' = 
 			
 			CALCULATE(
 			    [meas.data_logs_user_count_eop]+0,
@@ -1016,8 +1211,11 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: e9b2eb17-1691-4b12-825c-1f151ac84361
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_nd.
-	measure 'meas.data_logs_user_count_eop_for_dept_nd' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.data_logs_user_count_eop_for_dept_nd' = 
 			
 			CALCULATE(
 			    [meas.data_logs_user_count_eop]+0,
@@ -1027,8 +1225,11 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: b7c20247-953b-46d0-b3ca-169b075bde67
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg.
-	measure 'meas.data_logs_won_amt_user_eop_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.data_logs_won_amt_user_eop_avg' = 
 			
 			DIVIDE(
 				SUM(ssr_history[opp_won_amt]),
@@ -1046,8 +1247,11 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_pipeline_amt_user_eop_avg.
-	measure 'meas.data_logs_pipeline_amt_user_eop_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.data_logs_pipeline_amt_user_eop_avg' = 
 			
 			DIVIDE(
 			        SUM('ssr_history'[opp_pipeline_amt]),
@@ -1060,15 +1264,18 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_new_logo_selling.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_logo_selling' = ```
-			
+
 			var reps = [meas.data_logs_user_count_eop]
 			var won_amt = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] IN { "New Logo Selling" })
-			
+
 			var res = DIVIDE(won_amt, reps)
-			return res 
-			```
+			return res
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: e942f6df-814c-42d0-a743-58d166e9dce8
@@ -1083,32 +1290,38 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_existing_acv.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_acv' = ```
-			
+
 			var reps = [meas.data_logs_user_count_eop]
-			var won_amt = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] IN { "New Logo Selling", "Existing Customer Selling" } && ssr_history[col.opp_acv_classification] = 
+			var won_amt = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] IN { "New Logo Selling", "Existing Customer Selling" } && ssr_history[col.opp_acv_classification] =
 			"Existing Customer Selling ACV")
-			
+
 			var res = DIVIDE(won_amt, reps)
-			return res 
-			```
+			return res
+	```
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _results_analysis
 		lineageTag: 5fcf4a6a-efa3-4459-988e-6eb31406c216
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_new_acv.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_acv' = ```
-			
+
 			var reps = [meas.data_logs_user_count_eop]
-			var won_amt = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] IN { "New Logo Selling", "Existing Customer Selling" } && ssr_history[col.opp_acv_classification] = 
+			var won_amt = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] IN { "New Logo Selling", "Existing Customer Selling" } && ssr_history[col.opp_acv_classification] =
 			"New ACV")
-			
+
 			var res = DIVIDE(won_amt, reps)
-			return res 
-			```
+			return res
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: 0b8c546c-cfa8-4fad-9bdc-f3d297110235
@@ -1123,110 +1336,161 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.user_history_user_new_hires_terminated_in_12_month_pos.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.user_history_user_new_hires_terminated_in_12_month_pos' = ```
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			var termed_within12 = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year
-			           && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) < users_history[trueai_hire_date] +365) -- terminated within a year
-			
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+			var termed_within12 = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]),
+			users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year
+			&& if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) < users_history[trueai_hire_date] +365) -- terminated within a year
+
 			var res = if(isblank(termed_within12),0,termed_within12 )
 			return res
-			```
+	```
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: 640150f5-397a-4029-bd36-e53852d020d0
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_existing_customer_selling.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_customer_selling' = ```
-			
+
 			var reps = [meas.data_logs_user_count_eop]
 			var won_amt = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] IN { "Existing Customer Selling" })
-			
+
 			var res = DIVIDE(won_amt, reps)
-			return res 
-			```
+			return res
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: f32bbee9-a90c-45cb-abb0-8f9a96ef2221
 
 		changedProperty = FormatString
 
-	/// Measure meas.users_history_row_filler2.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler2' = ""
 		displayFolder: _filler
 		lineageTag: edeb15e2-b186-459d-8646-a21595bab838
 
-	/// Measure meas.users_history_row_filler3.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler3' = ""
 		displayFolder: _filler
 		lineageTag: fb5ce7e1-3b57-4caa-b47c-75f38cf431ca
 
-	/// Measure meas.users_history_row_filler4.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler4' = ""
 		displayFolder: _filler
 		lineageTag: 8980361f-9d0f-4b4f-a5b9-adfe40234d48
 
-	/// Measure meas.users_history_row_filler5.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler5' = ""
 		displayFolder: _filler
 		lineageTag: c1e1b654-df56-4f96-a7f2-b175c3e859ef
 
-	/// Measure meas.users_history_row_filler6.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler6' = ""
 		displayFolder: _filler
 		lineageTag: 2f5a5d5a-b880-4048-a7c5-e5d12008ee28
 
-	/// Measure meas.users_history_row_filler7.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler7' = ""
 		displayFolder: _filler
 		lineageTag: 3e1bb5f9-21ff-4763-b675-e056bebbc144
 
-	/// Measure meas.users_history_row_filler8.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler8' = ""
 		displayFolder: _filler
 		lineageTag: 7aa1bc6d-19ee-4f88-8447-c4ebd53bf512
 
-	/// Measure meas.users_history_row_filler9.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler9' = ""
 		displayFolder: _filler
 		lineageTag: 969c4058-2234-4575-ba9f-0cc3d76a47ce
 
-	/// Measure meas.users_history_row_filler10.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler10' = ""
 		displayFolder: _filler
 		lineageTag: f362c584-a411-4e49-bbf6-31cb18a66a80
 
-	/// Measure meas.users_history_row_filler11.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler11' = ""
 		displayFolder: _filler
 		lineageTag: a6884327-0fed-4df0-8827-faaeeda5986f
 
-	/// Measure meas.users_history_row_filler12.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler12' = ""
 		displayFolder: _filler
 		lineageTag: 13189c9e-d0d2-42cd-a41c-e2969b8dab74
 
-	/// Measure meas.users_history_row_filler13.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler13' = ""
 		displayFolder: _filler
 		lineageTag: 68cc992c-591e-4f1f-9386-89571ceb05af
 
-	/// Measure meas.users_history_row_filler14.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler14' = ""
 		displayFolder: _filler
 		lineageTag: 272625e7-1621-4db5-a38a-56e0f218088a
 
-	/// Measure meas.users_history_row_filler15.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_row_filler15' = ""
 		displayFolder: _filler
 		lineageTag: bce5d1d3-b76b-4858-862e-46f081a4d53b
 
-	/// Measure meas.data_logs_user_turnover_pct.
-	measure 'meas.data_logs_user_turnover_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.data_logs_user_turnover_pct' = 
 			
 			var res =DIVIDE(
 				[meas.data_logs_user_new_terminations_pos],
@@ -1248,8 +1512,11 @@ table users_history
 				  "version": 0
 				}
 
-	/// Measure meas.time_allocation_total_not_eng.
-	measure 'meas.time_allocation_total_not_eng' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.time_allocation_total_not_eng' = 
 			
 			AVERAGE('users_history'[ci_time_alloc_tot]) - AVERAGE('users_history'[ci_time_alloc_tot_eng])
 		displayFolder: _ta_analysis
@@ -1265,21 +1532,27 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ta_potential_vs_actual.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.users_history_ta_potential_vs_actual' = ```
-			
+
 			var uh_filt_tbl = CALCULATETABLE(users_history, users_history[ci_time_alloc_tot] <> blank())
 			var ratio = AVERAGEX(uh_filt_tbl, DIVIDE(users_history[ci_time_alloc_tot] * users_history[ci_time_alloc_month_to_week_adjustment], users_history[col.ci_ta_potential_hours]) )
 			var res  = ratio
 			return res
-			
-			```
+
+	```
 		formatString: 0%;-0%;0%
 		displayFolder: _ta_analysis
 		lineageTag: dd9b7816-b83c-4d60-bfb1-f374cc0531f5
 
-	/// Measure meas.data_logs_user_turnover_pct_regrettable.
-	measure 'meas.data_logs_user_turnover_pct_regrettable' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.data_logs_user_turnover_pct_regrettable' = 
 			
 			
 			var res = DIVIDE(
@@ -1294,119 +1567,152 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 36204f55-92aa-45d3-846e-38ef4694b4bb
 
-	/// Measure meas.data_logs_user_new_terminations_regrettable.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_new_terminations_regrettable' = ```
-			
+
 			var tbl_perf_users = SUMMARIZE(users_history , users_history[_sys_user_id], "months", Count(users_history[_sys_doc_id]), "avg_perf_tier_num", AVERAGE(users_history[ci_perf_qtly_performance_tier_num])+ 0)
-			
-			var res = CALCULATE([meas.data_logs_user_new_terminations] , Filter(tbl_perf_users, [avg_perf_tier_num] >=2)) +0 
-			
+
+			var res = CALCULATE([meas.data_logs_user_new_terminations] , Filter(tbl_perf_users, [avg_perf_tier_num] >=2)) +0
+
 			return res
-			
-			
-			```
+
+
+	```
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: 64a5d1ae-0403-49d9-b03e-a8ef509b3d19
 
-	/// Measure meas.users_history_user_role_function_concat_w_count_eop.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_user_role_function_concat_w_count_eop' = ```
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
 			var applicable_rows_tbl = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-			
-			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <  toDate   && if(isblank([trueai_termination_date]), date(2100,1,1),[trueai_termination_date]) >=  toDate) // make sure we only include reps that are in the active 
-			
+
+			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <  toDate   && if(isblank([trueai_termination_date]), date(2100,1,1),[trueai_termination_date]) >=  toDate) // make sure we only include reps that are in the active
+
 			-- concats all the crm values for trueai value
-			
+
 			-- summarize the currect context and sort by count desc
 			var tbl_summarized = TOPN(10,SUMMARIZE(active_users_tbl, [trueai_user_role_function], [trueai_user_role_alias], "count", Count(users[_sys_doc_id]) ),[count], DESC)
-			
+
 			-- use the summarized data and concat
-			var str_crm_vals = CONCATENATEX(tbl_summarized, [trueai_user_role_function] & ": " & [trueai_user_role_alias] & " (" & [count]  & ")", ", ") 
-			
+			var str_crm_vals = CONCATENATEX(tbl_summarized, [trueai_user_role_function] & ": " & [trueai_user_role_alias] & " (" & [count]  & ")", ", ")
+
 			var res = str_crm_vals -- output string
 			return res
-			
-			
-			```
+
+
+	```
 		lineageTag: d413b1b6-88bb-4362-ba1f-b09ba6abc6ae
 
-	/// Measure meas.exp_rpts_all_avg_perf_tier.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.exp_rpts_all_avg_perf_tier' = ```
-			
-			 var calc = CALCULATE(AVERAGE(users_history[ci_perf_qtly_performance_tier_num]))
+
+			var calc = CALCULATE(AVERAGE(users_history[ci_perf_qtly_performance_tier_num]))
 			var res = if(isblank(calc), blank(),calc)
 			return res
-			```
+	```
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: ae176c1b-1966-4b3d-bbf0-fa4cbe7fc464
 
-	/// Measure meas.exp_rpts_last_year_avg_perf_tier.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.exp_rpts_last_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "LAST_YEAR")
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: 4cab50c1-511d-439f-89d3-669c0173ffcc
 
-	/// Measure meas.exp_rpts_prior_to_last_year_avg_perf_tier.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.exp_rpts_prior_to_last_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "PRIOR_TO_LAST_YEAR")
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: c7aef491-020f-4a36-abf4-ec5b554a1bfa
 
-	/// Measure meas.exp_rpts_current_year_avg_perf_tier.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.exp_rpts_current_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "CURRENT_YEAR")
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: db51bd07-3023-4d79-b5df-64359d2834ba
 
-	/// Measure meas.data_logs_user_count_all.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_count_all' = [meas.data_logs_user_count_eop_for_dept_mkt]+[meas.data_logs_user_count_eop_for_dept_nd]+[meas.data_logs_user_count_eop_for_dept_ops]+[meas.data_logs_user_count_eop_for_dept_other]+[meas.data_logs_user_count_eop_for_dept_sales]+[meas.data_logs_user_count_eop_for_dept_support]
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: bd7a4307-ed50-4555-bd87-089699d608ba
 
-	/// Measure meas.calibration_user_role_title.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.calibration_user_role_title' = "User Roles - " & [meas.prior_year] & " Full Calendar Year"
 		displayFolder: _rep_count_analysis
 		lineageTag: b46bd447-2ddc-4adc-a282-c0bd8c15171d
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_bookings_account_executive.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_executive' = ```
-			
+
 			var end_date =   [meas.companies_history_reference_date]
 			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
 			var res =  CALCULATE(AVERAGE(users_history[ci_perf_qtly_avg_bookings_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date, users_history[trueai_user_role]="Account Executive") // qtly number
 			return res * 4 // annual number
-			
-			```
+
+	```
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _perf_analysis
 		lineageTag: 03cf934b-81ba-444c-87f7-f0d6df3312dd
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_bookings_account_manager.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_manager' = ```
-			
+
 			var end_date =   [meas.companies_history_reference_date]
 			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
 			var res =  CALCULATE(AVERAGE(users_history[ci_perf_qtly_avg_bookings_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date, users_history[trueai_user_role]="Account Manager") // qtly number
 			return res * 4 // annual number
-			
-			```
+
+	```
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _perf_analysis
 		lineageTag: f48cadb1-b2f6-4fb7-ba35-e7ebc413f6c9
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_pipeline_created_sdr.
-	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created_sdr' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created_sdr' = 
 			
 			var end_date =   [meas.companies_history_reference_date]
 			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
@@ -1418,128 +1724,155 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.perf_consider_mrasure.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.perf_consider_mrasure' = "To be considered a Performer, a rep needs to fall within +/- 35% of AAB / AAPC"
 		displayFolder: _perf_analysis
 		lineageTag: e36df813-494b-4999-a2d5-0c02c594db11
 
-	/// Measure meas.calibration_department_title.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.calibration_department_title' = "Department - " & [meas.prior_year] & " Full Calendar Year"
 		displayFolder: _rep_count_analysis
 		lineageTag: 6f133e82-cd13-456d-ba5f-2bb46c770268
 
-	/// Measure meas.calibration_group_title.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.calibration_group_title' = "Group - " & [meas.prior_year] & " Full Calendar Year"
 		displayFolder: _rep_count_analysis
 		lineageTag: f1b13f39-437e-469b-977e-2ef145c2c495
 
-	/// Measure meas.data_logs_ci_perf_status.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.data_logs_ci_perf_status' = ```
-			
-			
+
+
 			-- get the dates
 			var end_date = CALCULATE(MAX(cal_end_dates[Date])) // get the mgmt current end date
 			var start_date = EDATE(end_date, -12) // get the start date from end_date
-			
-			
+
+
 			var perf_tier_num = CALCULATE(
-			    AVERAGE(
-			        users_history[ci_perf_qtly_performance_tier_num]
-			    ), 
-			    users_history[_sys_filt_end_date] > start_date && users_history[_sys_filt_end_date]<end_date
-			)  
-			var rounded_num = ROUNDUP(perf_tier_num, 0)
-			
-			RETURN 
-			SWITCH(
-			    TRUE(),
-			    rounded_num =1,  "Underperformer",
-			    rounded_num =2,  "Performer",                       // putting an condition to get the performance 
-			    rounded_num = 3, "Overperformer"
+			AVERAGE(
+			users_history[ci_perf_qtly_performance_tier_num]
+			),
+			users_history[_sys_filt_end_date] > start_date && users_history[_sys_filt_end_date]<end_date
 			)
-			```
+			var rounded_num = ROUNDUP(perf_tier_num, 0)
+
+			RETURN
+			SWITCH(
+			TRUE(),
+			rounded_num =1,  "Underperformer",
+			rounded_num =2,  "Performer",                       // putting an condition to get the performance
+			rounded_num = 3, "Overperformer"
+			)
+	```
 		displayFolder: _perf_analysis
 		lineageTag: a97b7deb-0320-4928-9344-62e8b0ac287e
 
-	/// Measure meas.data_logs_user_12_Mos_ci_perf_status.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.data_logs_user_12_Mos_ci_perf_status' = ```
-			
-			
+
+
 			-- get the dates
 			var end_date = [meas.last_date_of_previous_quarter] // get the mgmt current end date
 			var start_date = EDATE(end_date, -12) // get the start date from end_date
-			
-			
+
+
 			var perf_tier_num = CALCULATE(
-			    AVERAGE(
-			        users_history[ci_perf_qtly_performance_tier_num]
-			    ), 
-			    cal_end_dates[Date] >= start_date && cal_end_dates[Date] <= end_date        // get the avg of qrtly perf tier number
-			)  
+			AVERAGE(
+			users_history[ci_perf_qtly_performance_tier_num]
+			),
+			cal_end_dates[Date] >= start_date && cal_end_dates[Date] <= end_date        // get the avg of qrtly perf tier number
+			)
 			var rounded_num = ROUND(perf_tier_num, 0)           // rounding the avg number with o decimal point
-			
+
 			var ramp_status = [meas.data_logs_users_ramping_status]
-			
+
 			RETURN
-			 IF(
-			    MAX(users[trueai_user_role_department])<>"SALES",
-			    "Not in Sales Team",        // result if the user not in sales team
-			    IF(
-			        MAX(users[trueai_user_role_department])="SALES" && ramp_status="Ramping",
-			        "Ramping",          // if the ci_perf_ramping status is ramping then user status 
-			        IF(
-			            MAX(users[trueai_user_role_department])="SALES" && ramp_status ="Ramped",
-			            SWITCH(
-			                TRUE(),
-			                rounded_num =1 ,  "Underperformer",
-			                rounded_num =2 ,  "Performer",                       // putting an condition to get the performance 
-			                rounded_num = 3 , "Overperformer",
-			                "N/A"
-			            )
-			        )
-			    )
-			 )
-			```
+			IF(
+			MAX(users[trueai_user_role_department])<>"SALES",
+			"Not in Sales Team",        // result if the user not in sales team
+			IF(
+			MAX(users[trueai_user_role_department])="SALES" && ramp_status="Ramping",
+			"Ramping",          // if the ci_perf_ramping status is ramping then user status
+			IF(
+			MAX(users[trueai_user_role_department])="SALES" && ramp_status ="Ramped",
+			SWITCH(
+			TRUE(),
+			rounded_num =1 ,  "Underperformer",
+			rounded_num =2 ,  "Performer",                       // putting an condition to get the performance
+			rounded_num = 3 , "Overperformer",
+			"N/A"
+			)
+			)
+			)
+			)
+	```
 		displayFolder: _perf_analysis
 		lineageTag: 7866caef-955b-4d57-9415-64d9df49695c
 
-	/// Measure meas.data_logs_user_count_rep_eop.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_count_rep_eop' = ```
-			
-			
+
+
 			var end_date = CALCULATE(MAX(cal_end_dates[Date])) // getting the latest date from the cal_end_date(perio_last_date)
 			var start_date = EDATE(end_date, -12) // get the start date from end_date
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
 			var applicable_rows_tbl = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-			
-			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) >=  toDate) // make sure we only include reps that are in the active 
-			
-			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
-			
+
+			var active_users_tbl =  filter(applicable_rows_tbl, [trueai_hire_date] <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) >=  toDate) // make sure we only include reps that are in the active
+
+			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context
+
 			return res // return the res :)
-			```
+	```
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: aa4e48f7-647a-4d50-ae41-06df2fbef33f
 
-	/// Measure meas.ramping_reps_details_title.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.ramping_reps_details_title' = "Ramping Reps -   " & [meas.step_owner_user_role_aliased]
 		displayFolder: _ramp_analysis
 		lineageTag: 2ab3c61d-7f9a-43c9-9555-deafb52b42f8
 
-	/// Measure meas.reps_w_time_allocation_prospecting_count.
-	measure 'meas.reps_w_time_allocation_prospecting_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.reps_w_time_allocation_prospecting_count' = 
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_prospecting])>0)
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: b9a4709c-76f5-444a-93e1-043c6fba0ff5
 
-	/// Measure meas.reps_w_time_allocation_prospecting_pct.
-	measure 'meas.reps_w_time_allocation_prospecting_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.reps_w_time_allocation_prospecting_pct' = 
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_prospecting_count]
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]))
@@ -1550,16 +1883,22 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 95eb85ee-1b16-496a-b04a-aa3042687603
 
-	/// Measure meas.reps_w_time_allocation_new_logo_count.
-	measure 'meas.reps_w_time_allocation_new_logo_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.reps_w_time_allocation_new_logo_count' = 
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_new_logo])>0)
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: dff9104a-517d-4d51-b63b-64e65bacf531
 
-	/// Measure meas.reps_w_time_allocation_new_logo_pct.
-	measure 'meas.reps_w_time_allocation_new_logo_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.reps_w_time_allocation_new_logo_pct' = 
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_new_logo_count]
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]))
@@ -1570,8 +1909,11 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 59a3a1e0-40af-42fd-8513-123844687a12
 
-	/// Measure meas.reps_w_time_allocation_prospect_pct.
-	measure 'meas.reps_w_time_allocation_prospect_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.reps_w_time_allocation_prospect_pct' = 
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_count]
 			var reps_tot = [meas.ssr_history_reps_prospecting]
@@ -1582,16 +1924,22 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: c95cc6f4-094d-425d-8174-a1e11580c6ff
 
-	/// Measure meas.reps_all_time_allocation_count.
-	measure 'meas.reps_all_time_allocation_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.reps_all_time_allocation_count' = 
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]))
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: aa4c3717-11a2-45fc-b083-3d1126f1fc90
 
-	/// Measure meas.data_logs_user_rep_mgr_ratio_updated.
-	measure 'meas.data_logs_user_rep_mgr_ratio_updated' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.data_logs_user_rep_mgr_ratio_updated' = 
 			
 			VAR _total_role = CALCULATE(
 			    [meas.data_logs_user_count_eop], // get the necessary count filtering role dept
@@ -1609,57 +1957,66 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 12898c88-6b57-432c-b8f8-c7a8c8bbb2c4
 
-	/// Measure meas.data_logs_users_tenure.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.data_logs_users_tenure' = ```
-			
+
 			-- get the dates
 			var end_date = [meas.last_date_of_previous_quarter]
 			var start_date = EDATE(end_date, -12) // get the start date from end_date
-			
-			
-			
+
+
+
 			var tenure_status =CALCULATE(
-			    MAX(
-			        users_history[trueai_tenure]
-			    ), 
-			    cal_end_dates[Date] >= start_date && cal_end_dates[Date] <= end_date        // get the avg of qrtly perf tier number
-			)  
-			
-			
+			MAX(
+			users_history[trueai_tenure]
+			),
+			cal_end_dates[Date] >= start_date && cal_end_dates[Date] <= end_date        // get the avg of qrtly perf tier number
+			)
+
+
 			RETURN
 			tenure_status
-			```
+	```
 		formatString: #,##0" Mos."
 		displayFolder: _perf_analysis
 		lineageTag: 65db4a01-5803-4f39-b98e-2d3164d16f6d
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_users_ramping_status.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.data_logs_users_ramping_status' = ```
-			
+
 			-- get the dates
 			var end_date = [meas.last_date_of_previous_quarter]
 			var start_date = EDATE(end_date, -12) // get the start date from end_date
-			
-			
-			
+
+
+
 			var _status =CALCULATE(
-			    MAX(
-			        users_history[ci_perf_ramping_status]
-			    ), 
-			    cal_end_dates[Date] = end_date        // get the avg of qrtly perf tier number
-			)  
-			
-			
+			MAX(
+			users_history[ci_perf_ramping_status]
+			),
+			cal_end_dates[Date] = end_date        // get the avg of qrtly perf tier number
+			)
+
+
 			RETURN
 			_status
-			```
+	```
 		displayFolder: _perf_analysis
 		lineageTag: a73a5ff6-d27e-40cf-b459-57c7e93a4a0e
 
-	/// Measure meas.users_history_ci_time_alloca_avg_existing_cust_selling.
-	measure 'meas.users_history_ci_time_alloca_avg_existing_cust_selling' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_history_ci_time_alloca_avg_existing_cust_selling' = 
 			
 			CALCULATE(
 			    AVERAGE(
@@ -1671,8 +2028,11 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_time_allocation_confidence.
-	measure 'meas.users_history_time_allocation_confidence' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_history_time_allocation_confidence' = 
 			
 			var avg_value = AVERAGE(users_history[ci_time_alloc_conf])    // get the avg of ci time allocation confidence
 			
@@ -1682,217 +2042,247 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_time_allocation_confidence_status.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.users_history_time_allocation_confidence_status' = ```
-			
-			
+
+
 			var _conf = ROUND(AVERAGE(users_history[ci_time_alloc_conf]),2)*100    // get the avg of ci time allocation confidence
-			
-			var _status_ = 
-			    IF(
-			    _conf >= 0 && _conf <= 49, 1,
-			        IF(
-			            _conf >=50 && _conf <= 74, 2,
-			            IF(
-			                _conf >=75 && _conf <= 84, 3,
-			                IF(
-			                    _conf >=85 && _conf <= 94, 4,
-			                    5
-			                )
-			            )
-			        )
-			)
-			
-			
-			
-			RETURN 
+
+			var _status_ =
 			IF(
-			    _conf <>0,
-			    _status_
+			_conf >= 0 && _conf <= 49, 1,
+			IF(
+			_conf >=50 && _conf <= 74, 2,
+			IF(
+			_conf >=75 && _conf <= 84, 3,
+			IF(
+			_conf >=85 && _conf <= 94, 4,
+			5
 			)
-			
-			```
+			)
+			)
+			)
+
+
+
+			RETURN
+			IF(
+			_conf <>0,
+			_status_
+			)
+
+	```
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: ebe06221-1ce3-4e18-9db4-d9701923fee8
 
-	/// Measure meas.time_allocation_confidence.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.time_allocation_confidence' = ```
-			
-			
+
+
 			var _conf = ROUND(AVERAGE(users_history[ci_time_alloc_conf]),2)*100    // get the avg of ci time allocation confidence
-			
-			var _status_ = 
-			    IF(
-			    _conf >= 0 && _conf <= 49, "Limited",
-			        IF(
-			            _conf >=50 && _conf <= 74, "Fair",
-			            IF(
-			                _conf >=75 && _conf <= 84, "Good",
-			                IF(
-			                    _conf >=85 && _conf <= 94, "Great",
-			                    "Excellent"
-			                )
-			            )
-			        )
-			)
-			
-			
-			
-			RETURN 
+
+			var _status_ =
 			IF(
-			    _conf <>0,
-			    _status_ & " (" & _conf & ")"  // Convert _conf to integer text format
+			_conf >= 0 && _conf <= 49, "Limited",
+			IF(
+			_conf >=50 && _conf <= 74, "Fair",
+			IF(
+			_conf >=75 && _conf <= 84, "Good",
+			IF(
+			_conf >=85 && _conf <= 94, "Great",
+			"Excellent"
 			)
-			
-			```
+			)
+			)
+			)
+
+
+
+			RETURN
+			IF(
+			_conf <>0,
+			_status_ & " (" & _conf & ")"  // Convert _conf to integer text format
+			)
+
+	```
 		displayFolder: _acl_ta_analysis
 		lineageTag: 30522698-ba19-4d59-a3c0-a10e54a3a4ae
 
-	/// Measure meas.peek_inside_text_supports_aab.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.peek_inside_text_supports_aab' = "AAB"
 		displayFolder: _helper
 		lineageTag: 43c5b6e1-ce31-496d-8af8-614ac968bdde
 
-	/// Measure meas.peek_inside_text_supports_aapc.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.peek_inside_text_supports_aapc' = "AAPC"
 		displayFolder: _helper
 		lineageTag: 22918bb7-2e2d-4dfd-98b3-17eb6b7a6c9b
 
-	/// Measure meas.peek_inside_text_supports_ramping_time.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.peek_inside_text_supports_ramping_time' = "Ramping Time"
 		displayFolder: _helper
 		lineageTag: ffd6401d-0cfb-4cf4-bcb1-a7739b744def
 
-	/// Measure meas.peek_inside_text_supports_trueai_reference_date.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.peek_inside_text_supports_trueai_reference_date' = "TrueAI Reference Date"
 		displayFolder: _helper
 		lineageTag: 2bda97e6-525d-43bf-9132-5dac7a60b10b
 
-	/// Measure meas.users_history_r2_bg_color.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.users_history_r2_bg_color' = ```
-			
+
 			var pros_r2 = [meas.quality_bucket__prospecting_r2]
 			var new_r2 = [meas.quality_bucket__new_logo_r2]
 			var post_r2 = [meas.quality_bucket_post_sales_r2]
 			var exist_r2 = [meas.quality_bucket_existing_customer_selling_r2]
-			
+
 			var step_name = CALCULATE(MAX(ssr_history[step_name]))
-			
+
 			var res = SWITCH(
-			    TRUE(),
-			    step_name = "Prospecting" || step_name = "Untouched" ,pros_r2,
-			    step_name = "New Logo Selling", new_r2,
-			    step_name = "Post-Sales Support", post_r2,
-			    step_name = "Existing Customer Selling", exist_r2
+			TRUE(),
+			step_name = "Prospecting" || step_name = "Untouched" ,pros_r2,
+			step_name = "New Logo Selling", new_r2,
+			step_name = "Post-Sales Support", post_r2,
+			step_name = "Existing Customer Selling", exist_r2
 			)
-			
-			
+
+
 			var _conf = ROUND(res,2)*100    // get the rounded r2 score
-			
-			var _status_ = 
-			    IF(
-			    _conf >= 0 && _conf <= 49, 1,
-			        IF(
-			            _conf >=50 && _conf <= 74, 2,
-			            IF(
-			                _conf >=75 && _conf <= 84, 3,
-			                IF(
-			                    _conf >=85 && _conf <= 94, 4,
-			                    5
-			                )
-			            )
-			        )
-			)
-			
-			
-			
-			RETURN 
+
+			var _status_ =
 			IF(
-			    _conf <>0,
-			    _status_
+			_conf >= 0 && _conf <= 49, 1,
+			IF(
+			_conf >=50 && _conf <= 74, 2,
+			IF(
+			_conf >=75 && _conf <= 84, 3,
+			IF(
+			_conf >=85 && _conf <= 94, 4,
+			5
 			)
-			```
+			)
+			)
+			)
+
+
+
+			RETURN
+			IF(
+			_conf <>0,
+			_status_
+			)
+	```
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: b9a6f5fd-0e8e-4a17-99f6-68bb6955b805
 
-	/// Measure meas.users_history_auc_bg_color.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.users_history_auc_bg_color' = ```
-			
+
 			var pros_auc = [meas.quality_bucket_prospecting_auc]
 			var new_auc = [meas.quality_bucket_new_logo_auc]
 			var post_auc = [meas.quality_bucket_post_sales_auc]
 			var exist_auc = [meas.quality_bucket_existing_customer_selling_auc]
-			
+
 			var step_name = CALCULATE(MAX(ssr_history[step_name]))
-			
+
 			var res = SWITCH(
-			    TRUE(),
-			    step_name = "Prospecting" || step_name = "Untouched" ,pros_auc,
-			    step_name = "New Logo Selling", new_auc,
-			    step_name = "Post-Sales Support", post_auc,
-			    step_name = "Existing Customer Selling", exist_auc
+			TRUE(),
+			step_name = "Prospecting" || step_name = "Untouched" ,pros_auc,
+			step_name = "New Logo Selling", new_auc,
+			step_name = "Post-Sales Support", post_auc,
+			step_name = "Existing Customer Selling", exist_auc
 			)
-			
-			
+
+
 			var _conf = ROUND(res,2)*100    // get the rounded r2 score
-			
-			var _status_ = 
-			    IF(
-			    _conf >= 0 && _conf <= 49, 1,
-			        IF(
-			            _conf >=50 && _conf <= 74, 2,
-			            IF(
-			                _conf >=75 && _conf <= 84, 3,
-			                IF(
-			                    _conf >=85 && _conf <= 94, 4,
-			                    5
-			                )
-			            )
-			        )
-			)
-			
-			
-			
-			RETURN 
+
+			var _status_ =
 			IF(
-			    _conf <>0,
-			    _status_
+			_conf >= 0 && _conf <= 49, 1,
+			IF(
+			_conf >=50 && _conf <= 74, 2,
+			IF(
+			_conf >=75 && _conf <= 84, 3,
+			IF(
+			_conf >=85 && _conf <= 94, 4,
+			5
 			)
-			```
+			)
+			)
+			)
+
+
+
+			RETURN
+			IF(
+			_conf <>0,
+			_status_
+			)
+	```
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: ebc1dec3-4c25-49a1-b757-cc84b583ae72
 
-	/// Measure meas.users_history_avg_act_capt_lvl.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_avg_act_capt_lvl' = ```
-			
-			 var _min_date = [meas.context_date_min]        // get the context min date
-			 var _max_date = [meas.context_date_max]        // get the context max date 
-			
+
+			var _min_date = [meas.context_date_min]        // get the context min date
+			var _max_date = [meas.context_date_max]        // get the context max date
+
 			var rep_tbl = CALCULATETABLE(
-			    users_history,
-			    cal_end_dates[Date] >= _min_date && cal_end_dates[Date] <= _max_date
+			users_history,
+			cal_end_dates[Date] >= _min_date && cal_end_dates[Date] <= _max_date
 			)
-			
+
 			var res = CALCULATE(
-			    AVERAGEX(
-			        rep_tbl,
-			        users_history[ci_act_capt_lvl]
-			    )
+			AVERAGEX(
+			rep_tbl,
+			users_history[ci_act_capt_lvl]
 			)
-			
+			)
+
 			RETURN
 			res
-			```
+	```
 		displayFolder: _acl_ta_analysis
 		lineageTag: 3b0377cc-1f96-47ec-95c0-2878eb5243bd
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_prospecting.
-	measure 'meas.users_history_ci_time_alloca_avg_prospecting' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.users_history_ci_time_alloca_avg_prospecting' = 
 			
 			CALCULATE(
 			    AVERAGE(
@@ -1903,8 +2293,11 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: 363287f9-8e11-4afb-a36a-636b9f8eb0c9
 
-	/// Measure meas.users_history_ci_time_alloca_avg_new_logo_selling.
-	measure 'meas.users_history_ci_time_alloca_avg_new_logo_selling' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_history_ci_time_alloca_avg_new_logo_selling' = 
 			
 			CALCULATE(
 			    AVERAGE(
@@ -1916,8 +2309,11 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_post_sales_support.
-	measure 'meas.users_history_ci_time_alloca_avg_post_sales_support' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_history_ci_time_alloca_avg_post_sales_support' = 
 			
 			CALCULATE(
 			    AVERAGE(
@@ -1929,8 +2325,11 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_internel.
-	measure 'meas.users_history_ci_time_alloca_avg_internel' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_history_ci_time_alloca_avg_internel' = 
 			
 			CALCULATE(
 			    AVERAGE(
@@ -1942,8 +2341,11 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.reps_without_act_lvl_count.
-	measure 'meas.reps_without_act_lvl_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.reps_without_act_lvl_count' = 
 			
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]), users_history[ci_act_capt_lvl]=BLANK())
 			RETURN
@@ -1952,8 +2354,11 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 823b6167-9d31-4002-92a5-8ef055257123
 
-	/// Measure meas.reps_without_act_lvl_pct.
-	measure 'meas.reps_without_act_lvl_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.reps_without_act_lvl_pct' = 
 			
 			var reps_w_acl = [meas.reps_without_act_lvl_count]
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]))
@@ -1964,8 +2369,11 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: b4f7597e-76a9-497e-9c04-10bad1c384ba
 
-	/// Measure meas.reps_has_ci_act_capt_lvl.
-	measure 'meas.reps_has_ci_act_capt_lvl' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.reps_has_ci_act_capt_lvl' = 
 			
 			
 			var res=IF(
@@ -1979,8 +2387,11 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: f7c7a23d-abf3-4d19-83f8-b9268e8cd6cb
 
-	/// Measure meas.ci_act_capt_lvl_pi_owner_act.
-	measure 'meas.ci_act_capt_lvl_pi_owner_act' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.ci_act_capt_lvl_pi_owner_act' = 
 			
 			var _prospect_count = SUM(users_history[ci_act_capt_lvl_pi_prospecting_owner_act])
 			var _new_logo_count = SUM(users_history[ci_act_capt_lvl_pi_new_logo_owner_act])
@@ -1992,8 +2403,11 @@ table users_history
 		formatString: 0
 		lineageTag: a9dc1dca-80f1-4459-bf59-70b7dc8b07fe
 
-	/// Measure meas.underperformer_annual_avg.
-	measure 'meas.underperformer_annual_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.underperformer_annual_avg' = 
 			
 			CALCULATE(
 			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the under performer annual average
@@ -2005,8 +2419,11 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.performer_annual_avg.
-	measure 'meas.performer_annual_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.performer_annual_avg' = 
 			
 			CALCULATE(
 			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the performer annual average
@@ -2018,8 +2435,11 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.overperformer_annual_avg.
-	measure 'meas.overperformer_annual_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.overperformer_annual_avg' = 
 			
 			CALCULATE(
 			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the over performer annual average
@@ -2031,8 +2451,11 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.min_user_role_alias.
-	measure 'meas.min_user_role_alias' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.min_user_role_alias' = 
 			
 			MINX(
 			    VALUES(users_history[trueai_user_role_alias]),

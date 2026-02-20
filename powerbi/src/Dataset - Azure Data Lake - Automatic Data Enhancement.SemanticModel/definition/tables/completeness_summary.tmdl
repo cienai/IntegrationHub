@@ -2,20 +2,20 @@
 table completeness_summary
 	lineageTag: 3fb477da-2334-4131-be85-e28100904333
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Measures: [crm_completeness].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.crm_completeness_score_display' = CALCULATE(AVERAGE([crm_completeness])  * 100)
 		formatString: 0
 		displayFolder: _completeness_score
 		lineageTag: 25d350dc-3b66-4cb2-83ae-59852cd3198b
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.trueai_completeness_score' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.trueai_completeness_score' = 
 			
 			var _before_score = [meas.crm_completeness_score_display]               // get the crm score(before)
 			var _after_score = CALCULATE(AVERAGE([trueai_completeness])  * 100)             // get the after score
@@ -32,11 +32,11 @@ table completeness_summary
 		displayFolder: _completeness_score
 		lineageTag: 220faaec-56c9-48ef-870f-4244580439c6
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.crm_completeness_score_industry_avg' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.crm_completeness_score_industry_avg' = 
 			
 			var _score = CALCULATE(
 			    MAX(metadata_reference_values[value]),
@@ -49,94 +49,94 @@ table completeness_summary
 		displayFolder: _completeness_score
 		lineageTag: 295be6f7-5568-467e-ada1-cb24b46e2ed9
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_completeness], [trueai_completeness].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.trueai_completeness_improvement' = ```
-			
+
 			var crmval = CALCULATE(AVERAGE([crm_completeness]))
 			var aival = CALCULATE(AVERAGE([trueai_completeness]))
-			var impro = Divide(aival - crmval, crmval) 
+			var impro = Divide(aival - crmval, crmval)
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
-			return res 
-			
-			```
+			return res
+
+	```
 		displayFolder: _completeness_score
 		lineageTag: 8cf3d72c-fedc-4ef5-970d-57580fe4ba53
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_completeness_geo], [trueai_completeness_geo].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0%;-0%;0%
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.trueai_completeness_geo_improvement' = ```
-			
+
 			var crmval = CALCULATE(AVERAGE([crm_completeness_geo]))
 			var aival = CALCULATE(AVERAGE([trueai_completeness_geo]))
-			var impro = Divide(aival - crmval, crmval) 
+			var impro = Divide(aival - crmval, crmval)
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
-			return res 
-			
-			```
+			return res
+
+	```
 		formatString: 0%;-0%;0%
 		displayFolder: _completeness_score
 		lineageTag: 8f49df2a-bdc7-43e0-aa92-36030435c286
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_completeness_marketing], [trueai_completeness_marketing].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0%;-0%;0%
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.trueai_completeness_marketing_improvement' = ```
-			
+
 			var crmval = CALCULATE(AVERAGE([crm_completeness_marketing]))
 			var aival = CALCULATE(AVERAGE([trueai_completeness_marketing]))
-			var impro = Divide(aival - crmval, crmval) 
+			var impro = Divide(aival - crmval, crmval)
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
-			return res 
-			
-			```
+			return res
+
+	```
 		formatString: 0%;-0%;0%
 		displayFolder: _completeness_score
 		lineageTag: 82d8b5b9-38ea-4989-9adf-d76ea2f2af22
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_completeness_contact], [trueai_completeness_contact].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.trueai_completeness_contact_improvement' = ```
-			
+
 			var crmval = CALCULATE(AVERAGE([crm_completeness_contact]))
 			var aival = CALCULATE(AVERAGE([trueai_completeness_contact]))
-			var impro = Divide(aival - crmval, crmval) 
+			var impro = Divide(aival - crmval, crmval)
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
-			return res 
-			
-			```
+			return res
+
+	```
 		displayFolder: _completeness_score
 		lineageTag: 7cf2b251-0b10-4d7d-ada9-772238f7d953
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_completeness_contact_method], [trueai_completeness_contact_method].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0%;-0%;0%
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.trueai_completeness_contact_method_improvement' = ```
-			
+
 			var crmval = CALCULATE(AVERAGE([crm_completeness_contact_method]))
 			var aival = CALCULATE(AVERAGE([trueai_completeness_contact_method]))
-			var impro = Divide(aival - crmval, crmval) 
+			var impro = Divide(aival - crmval, crmval)
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
-			return res 
-			
-			```
+			return res
+
+	```
 		formatString: 0%;-0%;0%
 		displayFolder: _completeness_score
 		lineageTag: 770b89c9-ad28-48c3-8957-004b46ed2d56
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: +#%;-#%;0%
-	measure 'meas.trueai_completeness_score_improvement' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.trueai_completeness_score_improvement' = 
 			
 			var trueai_score = ROUND([meas.trueai_completeness_score],2)
 			var crm_score = ROUND([meas.crm_completeness_score_display],2)

@@ -2,32 +2,38 @@
 table users_activities
 	lineageTag: fb2d1c4a-d460-4eb9-94bd-25ddedeb3f9c
 
-	/// Measure meas.act_capt_lvl_adj_total_eng_dur_hr.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.act_capt_lvl_adj_total_eng_dur_hr' = ```
-			
-			
+
+
 			var act_capt_lvl_adj  = CALCULATE(
-			    SUMX(
-			        users_activities, 
-			        users_activities[trueai_adj_eng_dur]
-			    )   // sum adj. duration 
+			SUMX(
+			users_activities,
+			users_activities[trueai_adj_eng_dur]
+			)   // sum adj. duration
 			)
-			
+
 			var res = DIVIDE(
-			    act_capt_lvl_adj,
-			    3600
+			act_capt_lvl_adj,
+			3600
 			)
-			RETURN 
+			RETURN
 			res
-			```
+	```
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 5a1cc8ee-8722-453e-a3bc-109bfb86222d
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.act_capt_lvl_reps_all_count.
-	measure 'meas.act_capt_lvl_reps_all_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.act_capt_lvl_reps_all_count' = 
 			CALCULATE(
 			    COUNT(
 			        users_activities[_sys_user_id]      // get the count of the users
@@ -37,22 +43,28 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 3aec840e-5730-46b3-a256-0725ff6e0d42
 
-	/// Measure meas.act_capt_lvl_reps_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.act_capt_lvl_reps_count' = ```
-			
+
 			var res = CALCULATE(
-			    [meas.act_capt_lvl_reps_all_count], 
-			    users_activities[trueai_owner_act_capt_lvl] > 0.4 // get the users/reps count owner_capt_lvl greater than 0.4
+			[meas.act_capt_lvl_reps_all_count],
+			users_activities[trueai_owner_act_capt_lvl] > 0.4 // get the users/reps count owner_capt_lvl greater than 0.4
 			)
-			RETURN 
+			RETURN
 			res
-			```
+	```
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: b1d73a7c-accc-49b5-bcb8-b555e0f014a1
 
-	/// Measure meas.act_capt_lvl_adj_dur_per_reps.
-	measure 'meas.act_capt_lvl_adj_dur_per_reps' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.act_capt_lvl_adj_dur_per_reps' = 
 			
 			var reps_count = [meas.act_capt_lvl_reps_count]
 			var adj_dur = [meas.act_capt_lvl_adj_total_dur_hr]
@@ -68,8 +80,11 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_eng_dur_per_reps.
-	measure 'meas.act_capt_lvl_adj_eng_dur_per_reps' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.act_capt_lvl_adj_eng_dur_per_reps' = 
 			
 			var reps_count = [meas.act_capt_lvl_reps_count]
 			var adj_dur = [meas.act_capt_lvl_adj_total_eng_dur_hr]
@@ -85,8 +100,11 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_non_eng_dur_per_reps.
-	measure 'meas.act_capt_lvl_adj_non_eng_dur_per_reps' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.act_capt_lvl_adj_non_eng_dur_per_reps' = 
 			
 			var _adjtot_dur = [meas.act_capt_lvl_adj_dur_per_reps]
 			var _eng_dur = [meas.act_capt_lvl_adj_eng_dur_per_reps]
@@ -103,24 +121,30 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_total_non_eng_dur_hr.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.act_capt_lvl_adj_total_non_eng_dur_hr' = ```
-			
-			
+
+
 			var _adj_tot_dur = [meas.act_capt_lvl_adj_total_dur_hr]
-			var _eng_tot_dur = [meas.act_capt_lvl_adj_total_eng_dur_hr]     // get the non-eng duration / the difference between by substration 
+			var _eng_tot_dur = [meas.act_capt_lvl_adj_total_eng_dur_hr]     // get the non-eng duration / the difference between by substration
 			var res = (_adj_tot_dur-_eng_tot_dur)
-			RETURN 
+			RETURN
 			res
-			```
+	```
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 3734d695-d5f3-4c05-97fb-33803f44371b
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.act_capt_lvl_reps_count_pct.
-	measure 'meas.act_capt_lvl_reps_count_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.act_capt_lvl_reps_count_pct' = 
 			
 			var _tot_reps_count = [meas.act_capt_lvl_reps_all_count]        // get the all reps/users count
 			var _reps_count = [meas.act_capt_lvl_reps_count]                // get the reps/users count act_capt_lvl greater than 0.4
@@ -135,49 +159,58 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: fe446259-6784-46e4-bee3-43279a4ee0be
 
-	/// Measure meas.act_capt_lvl_trueai_total_dur_hr.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.act_capt_lvl_trueai_total_dur_hr' = ```
-			
-			
+
+
 			var _trueai_dur  = CALCULATE(
-			    SUMX(
-			        users_activities, 
-			        users_activities[trueai_dur]        // get the sum of truai_dur 
-			    )
+			SUMX(
+			users_activities,
+			users_activities[trueai_dur]        // get the sum of truai_dur
 			)
-			
+			)
+
 			var res = DIVIDE(
-			    _trueai_dur,
-			    3600
+			_trueai_dur,
+			3600
 			)
-			RETURN 
+			RETURN
 			res
-			```
+	```
 		displayFolder: _act_capt_lvl
 		lineageTag: 56919be7-90fe-4d0f-9a1b-1b9b70c66ea1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_trueai_dur_per_reps.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.act_capt_lvl_trueai_dur_per_reps' = ```
-			
+
 			var reps_count = [meas.act_capt_lvl_reps_count]     // get the reps/users count act_capt_lvl greater than 0.4
-			var adj_dur = [meas.act_capt_lvl_trueai_total_dur_hr]       // get the total dur 
-			
+			var adj_dur = [meas.act_capt_lvl_trueai_total_dur_hr]       // get the total dur
+
 			var res = DIVIDE(
-			    adj_dur,
-			    reps_count      // get the difference
+			adj_dur,
+			reps_count      // get the difference
 			)
 			RETURN
 			res
-			```
+	```
 		displayFolder: _act_capt_lvl
 		lineageTag: d99d0f9b-25cb-4df0-ab62-eaa3060d46cb
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_avg_capture_adj_factor.
-	measure 'meas.act_capt_lvl_avg_capture_adj_factor' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.act_capt_lvl_avg_capture_adj_factor' = 
 			
 			CALCULATE(
 			    AVERAGE(
@@ -189,8 +222,11 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_avg_prep_factor.
-	measure 'meas.act_capt_lvl_avg_prep_factor' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.act_capt_lvl_avg_prep_factor' = 
 			
 			CALCULATE(
 			    AVERAGE(
@@ -202,32 +238,38 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_total_dur_hr.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.act_capt_lvl_adj_total_dur_hr' = ```
-			
-			
+
+
 			var act_capt_lvl_adj  = CALCULATE(
-			    SUMX(
-			        users_activities, 
-			        users_activities[trueai_adj_dur]        // sum of the adj. duration
-			    )
+			SUMX(
+			users_activities,
+			users_activities[trueai_adj_dur]        // sum of the adj. duration
 			)
-			
+			)
+
 			var res = DIVIDE(
-			    act_capt_lvl_adj,
-			    3600
+			act_capt_lvl_adj,
+			3600
 			)
-			RETURN 
+			RETURN
 			res
-			```
+	```
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 545ac815-9222-429f-a470-4c9b680a9366
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.act_capt_lvl_bar_date_filter.
-	measure 'meas.act_capt_lvl_bar_date_filter' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.act_capt_lvl_bar_date_filter' = 
 			
 			var _min_date = [meas.context_date_min]         // get the screen min date from slicer
 			var _max_date = [meas.context_date_max]         // get the screen max date from the slicer
@@ -245,8 +287,11 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 76b901f4-e8d2-426f-9790-a30d3e7a2717
 
-	/// Measure meas.act_capt_lvl_reps_all_distinct_count.
-	measure 'meas.act_capt_lvl_reps_all_distinct_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.act_capt_lvl_reps_all_distinct_count' = 
 			CALCULATE(
 			    DISTINCTCOUNT(
 			        users_activities[_sys_user_id]      // get the distinct count of the users
@@ -256,8 +301,11 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 6cebb7de-b574-496d-aa40-cc0140e390bd
 
-	/// Measure meas.act_capt_lvl_reps_distinct_count.
-	measure 'meas.act_capt_lvl_reps_distinct_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.act_capt_lvl_reps_distinct_count' = 
 			CALCULATE(
 			    DISTINCTCOUNT(
 			        users_activities[_sys_user_id]      // get the distinct count of the users
@@ -268,8 +316,11 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 90d9e0c7-f44d-4bbd-af85-06d9abf127ce
 
-	/// Measure meas.users_activities_trueai_email_count.
-	measure 'meas.users_activities_trueai_email_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.users_activities_trueai_email_count' = 
 			
 			CALCULATE(
 			    SUM(users_activities[trueai_type_auto_email_count])
@@ -278,8 +329,11 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 14a0bbf4-0d9b-4108-b92a-8b501be0c185
 
-	/// Measure meas.users_activities_trueai_email_dur.
-	measure 'meas.users_activities_trueai_email_dur' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_activities_trueai_email_dur' = 
 			
 			
 			var _dur = CALCULATE(
@@ -295,8 +349,11 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_call_count.
-	measure 'meas.users_activities_trueai_call_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.users_activities_trueai_call_count' = 
 			
 			CALCULATE(
 			    sum(users_activities[trueai_type_call_count])
@@ -305,8 +362,11 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 583a0940-97a3-43cc-8626-a6a72e3668c0
 
-	/// Measure meas.users_activities_trueai_call_dur.
-	measure 'meas.users_activities_trueai_call_dur' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_activities_trueai_call_dur' = 
 			
 			
 			var _dur = CALCULATE(
@@ -322,8 +382,11 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_social_count.
-	measure 'meas.users_activities_trueai_social_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.users_activities_trueai_social_count' = 
 			
 			CALCULATE(
 			    sum(users_activities[trueai_type_social_count])
@@ -332,8 +395,11 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: ac7f3891-0901-4135-8ecc-e0dade833dfb
 
-	/// Measure meas.users_activities_trueai_social_dur.
-	measure 'meas.users_activities_trueai_social_dur' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_activities_trueai_social_dur' = 
 			
 			
 			var _dur = CALCULATE(
@@ -349,59 +415,68 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_history_ci_act_capt_lvl_latest_month.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_ci_act_capt_lvl_latest_month' = ```
-			
+
 			var latest_row  = CALCULATETABLE(TOPN(1,users_history, users_history[_sys_filt_end_date], DESC))  // get the latest row
 			VAR latest_date = MAXX(latest_row, users_history[_sys_filt_end_date])       //Extract the latest date
-			
-			VAR previous_month_row = 
-			    CALCULATETABLE(
-			        users_history,
-			        users_history[_sys_filt_end_date] >= EOMONTH(latest_date, -2) + 1, 
-			        users_history[_sys_filt_end_date] <= EOMONTH(latest_date, -1)
-			    )  // Get rows from the previous month
-			
+
+			VAR previous_month_row =
+			CALCULATETABLE(
+			users_history,
+			users_history[_sys_filt_end_date] >= EOMONTH(latest_date, -2) + 1,
+			users_history[_sys_filt_end_date] <= EOMONTH(latest_date, -1)
+			)  // Get rows from the previous month
+
 			VAR res = AVERAGEX(previous_month_row, users_history[ci_act_capt_lvl])
-			
+
 			RETURN
 			res
-			```
+	```
 		displayFolder: _act_capt_lvl
 		lineageTag: 14087102-69ba-4af7-aa1d-ae17dd6bd437
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_act_capt_lvl_most_latest_previous.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_ci_act_capt_lvl_most_latest_previous' = ```
-			
+
 			VAR latest_row = CALCULATETABLE(TOPN(1, users_history, users_history[_sys_filt_end_date], DESC))  // Get the latest row
-			
+
 			VAR latest_date = MAXX(latest_row, users_history[_sys_filt_end_date])         //Extract the latest date from the latest row
-			
+
 			VAR one_month_back_start = EOMONTH(latest_date, -3) + 1         //Start of the month that is 1 month before the previous month
-			
+
 			VAR one_month_back_end = EOMONTH(latest_date, -2)               //End of that month
-			
-			VAR one_month_back_row = 
-			    CALCULATETABLE(
-			        users_history,
-			        users_history[_sys_filt_end_date] >= one_month_back_start,      // Get rows from the month 1 month before the previous month
-			        users_history[_sys_filt_end_date] <= one_month_back_end
-			    )  
-			
+
+			VAR one_month_back_row =
+			CALCULATETABLE(
+			users_history,
+			users_history[_sys_filt_end_date] >= one_month_back_start,      // Get rows from the month 1 month before the previous month
+			users_history[_sys_filt_end_date] <= one_month_back_end
+			)
+
 			VAR res = AVERAGEX(one_month_back_row, users_history[ci_act_capt_lvl])
-			
+
 			RETURN
 			res
-			```
+	```
 		displayFolder: _act_capt_lvl
 		lineageTag: 496440bc-039e-47a5-9caf-86e55ec83ca0
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_avg_ci_act_capt_lvl.
-	measure 'meas.users_history_avg_ci_act_capt_lvl' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.users_history_avg_ci_act_capt_lvl' = 
 			
 			var res = CALCULATE(
 			    AVERAGEX(users_history, users_history[ci_act_capt_lvl])     // get the avegare of ci_act_capt lvl
@@ -412,8 +487,11 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 09188a3f-50bd-4b1c-bfba-66ef796ac30c
 
-	/// Measure meas.users_history_ci_act_capt_lvl_latest_previous_diff.
-	measure 'meas.users_history_ci_act_capt_lvl_latest_previous_diff' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_history_ci_act_capt_lvl_latest_previous_diff' = 
 			
 			var latest = [meas.users_history_ci_act_capt_lvl_latest_month]          // get the latest ci_act_capt_lvl
 			var _previous = [meas.users_history_ci_act_capt_lvl_most_latest_previous]           // get the previous
@@ -426,73 +504,85 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_activities_trueai_call_dur_weekly.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.users_activities_trueai_call_dur_weekly' = ```
-			
+
 			var _min_date = [meas.context_date_min]             // get the context min date
 			var _max_date = [meas.context_date_max]             // get the context max date
 			var _dur = CALCULATE(
-			    SUM(users_activities[trueai_type_call_dur])         // get the total duration
+			SUM(users_activities[trueai_type_call_dur])         // get the total duration
 			)
-			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count 
+			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count
 			var _hrs = _dur/3600                 // converting into hours
-			var res = (_hrs/_week)              // get the weekly 
-			
+			var res = (_hrs/_week)              // get the weekly
+
 			RETURN
 			res
-			```
+	```
 		formatString: #,##0" hrs"
 		displayFolder: _act_capt_lvl
 		lineageTag: 27eb394b-0b2c-472a-81db-24fc52b391fa
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_email_dur_weekly.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.users_activities_trueai_email_dur_weekly' = ```
-			
-			
+
+
 			var _min_date = [meas.context_date_min]             // get the context min date
 			var _max_date = [meas.context_date_max]             // get the context max date
 			var _dur = CALCULATE(
-			    SUM(users_activities[trueai_type_auto_email_dur])           // total duration
+			SUM(users_activities[trueai_type_auto_email_dur])           // total duration
 			)
-			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count 
+			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count
 			var _hrs = _dur/3600                 // converting into hours
-			var res = (_hrs/_week)              // get the weekly 
-			
+			var res = (_hrs/_week)              // get the weekly
+
 			RETURN
 			res
-			```
+	```
 		formatString: #,##0" hrs"
 		displayFolder: _act_capt_lvl
 		lineageTag: fca004a1-3954-4d10-aff0-3d1d43ecb4f2
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_social_dur_weekly.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.users_activities_trueai_social_dur_weekly' = ```
-			
-			
+
+
 			var _min_date = [meas.context_date_min]             // get the context min date
 			var _max_date = [meas.context_date_max]             // get the context max date
 			var _dur = CALCULATE(
-			    sum(users_activities[trueai_type_social_dur])
+			sum(users_activities[trueai_type_social_dur])
 			)
-			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count 
+			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count
 			var _hrs = _dur/3600                 // converting into hours
-			var res = (_hrs/_week)              // get the weekly 
-			
+			var res = (_hrs/_week)              // get the weekly
+
 			RETURN
 			res
-			```
+	```
 		formatString: #,##0" hrs"
 		displayFolder: _act_capt_lvl
 		lineageTag: 46735ce5-09d7-48ba-a08a-e1ced67ca7c9
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_meeting_count.
-	measure 'meas.users_activities_trueai_meeting_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.users_activities_trueai_meeting_count' = 
 			
 			CALCULATE(
 			    sum(users_activities[trueai_type_meeting_count])
@@ -501,8 +591,11 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 95b895ec-9000-41b5-99a1-c6c36f471dc0
 
-	/// Measure meas.users_activities_trueai_meeting_dur.
-	measure 'meas.users_activities_trueai_meeting_dur' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_activities_trueai_meeting_dur' = 
 			
 			
 			var _dur = CALCULATE(
@@ -518,30 +611,36 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_meeting_dur_weekly.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.users_activities_trueai_meeting_dur_weekly' = ```
-			
-			
+
+
 			var _min_date = [meas.context_date_min]             // get the context min date
 			var _max_date = [meas.context_date_max]             // get the context max date
 			var _dur = CALCULATE(
-			    sum(users_activities[trueai_type_meeting_dur])
+			sum(users_activities[trueai_type_meeting_dur])
 			)
-			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count 
+			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count
 			var _hrs = _dur/3600                 // converting into hours
-			var res = (_hrs/_week)              // get the weekly 
-			
+			var res = (_hrs/_week)              // get the weekly
+
 			RETURN
 			res
-			```
+	```
 		formatString: #,##0" hrs"
 		displayFolder: _act_capt_lvl
 		lineageTag: e602cd49-d55e-4496-b714-80faa96803d7
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_prospecting_count.
-	measure 'meas.users_activities_prospecting_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.users_activities_prospecting_count' = 
 			
 			CALCULATE(
 			    SUM(users_activities[trueai_purpose_prospecting_count])     // get the total prosprecting act count
@@ -550,8 +649,11 @@ table users_activities
 		displayFolder: _step_activities
 		lineageTag: 5e7edb4a-4fde-4263-b9aa-7fd3957cbe38
 
-	/// Measure meas.users_activities_new_logo_count.
-	measure 'meas.users_activities_new_logo_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.users_activities_new_logo_count' = 
 			
 			CALCULATE(
 			    SUM(users_activities[trueai_purpose_new_logo_count])     // get the total new logo act count
@@ -560,8 +662,11 @@ table users_activities
 		displayFolder: _step_activities
 		lineageTag: 9fb93954-0da2-4918-a58d-a247c88c8085
 
-	/// Measure meas.users_activities_post_sales_count.
-	measure 'meas.users_activities_post_sales_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.users_activities_post_sales_count' = 
 			
 			CALCULATE(
 			    SUM(users_activities[trueai_purpose_post_sales_count])     // get the total post sales  act count
@@ -570,8 +675,11 @@ table users_activities
 		displayFolder: _step_activities
 		lineageTag: c3005fc1-3c14-43c1-8df1-5724c8a97233
 
-	/// Measure meas.users_activities_existing_customer_count.
-	measure 'meas.users_activities_existing_customer_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.users_activities_existing_customer_count' = 
 			
 			CALCULATE(
 			    SUM(users_activities[trueai_purpose_exist_cust_selling_count])     // get the total existing customer act count
@@ -580,8 +688,11 @@ table users_activities
 		displayFolder: _step_activities
 		lineageTag: f3e51cac-e237-45bd-a998-a7e1b91b94bc
 
-	/// Measure meas.users_activities_internal_count.
-	measure 'meas.users_activities_internal_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.users_activities_internal_count' = 
 			
 			CALCULATE(
 			    SUM(users_activities[trueai_purpose_internal_count])     // get the total internal act count

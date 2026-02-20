@@ -2,21 +2,27 @@
 table opp_line_items
 	lineageTag: 686ea3a9-2296-4d86-bcfd-80415925b6e8
 
-	/// Measure meas.opp_line_item_discount_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.opp_line_item_discount_amt' = ```
-			
-			var res = ([meas.opp_line_item_total_price_before_discount]-[meas.opp_line_item_total_price_after_discount])*-1  // use the existing measures and multiply by -1  
+
+			var res = ([meas.opp_line_item_total_price_before_discount]-[meas.opp_line_item_total_price_after_discount])*-1  // use the existing measures and multiply by -1
 			RETURN
 			res
-			```
+	```
 		formatString: -$#,##0;-$#,##0;$0
 		displayFolder: discount opp
 		lineageTag: c58a9bec-10b0-4753-95d5-905afcfe0653
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.opp_line_item_discount_pct.
-	measure 'meas.opp_line_item_discount_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.opp_line_item_discount_pct' = 
 			
 			
 			var res = DIVIDE(([meas.opp_line_item_discount_amt]*-1), [meas.opp_line_item_total_price_before_discount]) // the diff / original. Turn discount back positive
@@ -27,16 +33,22 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: dd1dba57-2410-444e-b287-68ada1efc23c
 
-	/// Measure meas.discount_line_opps.
-	measure 'meas.discount_line_opps' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.discount_line_opps' = 
 			
 			IF([meas.opp_line_item_discount_pct] = 0, 0,BLANK())
 		formatString: 0
 		displayFolder: discount opp
 		lineageTag: 55bd8ea0-eb11-461f-b799-99a4f1e6e0ac
 
-	/// Measure meas.opp_line_item_dis_pct.
-	measure 'meas.opp_line_item_dis_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.opp_line_item_dis_pct' = 
 			
 			var orig_cost = SUMX(opp_line_items, [trueai_list_price]*[trueai_qty])              // get the original cost
 			var actual_cost = SUMX(opp_line_items, [trueai_unit_price]*[trueai_qty])            // get the actual cost
@@ -46,8 +58,11 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: b5f83928-e12e-4884-aa64-e29f8c0e2b70
 
-	/// Measure meas.opp_line_item_total_price_after_discount.
-	measure 'meas.opp_line_item_total_price_after_discount' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_line_item_total_price_after_discount' = 
 			
 			
 			var tbl = CALCULATETABLE(opp_line_items)        // get the calculatd table
@@ -58,37 +73,46 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: 982b866e-1a68-4089-9f0b-fff63419a571
 
-	/// Measure meas.opp_lines_item_discount_pct.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.opp_lines_item_discount_pct' = ```
-			
-			
+
+
 			var tbl = CALCULATETABLE(opp_line_items)        // get the opp line items virtual table
 			var orig_cost = SUMX(tbl, [col.trueai_list_price] * [crm_qty])      // get the original cost
 			var actual_cost = SUMX(tbl, [col.trueai_unit_price] * [crm_qty])        // get the actual cost
-			var res = DIVIDE(actual_cost - orig_cost, orig_cost)        // get the pct 
+			var res = DIVIDE(actual_cost - orig_cost, orig_cost)        // get the pct
 			RETURN ABS(res)
-			```
+	```
 		formatString: 0%;-0%;0%
 		displayFolder: discount opp
 		lineageTag: 92f502aa-be60-41d1-a075-d98ed0682e74
 
-	/// Measure meas.delta_expected_booking_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.delta_expected_booking_amt' = ```
-			
-			var wonAmt = [meas.ssr_history_won_amt]     // get the won amt 
+
+			var wonAmt = [meas.ssr_history_won_amt]     // get the won amt
 			var pct = [meas.opps_delta_expected_pct]        // get the delta-expected pct
-			
+
 			var res = wonAmt * pct
 			RETURN res
-			```
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: fdd8ec9f-4d49-4be5-9806-37f53f5183ba
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_average_discount_pct.
-	measure 'meas.opps_average_discount_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_average_discount_pct' = 
 			
 			ABS(CALCULATE(AVERAGE(opps[trueai_discount_pct])))     // get the abs of avg discount pct
 		displayFolder: discount opp
@@ -96,8 +120,11 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_avg_deals_amt.
-	measure 'meas.opps_avg_deals_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.opps_avg_deals_amt' = 
 			
 			var Amt = [meas.ssr_history_won_amt] - [meas.opps_deal_discount_amt]        // get the difference amt
 			var totdeals = [meas.ssr_history_step_count]            // total deals count
@@ -109,26 +136,32 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_deal_discount_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_deal_discount_amt' = ```
-			
+
 			// var pct = ABS([meas.opps_average_discount_pct])
 			// var wonAmt = [meas.ssr_history_won_amt]
 			// var disAmt = wonAmt * pct
-			
+
 			var pct = ABS([meas.opp_line_item_discount_pct])        // geting the abs value of opp line items discount pct
-			var wonAmt = [meas.ssr_history_won_amt]     // won amount 
+			var wonAmt = [meas.ssr_history_won_amt]     // won amount
 			var disAmt = wonAmt * pct
-			
+
 			RETURN disAmt
-			
-			```
+
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: a7e40876-f224-4016-b137-855d4e4bb99c
 
-	/// Measure meas.opps_deals_pct.
-	measure 'meas.opps_deals_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.opps_deals_pct' = 
 			
 			var stepCount = [meas.ssr_history_step_count]       // calculating the step count
 			var disdeals = CALCULATE(count(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK())  // gt the count of opps that has discount tier
@@ -140,8 +173,11 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: c7df8b8f-3864-41d9-94e5-b44b2836158f
 
-	/// Measure meas.opps_delta_expected_pct.
-	measure 'meas.opps_delta_expected_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.opps_delta_expected_pct' = 
 			
 			VAR SuccessRate =
 			    CALCULATE(
@@ -159,16 +195,22 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: 9d875de2-fc0a-47b4-86e6-f717b75bf26f
 
-	/// Measure meas.opps_tot_deals.
-	measure 'meas.opps_tot_deals' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.opps_tot_deals' = 
 			
 			CALCULATE(COUNT(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK()) // get the total deals count
 		formatString: 0
 		displayFolder: discount opp
 		lineageTag: ba127637-f77b-4fbe-8646-8ee9fea3c6a3
 
-	/// Measure meas.opp_line_items_avg_discount_pct.
-	measure 'meas.opp_line_items_avg_discount_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_line_items_avg_discount_pct' = 
 			CALCULATE(
 			    AVERAGE(
 			        opps[trueai_discount_pct]      // get the average discount pct
@@ -179,8 +221,11 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_line_item_total_price_before_discount.
-	measure 'meas.opp_line_item_total_price_before_discount' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_line_item_total_price_before_discount' = 
 			
 			var tbl = CALCULATETABLE(opp_line_items)        // get the calculatd table
 			var orig_cost = SUMX(tbl, [trueai_list_price] * [trueai_qty])  // calculating the original price
@@ -191,8 +236,11 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opp_line_items_trueai_list_price.
-	measure 'meas.opp_line_items_trueai_list_price' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_line_items_trueai_list_price' = 
 			
 			CALCULATE(
 			    MAX(opp_line_items[trueai_list_price])
@@ -203,8 +251,11 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.avg_discount_pct_change.
-	measure 'meas.avg_discount_pct_change' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.avg_discount_pct_change' = 
 			
 			VAR MinVisibleDate =
 			    CALCULATE(
@@ -235,8 +286,11 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_line_items_trueai_total_price.
-	measure 'meas.opp_line_items_trueai_total_price' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_line_items_trueai_total_price' = 
 			
 			CALCULATE(
 			    SUM ( opp_line_items[trueai_total_price] )

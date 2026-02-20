@@ -2,8 +2,11 @@
 table ssr_history_success_factors
 	lineageTag: 6d0d1645-2b04-4700-87d8-13fed799fb4d
 
-	/// Measure meas.ssr_history_success_prob_impact.
-	measure 'meas.ssr_history_success_prob_impact' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.ssr_history_success_prob_impact' = 
 			
 			var _prob = CALCULATE(
 			    AVERAGE(
@@ -21,8 +24,11 @@ table ssr_history_success_factors
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.ssr_history_success_prob_impact_positive.
-	measure 'meas.ssr_history_success_prob_impact_positive' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.ssr_history_success_prob_impact_positive' = 
 			
 			var positiveVal = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
 			RETURN
@@ -31,8 +37,11 @@ table ssr_history_success_factors
 		displayFolder: success_prob_factors
 		lineageTag: 565e0f38-f6ce-4548-a88e-9b6de987e2fa
 
-	/// Measure meas.ssr_history_success_prob_impact_negative.
-	measure 'meas.ssr_history_success_prob_impact_negative' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.ssr_history_success_prob_impact_negative' = 
 			
 			var Val = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
 			RETURN
@@ -41,8 +50,11 @@ table ssr_history_success_factors
 		displayFolder: success_prob_factors
 		lineageTag: 9148a5ce-e1ea-4877-a07c-e9990c3e02af
 
-	/// Measure meas.ssr_history_success_prob_impact_neutral.
-	measure 'meas.ssr_history_success_prob_impact_neutral' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.ssr_history_success_prob_impact_neutral' = 
 			
 			var positiveVal = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
 			RETURN
@@ -51,63 +63,75 @@ table ssr_history_success_factors
 		displayFolder: success_prob_factors
 		lineageTag: be309515-4d9a-4856-ad6a-8d0c3dad396e
 
-	/// Measure meas.ssr_history_success_prob_factors_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.ssr_history_success_prob_factors_count' = ```
-			
+
 			var res = CALCULATE(count(ssr_history_success_factors[_sys_doc_id]))
 			RETURN res
-			
-			```
+
+	```
 		formatString: #,0
 		displayFolder: success_prob_factors
 		lineageTag: ffbf4531-12c0-4a82-889e-ed353a5a1a5e
 
-	/// Measure meas.ssr_history_success_prob_factors_all_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.ssr_history_success_prob_factors_all_count' = ```
-			
+
 			var res = CALCULATE(count(ssr_history_success_factors[_sys_ssr_history_id]), ssr_history_success_factors[trueai_factor_name] <> "aaa" &&  ssr_history_success_factors[trueai_value] <> "aaa" ) // get the count of all outside the filter
 			RETURN res
-			
-			```
+
+	```
 		formatString: 0
 		displayFolder: success_prob_factors
 		lineageTag: bb952828-5ff6-4ce1-8186-7124fb7627ac
 
-	/// Measure meas.ssr_history_success_prob_factors_pct.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
 	measure 'meas.ssr_history_success_prob_factors_pct' = ```
-			
-			
+
+
 			// this is our old measure
 			var res = DIVIDE([meas.ssr_history_success_prob_factors_count], [meas.ssr_history_success_prob_factors_all_count])  // ratio of the factors count
 			RETURN res
-			
-			```
+
+	```
 		formatString: #%
 		displayFolder: success_prob_factors
 		lineageTag: fbebdf1c-4075-4d59-9b9d-7cae7d96dee0
 
-	/// Measure meas.success_prob_factors_most_impact_str.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.success_prob_factors_most_impact_str' = ```
-			
-			
+
+
 			// changes for git check
-			
-			// // get most impct. 
-			// VAR FactorImpactCount = 
+
+			// // get most impct.
+			// VAR FactorImpactCount =
 			//     ADDCOLUMNS(
 			//         SUMMARIZE(
-			//             ssr_history_success_prob_factors, 
+			//             ssr_history_success_prob_factors,
 			//             ssr_history_success_prob_factors[name] ,ssr_history_success_prob_factors[value] ,
 			//                         ssr_history_success_prob_factors[impact]
 			//         ),
 			//         "Count", CALCULATE(COUNTROWS(ssr_history_success_prob_factors))
 			//     )
-			// VAR RankedFactors = 
+			// VAR RankedFactors =
 			//     ADDCOLUMNS(
 			//         FactorImpactCount,
 			//         "Rank", RANKX(ALL(FactorImpactCount), [impact] * 10000 + [Count], , DESC, Dense)
 			//     )
-			// VAR Top4Factors = 
+			// VAR Top4Factors =
 			//     FILTER(
 			//         RankedFactors,
 			//         [Rank] <= 4
@@ -120,27 +144,33 @@ table ssr_history_success_factors
 			//         [Rank],
 			//         ASC
 			//     )
-			```
+	```
 		formatString: 0
 		displayFolder: success_prob_factors
 		lineageTag: d3d03bb1-d585-4650-afcf-21178f54a977
 
-	/// Measure meas.ssr_history_success_prob_feature_impact.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.ssr_history_success_prob_feature_impact' = ```
-			
+
 			CALCULATE(
-			    AVERAGEX(
-			        ssr_history_success_factors, 
-			        ssr_history_success_factors[trueai_factor_impact]        // get the average feature impact
-			    )
+			AVERAGEX(
+			ssr_history_success_factors,
+			ssr_history_success_factors[trueai_factor_impact]        // get the average feature impact
 			)
-			```
+			)
+	```
 		formatString: 0%;-0%;0%
 		displayFolder: success_prob_factors
 		lineageTag: ca2857e0-3196-408f-8103-8b2b7f7460ba
 
-	/// Measure meas.ssr_history_success_prob_factors_pct_how_many.
-	measure 'meas.ssr_history_success_prob_factors_pct_how_many' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.ssr_history_success_prob_factors_pct_how_many' = 
 			
 			
 			var step_count = [meas.ssr_history_step_count]           // get the converted leads count from ssr_history table
@@ -155,22 +185,25 @@ table ssr_history_success_factors
 		displayFolder: success_prob_factors
 		lineageTag: 0162ca58-4bf0-4d0b-8b9b-11e1cccf55ea
 
-	/// Measure meas.top_factor_name_by_impact.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: ssr_history_success_factors
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Boolean
 	measure 'meas.top_factor_name_by_impact' = ```
-			
-			VAR MaxImpact = 
-			    MAXX(
-			        'ssr_history_success_factors', 
-			        'ssr_history_success_factors'[trueai_value_impact]
-			    )
+
+			VAR MaxImpact =
+			MAXX(
+			'ssr_history_success_factors',
+			'ssr_history_success_factors'[trueai_value_impact]
+			)
 			-- Now find the corresponding name with that max impact
 			RETURN
 			CALCULATE(
-			    MAX('ssr_history_success_factors'[trueai_factor_name]),
-			    'ssr_history_success_factors'[trueai_value_impact] = MaxImpact
+			MAX('ssr_history_success_factors'[trueai_factor_name]),
+			'ssr_history_success_factors'[trueai_value_impact] = MaxImpact
 			)
-			
-			```
+
+	```
 		displayFolder: success_prob_factors
 		lineageTag: f24a5b64-818e-42df-920a-3a818a663c56
 

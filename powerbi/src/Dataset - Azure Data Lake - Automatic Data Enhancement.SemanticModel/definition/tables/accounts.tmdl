@@ -2,63 +2,63 @@
 table accounts
 	lineageTag: a6327903-d2c7-49aa-94b9-d45c52607f22
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: accounts[_sys_docid], accounts[trueai_account_dupe_id].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0.00%;-0.00%;0.00%
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.account_trueai_dupe_rate' = CALCULATE(DISTINCTCOUNT(accounts[trueai_account_dupe_id]) / CALCULATE(count(accounts[_sys_docid])))
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 78562b48-eb24-4c22-9628-a15da188859a
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_complt], [trueai_complt].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0 %
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.account_trueai_completeness_improvement' = ```
-			
+
 			var crmval = CALCULATE(AVERAGE([crm_complt]))
 			var aival = CALCULATE(AVERAGE([trueai_complt]))
-			var impro = Divide(aival - crmval, crmval) 
+			var impro = Divide(aival - crmval, crmval)
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
-			return res 
-			
-			```
+			return res
+
+	```
 		formatString: 0 %
 		lineageTag: 8e3a434f-82f7-400f-88ee-ac2551a93985
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Columns: accounts[_sys_docid], accounts[trueai_is_master].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.accounts_trueai_non_dupe_counts' = ```
-			
-			
+
+
 			var res = calculate(COUNT(accounts[_sys_docid]) , accounts[trueai_is_master] = true || isblank(accounts[trueai_is_master]) = true )
-			
-			
-			
+
+
+
 			/*
-			id	name	dupeid	is master	
-			1	john	1	1	
-			2	morgan			
-			3	lucy			
-			4	john	1	0	
-			5	john	1	0	
-			6	ben			
-			7	rob	2	1	
-			8	rob	2	0	
-			9	ronny			
-			10	dodi			
-							
-				total	10	count(id)	
-				non dupes	7	count(id) - count(dupeid) - distinct count(dupeid)	ismaster =1 or null
-				records that are part of dupes	5	count (dupeid)	
-				unique records duped	2	distinctcount (dupeid)	
-				records that should not be included	3	 count(dupeid) - distinct count(dupeid)	ismaster=0
+			id	name	dupeid	is master
+			1	john	1	1
+			2	morgan
+			3	lucy
+			4	john	1	0
+			5	john	1	0
+			6	ben
+			7	rob	2	1
+			8	rob	2	0
+			9	ronny
+			10	dodi
+
+			total	10	count(id)
+			non dupes	7	count(id) - count(dupeid) - distinct count(dupeid)	ismaster =1 or null
+			records that are part of dupes	5	count (dupeid)
+			unique records duped	2	distinctcount (dupeid)
+			records that should not be included	3	 count(dupeid) - distinct count(dupeid)	ismaster=0
 			*/
-			
+
 			return res
-			```
+	```
 		formatString: 0
 		lineageTag: ef16364d-0133-48cc-bbbf-e0b706ffe258
 

@@ -1,565 +1,581 @@
 table cal_end_dates
 	lineageTag: 0c87fa54-b3b7-47c2-9154-a95fcfb4b586
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.filter_string_full' = ```
-			
-			
+
+
 			var max_filters =15
 			var date_str =  "Date: " & Min(cal_end_dates[Date])  & " - " &  Max(cal_end_dates[Date] )
-			
-			var group_str = IF ( 
-			    ISFILTERED ( users[trueai_group]), 
-			    VAR ___f = FILTERS ( users[trueai_group] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
-			    VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Group: All"
+
+			var group_str = IF (
+			ISFILTERED ( users[trueai_group]),
+			VAR ___f = FILTERS ( users[trueai_group] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
+			VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Group: All"
 			)
-			
-			var user_role_str = IF ( 
-			    ISFILTERED ( users_history[trueai_user_role_alias]), 
-			    VAR ___f = FILTERS ( users_history[trueai_user_role_alias] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_alias] )
-			    VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_alias], ", " )
-			    VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x, "User Role: All"
+
+			var user_role_str = IF (
+			ISFILTERED ( users_history[trueai_user_role_alias]),
+			VAR ___f = FILTERS ( users_history[trueai_user_role_alias] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_alias] )
+			VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_alias], ", " )
+			VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x, "User Role: All"
 			)
-			
-			var userfunction_str = IF ( 
-			    ISFILTERED ( users_history[trueai_user_role_function]), 
-			    VAR ___f = FILTERS ( users_history[trueai_user_role_function] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_function] )
-			    VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_function], ", " )
-			    VAR ___x = "User Role Function: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Role Function: All"
+
+			var userfunction_str = IF (
+			ISFILTERED ( users_history[trueai_user_role_function]),
+			VAR ___f = FILTERS ( users_history[trueai_user_role_function] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_function] )
+			VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_function], ", " )
+			VAR ___x = "User Role Function: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Role Function: All"
 			)
-			
-			var dept_str = IF ( 
-			    ISFILTERED ( users_history[trueai_user_role_department]), 
-			    VAR ___f = FILTERS ( users_history[trueai_user_role_department] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_department] )
-			    VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_department], ", " )
-			    VAR ___x = "Department: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Department: All"
+
+			var dept_str = IF (
+			ISFILTERED ( users_history[trueai_user_role_department]),
+			VAR ___f = FILTERS ( users_history[trueai_user_role_department] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_department] )
+			VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_department], ", " )
+			VAR ___x = "Department: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Department: All"
 			)
-			
-			var mgrtotreports_str = IF ( 
-			    ISFILTERED ( managers_total[trueai_full_name]), 
-			    VAR ___f = FILTERS ( managers_total [trueai_full_name]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, managers_total [trueai_full_name])
-			    VAR ___d = CONCATENATEX ( ___t, managers_total [trueai_full_name], ", " )
-			    VAR ___x = "Mgr. - All Reports: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Mgr. - All Reports: All"
+
+			var mgrtotreports_str = IF (
+			ISFILTERED ( managers_total[trueai_full_name]),
+			VAR ___f = FILTERS ( managers_total [trueai_full_name])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, managers_total [trueai_full_name])
+			VAR ___d = CONCATENATEX ( ___t, managers_total [trueai_full_name], ", " )
+			VAR ___x = "Mgr. - All Reports: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Mgr. - All Reports: All"
 			)
-			
-			var mgrdirreports_str = IF ( 
-			    ISFILTERED ( managers_direct[trueai_full_name]), 
-			    VAR ___f = FILTERS ( managers_direct [trueai_full_name]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, managers_direct [trueai_full_name] )
-			    VAR ___d = CONCATENATEX ( ___t, managers_direct [trueai_full_name], ", " )
-			    VAR ___x = "Mgr. - Only Direct Reports: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Mgr. - Only Direct Reports: All"
+
+			var mgrdirreports_str = IF (
+			ISFILTERED ( managers_direct[trueai_full_name]),
+			VAR ___f = FILTERS ( managers_direct [trueai_full_name])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, managers_direct [trueai_full_name] )
+			VAR ___d = CONCATENATEX ( ___t, managers_direct [trueai_full_name], ", " )
+			VAR ___x = "Mgr. - Only Direct Reports: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Mgr. - Only Direct Reports: All"
 			)
-			
-			var username_str = IF ( 
-			    ISFILTERED ( users[trueai_full_name]), 
-			    VAR ___f = FILTERS ( users[trueai_full_name]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_full_name] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_full_name], ", " )
-			    VAR ___x = "User Name: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Name: All"
+
+			var username_str = IF (
+			ISFILTERED ( users[trueai_full_name]),
+			VAR ___f = FILTERS ( users[trueai_full_name])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_full_name] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_full_name], ", " )
+			VAR ___x = "User Name: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Name: All"
 			)
-			
+
 			//var d =  ISFILTERED  (users[trueai_hire_date].[Year]) // CONCATENATEX(FILTERS ( users[trueai_hire_date]), users[trueai_hire_date], ", " )
-			
-			var rephireyear_str = IF ( 
-			    ISFILTERED ( users[trueai_hire_date].[Year]), 
-			    VAR ___f = FILTERS ( users[trueai_hire_date].[Year]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_hire_date].[Year] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_hire_date].[Year], ", " )
-			    VAR ___x = "User Hire Year: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Hire Year: All"
+
+			var rephireyear_str = IF (
+			ISFILTERED ( users[trueai_hire_date].[Year]),
+			VAR ___f = FILTERS ( users[trueai_hire_date].[Year])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_hire_date].[Year] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_hire_date].[Year], ", " )
+			VAR ___x = "User Hire Year: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Hire Year: All"
 			)
-			
-			var reptermyear_str = IF ( 
-			    ISFILTERED ( users[trueai_termination_date].[Year]), 
-			    VAR ___f = FILTERS ( users[trueai_termination_date].[Year]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f,users[trueai_termination_date].[Year] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_termination_date].[Year], ", " )
-			    VAR ___x = "User Termination Year: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Termination Year: All"
+
+			var reptermyear_str = IF (
+			ISFILTERED ( users[trueai_termination_date].[Year]),
+			VAR ___f = FILTERS ( users[trueai_termination_date].[Year])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,users[trueai_termination_date].[Year] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_termination_date].[Year], ", " )
+			VAR ___x = "User Termination Year: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Termination Year: All"
 			)
-			
-			var reploccountry_str = IF ( 
-			    ISFILTERED ( users[trueai_addr_country]), 
-			    VAR ___f = FILTERS ( users[trueai_addr_country]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_country] )
-			    VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_country], ", " )
-			    VAR ___x = "User Location Country: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Location Country: All"
+
+			var reploccountry_str = IF (
+			ISFILTERED ( users[trueai_addr_country]),
+			VAR ___f = FILTERS ( users[trueai_addr_country])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_country] )
+			VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_country], ", " )
+			VAR ___x = "User Location Country: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Location Country: All"
 			)
-			
-			var replocstate_str = IF ( 
-			    ISFILTERED ( users[trueai_addr_state]), 
-			    VAR ___f = FILTERS ( users[trueai_addr_state]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_state] )
-			    VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_state], ", " )
-			    VAR ___x = "User Location State: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Location State: All"
+
+			var replocstate_str = IF (
+			ISFILTERED ( users[trueai_addr_state]),
+			VAR ___f = FILTERS ( users[trueai_addr_state])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_state] )
+			VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_state], ", " )
+			VAR ___x = "User Location State: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Location State: All"
 			)
-			
-			var reploccity_str = IF ( 
-			    ISFILTERED ( users[trueai_addr_city]), 
-			    VAR ___f = FILTERS ( users[trueai_addr_city]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_city] )
-			    VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_city], ", " )
-			    VAR ___x = "User Location City: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Location City: All"
+
+			var reploccity_str = IF (
+			ISFILTERED ( users[trueai_addr_city]),
+			VAR ___f = FILTERS ( users[trueai_addr_city])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_city] )
+			VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_city], ", " )
+			VAR ___x = "User Location City: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Location City: All"
 			)
-			
-			var stepname_str = IF ( 
-			    ISFILTERED ( ssr_history[step_name]), 
-			    VAR ___f = FILTERS ( ssr_history[step_name]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr_history[step_name] )
-			    VAR ___d = CONCATENATEX ( ___t, ssr_history[step_name], ", " )
-			    VAR ___x = "Sales Process Steps: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Sales Process Steps: All"
+
+			var stepname_str = IF (
+			ISFILTERED ( ssr_history[step_name]),
+			VAR ___f = FILTERS ( ssr_history[step_name])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[step_name] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[step_name], ", " )
+			VAR ___x = "Sales Process Steps: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Sales Process Steps: All"
 			)
-			
-			var substeps_str = IF ( 
-			    ISFILTERED ( ssr_history[step_sub_type]), 
-			    VAR ___f = FILTERS ( ssr_history[step_sub_type]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr_history[step_sub_type] )
-			    VAR ___d = CONCATENATEX ( ___t, ssr_history[step_sub_type], ", " )
-			    VAR ___x = "Sales Process Sub-Steps: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Sales Process Sub-Steps: All"
+
+			var substeps_str = IF (
+			ISFILTERED ( ssr_history[step_sub_type]),
+			VAR ___f = FILTERS ( ssr_history[step_sub_type])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[step_sub_type] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[step_sub_type], ", " )
+			VAR ___x = "Sales Process Sub-Steps: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Sales Process Sub-Steps: All"
 			)
-			
-			var industry_str = IF ( 
-			    ISFILTERED ( ssr[trueai_industry]), 
-			    VAR ___f = FILTERS ( ssr[trueai_industry]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr[trueai_industry] )
-			    VAR ___d = CONCATENATEX ( ___t, ssr[trueai_industry], ", " )
-			    VAR ___x = "Industry: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Industry: All"
+
+			var industry_str = IF (
+			ISFILTERED ( ssr[trueai_industry]),
+			VAR ___f = FILTERS ( ssr[trueai_industry])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr[trueai_industry] )
+			VAR ___d = CONCATENATEX ( ___t, ssr[trueai_industry], ", " )
+			VAR ___x = "Industry: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Industry: All"
 			)
-			
-			var country_str = IF ( 
-			    ISFILTERED ( ssr[trueai_addr_country]), 
-			    VAR ___f = FILTERS ( ssr[trueai_addr_country]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr[trueai_addr_country] )
-			    VAR ___d = CONCATENATEX ( ___t, ssr[trueai_addr_country], ", " )
-			    VAR ___x = "Country: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Country: All"
+
+			var country_str = IF (
+			ISFILTERED ( ssr[trueai_addr_country]),
+			VAR ___f = FILTERS ( ssr[trueai_addr_country])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr[trueai_addr_country] )
+			VAR ___d = CONCATENATEX ( ___t, ssr[trueai_addr_country], ", " )
+			VAR ___x = "Country: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Country: All"
 			)
-			
-			var companysize_str = IF ( 
-			    ISFILTERED ( ssr_company_sizes[trueai_company_size]), 
-			    VAR ___f = FILTERS ( ssr_company_sizes[trueai_company_size]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr_company_sizes[trueai_company_size])
-			    VAR ___d = CONCATENATEX ( ___t, ssr_company_sizes[trueai_company_size], ", " )
-			    VAR ___x = "Company Size: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Company Size: All"
+
+			var companysize_str = IF (
+			ISFILTERED ( ssr_company_sizes[trueai_company_size]),
+			VAR ___f = FILTERS ( ssr_company_sizes[trueai_company_size])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_company_sizes[trueai_company_size])
+			VAR ___d = CONCATENATEX ( ___t, ssr_company_sizes[trueai_company_size], ", " )
+			VAR ___x = "Company Size: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Company Size: All"
 			)
-			
-			var productfamily_str = IF ( 
-			    ISFILTERED (products[trueai_family]), 
-			    VAR ___f = FILTERS ( products[trueai_family]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, products[trueai_family])
-			    VAR ___d = CONCATENATEX ( ___t, products[trueai_family], ", " )
-			    VAR ___x = "Product Family: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Product Family: All"
+
+			var productfamily_str = IF (
+			ISFILTERED (products[trueai_family]),
+			VAR ___f = FILTERS ( products[trueai_family])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, products[trueai_family])
+			VAR ___d = CONCATENATEX ( ___t, products[trueai_family], ", " )
+			VAR ___x = "Product Family: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Product Family: All"
 			)
-			
-			var opp_erp_str = IF ( 
-			    ISFILTERED ( ssr_history[opp_erp]), 
-			    VAR ___f = FILTERS ( ssr_history[opp_erp] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr_history[opp_erp] )
-			    VAR ___d = CONCATENATEX ( ___t, ssr_history[opp_erp], ", " )
-			    VAR ___x = "ERP: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Opportunity ERP: All"
+
+			var opp_erp_str = IF (
+			ISFILTERED ( ssr_history[opp_erp]),
+			VAR ___f = FILTERS ( ssr_history[opp_erp] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[opp_erp] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[opp_erp], ", " )
+			VAR ___x = "ERP: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Opportunity ERP: All"
 			)
-			
-			var opp_pipeline_name_str = IF ( 
-			    ISFILTERED ( ssr_history[opp_pipeline_name] ), 
-			    VAR ___f = FILTERS ( ssr_history[opp_pipeline_name] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr_history[opp_pipeline_name] )
-			    VAR ___d = CONCATENATEX ( ___t, ssr_history[opp_pipeline_name], ", " )
-			    VAR ___x = "Pipeline: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Opportunity Pipeline: All"
+
+			var opp_pipeline_name_str = IF (
+			ISFILTERED ( ssr_history[opp_pipeline_name] ),
+			VAR ___f = FILTERS ( ssr_history[opp_pipeline_name] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[opp_pipeline_name] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[opp_pipeline_name], ", " )
+			VAR ___x = "Pipeline: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Opportunity Pipeline: All"
 			)
-			
-			var crm_mtach_id_str = IF ( 
-			    ISFILTERED (users[trueai_ext_match_id]), 
-			    VAR ___f = FILTERS ( users[trueai_ext_match_id]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_ext_match_id])
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_ext_match_id], ", " )
-			    VAR ___x = "HR Roster Matches Only: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "HR Roster Matches Only: All"
+
+			var crm_mtach_id_str = IF (
+			ISFILTERED (users[trueai_ext_match_id]),
+			VAR ___f = FILTERS ( users[trueai_ext_match_id])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_ext_match_id])
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_ext_match_id], ", " )
+			VAR ___x = "HR Roster Matches Only: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "HR Roster Matches Only: All"
 			)
-			
-			var _ssr_crm_leadsource = IF ( 
-			    ISFILTERED ( ssr[crm_leadsource]), 
-			    VAR ___f = FILTERS ( ssr[crm_leadsource]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr[crm_leadsource])
-			    VAR ___d = CONCATENATEX ( ___t, ssr[crm_leadsource], ", " )
-			    VAR ___x = "Lead Source CRM Name: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x ," | "  &  "Lead Source CRM Name: All"
+
+			var _ssr_crm_leadsource = IF (
+			ISFILTERED ( ssr[crm_leadsource]),
+			VAR ___f = FILTERS ( ssr[crm_leadsource])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr[crm_leadsource])
+			VAR ___d = CONCATENATEX ( ___t, ssr[crm_leadsource], ", " )
+			VAR ___x = "Lead Source CRM Name: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  &  "Lead Source CRM Name: All"
 			)
-			
-			var _ssr_crm_leadsource_type = IF ( 
-			    ISFILTERED ( ssr[col.trueai_leadsource_inbound_outbound]), 
-			    VAR ___f = FILTERS ( ssr[col.trueai_leadsource_inbound_outbound]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr[col.trueai_leadsource_inbound_outbound])
-			    VAR ___d = CONCATENATEX ( ___t, ssr[col.trueai_leadsource_inbound_outbound], ", " )
-			    VAR ___x = "Lead Source Type: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x ," | "  &  "Lead Source Type: All"
+
+			var _ssr_crm_leadsource_type = IF (
+			ISFILTERED ( ssr[col.trueai_leadsource_inbound_outbound]),
+			VAR ___f = FILTERS ( ssr[col.trueai_leadsource_inbound_outbound])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr[col.trueai_leadsource_inbound_outbound])
+			VAR ___d = CONCATENATEX ( ___t, ssr[col.trueai_leadsource_inbound_outbound], ", " )
+			VAR ___x = "Lead Source Type: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  &  "Lead Source Type: All"
 			)
-			 
-			var acc_custfield1_str = 
+
+			var acc_custfield1_str =
 			IF(
-			    [meas.aliasing_labels_accounts_cust_field_1] <> "N/A",
-			    IF ( 
-			        ISFILTERED ( ssr[crm_account_custom_value_1]), 
-			        VAR ___f = FILTERS ( ssr[crm_account_custom_value_1]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f,  ssr[crm_account_custom_value_1] )
-			        VAR ___d = CONCATENATEX ( ___t,  ssr[crm_account_custom_value_1], ", " )
-			        VAR ___x = [meas.aliasing_labels_accounts_cust_field_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_1] &" : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_accounts_cust_field_1] <> "N/A",
+			IF (
+			ISFILTERED ( ssr[crm_account_custom_value_1]),
+			VAR ___f = FILTERS ( ssr[crm_account_custom_value_1])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,  ssr[crm_account_custom_value_1] )
+			VAR ___d = CONCATENATEX ( ___t,  ssr[crm_account_custom_value_1], ", " )
+			VAR ___x = [meas.aliasing_labels_accounts_cust_field_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_1] &" : All"
+			),
+			"N/A"
 			)
-			
+
 			var acc_custfield2_str =
 			IF(
-			    [meas.aliasing_labels_accounts_cust_field_2] <> "N/A",
-			    IF ( 
-			        ISFILTERED ( ssr[crm_account_custom_value_2]), 
-			        VAR ___f = FILTERS ( ssr[crm_account_custom_value_2]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f,  ssr[crm_account_custom_value_2] )
-			        VAR ___d = CONCATENATEX ( ___t,  ssr[crm_account_custom_value_2], ", " )
-			        VAR ___x = [meas.aliasing_labels_accounts_cust_field_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_2] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_accounts_cust_field_2] <> "N/A",
+			IF (
+			ISFILTERED ( ssr[crm_account_custom_value_2]),
+			VAR ___f = FILTERS ( ssr[crm_account_custom_value_2])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,  ssr[crm_account_custom_value_2] )
+			VAR ___d = CONCATENATEX ( ___t,  ssr[crm_account_custom_value_2], ", " )
+			VAR ___x = [meas.aliasing_labels_accounts_cust_field_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_2] & " : All"
+			),
+			"N/A"
 			)
-			
+
 			var acc_custfield3_str =IF(
-			    [meas.aliasing_labels_accounts_cust_field_3] <> "N/A",
-			    IF ( 
-			        ISFILTERED ( ssr[crm_account_custom_value_3]), 
-			        VAR ___f = FILTERS ( ssr[crm_account_custom_value_3]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr[crm_account_custom_value_3] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr[crm_account_custom_value_3], ", " )
-			        VAR ___x = [meas.aliasing_labels_accounts_cust_field_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_3] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_accounts_cust_field_3] <> "N/A",
+			IF (
+			ISFILTERED ( ssr[crm_account_custom_value_3]),
+			VAR ___f = FILTERS ( ssr[crm_account_custom_value_3])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr[crm_account_custom_value_3] )
+			VAR ___d = CONCATENATEX ( ___t, ssr[crm_account_custom_value_3], ", " )
+			VAR ___x = [meas.aliasing_labels_accounts_cust_field_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_3] & " : All"
+			),
+			"N/A"
 			)
-			
-			
+
+
 			var opp_custfield1_str = IF(
-			    [meas.aliasing_labels_opps_cust_field_1] <> "N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_1]), 
-			        VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_1]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_1] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_1], ", " )
-			        VAR ___x = [meas.aliasing_labels_opps_cust_field_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_1] &" : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_opps_cust_field_1] <> "N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_1]),
+			VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_1])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_1] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_1], ", " )
+			VAR ___x = [meas.aliasing_labels_opps_cust_field_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_1] &" : All"
+			),
+			"N/A"
 			)
-			
+
 			var opp_custfield2_str = IF(
-			    [meas.aliasing_labels_opps_cust_field_2] <>"N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_2]), 
-			        VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_2]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_2] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_2], ", " )
-			        VAR ___x = [meas.aliasing_labels_opps_cust_field_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_2] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_opps_cust_field_2] <>"N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_2]),
+			VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_2])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_2] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_2], ", " )
+			VAR ___x = [meas.aliasing_labels_opps_cust_field_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_2] & " : All"
+			),
+			"N/A"
 			)
-			
+
 			var opp_custfield3_str = IF(
-			    [meas.aliasing_labels_opps_cust_field_3]<>"N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_3]), 
-			        VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_3]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_3] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_3], ", " )
-			        VAR ___x = [meas.aliasing_labels_opps_cust_field_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_3] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_opps_cust_field_3]<>"N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_3]),
+			VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_3])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_3] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_3], ", " )
+			VAR ___x = [meas.aliasing_labels_opps_cust_field_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_3] & " : All"
+			),
+			"N/A"
 			)
-			
+
 			var leads_custfield1_str = IF(
-			    [meas.aliasing_labels_leads_cust_fiel_1] <> "N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_1]), 
-			        VAR ___f = FILTERS (ssr_history[entity_crm_custom_value_1]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_1] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_1], ", " )
-			        VAR ___x = [meas.aliasing_labels_leads_cust_fiel_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_1] &" : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_leads_cust_fiel_1] <> "N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_1]),
+			VAR ___f = FILTERS (ssr_history[entity_crm_custom_value_1])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_1] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_1], ", " )
+			VAR ___x = [meas.aliasing_labels_leads_cust_fiel_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_1] &" : All"
+			),
+			"N/A"
 			)
-			
+
 			var leads_custfield2_str = IF(
-			    [meas.aliasing_labels_leads_cust_fiel_2] <>"N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_2]), 
-			        VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_2]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_2] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_2], ", " )
-			        VAR ___x = [meas.aliasing_labels_leads_cust_fiel_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_2] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_leads_cust_fiel_2] <>"N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_2]),
+			VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_2])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_2] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_2], ", " )
+			VAR ___x = [meas.aliasing_labels_leads_cust_fiel_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_2] & " : All"
+			),
+			"N/A"
 			)
-			
+
 			var leads_custfield3_str = IF(
-			    [meas.aliasing_labels_leads_cust_fiel_3]<>"N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_3]), 
-			        VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_3]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_3] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_3], ", " )
-			        VAR ___x = [meas.aliasing_labels_leads_cust_fiel_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_3] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_leads_cust_fiel_3]<>"N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_3]),
+			VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_3])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_3] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_3], ", " )
+			VAR ___x = [meas.aliasing_labels_leads_cust_fiel_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_3] & " : All"
+			),
+			"N/A"
 			)
-			
-			
-			
-			
-			var res =  "When" & UNICHAR(13) & UNICHAR(10) & "  |  " & date_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) & "Who" & UNICHAR(13) & UNICHAR(10)  & " | "  &  group_str & UNICHAR(13) & UNICHAR(10) & "  |  " & user_role_str & UNICHAR(13) & UNICHAR(10) & " | "  &  userfunction_str & UNICHAR(13) & UNICHAR(10) & " | "  &  dept_str & UNICHAR(13) & UNICHAR(10) & " | "  &  mgrtotreports_str & UNICHAR(13) & UNICHAR(10) & " | "  &  mgrdirreports_str & UNICHAR(13) & UNICHAR(10) & " | "  &  username_str & UNICHAR(13) & UNICHAR(10) & " | "  &  rephireyear_str & UNICHAR(13) & UNICHAR(10) & " | "  &  reptermyear_str & UNICHAR(13) & UNICHAR(10) &  " | "  &  reploccountry_str & UNICHAR(13) & UNICHAR(10)  &  " | "  &  replocstate_str & UNICHAR(13) & UNICHAR(10) &   " | "  &  reploccity_str & UNICHAR(13) & UNICHAR(10) &   " | "  &  crm_mtach_id_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) 
-			
-			& "What" & UNICHAR(13) & UNICHAR(10) & 
+
+
+
+
+			var res =  "When" & UNICHAR(13) & UNICHAR(10) & "  |  " & date_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) & "Who" & UNICHAR(13) & UNICHAR(10)  & " | "  &  group_str & UNICHAR(13) & UNICHAR(10) & "  |  " & user_role_str & UNICHAR(13) & UNICHAR(10) & " | "  &  userfunction_str & UNICHAR(13) & UNICHAR(10) & " | "  &  dept_str & UNICHAR(13) & UNICHAR(10) & " | "  &  mgrtotreports_str & UNICHAR(13) & UNICHAR(10) & " | "  &  mgrdirreports_str & UNICHAR(13) & UNICHAR(10) & " | "  &  username_str & UNICHAR(13) & UNICHAR(10) & " | "  &  rephireyear_str & UNICHAR(13) & UNICHAR(10) & " | "  &  reptermyear_str & UNICHAR(13) & UNICHAR(10) &  " | "  &  reploccountry_str & UNICHAR(13) & UNICHAR(10)  &  " | "  &  replocstate_str & UNICHAR(13) & UNICHAR(10) &   " | "  &  reploccity_str & UNICHAR(13) & UNICHAR(10) &   " | "  &  crm_mtach_id_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10)
+
+			& "What" & UNICHAR(13) & UNICHAR(10) &
 			UNICHAR(13) & UNICHAR(10) &
-			
+
 			"Standardized Sales Process Steps" & UNICHAR(13) & UNICHAR(10) &
 			" | " & stepname_str & UNICHAR(13) & UNICHAR(10) &
 			" | " & substeps_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) &
-			
+
 			"Customer Segmentation" & UNICHAR(13) & UNICHAR(10) &
 			" | "  &  industry_str & UNICHAR(13) & UNICHAR(10) &
 			" | "  &  country_str & UNICHAR(13) & UNICHAR(10) &
 			" | "  &  companysize_str & UNICHAR(13) & UNICHAR(10) &
-			
+
 			UNICHAR(13) & UNICHAR(10) &  _ssr_crm_leadsource &
 			UNICHAR(13) & UNICHAR(10) &  _ssr_crm_leadsource_type &
 			UNICHAR(13) & UNICHAR(10) &
 			UNICHAR(13) & UNICHAR(10) &
-			
+
 			"Product " & UNICHAR(13) & UNICHAR(10) &
-			" | "  &  productfamily_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) & 
-			
+			" | "  &  productfamily_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) &
+
 			"(ERP/eCommerce) vs. Opps" & UNICHAR(13) & UNICHAR(10) &
 			" | "  &  opp_erp_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) &
-			
+
 			"Pipeline" & UNICHAR(13) & UNICHAR(10) &
 			" | "  &  opp_pipeline_name_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) &
-			
+
 			"Custom Fields" & UNICHAR(13) & UNICHAR(10) &
-			
+
 			"Leads : " &
 			UNICHAR(13) & UNICHAR(10) & leads_custfield1_str &
 			UNICHAR(13) & UNICHAR(10) &  leads_custfield2_str &
 			UNICHAR(13) & UNICHAR(10) &  leads_custfield3_str &
 			UNICHAR(13) & UNICHAR(10) &
 			UNICHAR(13) & UNICHAR(10) &
-			
+
 			"Accounts: " &
 			UNICHAR(13) & UNICHAR(10) & acc_custfield1_str &
 			UNICHAR(13) & UNICHAR(10) &  acc_custfield2_str &
 			UNICHAR(13) & UNICHAR(10) &  acc_custfield3_str &
 			UNICHAR(13) & UNICHAR(10) &
 			UNICHAR(13) & UNICHAR(10) &
-			
+
 			"Opportunities:" &
 			UNICHAR(13) & UNICHAR(10) & opp_custfield1_str &
 			UNICHAR(13) & UNICHAR(10) &  opp_custfield2_str &
 			UNICHAR(13) & UNICHAR(10) &  opp_custfield3_str &
 			UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10)
-			
-			return 
+
+			return
 			res
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: 3c24663e-f9df-402c-afeb-239cbdbf6b15
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'DumpFilters cal_end_dates' = ```
-			
+
 			VAR MaxFilters = 3
 			RETURN
-			IF ( 
-			    ISFILTERED ( cal_end_dates[Date] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[Date] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[Date] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[Date], ", " )
-			    VAR ___x = "cal_end_dates[Date] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			IF (
+			ISFILTERED ( cal_end_dates[Date] ),
+			VAR ___f = FILTERS ( cal_end_dates[Date] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[Date] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[Date], ", " )
+			VAR ___x = "cal_end_dates[Date] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[date_as_integer] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[date_as_integer] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[date_as_integer] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[date_as_integer], ", " )
-			    VAR ___x = "cal_end_dates[date_as_integer] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[date_as_integer] ),
+			VAR ___f = FILTERS ( cal_end_dates[date_as_integer] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[date_as_integer] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[date_as_integer], ", " )
+			VAR ___x = "cal_end_dates[date_as_integer] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[day_of_week] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[day_of_week] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[day_of_week] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[day_of_week], ", " )
-			    VAR ___x = "cal_end_dates[day_of_week] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[day_of_week] ),
+			VAR ___f = FILTERS ( cal_end_dates[day_of_week] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[day_of_week] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[day_of_week], ", " )
+			VAR ___x = "cal_end_dates[day_of_week] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[day_of_week_number] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[day_of_week_number] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[day_of_week_number] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[day_of_week_number], ", " )
-			    VAR ___x = "cal_end_dates[day_of_week_number] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[day_of_week_number] ),
+			VAR ___f = FILTERS ( cal_end_dates[day_of_week_number] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[day_of_week_number] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[day_of_week_number], ", " )
+			VAR ___x = "cal_end_dates[day_of_week_number] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[day_of_week_short] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[day_of_week_short] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[day_of_week_short] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[day_of_week_short], ", " )
-			    VAR ___x = "cal_end_dates[day_of_week_short] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[day_of_week_short] ),
+			VAR ___f = FILTERS ( cal_end_dates[day_of_week_short] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[day_of_week_short] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[day_of_week_short], ", " )
+			VAR ___x = "cal_end_dates[day_of_week_short] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[month_name_long] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[month_name_long] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[month_name_long] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[month_name_long], ", " )
-			    VAR ___x = "cal_end_dates[month_name_long] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[month_name_long] ),
+			VAR ___f = FILTERS ( cal_end_dates[month_name_long] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[month_name_long] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[month_name_long], ", " )
+			VAR ___x = "cal_end_dates[month_name_long] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[month_name_short] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[month_name_short] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[month_name_short] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[month_name_short], ", " )
-			    VAR ___x = "cal_end_dates[month_name_short] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[month_name_short] ),
+			VAR ___f = FILTERS ( cal_end_dates[month_name_short] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[month_name_short] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[month_name_short], ", " )
+			VAR ___x = "cal_end_dates[month_name_short] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[month_number] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[month_number] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[month_number] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[month_number], ", " )
-			    VAR ___x = "cal_end_dates[month_number] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[month_number] ),
+			VAR ___f = FILTERS ( cal_end_dates[month_number] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[month_number] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[month_number], ", " )
+			VAR ___x = "cal_end_dates[month_number] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[quarter] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[quarter] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[quarter] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[quarter], ", " )
-			    VAR ___x = "cal_end_dates[quarter] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[quarter] ),
+			VAR ___f = FILTERS ( cal_end_dates[quarter] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[quarter] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[quarter], ", " )
+			VAR ___x = "cal_end_dates[quarter] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[year] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[year] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[year] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[year], ", " )
-			    VAR ___x = "cal_end_dates[year] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[year] ),
+			VAR ___f = FILTERS ( cal_end_dates[year] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[year] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[year], ", " )
+			VAR ___x = "cal_end_dates[year] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[year_month_number] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[year_month_number] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[year_month_number] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[year_month_number], ", " )
-			    VAR ___x = "cal_end_dates[year_month_number] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[year_month_number] ),
+			VAR ___f = FILTERS ( cal_end_dates[year_month_number] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[year_month_number] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[year_month_number], ", " )
+			VAR ___x = "cal_end_dates[year_month_number] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[year_month_short] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[year_month_short] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[year_month_short] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[year_month_short], ", " )
-			    VAR ___x = "cal_end_dates[year_month_short] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[year_month_short] ),
+			VAR ___f = FILTERS ( cal_end_dates[year_month_short] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[year_month_short] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[year_month_short], ", " )
+			VAR ___x = "cal_end_dates[year_month_short] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			 & IF ( 
-			    ISFILTERED ( cal_end_dates[year_quarter] ), 
-			    VAR ___f = FILTERS ( cal_end_dates[year_quarter] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[year_quarter] )
-			    VAR ___d = CONCATENATEX ( ___t, cal_end_dates[year_quarter], ", " )
-			    VAR ___x = "cal_end_dates[year_quarter] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
+			& IF (
+			ISFILTERED ( cal_end_dates[year_quarter] ),
+			VAR ___f = FILTERS ( cal_end_dates[year_quarter] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( MaxFilters, ___f, cal_end_dates[year_quarter] )
+			VAR ___d = CONCATENATEX ( ___t, cal_end_dates[year_quarter], ", " )
+			VAR ___x = "cal_end_dates[year_quarter] = " & ___d & IF(___r > MaxFilters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
-			
-			```
+
+	```
 		displayFolder: __needs_attention
 		lineageTag: 53a59e30-5a64-4b49-8c66-ce6f79152608
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.dynamic_date_period' = ```
-			Max(cal_end_dates[Date]) 
-			```
+			Max(cal_end_dates[Date])
+	```
 		formatString: General Date
 		displayFolder: __needs_attention
 		lineageTag: e7904eee-f3a8-43c6-b6ec-758aaa9647ac
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.context_date_min' = CALCULATE(min([Date]))
 		formatString: Short Date
 		displayFolder: _date_helpers
@@ -567,6 +583,10 @@ table cal_end_dates
 
 		changedProperty = FormatString
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.context_date_max' = CALCULATE(max([Date])) -- the max date of a period
 		formatString: Short Date
 		displayFolder: _date_helpers
@@ -574,8 +594,12 @@ table cal_end_dates
 
 		changedProperty = FormatString
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.context_prev_period_max' = ```
-			
+
 			var period_start =  CALCULATE(min([Date]))
 			var period_end =  CALCULATE(max([Date]))
 			var period_in_months =  DATEDIFF(period_start, period_end + 1, month) * -1
@@ -583,17 +607,21 @@ table cal_end_dates
 			var prev_period_end =   EDATE(period_end,period_in_months)
 			var res = prev_period_end
 			return res
-			
-			
-			```
+
+
+	```
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: ff71e57c-ddd1-448e-9bc2-e103ffdbf5a8
 
 		changedProperty = FormatString
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.context_prev_period_min' = ```
-			
+
 			var period_start =  CALCULATE(min([Date]))
 			var period_end =  CALCULATE(max([Date]))
 			var period_in_months =  DATEDIFF(period_start, period_end + 1, month) * -1
@@ -601,21 +629,29 @@ table cal_end_dates
 			var prev_period_end =   EDATE(period_end,period_in_months)
 			var res = prev_period_start
 			return res
-			
-			
-			```
+
+
+	```
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: 3dbf3f5d-68a8-426f-824b-75751aebb196
 
 		changedProperty = FormatString
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.first_filt_date' = date(2010,01,01)
 		formatString: General Date
 		displayFolder: __needs_attention
 		lineageTag: 8061d3ce-bc08-42a4-8ffa-8b0d7253cabe
 
-	measure 'meas.end_of_prev_year_as_of' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.end_of_prev_year_as_of' = 
 			
 			var asof_prevyear = Year(MAX(ssr[_sys_as_of])) -1
 			var res = date(asof_prevyear,12,31)
@@ -624,121 +660,153 @@ table cal_end_dates
 		displayFolder: _date_helpers
 		lineageTag: 438fecb4-807d-4ca3-9f8e-24197be82673
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.filter_string' = ```
-			
-			
+
+
 			VAR _active_slicer_count = [meas.criteria_active_filters_count]
 			//var filter_start_table = topn(1, filter(cal_end_dates,[Date])) // "01/01/2010"
 			//var filter_start_val = ISFILTERED(cal_end_dates[Date]) //  min(filter_start_table[Date])
 			var max_filters =3
 			var date_str =  "Date: " & Min(cal_end_dates[Date])  & " - " &  Max(cal_end_dates[Date])
-			
-			var user_role_str = IF ( 
-			    ISFILTERED ( users[trueai_user_role_alias]), 
-			    VAR ___f = FILTERS ( users[trueai_user_role_alias] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_user_role_alias] )
-			    VAR ___d = CONCATENATEX ( ___t, users [trueai_user_role_alias], ", " )
-			    VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Role: All"
+
+			var user_role_str = IF (
+			ISFILTERED ( users[trueai_user_role_alias]),
+			VAR ___f = FILTERS ( users[trueai_user_role_alias] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_user_role_alias] )
+			VAR ___d = CONCATENATEX ( ___t, users [trueai_user_role_alias], ", " )
+			VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Role: All"
 			)
-			
-			var group_str = IF ( 
-			    ISFILTERED ( users[trueai_group]), 
-			    VAR ___f = FILTERS ( users[trueai_group] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
-			    VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Group: All"
+
+			var group_str = IF (
+			ISFILTERED ( users[trueai_group]),
+			VAR ___f = FILTERS ( users[trueai_group] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
+			VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Group: All"
 			)
-			
+
 			var res =  date_str & "  |  " & user_role_str & "  |  "  &  group_str
 			RETURN
 			IF(
-			    _active_slicer_count >0,
-			    res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
-			    res
+			_active_slicer_count >0,
+			res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
+			res
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: 0e9f4d40-1128-4ca5-ada9-417fa063d10d
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.relative_year' = ```
-			
+
 			var max_date = [meas.filter_date_max]
 			var curr_context_date = [meas.context_date_max]
 			var rel_period = DATEDIFF(  max_date, curr_context_date, YEAR)
 			var res = rel_period
-			return res 
-			```
+			return res
+	```
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: f5ac0b22-bebb-4965-bcea-73be44b4e6c0
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.filter_date_max' = ```
-			
-			
-			VAR res = MAXX (CALCULATETABLE(ALLSELECTED ( cal_end_dates )), cal_end_dates[Date]) 
+
+
+			VAR res = MAXX (CALCULATETABLE(ALLSELECTED ( cal_end_dates )), cal_end_dates[Date])
 			Return res
-			
-			
-			```
+
+
+	```
 		formatString: General Date
 		displayFolder: _date_helpers
 		lineageTag: ea526ed6-3776-4dcc-94a6-36856278b0bc
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.relative_month' = ```
-			
+
 			var max_date = [meas.filter_date_max]
 			var curr_context_date = [meas.context_date_max]
 			var rel_period = DATEDIFF(  max_date, curr_context_date, MONTH)
 			var res = rel_period
-			return res 
-			```
+			return res
+	```
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 3ae7b508-2cd4-4af3-bc5c-5124b75128e2
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.relative_qtr' = ```
-			
+
 			var max_date = [meas.filter_date_max]
 			var curr_context_date = [meas.context_date_max]
 			var rel_period = DATEDIFF(  max_date, curr_context_date, QUARTER)
 			var res = rel_period
-			return res 
-			```
+			return res
+	```
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 0a42b663-9ce6-4528-8dea-88502a2358eb
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.relative_week' = ```
-			
+
 			var max_date = [meas.filter_date_max]
 			var curr_context_date = [meas.context_date_max]
 			var rel_period = DATEDIFF(  max_date, curr_context_date, WEEK)
 			var res = rel_period
-			return res 
-			```
+			return res
+	```
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 969c62b9-5485-4f67-b1ac-ea5590007180
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.relative_day' = ```
-			
+
 			var max_date = [meas.filter_date_max]
 			var curr_context_date = [meas.context_date_max]
 			var rel_period = DATEDIFF(  max_date, curr_context_date, DAY)
 			var res = rel_period
-			return res 
-			```
+			return res
+	```
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 1bb41c93-8141-4c96-a44b-dcd1b7f8518f
 
-	measure 'meas.filter_first_of_year_date_string' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.filter_first_of_year_date_string' = 
 			
 			
 			//var filter_start_table = topn(1, filter(cal_end_dates,[first_of_year_date]])) // "2010"
@@ -750,648 +818,708 @@ table cal_end_dates
 		displayFolder: _filter_helpers
 		lineageTag: 0a8552ea-34ce-4249-b450-939e6c3e0b1c
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.filter_year' = Year([meas.filter_date_max]) & ""
 		displayFolder: _filter_helpers
 		lineageTag: 9e1f9e43-9e18-4e3d-8f09-6599b4e97631
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.filter_date_min' = ```
-			
-			
-			VAR res = MINX (CALCULATETABLE(ALLSELECTED ( cal_end_dates )), cal_end_dates[Date]) 
+
+
+			VAR res = MINX (CALCULATETABLE(ALLSELECTED ( cal_end_dates )), cal_end_dates[Date])
 			Return res
-			
-			
-			```
+
+
+	```
 		formatString: General Date
 		displayFolder: _date_helpers
 		lineageTag: 33a44e1e-5dd2-4860-8ca3-ff716c6b2544
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.data_logs_user_new_terminations_pos' = ```
-			
-			
-			
-			var fromDate =[meas.context_date_min] 
-			var toDate = [meas.context_date_max] 
-			
-			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_termination_date] >= fromDate &&     users_history[trueai_termination_date]  <= toDate 
+
+
+
+			var fromDate =[meas.context_date_min]
+			var toDate = [meas.context_date_max]
+
+			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]),
+			users_history[trueai_termination_date] >= fromDate &&     users_history[trueai_termination_date]  <= toDate
 			)
 			return res * 1
-			```
+	```
 		formatString: 0
 		lineageTag: da3d37b7-d270-4d82-a183-7092ad11bb0b
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.prior_year' = YEAR(MAX(cal_end_dates[Date]))
 		formatString: 0
 		lineageTag: 11707a90-f9fe-4e34-8794-bf5aa4facfe6
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.active_user_filter_string' = ```
-			
+
 			VAR _active_slicer_count = [meas.criteria_active_filters_count]
-			
+
 			//var filter_start_table = topn(1, filter(cal_end_dates,[Date])) // "01/01/2010"
 			//var filter_start_val = ISFILTERED(cal_end_dates[Date]) //  min(filter_start_table[Date])
 			var max_filters =3
 			var date_str = "As of: " & Max(cal_end_dates[Date])  //"Date: "  &  Max(cal_start_dates[Date])
-			
-			var user_role_str = IF ( 
-			    ISFILTERED ( users[trueai_user_role_alias]), 
-			    VAR ___f = FILTERS ( users[trueai_user_role_alias] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_user_role_alias] )
-			    VAR ___d = CONCATENATEX ( ___t, users [trueai_user_role_alias], ", " )
-			    VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Role: All"
+
+			var user_role_str = IF (
+			ISFILTERED ( users[trueai_user_role_alias]),
+			VAR ___f = FILTERS ( users[trueai_user_role_alias] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_user_role_alias] )
+			VAR ___d = CONCATENATEX ( ___t, users [trueai_user_role_alias], ", " )
+			VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Role: All"
 			)
-			
-			var group_str = IF ( 
-			    ISFILTERED ( users[trueai_group]), 
-			    VAR ___f = FILTERS ( users[trueai_group] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
-			    VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Group: All"
+
+			var group_str = IF (
+			ISFILTERED ( users[trueai_group]),
+			VAR ___f = FILTERS ( users[trueai_group] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
+			VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Group: All"
 			)
-			
+
 			var res =  date_str & "  |  " & user_role_str & "  |  "  &  group_str
 			RETURN
 			IF(
-			    _active_slicer_count >0,
-			    res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
-			    res
+			_active_slicer_count >0,
+			res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
+			res
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: e6db8f05-3598-4f7c-ae2c-360591df6c38
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.current_page_filter_string' = CALCULATE(Max(cal_end_dates[Date]))
 		formatString: Short Date
 		displayFolder: _filter_helpers
 		lineageTag: 25384dcf-0901-4fb5-a134-31612f5d3f98
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.aliasing_labels_accounts_cust_field_1' = ```
-			
-			 // needs to be filterd by correct model/field to show the right data
-			 var alias_str = CALCULATE(
-			    FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
-			    metadata_aliasing[label]="crm_cat_var_1" && metadata_aliasing[model]="peek_inside_customer_accounts"
+
+			// needs to be filterd by correct model/field to show the right data
+			var alias_str = CALCULATE(
+			FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
+			metadata_aliasing[label]="crm_cat_var_1" && metadata_aliasing[model]="peek_inside_customer_accounts"
 			)
-			
+
 			RETURN
 			IF(
-			    alias_str = BLANK(),
-			    "Custom Field 1 (Not Used)",
-			    alias_str
+			alias_str = BLANK(),
+			"Custom Field 1 (Not Used)",
+			alias_str
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: 84f61f78-e3dd-4d3d-bf74-190860b35b02
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.aliasing_labels_accounts_cust_field_2' = ```
-			
-			 // needs to be filterd by correct model/field to show the right data
-			 var alias_str = CALCULATE(
-			    FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
-			    metadata_aliasing[label]="crm_cat_var_2" && metadata_aliasing[model]="peek_inside_customer_accounts"
+
+			// needs to be filterd by correct model/field to show the right data
+			var alias_str = CALCULATE(
+			FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
+			metadata_aliasing[label]="crm_cat_var_2" && metadata_aliasing[model]="peek_inside_customer_accounts"
 			)
-			
+
 			RETURN
 			IF(
-			    alias_str = BLANK(),
-			    "Custom Field 2 (Not Used)",
-			    alias_str
+			alias_str = BLANK(),
+			"Custom Field 2 (Not Used)",
+			alias_str
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: 6a326ead-c9bc-4c2e-901a-f832145e701e
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.aliasing_labels_accounts_cust_field_3' = ```
-			
-			 // needs to be filterd by correct model/field to show the right data
-			 var alias_str = CALCULATE(
-			    FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
-			    metadata_aliasing[label]="crm_cat_var_3" && metadata_aliasing[model]="peek_inside_customer_accounts"
+
+			// needs to be filterd by correct model/field to show the right data
+			var alias_str = CALCULATE(
+			FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
+			metadata_aliasing[label]="crm_cat_var_3" && metadata_aliasing[model]="peek_inside_customer_accounts"
 			)
-			
+
 			RETURN
 			IF(
-			    alias_str = BLANK(),
-			    "Custom Field 3 (Not Used)",
-			    alias_str
+			alias_str = BLANK(),
+			"Custom Field 3 (Not Used)",
+			alias_str
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: b700819b-a3c3-4a42-814a-febb88f0cfd8
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.aliasing_labels_opps_cust_field_1' = ```
-			
-			 // needs to be filterd by correct model/field to show the right data
+
+			// needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
-			    FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
-			    metadata_aliasing[label]="crm_cat_var_1",
-			    metadata_aliasing[model]="peek_inside_opps"
+			FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
+			metadata_aliasing[label]="crm_cat_var_1",
+			metadata_aliasing[model]="peek_inside_opps"
 			)
-			
+
 			RETURN
 			IF(
-			    alias_str = BLANK(),
-			    "Custom Field 1 (Not Used)",
-			    alias_str
+			alias_str = BLANK(),
+			"Custom Field 1 (Not Used)",
+			alias_str
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: a15ccfa1-33da-4632-a2fc-47b0cf2abd9f
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.aliasing_labels_opps_cust_field_2' = ```
-			
-			 // needs to be filterd by correct model/field to show the right data
+
+			// needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
-			    FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
-			    metadata_aliasing[label]="crm_cat_var_2",
-			    metadata_aliasing[model]="peek_inside_opps"
+			FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
+			metadata_aliasing[label]="crm_cat_var_2",
+			metadata_aliasing[model]="peek_inside_opps"
 			)
 			RETURN
 			IF(
-			    alias_str = BLANK(),
-			    "Custom Field 2 (Not Used)",
-			    alias_str
+			alias_str = BLANK(),
+			"Custom Field 2 (Not Used)",
+			alias_str
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: 8c4b5a7f-bed6-4bad-8f2e-2eac34b97e34
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.aliasing_labels_opps_cust_field_3' = ```
-			
-			 // needs to be filterd by correct model/field to show the right data
+
+			// needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
-			    FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
-			    metadata_aliasing[label]="crm_cat_var_3",
-			    metadata_aliasing[model]="peek_inside_opps"
+			FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
+			metadata_aliasing[label]="crm_cat_var_3",
+			metadata_aliasing[model]="peek_inside_opps"
 			)
-			
+
 			RETURN
 			IF(
-			    alias_str = BLANK(),
-			    "Custom Field 3 (Not Used)",
-			    alias_str
+			alias_str = BLANK(),
+			"Custom Field 3 (Not Used)",
+			alias_str
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: 1e3014e6-c531-4de9-9ed8-179f46bfc30f
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.filter_string_full_updated' = ```
-			
-			
+
+
 			var max_filters =15
 			var date_str =  "Date: " & Min(cal_end_dates[Date])  & " - " &  Max(cal_end_dates[Date] )
-			
-			var group_str = IF ( 
-			    ISFILTERED ( users[trueai_group]), 
-			    VAR ___f = FILTERS ( users[trueai_group] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
-			    VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Group: All"
+
+			var group_str = IF (
+			ISFILTERED ( users[trueai_group]),
+			VAR ___f = FILTERS ( users[trueai_group] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
+			VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Group: All"
 			)
-			
-			var user_role_str = IF ( 
-			    ISFILTERED ( users_history[trueai_user_role_alias]), 
-			    VAR ___f = FILTERS ( users_history[trueai_user_role_alias] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_alias] )
-			    VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_alias], ", " )
-			    VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x, "User Role: All"
+
+			var user_role_str = IF (
+			ISFILTERED ( users_history[trueai_user_role_alias]),
+			VAR ___f = FILTERS ( users_history[trueai_user_role_alias] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_alias] )
+			VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_alias], ", " )
+			VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x, "User Role: All"
 			)
-			
-			var userfunction_str = IF ( 
-			    ISFILTERED ( users_history[trueai_user_role_function]), 
-			    VAR ___f = FILTERS ( users_history[trueai_user_role_function] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_function] )
-			    VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_function], ", " )
-			    VAR ___x = "User Role Function: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Role Function: All"
+
+			var userfunction_str = IF (
+			ISFILTERED ( users_history[trueai_user_role_function]),
+			VAR ___f = FILTERS ( users_history[trueai_user_role_function] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_function] )
+			VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_function], ", " )
+			VAR ___x = "User Role Function: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Role Function: All"
 			)
-			
-			var dept_str = IF ( 
-			    ISFILTERED ( users_history[trueai_user_role_department]), 
-			    VAR ___f = FILTERS ( users_history[trueai_user_role_department] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_department] )
-			    VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_department], ", " )
-			    VAR ___x = "Department: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Department: All"
+
+			var dept_str = IF (
+			ISFILTERED ( users_history[trueai_user_role_department]),
+			VAR ___f = FILTERS ( users_history[trueai_user_role_department] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users_history[trueai_user_role_department] )
+			VAR ___d = CONCATENATEX ( ___t, users_history[trueai_user_role_department], ", " )
+			VAR ___x = "Department: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Department: All"
 			)
-			
-			var mgrtotreports_str = IF ( 
-			    ISFILTERED ( managers_total[trueai_full_name]), 
-			    VAR ___f = FILTERS ( managers_total [trueai_full_name]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, managers_total [trueai_full_name])
-			    VAR ___d = CONCATENATEX ( ___t, managers_total [trueai_full_name], ", " )
-			    VAR ___x = "Mgr. - All Reports: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Mgr. - All Reports: All"
+
+			var mgrtotreports_str = IF (
+			ISFILTERED ( managers_total[trueai_full_name]),
+			VAR ___f = FILTERS ( managers_total [trueai_full_name])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, managers_total [trueai_full_name])
+			VAR ___d = CONCATENATEX ( ___t, managers_total [trueai_full_name], ", " )
+			VAR ___x = "Mgr. - All Reports: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Mgr. - All Reports: All"
 			)
-			
-			var mgrdirreports_str = IF ( 
-			    ISFILTERED ( managers_direct[trueai_full_name]), 
-			    VAR ___f = FILTERS ( managers_direct [trueai_full_name]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, managers_direct [trueai_full_name] )
-			    VAR ___d = CONCATENATEX ( ___t, managers_direct [trueai_full_name], ", " )
-			    VAR ___x = "Mgr. - Only Direct Reports: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Mgr. - Only Direct Reports: All"
+
+			var mgrdirreports_str = IF (
+			ISFILTERED ( managers_direct[trueai_full_name]),
+			VAR ___f = FILTERS ( managers_direct [trueai_full_name])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, managers_direct [trueai_full_name] )
+			VAR ___d = CONCATENATEX ( ___t, managers_direct [trueai_full_name], ", " )
+			VAR ___x = "Mgr. - Only Direct Reports: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Mgr. - Only Direct Reports: All"
 			)
-			
-			var username_str = IF ( 
-			    ISFILTERED ( users[trueai_full_name]), 
-			    VAR ___f = FILTERS ( users[trueai_full_name]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_full_name] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_full_name], ", " )
-			    VAR ___x = "User Name: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Name: All"
+
+			var username_str = IF (
+			ISFILTERED ( users[trueai_full_name]),
+			VAR ___f = FILTERS ( users[trueai_full_name])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_full_name] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_full_name], ", " )
+			VAR ___x = "User Name: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Name: All"
 			)
-			
+
 			//var d =  ISFILTERED  (users[trueai_hire_date].[Year]) // CONCATENATEX(FILTERS ( users[trueai_hire_date]), users[trueai_hire_date], ", " )
-			
-			var rephireyear_str = IF ( 
-			    ISFILTERED ( users[trueai_hire_date].[Year]), 
-			    VAR ___f = FILTERS ( users[trueai_hire_date].[Year]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_hire_date].[Year] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_hire_date].[Year], ", " )
-			    VAR ___x = "User Hire Year: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Hire Year: All"
+
+			var rephireyear_str = IF (
+			ISFILTERED ( users[trueai_hire_date].[Year]),
+			VAR ___f = FILTERS ( users[trueai_hire_date].[Year])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_hire_date].[Year] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_hire_date].[Year], ", " )
+			VAR ___x = "User Hire Year: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Hire Year: All"
 			)
-			
-			var reptermyear_str = IF ( 
-			    ISFILTERED ( users[trueai_termination_date].[Year]), 
-			    VAR ___f = FILTERS ( users[trueai_termination_date].[Year]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f,users[trueai_termination_date].[Year] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_termination_date].[Year], ", " )
-			    VAR ___x = "User Termination Year: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Termination Year: All"
+
+			var reptermyear_str = IF (
+			ISFILTERED ( users[trueai_termination_date].[Year]),
+			VAR ___f = FILTERS ( users[trueai_termination_date].[Year])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,users[trueai_termination_date].[Year] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_termination_date].[Year], ", " )
+			VAR ___x = "User Termination Year: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Termination Year: All"
 			)
-			
-			var reploccountry_str = IF ( 
-			    ISFILTERED ( users[trueai_addr_country]), 
-			    VAR ___f = FILTERS ( users[trueai_addr_country]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_country] )
-			    VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_country], ", " )
-			    VAR ___x = "User Location Country: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Location Country: All"
+
+			var reploccountry_str = IF (
+			ISFILTERED ( users[trueai_addr_country]),
+			VAR ___f = FILTERS ( users[trueai_addr_country])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_country] )
+			VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_country], ", " )
+			VAR ___x = "User Location Country: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Location Country: All"
 			)
-			
-			var replocstate_str = IF ( 
-			    ISFILTERED ( users[trueai_addr_state]), 
-			    VAR ___f = FILTERS ( users[trueai_addr_state]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_state] )
-			    VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_state], ", " )
-			    VAR ___x = "User Location State: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Location State: All"
+
+			var replocstate_str = IF (
+			ISFILTERED ( users[trueai_addr_state]),
+			VAR ___f = FILTERS ( users[trueai_addr_state])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_state] )
+			VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_state], ", " )
+			VAR ___x = "User Location State: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Location State: All"
 			)
-			
-			var reploccity_str = IF ( 
-			    ISFILTERED ( users[trueai_addr_city]), 
-			    VAR ___f = FILTERS ( users[trueai_addr_city]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_city] )
-			    VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_city], ", " )
-			    VAR ___x = "User Location City: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Location City: All"
+
+			var reploccity_str = IF (
+			ISFILTERED ( users[trueai_addr_city]),
+			VAR ___f = FILTERS ( users[trueai_addr_city])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,users[trueai_addr_city] )
+			VAR ___d = CONCATENATEX ( ___t,users[trueai_addr_city], ", " )
+			VAR ___x = "User Location City: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Location City: All"
 			)
-			
-			var stepname_str = IF ( 
-			    ISFILTERED ( ssr_history[step_name]), 
-			    VAR ___f = FILTERS ( ssr_history[step_name]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr_history[step_name] )
-			    VAR ___d = CONCATENATEX ( ___t, ssr_history[step_name], ", " )
-			    VAR ___x = "Sales Process Steps: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Sales Process Steps: All"
+
+			var stepname_str = IF (
+			ISFILTERED ( ssr_history[step_name]),
+			VAR ___f = FILTERS ( ssr_history[step_name])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[step_name] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[step_name], ", " )
+			VAR ___x = "Sales Process Steps: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Sales Process Steps: All"
 			)
-			
-			var substeps_str = IF ( 
-			    ISFILTERED ( ssr_history[step_sub_type]), 
-			    VAR ___f = FILTERS ( ssr_history[step_sub_type]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr_history[step_sub_type] )
-			    VAR ___d = CONCATENATEX ( ___t, ssr_history[step_sub_type], ", " )
-			    VAR ___x = "Sales Process Sub-Steps: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Sales Process Sub-Steps: All"
+
+			var substeps_str = IF (
+			ISFILTERED ( ssr_history[step_sub_type]),
+			VAR ___f = FILTERS ( ssr_history[step_sub_type])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[step_sub_type] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[step_sub_type], ", " )
+			VAR ___x = "Sales Process Sub-Steps: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Sales Process Sub-Steps: All"
 			)
-			
-			var industry_str = IF ( 
-			    ISFILTERED ( ssr[trueai_industry]), 
-			    VAR ___f = FILTERS ( ssr[trueai_industry]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr[trueai_industry] )
-			    VAR ___d = CONCATENATEX ( ___t, ssr[trueai_industry], ", " )
-			    VAR ___x = "Industry: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Industry: All"
+
+			var industry_str = IF (
+			ISFILTERED ( ssr[trueai_industry]),
+			VAR ___f = FILTERS ( ssr[trueai_industry])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr[trueai_industry] )
+			VAR ___d = CONCATENATEX ( ___t, ssr[trueai_industry], ", " )
+			VAR ___x = "Industry: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Industry: All"
 			)
-			
-			var country_str = IF ( 
-			    ISFILTERED ( ssr[trueai_addr_country]), 
-			    VAR ___f = FILTERS ( ssr[trueai_addr_country]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr[trueai_addr_country] )
-			    VAR ___d = CONCATENATEX ( ___t, ssr[trueai_addr_country], ", " )
-			    VAR ___x = "Country: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Country: All"
+
+			var country_str = IF (
+			ISFILTERED ( ssr[trueai_addr_country]),
+			VAR ___f = FILTERS ( ssr[trueai_addr_country])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr[trueai_addr_country] )
+			VAR ___d = CONCATENATEX ( ___t, ssr[trueai_addr_country], ", " )
+			VAR ___x = "Country: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Country: All"
 			)
-			
-			var companysize_str = IF ( 
-			    ISFILTERED ( ssr_company_sizes[trueai_company_size]), 
-			    VAR ___f = FILTERS ( ssr_company_sizes[trueai_company_size]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr_company_sizes[trueai_company_size])
-			    VAR ___d = CONCATENATEX ( ___t, ssr_company_sizes[trueai_company_size], ", " )
-			    VAR ___x = "Company Size: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Company Size: All"
+
+			var companysize_str = IF (
+			ISFILTERED ( ssr_company_sizes[trueai_company_size]),
+			VAR ___f = FILTERS ( ssr_company_sizes[trueai_company_size])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_company_sizes[trueai_company_size])
+			VAR ___d = CONCATENATEX ( ___t, ssr_company_sizes[trueai_company_size], ", " )
+			VAR ___x = "Company Size: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Company Size: All"
 			)
-			
-			var productfamily_str = IF ( 
-			    ISFILTERED (products[trueai_family]), 
-			    VAR ___f = FILTERS ( products[trueai_family]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, products[trueai_family])
-			    VAR ___d = CONCATENATEX ( ___t, products[trueai_family], ", " )
-			    VAR ___x = "Product Family: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Product Family: All"
+
+			var productfamily_str = IF (
+			ISFILTERED (products[trueai_family]),
+			VAR ___f = FILTERS ( products[trueai_family])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, products[trueai_family])
+			VAR ___d = CONCATENATEX ( ___t, products[trueai_family], ", " )
+			VAR ___x = "Product Family: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Product Family: All"
 			)
-			
-			var crm_mtach_id_str = IF ( 
-			    ISFILTERED (users[trueai_ext_match_id]), 
-			    VAR ___f = FILTERS ( users[trueai_ext_match_id]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_ext_match_id])
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_ext_match_id], ", " )
-			    VAR ___x = "HR Roster Matches Only: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "HR Roster Matches Only: All"
+
+			var crm_mtach_id_str = IF (
+			ISFILTERED (users[trueai_ext_match_id]),
+			VAR ___f = FILTERS ( users[trueai_ext_match_id])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_ext_match_id])
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_ext_match_id], ", " )
+			VAR ___x = "HR Roster Matches Only: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "HR Roster Matches Only: All"
 			)
-			
-			var _booking_amt_mode = IF ( 
-			    ISFILTERED ( all_act_support[Booking Amount Display Mode]), 
-			    VAR ___f = FILTERS ( all_act_support[Booking Amount Display Mode]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, all_act_support[Booking Amount Display Mode])
-			    VAR ___d = CONCATENATEX ( ___t, all_act_support[Booking Amount Display Mode], ", " )
-			    VAR ___x = "Booking Amount Display Mode: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Booking Amount Display Mode: All"
+
+			var _booking_amt_mode = IF (
+			ISFILTERED ( all_act_support[Booking Amount Display Mode]),
+			VAR ___f = FILTERS ( all_act_support[Booking Amount Display Mode])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, all_act_support[Booking Amount Display Mode])
+			VAR ___d = CONCATENATEX ( ___t, all_act_support[Booking Amount Display Mode], ", " )
+			VAR ___x = "Booking Amount Display Mode: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Booking Amount Display Mode: All"
 			)
-			
-			var _ssr_crm_leadsource = IF ( 
-			    ISFILTERED ( ssr[crm_leadsource]), 
-			    VAR ___f = FILTERS ( ssr[crm_leadsource]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr[crm_leadsource])
-			    VAR ___d = CONCATENATEX ( ___t, ssr[crm_leadsource], ", " )
-			    VAR ___x = "Lead Source CRM Name: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x ," | "  &  "Lead Source CRM Name: All"
+
+			var _ssr_crm_leadsource = IF (
+			ISFILTERED ( ssr[crm_leadsource]),
+			VAR ___f = FILTERS ( ssr[crm_leadsource])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr[crm_leadsource])
+			VAR ___d = CONCATENATEX ( ___t, ssr[crm_leadsource], ", " )
+			VAR ___x = "Lead Source CRM Name: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  &  "Lead Source CRM Name: All"
 			)
-			
-			var _ssr_crm_leadsource_type = IF ( 
-			    ISFILTERED ( ssr[col.trueai_leadsource_inbound_outbound]), 
-			    VAR ___f = FILTERS ( ssr[col.trueai_leadsource_inbound_outbound]) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr[col.trueai_leadsource_inbound_outbound])
-			    VAR ___d = CONCATENATEX ( ___t, ssr[col.trueai_leadsource_inbound_outbound], ", " )
-			    VAR ___x = "Lead Source Type: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x ," | "  &  "Lead Source Type: All"
+
+			var _ssr_crm_leadsource_type = IF (
+			ISFILTERED ( ssr[col.trueai_leadsource_inbound_outbound]),
+			VAR ___f = FILTERS ( ssr[col.trueai_leadsource_inbound_outbound])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr[col.trueai_leadsource_inbound_outbound])
+			VAR ___d = CONCATENATEX ( ___t, ssr[col.trueai_leadsource_inbound_outbound], ", " )
+			VAR ___x = "Lead Source Type: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  &  "Lead Source Type: All"
 			)
-			 
-			var acc_custfield1_str = 
+
+			var acc_custfield1_str =
 			IF(
-			    [meas.aliasing_labels_accounts_cust_field_1] <> "N/A",
-			    IF ( 
-			        ISFILTERED ( ssr[crm_account_custom_value_1]), 
-			        VAR ___f = FILTERS ( ssr[crm_account_custom_value_1]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f,  ssr[crm_account_custom_value_1] )
-			        VAR ___d = CONCATENATEX ( ___t,  ssr[crm_account_custom_value_1], ", " )
-			        VAR ___x = [meas.aliasing_labels_accounts_cust_field_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_1] &" : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_accounts_cust_field_1] <> "N/A",
+			IF (
+			ISFILTERED ( ssr[crm_account_custom_value_1]),
+			VAR ___f = FILTERS ( ssr[crm_account_custom_value_1])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,  ssr[crm_account_custom_value_1] )
+			VAR ___d = CONCATENATEX ( ___t,  ssr[crm_account_custom_value_1], ", " )
+			VAR ___x = [meas.aliasing_labels_accounts_cust_field_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_1] &" : All"
+			),
+			"N/A"
 			)
-			
+
 			var acc_custfield2_str =
 			IF(
-			    [meas.aliasing_labels_accounts_cust_field_2] <> "N/A",
-			    IF ( 
-			        ISFILTERED ( ssr[crm_account_custom_value_2]), 
-			        VAR ___f = FILTERS ( ssr[crm_account_custom_value_2]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f,  ssr[crm_account_custom_value_2] )
-			        VAR ___d = CONCATENATEX ( ___t,  ssr[crm_account_custom_value_2], ", " )
-			        VAR ___x = [meas.aliasing_labels_accounts_cust_field_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_2] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_accounts_cust_field_2] <> "N/A",
+			IF (
+			ISFILTERED ( ssr[crm_account_custom_value_2]),
+			VAR ___f = FILTERS ( ssr[crm_account_custom_value_2])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f,  ssr[crm_account_custom_value_2] )
+			VAR ___d = CONCATENATEX ( ___t,  ssr[crm_account_custom_value_2], ", " )
+			VAR ___x = [meas.aliasing_labels_accounts_cust_field_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_2] & " : All"
+			),
+			"N/A"
 			)
-			
+
 			var acc_custfield3_str =IF(
-			    [meas.aliasing_labels_accounts_cust_field_3] <> "N/A",
-			    IF ( 
-			        ISFILTERED ( ssr[crm_account_custom_value_3]), 
-			        VAR ___f = FILTERS ( ssr[crm_account_custom_value_3]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr[crm_account_custom_value_3] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr[crm_account_custom_value_3], ", " )
-			        VAR ___x = [meas.aliasing_labels_accounts_cust_field_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_3] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_accounts_cust_field_3] <> "N/A",
+			IF (
+			ISFILTERED ( ssr[crm_account_custom_value_3]),
+			VAR ___f = FILTERS ( ssr[crm_account_custom_value_3])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr[crm_account_custom_value_3] )
+			VAR ___d = CONCATENATEX ( ___t, ssr[crm_account_custom_value_3], ", " )
+			VAR ___x = [meas.aliasing_labels_accounts_cust_field_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_accounts_cust_field_3] & " : All"
+			),
+			"N/A"
 			)
-			
-			
+
+
 			var opp_custfield1_str = IF(
-			    [meas.aliasing_labels_opps_cust_field_1] <> "N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_1]), 
-			        VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_1]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_1] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_1], ", " )
-			        VAR ___x = [meas.aliasing_labels_opps_cust_field_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_1] &" : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_opps_cust_field_1] <> "N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_1]),
+			VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_1])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_1] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_1], ", " )
+			VAR ___x = [meas.aliasing_labels_opps_cust_field_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_1] &" : All"
+			),
+			"N/A"
 			)
-			
+
 			var opp_custfield2_str = IF(
-			    [meas.aliasing_labels_opps_cust_field_2] <>"N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_2]), 
-			        VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_2]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_2] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_2], ", " )
-			        VAR ___x = [meas.aliasing_labels_opps_cust_field_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_2] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_opps_cust_field_2] <>"N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_2]),
+			VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_2])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_2] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_2], ", " )
+			VAR ___x = [meas.aliasing_labels_opps_cust_field_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_2] & " : All"
+			),
+			"N/A"
 			)
-			
+
 			var opp_custfield3_str = IF(
-			    [meas.aliasing_labels_opps_cust_field_3]<>"N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_3]), 
-			        VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_3]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_3] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_3], ", " )
-			        VAR ___x = [meas.aliasing_labels_opps_cust_field_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_3] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_opps_cust_field_3]<>"N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_3]),
+			VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_3])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_3] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_3], ", " )
+			VAR ___x = [meas.aliasing_labels_opps_cust_field_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_opps_cust_field_3] & " : All"
+			),
+			"N/A"
 			)
-			
+
 			var leads_custfield1_str = IF(
-			    [meas.aliasing_labels_leads_cust_fiel_1] <> "N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_1]), 
-			        VAR ___f = FILTERS (ssr_history[entity_crm_custom_value_1]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_1] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_1], ", " )
-			        VAR ___x = [meas.aliasing_labels_leads_cust_fiel_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_1] &" : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_leads_cust_fiel_1] <> "N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_1]),
+			VAR ___f = FILTERS (ssr_history[entity_crm_custom_value_1])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_1] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_1], ", " )
+			VAR ___x = [meas.aliasing_labels_leads_cust_fiel_1] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_1] &" : All"
+			),
+			"N/A"
 			)
-			
+
 			var leads_custfield2_str = IF(
-			    [meas.aliasing_labels_leads_cust_fiel_2] <>"N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_2]), 
-			        VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_2]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_2] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_2], ", " )
-			        VAR ___x = [meas.aliasing_labels_leads_cust_fiel_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_2] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_leads_cust_fiel_2] <>"N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_2]),
+			VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_2])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_2] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_2], ", " )
+			VAR ___x = [meas.aliasing_labels_leads_cust_fiel_2] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_2] & " : All"
+			),
+			"N/A"
 			)
-			
+
 			var leads_custfield3_str = IF(
-			    [meas.aliasing_labels_leads_cust_fiel_3]<>"N/A",
-			    IF ( 
-			        ISFILTERED ( ssr_history[entity_crm_custom_value_3]), 
-			        VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_3]) 
-			        VAR ___r = COUNTROWS ( ___f ) 
-			        VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_3] )
-			        VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_3], ", " )
-			        VAR ___x = [meas.aliasing_labels_leads_cust_fiel_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			        RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_3] & " : All"
-			    ),
-			    "N/A"
+			[meas.aliasing_labels_leads_cust_fiel_3]<>"N/A",
+			IF (
+			ISFILTERED ( ssr_history[entity_crm_custom_value_3]),
+			VAR ___f = FILTERS ( ssr_history[entity_crm_custom_value_3])
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[entity_crm_custom_value_3] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[entity_crm_custom_value_3], ", " )
+			VAR ___x = [meas.aliasing_labels_leads_cust_fiel_3] & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x ," | "  & [meas.aliasing_labels_leads_cust_fiel_3] & " : All"
+			),
+			"N/A"
 			)
-			
-			
-			
-			
-			var res = "When" & UNICHAR(13) & UNICHAR(10) & "  |  " & date_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) & "Who" & UNICHAR(13) & UNICHAR(10)  & " | "  &  group_str & UNICHAR(13) & UNICHAR(10) & "  |  " & user_role_str & UNICHAR(13) & UNICHAR(10) & " | "  &  userfunction_str & UNICHAR(13) & UNICHAR(10) & " | "  &  dept_str & UNICHAR(13) & UNICHAR(10) & " | "  &  mgrtotreports_str & UNICHAR(13) & UNICHAR(10) & " | "  &  mgrdirreports_str & UNICHAR(13) & UNICHAR(10) & " | "  &  username_str & UNICHAR(13) & UNICHAR(10) & " | "  &  rephireyear_str & UNICHAR(13) & UNICHAR(10) & " | "  &  reptermyear_str & UNICHAR(13) & UNICHAR(10) &  " | "  &  reploccountry_str & UNICHAR(13) & UNICHAR(10)  &  " | "  &  replocstate_str & UNICHAR(13) & UNICHAR(10) &   " | "  &  reploccity_str & UNICHAR(13) & UNICHAR(10) &   " | "  &  crm_mtach_id_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) 
-			
-			& "What" & UNICHAR(13) & UNICHAR(10) & 
+
+
+
+
+			var res = "When" & UNICHAR(13) & UNICHAR(10) & "  |  " & date_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) & "Who" & UNICHAR(13) & UNICHAR(10)  & " | "  &  group_str & UNICHAR(13) & UNICHAR(10) & "  |  " & user_role_str & UNICHAR(13) & UNICHAR(10) & " | "  &  userfunction_str & UNICHAR(13) & UNICHAR(10) & " | "  &  dept_str & UNICHAR(13) & UNICHAR(10) & " | "  &  mgrtotreports_str & UNICHAR(13) & UNICHAR(10) & " | "  &  mgrdirreports_str & UNICHAR(13) & UNICHAR(10) & " | "  &  username_str & UNICHAR(13) & UNICHAR(10) & " | "  &  rephireyear_str & UNICHAR(13) & UNICHAR(10) & " | "  &  reptermyear_str & UNICHAR(13) & UNICHAR(10) &  " | "  &  reploccountry_str & UNICHAR(13) & UNICHAR(10)  &  " | "  &  replocstate_str & UNICHAR(13) & UNICHAR(10) &   " | "  &  reploccity_str & UNICHAR(13) & UNICHAR(10) &   " | "  &  crm_mtach_id_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10)
+
+			& "What" & UNICHAR(13) & UNICHAR(10) &
 			UNICHAR(13) & UNICHAR(10) &
-			
-			"Booking Amount Display Mode" & UNICHAR(13) & UNICHAR(10) & 
+
+			"Booking Amount Display Mode" & UNICHAR(13) & UNICHAR(10) &
 			" | " & _booking_amt_mode & UNICHAR(13) & UNICHAR(10) &
 			UNICHAR(13) & UNICHAR(10) &
-			
-			"Customer Segmentation" & UNICHAR(13) & UNICHAR(10) & 
-			" | "  &  industry_str & UNICHAR(13) & UNICHAR(10) & 
-			" | "  &  country_str & UNICHAR(13) & UNICHAR(10) & 
-			" | "  &  companysize_str & UNICHAR(13) & UNICHAR(10) & 
-			UNICHAR(13) & UNICHAR(10) & 
-			
-			"Custom Fields" & UNICHAR(13) & UNICHAR(10) & 
-			"Leads & Accounts: " & 
-			UNICHAR(13) & UNICHAR(10) & leads_custfield1_str & 
-			UNICHAR(13) & UNICHAR(10) &  leads_custfield2_str & 
-			UNICHAR(13) & UNICHAR(10) &  leads_custfield3_str & 
-			UNICHAR(13) & UNICHAR(10) &  _ssr_crm_leadsource & 
-			UNICHAR(13) & UNICHAR(10) &  _ssr_crm_leadsource_type & 
-			UNICHAR(13) & UNICHAR(10) & acc_custfield1_str & 
-			UNICHAR(13) & UNICHAR(10) &  acc_custfield2_str & 
-			UNICHAR(13) & UNICHAR(10) &  acc_custfield3_str & 
-			UNICHAR(13) & UNICHAR(10) & 
+
+			"Customer Segmentation" & UNICHAR(13) & UNICHAR(10) &
+			" | "  &  industry_str & UNICHAR(13) & UNICHAR(10) &
+			" | "  &  country_str & UNICHAR(13) & UNICHAR(10) &
+			" | "  &  companysize_str & UNICHAR(13) & UNICHAR(10) &
 			UNICHAR(13) & UNICHAR(10) &
-			"Opportunities:" & 
-			UNICHAR(13) & UNICHAR(10) & opp_custfield1_str & 
-			UNICHAR(13) & UNICHAR(10) &  opp_custfield2_str & 
-			UNICHAR(13) & UNICHAR(10) &  opp_custfield3_str & 
+
+			"Custom Fields" & UNICHAR(13) & UNICHAR(10) &
+			"Leads & Accounts: " &
+			UNICHAR(13) & UNICHAR(10) & leads_custfield1_str &
+			UNICHAR(13) & UNICHAR(10) &  leads_custfield2_str &
+			UNICHAR(13) & UNICHAR(10) &  leads_custfield3_str &
+			UNICHAR(13) & UNICHAR(10) &  _ssr_crm_leadsource &
+			UNICHAR(13) & UNICHAR(10) &  _ssr_crm_leadsource_type &
+			UNICHAR(13) & UNICHAR(10) & acc_custfield1_str &
+			UNICHAR(13) & UNICHAR(10) &  acc_custfield2_str &
+			UNICHAR(13) & UNICHAR(10) &  acc_custfield3_str &
+			UNICHAR(13) & UNICHAR(10) &
+			UNICHAR(13) & UNICHAR(10) &
+			"Opportunities:" &
+			UNICHAR(13) & UNICHAR(10) & opp_custfield1_str &
+			UNICHAR(13) & UNICHAR(10) &  opp_custfield2_str &
+			UNICHAR(13) & UNICHAR(10) &  opp_custfield3_str &
 			UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) &
-			
+
 			"Product " & UNICHAR(13) & UNICHAR(10) &
-			" | "  &  productfamily_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) & 
-			
-			"Standardized Sales Process Steps" & UNICHAR(13) & UNICHAR(10) & 
+			" | "  &  productfamily_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10) &
+
+			"Standardized Sales Process Steps" & UNICHAR(13) & UNICHAR(10) &
 			" | " & stepname_str & UNICHAR(13) & UNICHAR(10) &
 			" | " & substeps_str & UNICHAR(13) & UNICHAR(10) & UNICHAR(13) & UNICHAR(10)
-			
-			
-			return 
+
+
+			return
 			res
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: a2bda876-e250-4cd4-9846-85a4c87a34c1
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.target_screen_filter_string' = ```
-			
-			
+
+
 			VAR _active_slicer_count = [meas.criteria_active_filters_count]
-			
+
 			//var filter_start_table = topn(1, filter(cal_end_dates,[Date])) // "01/01/2010"
 			//var filter_start_val = ISFILTERED(cal_end_dates[Date]) //  min(filter_start_table[Date])
 			var max_filters =3
 			var date_str =  "Date: "  &  Max(cal_start_dates[Date])
-			
-			var user_role_str = IF ( 
-			    ISFILTERED ( users[trueai_user_role_function]), 
-			    VAR ___f = FILTERS ( users[trueai_user_role_function] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_user_role_function] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_user_role_function], ", " )
-			    VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Role: All"
+
+			var user_role_str = IF (
+			ISFILTERED ( users[trueai_user_role_function]),
+			VAR ___f = FILTERS ( users[trueai_user_role_function] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_user_role_function] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_user_role_function], ", " )
+			VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Role: All"
 			)
-			
-			var outcome_str = IF ( 
-			    ISFILTERED ( ssr_history[col.step_outcome]), 
-			    VAR ___f = FILTERS ( ssr_history[col.step_outcome] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, ssr_history[col.step_outcome] )
-			    VAR ___d = CONCATENATEX ( ___t, ssr_history[col.step_outcome], ", " )
-			    VAR ___x = "Step Outcome: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Step Outcome: All"
+
+			var outcome_str = IF (
+			ISFILTERED ( ssr_history[col.step_outcome]),
+			VAR ___f = FILTERS ( ssr_history[col.step_outcome] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, ssr_history[col.step_outcome] )
+			VAR ___d = CONCATENATEX ( ___t, ssr_history[col.step_outcome], ", " )
+			VAR ___x = "Step Outcome: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Step Outcome: All"
 			)
 			var res =  date_str & "  |  " & user_role_str & " | "  &  outcome_str
-			
+
 			RETURN
 			IF(
-			    _active_slicer_count >0,
-			    res & " " & "Add’l filters applied: " & _active_slicer_count,
-			    res
+			_active_slicer_count >0,
+			res & " " & "Add’l filters applied: " & _active_slicer_count,
+			res
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: de33efac-38fd-4361-94e8-7fdc39fd008b
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.criteria_active_filters_count' = ```
-			
+
 			VAR _date = IF(ISFILTERED(cal_end_dates[Date]), 1, 0)
 			VAR _group = IF(ISFILTERED(users[trueai_group]),1,0)
 			VAR _user_role = IF(ISFILTERED(users[trueai_user_role_alias]), 1, 0)
@@ -1418,25 +1546,29 @@ table cal_end_dates
 			VAR opp_custom_3 = IF(ISFILTERED(ssr_history[entity_crm_custom_value_3]),1,0)
 			VAR exact_id = IF(ISFILTERED(users[trueai_ext_match_id]),1,0)
 			VAR _display_mode = 0
-			    
+
 			var total_active_slicer = _role_function + _role_dept+_all_report+_direct_report+_username+_new_hires+_termination+_rep_country+_rep_state+_rep_city+_opp_step+_segment_industry+
-			    _segment_country+_segment_company_size+_product_family+acc_custom_1+acc_custom_2+acc_custom_3+opp_custom_1+opp_custom_2+opp_custom_3+exact_id +_display_mode 
-			
+			_segment_country+_segment_company_size+_product_family+acc_custom_1+acc_custom_2+acc_custom_3+opp_custom_1+opp_custom_2+opp_custom_3+exact_id +_display_mode
+
 			RETURN
 			total_active_slicer
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: dcc5f402-4104-4713-ac64-5c4dcc6f7d69
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.ssr_history_success_count_lead_gen_w_thresh' = ```
-			
+
 			//this measure helps you filter out small segments of a result so they don't "pollute" the result. Use this is a filter measure and make the condition "greater than 0"
-			// first get the current count but remove the groupiing filter context 
+			// first get the current count but remove the groupiing filter context
 			var all_current_val =  CALCULATE(count(ssr_history[_sys_doc_id]), ssr_history[_sys_doc_id] <> "abc") // abc is a value that will never exist in the db
 			// get the regular count in the current filter context
-			var count_current_val = CALCULATE(count(ssr_history[_sys_doc_id]),ssr_history[step_name]= "Lead Gen" && ssr_history[step_success] = true && isBlank(ssr_history[entity_propensity]) = false ) 
+			var count_current_val = CALCULATE(count(ssr_history[_sys_doc_id]),ssr_history[step_name]= "Lead Gen" && ssr_history[step_success] = true && isBlank(ssr_history[entity_propensity]) = false )
 			// see the ration of this value
 			var ratio = DIVIDE(count_current_val, all_current_val)
 			// set the threshold - in this case 3%
@@ -1445,18 +1577,22 @@ table cal_end_dates
 			var res  = IF(ratio >= thresh, 1, 0)
 			RETURN
 			res
-			```
+	```
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: 8799b9a6-ea2a-46c0-a672-0fa61c9c8751
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.ssr_history_threshold_filter_less_than_3%' = ```
-			
+
 			//this measure helps you filter out small segments of a result so they don't "pollute" the result. Use this is a filter measure and make the condition "greater than 0"
-			// first get the current count but remove the groupiing filter context 
+			// first get the current count but remove the groupiing filter context
 			var all_current_val =  CALCULATE(count(ssr_history[_sys_ssr_id]),users[trueai_group] <> "abc" && users[trueai_user_role_function] <> "abc" ) // abc is a value that will never exist in the db
 			// get the regular count in the current filter context
-			var count_current_val = CALCULATE(count(ssr_history[_sys_ssr_id])) 
+			var count_current_val = CALCULATE(count(ssr_history[_sys_ssr_id]))
 			// see the ration of this value
 			var ratio = DIVIDE(count_current_val, all_current_val)
 			// set the threshold - in this case 3%
@@ -1464,24 +1600,28 @@ table cal_end_dates
 			// determine if the ratio is over the threshhold and resturn o
 			var res  = IF(ratio >= thresh, 1, 0)
 			return res
-			```
+	```
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: 61f7cfca-1076-41cc-bfd0-cd87890decb7
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.ssr_history_threshold_filter_lead_less_than_3%' = ```
-			
+
 			//this measure helps you filter out small segments of a result so they don't "pollute" the result. Use this is a filter measure and make the condition "greater than 0"
-			// first get the current count but remove the groupiing filter context 
+			// first get the current count but remove the groupiing filter context
 			// var all_current_val =  CALCULATE(count(ssr_history[_sys_doc_id]),ssr_history[step_name] <> "abc") // abc is a value that will never exist in the db
 			var all_current_val = CALCULATE(
-			    COUNT(
-			        ssr_history[_sys_ssr_id]
-			    ),
-			    ALLSELECTED()
+			COUNT(
+			ssr_history[_sys_ssr_id]
+			),
+			ALLSELECTED()
 			)
 			// get the regular count in the current filter context
-			var count_current_val = CALCULATE(count(ssr_history[_sys_ssr_id])) 
+			var count_current_val = CALCULATE(count(ssr_history[_sys_ssr_id]))
 			// see the ration of this value
 			var ratio = DIVIDE(count_current_val, all_current_val)
 			// set the threshold - in this case 2%
@@ -1490,18 +1630,22 @@ table cal_end_dates
 			var res  = IF(ratio >= thresh, 1, 0)
 			RETURN
 			res
-			```
+	```
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: 0bdda3b4-1e58-4e90-bb18-0f9f31c289a0
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.ssr_history_threshold_filter_less_than_3%_updated' = ```
-			
+
 			//this measure helps you filter out small segments of a result so they don't "pollute" the result. Use this is a filter measure and make the condition "greater than 0"
-			// first get the current count but remove the groupiing filter context 
+			// first get the current count but remove the groupiing filter context
 			var all_current_val =  CALCULATE(count(ssr_history[_sys_ssr_id]), ssr_history[step_name] <> "abc") // abc is a value that will never exist in the db
 			// get the regular count in the current filter context
-			var count_current_val = CALCULATE(count(ssr_history[_sys_ssr_id])) 
+			var count_current_val = CALCULATE(count(ssr_history[_sys_ssr_id]))
 			// see the ration of this value
 			var ratio = DIVIDE(count_current_val, all_current_val)
 			// set the threshold - in this case 3%
@@ -1509,58 +1653,70 @@ table cal_end_dates
 			// determine if the ratio is over the threshhold and resturn o
 			var res  = IF(ratio >= thresh, 1, 0)
 			return res
-			```
+	```
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: d1b55725-3709-43a0-9d85-d40ee4c96aea
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.last_date_of_previous_quarter' = ```
-			
+
 			// -- Measure to get the end date of the current quarter
-			
+
 			VAR SelectedDate = CALCULATE(MAX(cal_end_dates[Date]))
-			VAR QuarterEndDate = 
-			    SWITCH(
-			        TRUE(),
-			        MONTH(SelectedDate) IN {1, 2, 3}, DATE(YEAR(SelectedDate), 3, 31),
-			        MONTH(SelectedDate) IN {4, 5, 6}, DATE(YEAR(SelectedDate), 6, 30),
-			        MONTH(SelectedDate) IN {7, 8, 9}, DATE(YEAR(SelectedDate), 9, 30),
-			        MONTH(SelectedDate) IN {10, 11, 12}, DATE(YEAR(SelectedDate), 12, 31)
-			    )
-			
-			
-			
+			VAR QuarterEndDate =
+			SWITCH(
+			TRUE(),
+			MONTH(SelectedDate) IN {1, 2, 3}, DATE(YEAR(SelectedDate), 3, 31),
+			MONTH(SelectedDate) IN {4, 5, 6}, DATE(YEAR(SelectedDate), 6, 30),
+			MONTH(SelectedDate) IN {7, 8, 9}, DATE(YEAR(SelectedDate), 9, 30),
+			MONTH(SelectedDate) IN {10, 11, 12}, DATE(YEAR(SelectedDate), 12, 31)
+			)
+
+
+
 			VAR CurrentQuarterEnd = QuarterEndDate
-			VAR PreviousQuarterEnd = 
-			    SWITCH(
-			        TRUE(),
-			        MONTH(CurrentQuarterEnd) = 3, DATE(YEAR(CurrentQuarterEnd) - 1, 12, 31),
-			        MONTH(CurrentQuarterEnd) = 6, DATE(YEAR(CurrentQuarterEnd), 3, 31),
-			        MONTH(CurrentQuarterEnd) = 9, DATE(YEAR(CurrentQuarterEnd), 6, 30),
-			        MONTH(CurrentQuarterEnd) = 12, DATE(YEAR(CurrentQuarterEnd), 9, 30)
-			    )
+			VAR PreviousQuarterEnd =
+			SWITCH(
+			TRUE(),
+			MONTH(CurrentQuarterEnd) = 3, DATE(YEAR(CurrentQuarterEnd) - 1, 12, 31),
+			MONTH(CurrentQuarterEnd) = 6, DATE(YEAR(CurrentQuarterEnd), 3, 31),
+			MONTH(CurrentQuarterEnd) = 9, DATE(YEAR(CurrentQuarterEnd), 6, 30),
+			MONTH(CurrentQuarterEnd) = 12, DATE(YEAR(CurrentQuarterEnd), 9, 30)
+			)
 			RETURN
-			    PreviousQuarterEnd
-			```
+			PreviousQuarterEnd
+	```
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: b62ca725-ab2e-40a1-a299-249d22d5960b
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.last_date_previous_quarter' = ```
-			
+
 			// -- Measure to get the end date of the current quarter
-			
+
 			CALCULATE(
-			    MAX(cal_end_dates[Date]),
-			    PREVIOUSQUARTER(cal_end_dates[Date])
+			MAX(cal_end_dates[Date]),
+			PREVIOUSQUARTER(cal_end_dates[Date])
 			)
-			
-			```
+
+	```
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: 01ca9ba2-a222-4b43-9752-c5b262cb7f73
 
-	measure 'meas.check_dates' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.check_dates' = 
 			
 			var end_date = [meas.last_date_of_previous_quarter]
 			var start_date = EDATE(end_date, -12) // get the start date from end_date
@@ -1571,61 +1727,77 @@ table cal_end_dates
 		displayFolder: _date_helpers
 		lineageTag: f37aa444-9c80-4b2a-9b7a-dae543b49450
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.aliasing_labels_leads_cust_fiel_1' = ```
-			
-			 // needs to be filterd by correct model/field to show the right data
+
+			// needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
-			    FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
-			    metadata_aliasing[label]="crm_cat_var_1" && metadata_aliasing[model]="peek_inside_leads"
+			FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
+			metadata_aliasing[label]="crm_cat_var_1" && metadata_aliasing[model]="peek_inside_leads"
 			)
-			
+
 			RETURN
 			IF(
-			    alias_str = BLANK(),
-			    "Custom Field 1 (Not Used)",
-			    alias_str
+			alias_str = BLANK(),
+			"Custom Field 1 (Not Used)",
+			alias_str
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: 4e68e0b4-0812-48b1-a5af-89c61c138593
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.aliasing_labels_leads_cust_fiel_2' = ```
-			
-			 // needs to be filterd by correct model/field to show the right data
+
+			// needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
-			    FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
-			    metadata_aliasing[label]="crm_cat_var_2" && metadata_aliasing[model]="peek_inside_leads"
+			FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
+			metadata_aliasing[label]="crm_cat_var_2" && metadata_aliasing[model]="peek_inside_leads"
 			)
-			
+
 			RETURN
 			IF(
-			    alias_str = BLANK(),
-			    "Custom Field 2 (Not Used)",
-			    alias_str
+			alias_str = BLANK(),
+			"Custom Field 2 (Not Used)",
+			alias_str
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: b76717ef-b77d-4c6f-bd9e-445ba7e18770
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.aliasing_labels_leads_cust_fiel_3' = ```
-			
-			 // needs to be filterd by correct model/field to show the right data
+
+			// needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
-			    FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
-			    metadata_aliasing[label]="crm_cat_var_3" && metadata_aliasing[model]="peek_inside_leads"
+			FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
+			metadata_aliasing[label]="crm_cat_var_3" && metadata_aliasing[model]="peek_inside_leads"
 			)
-			
+
 			RETURN
 			IF(
-			    alias_str = BLANK(),
-			    "Custom Field 3 (Not Used)",
-			    alias_str
+			alias_str = BLANK(),
+			"Custom Field 3 (Not Used)",
+			alias_str
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: bb86cea1-8ab0-4556-837d-c74c2e7eb9e8
 
-	measure 'meas.user_role_aliased_effectiveness_title' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.user_role_aliased_effectiveness_title' = 
 			
 			var alias_str = CALCULATE(
 			    MAX(users[trueai_user_role])
@@ -1639,7 +1811,11 @@ table cal_end_dates
 		displayFolder: _filter_helpers
 		lineageTag: 775e95ef-42eb-4a1a-835f-7ed41d0ed499
 
-	measure 'meas.user_role_aliased_performance_title' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.user_role_aliased_performance_title' = 
 			
 			var _aliased_role = CALCULATE(MAX(users[trueai_user_role_alias]))        // get the user role aliased
 			var txt = "Performance"
@@ -1650,7 +1826,11 @@ table cal_end_dates
 		displayFolder: _filter_helpers
 		lineageTag: f0c111df-549d-48ea-838d-d165d677a3c7
 
-	measure 'meas.aliasing_user_role' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.aliasing_user_role' = 
 			
 			var alias_str = CALCULATE(
 			    FIRSTNONBLANK(metadata_aliasing[alias] , "No Such Field"),
@@ -1662,7 +1842,11 @@ table cal_end_dates
 		displayFolder: _filter_helpers
 		lineageTag: c9ab31eb-f0be-4b70-8ded-1329bb876fd2
 
-	measure 'meas.cal_end_sel_date' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.cal_end_sel_date' = 
 			
 			
 			VAR res = MAXX (CALCULATETABLE(ALLSELECTED ( cal_end_dates )), cal_end_dates[Date]) // get the selected start dagte
@@ -1671,81 +1855,101 @@ table cal_end_dates
 		formatString: General Date
 		lineageTag: 1b45670c-d196-4083-8c1e-1bf35c9400a8
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.open_pipeline_filter_string' = ```
-			
+
 			VAR _active_slicer_count = [meas.criteria_active_filters_count]
-			
+
 			//var filter_start_table = topn(1, filter(cal_end_dates,[Date])) // "01/01/2010"
 			//var filter_start_val = ISFILTERED(cal_end_dates[Date]) //  min(filter_start_table[Date])
 			var max_filters =3
 			var date_str = "As of: " & Max(cal_start_dates[Date])  //"Date: "  &  Max(cal_start_dates[Date])
-			
-			var user_role_str = IF ( 
-			    ISFILTERED ( users[trueai_user_role_alias]), 
-			    VAR ___f = FILTERS ( users[trueai_user_role_alias] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_user_role_alias] )
-			    VAR ___d = CONCATENATEX ( ___t, users [trueai_user_role_alias], ", " )
-			    VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Role: All"
+
+			var user_role_str = IF (
+			ISFILTERED ( users[trueai_user_role_alias]),
+			VAR ___f = FILTERS ( users[trueai_user_role_alias] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_user_role_alias] )
+			VAR ___d = CONCATENATEX ( ___t, users [trueai_user_role_alias], ", " )
+			VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Role: All"
 			)
-			
-			var group_str = IF ( 
-			    ISFILTERED ( users[trueai_group]), 
-			    VAR ___f = FILTERS ( users[trueai_group] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
-			    VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Group: All"
+
+			var group_str = IF (
+			ISFILTERED ( users[trueai_group]),
+			VAR ___f = FILTERS ( users[trueai_group] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
+			VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Group: All"
 			)
-			
+
 			var res =  date_str & "  |  " & user_role_str & "  |  "  &  group_str
-			
+
 			RETURN
 			IF(
-			    _active_slicer_count > 0,
-			    res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
-			    res
+			_active_slicer_count > 0,
+			res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
+			res
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: 0d62af9a-ef4b-4249-902b-5fe229d4796d
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: cal_end_dates
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.current_context_min_date' = ```
-			
+
 			CALCULATE (
-			    MAX('cal_end_dates'[Date]),
-			    TOPN(1, 'cal_end_dates', 'cal_end_dates'[Date], ASC)
+			MAX('cal_end_dates'[Date]),
+			TOPN(1, 'cal_end_dates', 'cal_end_dates'[Date], ASC)
 			)
-			
-			```
+
+	```
 		formatString: General Date
 		displayFolder: _filter_helpers
 		lineageTag: c5a39642-9bc6-4868-adfe-0b6fa1c15ed9
 
-	measure 'meas.current_context_max_date' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.current_context_max_date' = 
 			
 			LASTDATE(cal_end_dates[Date])
 		formatString: General Date
 		displayFolder: _filter_helpers
 		lineageTag: fe3da003-12d9-4c41-a4eb-4e09c8084cf5
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.filter_string_as_of' = ```
-			
-			
+
+
 			var date_str =  "As of: " & Max(cal_end_dates[Date])
-			
-			var res =  date_str 
+
+			var res =  date_str
 			RETURN
 			res
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: 4aaf52ad-1ce1-4a47-9fc1-fe03ea71b7fb
 
-	measure 'meas.date_filter_string' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.date_filter_string' = 
 			
 			
 			var date_str =  "Date: " & Min(cal_end_dates[Date])  & " - " &  Max(cal_end_dates[Date])
@@ -1756,44 +1960,48 @@ table cal_end_dates
 		displayFolder: _filter_helpers
 		lineageTag: 6610e67f-0a8d-4a64-bf04-34e8c044cab5
 
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.filter_string_as_of_full' = ```
-			
+
 			VAR _active_slicer_count = [meas.criteria_active_filters_count]
-			
+
 			//var filter_start_table = topn(1, filter(cal_end_dates,[Date])) // "01/01/2010"
 			//var filter_start_val = ISFILTERED(cal_end_dates[Date]) //  min(filter_start_table[Date])
 			var max_filters =3
 			var date_str = "As of: " & Max(cal_start_dates[Date])  //"Date: "  &  Max(cal_start_dates[Date])
-			
-			var user_role_str = IF ( 
-			    ISFILTERED ( users[trueai_user_role_alias]), 
-			    VAR ___f = FILTERS ( users[trueai_user_role_alias] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_user_role_alias] )
-			    VAR ___d = CONCATENATEX ( ___t, users [trueai_user_role_alias], ", " )
-			    VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "User Role: All"
+
+			var user_role_str = IF (
+			ISFILTERED ( users[trueai_user_role_alias]),
+			VAR ___f = FILTERS ( users[trueai_user_role_alias] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_user_role_alias] )
+			VAR ___d = CONCATENATEX ( ___t, users [trueai_user_role_alias], ", " )
+			VAR ___x = "User Role: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "User Role: All"
 			)
-			
-			var group_str = IF ( 
-			    ISFILTERED ( users[trueai_group]), 
-			    VAR ___f = FILTERS ( users[trueai_group] ) 
-			    VAR ___r = COUNTROWS ( ___f ) 
-			    VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
-			    VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
-			    VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " " 
-			    RETURN ___x , "Group: All"
+
+			var group_str = IF (
+			ISFILTERED ( users[trueai_group]),
+			VAR ___f = FILTERS ( users[trueai_group] )
+			VAR ___r = COUNTROWS ( ___f )
+			VAR ___t = TOPN ( max_filters, ___f, users[trueai_group] )
+			VAR ___d = CONCATENATEX ( ___t, users[trueai_group], ", " )
+			VAR ___x = "Group: " & ___d & IF(___r > max_filters, ", ... [" & ___r & " items selected]") & " "
+			RETURN ___x , "Group: All"
 			)
-			
+
 			var res =  date_str & "  |  " & user_role_str & "  |  "  &  group_str
-			
+
 			RETURN
 			IF(
-			    _active_slicer_count > 0,
-			    res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
-			    res
+			_active_slicer_count > 0,
+			res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
+			res
 			)
-			```
+	```
 		displayFolder: _filter_helpers
 		lineageTag: eef60dbc-6ba5-4dd9-ad28-601b2abb6533
 

@@ -2,109 +2,109 @@
 table leads
 	lineageTag: 25e3e4ea-0df2-46dd-992e-aac0d8b5ee40
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: #,0
-	measure 'meas.lead_crm_converted_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.lead_crm_converted_count' = 
 			
 			var res = ( CALCULATE(count(leads[_sys_docid]), leads[crm_converted_opp_id] <> "" ))
 			return if(ISBLANK(res), 0, res)
 		formatString: #,0
 		lineageTag: dc3fc272-4fc0-4cd3-8fba-b7a7f678c286
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: leads[_sys_docid] | Measures: [meas.lead_crm_converted_count].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0.0%;-0.0%;0.0%
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.lead_crm_conversion_rate' = [meas.lead_crm_converted_count] / CALCULATE(count(leads[_sys_docid]))
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 39248331-9a8b-40c1-b9df-e4d4341fde51
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (val) used later in the expression. Dependencies: Columns: leads[_sys_docid], leads[crm_leadsource].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: #,0
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.lead_crm_no_leadsource_count' = ```
-			
+
 			var val = CALCULATE(count(leads[_sys_docid]), or(ISBLANK(leads[crm_leadsource]) = TRUE(),leads[crm_leadsource] = "" ))
 			return if(ISBLANK(val), 0, val)
-			
-			```
+
+	```
 		formatString: #,0
 		lineageTag: c6c29d01-f327-4b4f-aea7-8b8f28c5e688
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: leads[_sys_docid] | Measures: [meas.lead_crm_no_leadsource_count].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0.0%;-0.0%;0.0%
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.lead_crm_no_leadsource_rate' = [meas.lead_crm_no_leadsource_count] / CALCULATE(count(leads[_sys_docid]))
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 94c5df5a-30ec-4cfe-b8af-5e1e2c2d8f7a
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: leads[_sys_docid], leads[trueai_lead_dupe_id].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0.00%;-0.00%;0.00%
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.lead_trueai_dupe_rate' = CALCULATE(DISTINCTCOUNT(leads[trueai_lead_dupe_id]) / CALCULATE(count(leads[_sys_docid])))
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: b828a8e6-91f0-4563-a2df-e83b275345c5
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: leads[_sys_docid], leads[trueai_company_dupe_id].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0.00%;-0.00%;0.00%
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.lead_trueai_company_dupe_rate' = CALCULATE(COUNT(leads[trueai_company_dupe_id]) / CALCULATE(count(leads[_sys_docid])))
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 43225ccc-8ed9-439b-95d1-44bcc74dee82
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_complt], [trueai_complt].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0 %
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.lead_trueai_completeness_improvement' = ```
-			
+
 			var crmval = CALCULATE(AVERAGE([crm_complt]))
 			var aival = CALCULATE(AVERAGE([trueai_complt]))
-			var impro = Divide(aival - crmval, crmval) 
+			var impro = Divide(aival - crmval, crmval)
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
-			return res 
-			
-			```
+			return res
+
+	```
 		formatString: 0 %
 		lineageTag: 6a763818-4ecf-40ff-9b1b-28b75532a269
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: leads[trueai_lead_dupe_id].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.lead_trueai_dupe_counts' = calculate(COUNT(leads[trueai_lead_dupe_id]))
 		formatString: 0
 		lineageTag: 9606d997-f205-475d-ac36-7d79084cf08c
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: leads[_sys_docid], leads[trueai_is_master].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.lead_trueai_non_dupe_counts' = calculate(COUNT(leads[_sys_docid]), leads[trueai_is_master] = true ||  ISBLANK(leads[trueai_is_master]) = true )
 		formatString: 0
 		lineageTag: 03b6db32-8906-4539-b414-5a8674d52849
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: leads[_sys_ssr_id].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.leads_trueai_unique_company_count' = ```
-			calculate(DISTINCTCOUNT(leads[_sys_ssr_id])) 
-			```
+			calculate(DISTINCTCOUNT(leads[_sys_ssr_id]))
+	```
 		formatString: 0
 		lineageTag: ab74326a-f655-49ee-a97a-d9df51cb6946
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: #,0
-	measure 'meas.leads_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.leads_count' = 
 			
 			CALCULATE(
 			    COUNT(leads[_sys_docid])        // get the count of the leads

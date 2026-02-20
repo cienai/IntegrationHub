@@ -2,7 +2,10 @@
 table ssr_history_stakeholders
 	lineageTag: 7d90e819-db99-4cda-845c-11c2533dfe69
 
-	/// Measure meas.stkhlds_first_act.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: DateTime
 	measure 'meas.stkhlds_first_act' = CALCULATE(MAX(ssr_history_stakeholders[trueai_first_act]))
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
@@ -10,7 +13,10 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_last_act.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: DateTime
 	measure 'meas.stkhlds_last_act' = CALCULATE(MAX(ssr_history_stakeholders[trueai_last_act]))
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
@@ -18,7 +24,10 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_first_eng.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: DateTime
 	measure 'meas.stkhlds_first_eng' = CALCULATE(MAX(ssr_history_stakeholders[trueai_first_eng]))
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
@@ -26,7 +35,10 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_last_eng.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: DateTime
 	measure 'meas.stkhlds_last_eng' = CALCULATE(MAX(ssr_history_stakeholders[trueai_last_eng]))
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
@@ -34,114 +46,144 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_seniority.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.stkhlds_seniority' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_seniority]))
 		displayFolder: champion_stkhld
 		lineageTag: 137d542d-667c-4931-b89c-d7a8afbe6a78
 
-	/// Measure meas.stkhlds_title_dept.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.stkhlds_title_dept' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]))
 		displayFolder: champion_stkhld
 		lineageTag: 742263c3-150e-4a72-9d14-0bec256467be
 
-	/// Measure meas.stkhlds_name_and_title.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.stkhlds_name_and_title' = ```
-			
+
 			// make a concat name title
 			var fullname = CALCULATE(MAX(ssr_history_stakeholders[crm_first_name]) & " " & MAX(ssr_history_stakeholders[crm_last_name]) ) // full name
 			var title =CALCULATE(MAX(ssr_history_stakeholders[crm_title])) // title
 			var res = IF(len(fullname) > 30 , lEFT(fullname, 27) & "...", fullname)  & ", " & title // cut the name if too long
-			return res 
-			```
+			return res
+	```
 		displayFolder: champion_stkhld
 		lineageTag: 8f971e63-ce5a-4267-9229-0e84eadf1781
 
-	/// Measure meas.stkhlds_name_and_title_most_senior.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.stkhlds_name_and_title_most_senior' = ```
-			
+
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
-			
-			var res= CALCULATE( [meas.stkhlds_name_and_title], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the title 
-			
-			return res 
-			
-			
-			```
+
+			var res= CALCULATE( [meas.stkhlds_name_and_title], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the title
+
+			return res
+
+
+	```
 		displayFolder: champion_stkhld
 		lineageTag: b63f829b-aaa0-40ee-8119-b6334c809800
 
-	/// Measure meas.stkhlds_most_senior_title_dept.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.stkhlds_most_senior_title_dept' = ```
-			
+
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
-			
+
 			var res= CALCULATE( [meas.stkhlds_title_dept], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the most senior title dept
-			
-			return res 
-			```
+
+			return res
+	```
 		displayFolder: champion_stkhld
 		lineageTag: 4ad56e5e-839b-457c-bf56-f90f07d6b6a2
 
-	/// Measure meas.stkhlds_most_senior_first_act.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: DateTime
 	measure 'meas.stkhlds_most_senior_first_act' = ```
-			
+
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
-			
+
 			var res= CALCULATE( [meas.stkhlds_first_act], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the first activity
-			
-			return res 
-			```
+
+			return res
+	```
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
 		lineageTag: 86c7341e-e7ff-47a7-b418-e86e353faa45
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_most_senior_last_act.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: DateTime
 	measure 'meas.stkhlds_most_senior_last_act' = ```
-			
+
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
-			
+
 			var res= CALCULATE( [meas.stkhlds_last_act], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the last activity
-			
-			return res 
-			```
+
+			return res
+	```
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
 		lineageTag: 15da1c81-f0ba-479b-b851-93e66ae0db8a
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_most_senior_last_eng.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: DateTime
 	measure 'meas.stkhlds_most_senior_last_eng' = ```
-			
-			 
+
+
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
-			
+
 			var res= CALCULATE( [meas.stkhlds_last_eng], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the last engagement
-			
-			return res 
-			```
+
+			return res
+	```
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
 		lineageTag: 7f2bd415-c5f1-4fdc-8251-faa716cf9bae
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_most_senior_seniority.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.stkhlds_most_senior_seniority' = ```
-			
+
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
-			
+
 			var res= CALCULATE( [meas.stkhlds_seniority], ssr_history_stakeholders[trueai_title_seniority] =seniority) // use it to filter the seniority
-			
-			return res 
-			```
+
+			return res
+	```
 		displayFolder: champion_stkhld
 		lineageTag: 30eb9278-7c18-4d89-837d-b415ecec64cf
 
-	/// Measure meas.stkhlds_primary_dur_involvement.
-	measure 'meas.stkhlds_primary_dur_involvement' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.stkhlds_primary_dur_involvement' = 
 			
 			var PrimDur = CALCULATE(SUM(ssr_history[stkhlds_primary_contact_dur])) // getting the secondary contact act duration
 			var allDur = CALCULATE(SUM(ssr_history[stkhlds_all_dur])) // getting all contact duration
@@ -151,8 +193,11 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: f3b8a9d2-e05e-485e-8783-3422f1f289e0
 
-	/// Measure meas.stkhlds_secondary_dur_involvement.
-	measure 'meas.stkhlds_secondary_dur_involvement' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.stkhlds_secondary_dur_involvement' = 
 			
 			var SecDur = CALCULATE(SUM(ssr_history[stkhlds_secondary_contact_dur])) // getting the secondary contact act duration
 			var allDur = CALCULATE(SUM(ssr_history[stkhlds_all_dur])) // getting all contact duration
@@ -163,32 +208,38 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 04f85556-5551-4042-b1e9-10981fd157e9
 
-	/// Measure meas.stkhlds_most_senior_dur_involvement.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.stkhlds_most_senior_dur_involvement' = ```
-			
-			
+
+
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority]))  // find the most senior seniority
 			var dept = [meas.stkhlds_most_senior_title_dept]
 			var senior_dur = CALCULATE(
-			    MAX(
-			        ssr_history_stakeholders[trueai_act_dur]
-			    ), 
-			    ssr_history_stakeholders[trueai_title_seniority]=seniority,
-			    ssr_history_stakeholders[trueai_title_department]= dept
-			) 
-			
+			MAX(
+			ssr_history_stakeholders[trueai_act_dur]
+			),
+			ssr_history_stakeholders[trueai_title_seniority]=seniority,
+			ssr_history_stakeholders[trueai_title_department]= dept
+			)
+
 			var total_dur = CALCULATE(SUM(ssr_history_stakeholders[trueai_act_dur]), ALLSELECTED())  // get the total duration
-			
+
 			var res = DIVIDE(senior_dur, total_dur, 0)
-			
+
 			RETURN res
-			```
+	```
 		formatString: 0%;-0%;0%
 		displayFolder: champion_stkhld
 		lineageTag: 7b81a3c1-2f06-40e2-81d0-ea82cf4df10d
 
-	/// Measure meas.other_stkhlds_involv_dur.
-	measure 'meas.other_stkhlds_involv_dur' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.other_stkhlds_involv_dur' = 
 			
 			var _dur = CALCULATE(Max(ssr_history_stakeholders[trueai_act_dur]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1, 2}))
 			
@@ -199,44 +250,59 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 0d1e49d5-8ac4-446e-ac00-84bc0eedcaf3
 
-	/// Measure meas.stkhlds_full_name.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.stkhlds_full_name' = ```
-			
-			
+
+
 			var full_name = CALCULATE(
-			    MAX(ssr_history_stakeholders[col.full_name]), 
-			    NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2})
+			MAX(ssr_history_stakeholders[col.full_name]),
+			NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2})
 			)
-			
+
 			return full_name
-			```
+	```
 		displayFolder: champion_stkhld
 		lineageTag: aace1864-dfc9-414b-ac89-fa076f7b9612
 
-	/// Measure meas.other_stkhlds_title_dept.
-	measure 'meas.other_stkhlds_title_dept' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.other_stkhlds_title_dept' = 
 			
 			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}) )  // get the  title dept filtering primary and secondary stakeholder
 		displayFolder: champion_stkhld
 		lineageTag: 1f3c8d3c-eced-4f0f-b24b-2fdba44b5453
 
-	/// Measure meas.other_stkhlds_seniority.
-	measure 'meas.other_stkhlds_seniority' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.other_stkhlds_seniority' = 
 			
 			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_seniority]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}))
 		displayFolder: champion_stkhld
 		lineageTag: bc7d75a2-edff-4a7b-a366-b6b65d2fe8c9
 
-	/// Measure meas.other_stkhlds_last_eng.
-	measure 'meas.other_stkhlds_last_eng' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.other_stkhlds_last_eng' = 
 			
 			CALCULATE(MAX(ssr_history_stakeholders[trueai_last_eng]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}))  // filter out the primary and secondary stkhlds
 		formatString: General Date
 		displayFolder: champion_stkhld
 		lineageTag: 173cf6a6-5668-4c8c-ab60-3ca3fc4b7d6a
 
-	/// Measure meas.prim_stkhlds_dur_involvement.
-	measure 'meas.prim_stkhlds_dur_involvement' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.prim_stkhlds_dur_involvement' = 
 			
 			var _dur = CALCULATE(sum(ssr_history_stakeholders[trueai_act_dur]), ssr_history_stakeholders[trueai_stkhld_ranking] in {1})
 			
@@ -247,8 +313,11 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 0cc030f4-fe8f-4343-851b-b7f959145666
 
-	/// Measure meas.sec_stkhlds_dur_involvement.
-	measure 'meas.sec_stkhlds_dur_involvement' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.sec_stkhlds_dur_involvement' = 
 			
 			var _dur = CALCULATE(sum(ssr_history_stakeholders[trueai_act_dur]), ssr_history_stakeholders[trueai_stkhld_ranking] in {2})
 			

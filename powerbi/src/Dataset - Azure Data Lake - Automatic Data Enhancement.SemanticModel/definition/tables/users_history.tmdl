@@ -2,11 +2,11 @@
 table users_history
 	lineageTag: 44776101-2806-4700-a1fe-2ddb9f44c42c
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: ###,###,###  hrs
-	measure 'meas.users_history_duration_hrs' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_history_duration_hrs' = 
 			
 			var dur = CALCULATE(sum(users_history[ci_time_alloc_tot_dur]))
 			var res =  dur / 3600
@@ -20,20 +20,20 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (dur, act, res) used later in the expression. Dependencies: Columns: users_history[ci_time_alloc_tot], users_history[ci_time_alloc_tot_dur].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: ###  min
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.users_history_duration_per_act_min' = ```
-			
+
 			var dur = CALCULATE(sum(users_history[ci_time_alloc_tot_dur]))		//get the allocated total duration
 			var act = CALCULATE(sum(users_history[ci_time_alloc_tot]))			// get the allocated total count
-			
+
 			var res =  divide(dur, act) / 60
 			return res
-			// act_tot_dur 
+			// act_tot_dur
 			// act_tot_count --> ci_time_alloc_tot
-			```
+	```
 		formatString: ###  min
 		displayFolder: _users_history_analysis
 		lineageTag: 6a291487-586f-4a27-872b-622feaa62c57
@@ -42,11 +42,11 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: ###,###,###  hrs
-	measure 'meas.users_history_duration_adjusted_hrs' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.users_history_duration_adjusted_hrs' = 
 			
 			var dur = CALCULATE(sum(users_history[ci_time_alloc_tot_dur]))
 			var prep = CALCULATE(average(users_history[ci_time_alloc_prep_adjustment]))
@@ -63,18 +63,18 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (periods_tbl, reps_tbl, periods, reps) used later in the expression. Dependencies: Columns: users_history[_sys_filt_start_date], users_history[_sys_user_id].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0.0
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.rep_count_avg' = ```
-			
+
 			var periods_tbl = SUMMARIZE(calculatetable(users_history), users_history[_sys_user_id], users_history[_sys_filt_start_date]) // get the total number of periods in the selection group by rep and month
 			var reps_tbl = SUMMARIZE(calculatetable(users_history), users_history[_sys_user_id]) // get just the unique reps
-			var periods =  divide(COUNTROWS(periods_tbl) , COUNTROWS( reps_tbl)) 
+			var periods =  divide(COUNTROWS(periods_tbl) , COUNTROWS( reps_tbl))
 			var reps =  divide(COUNTROWS(periods_tbl) , periods) // get the avg number of "active" reps per period
 			return  reps
-			```
+	```
 		formatString: 0.0
 		displayFolder: _users_history_analysis
 		lineageTag: ecb23497-da79-4ea3-89dd-235cfeda7437

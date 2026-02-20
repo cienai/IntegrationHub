@@ -2,23 +2,26 @@
 table metadata_ai_scores_analysis_categories
 	lineageTag: 2a9487c6-d810-48ea-ac55-50ee75f3d4b8
 
-	/// Measure meas.analysis_cat_weighted_avg.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.analysis_cat_weighted_avg' = ```
-			
+
 			var sum_prod = SUMX(
-			    metadata_ai_scores,
-			    [meas.ai_score] * [meas.metadata_score_weighting_pct]
+			metadata_ai_scores,
+			[meas.ai_score] * [meas.metadata_score_weighting_pct]
 			) // get teh sum product of the weighting and the score
 			var sum_weights = SUMX(
-			    metadata_ai_scores,
-			     [meas.metadata_score_weighting_pct]
+			metadata_ai_scores,
+			[meas.metadata_score_weighting_pct]
 			) // get the sum of weighting
 			var res = DIVIDE( sum_prod, sum_weights)
-			
+
 			return res
-			
-			
-			```
+
+
+	```
 		formatString: 0
 		lineageTag: 9c3ab88f-1120-4e1e-8193-01bbd2fc7a88
 

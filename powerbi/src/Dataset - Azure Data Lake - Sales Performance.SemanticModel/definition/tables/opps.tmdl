@@ -2,13 +2,19 @@
 table opps
 	lineageTag: 94b5d4f0-c14b-4b61-8e6f-fc611c85e6de
 
-	/// Measure meas.opps_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.opps_count' = CALCULATE(Count(opps[_sys_doc_id]))  // count of opportunity
 		formatString: #,0
 		displayFolder: _success_metrics
 		lineageTag: 2cc843ff-f70c-4756-bc7f-55b6fe32f6b0
 
-	/// Measure meas.opps_won_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_won_amt' = CALCULATE(SUM(opps[trueai_booking_amt]),opps[trueai_is_won] = True ) // get the won opps  booking amount
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
@@ -16,142 +22,175 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":""}
 
-	/// Measure meas.opps_won_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.opps_won_count' = CALCULATE(Count(opps[_sys_doc_id]),opps[trueai_is_won] = True )// count of won opps
 		formatString: #,0
 		displayFolder: _success_metrics
 		lineageTag: d06a26ea-8130-4af3-99b3-4a9e2d505033
 
-	/// Measure meas.opps_lost_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.opps_lost_count' = CALCULATE(Count(opps[_sys_doc_id]),opps[trueai_is_won] = False ) // get the lost opps count
 		formatString: #,0
 		displayFolder: _success_metrics
 		lineageTag: 8a99d981-2d57-4959-a3a1-1438b9c03dc9
 
-	/// Measure meas.opps_won_new_logo_existing_cust_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.opps_won_new_logo_existing_cust_count' = ```
-			
+
 			CALCULATE(
-			    Count(opps[_sys_doc_id]),           // count of won opps for step new logo and existing customer 
-			    opps[trueai_is_won] = True,
-			    ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}
+			Count(opps[_sys_doc_id]),           // count of won opps for step new logo and existing customer
+			opps[trueai_is_won] = True,
+			ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}
 			)
-			```
+	```
 		formatString: #,0
 		displayFolder: _success_metrics
 		lineageTag: d581aaf4-aff3-4ab8-ac67-5e6ec53b0421
 
-	/// Measure meas.opps_new_logo_existing_customer_selling_won_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_new_logo_existing_customer_selling_won_amt' = ```
-			
+
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			    ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}
-			    ) 
-			```
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
+			opps[trueai_is_won] = True,
+			ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}
+			)
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
 		lineageTag: 7514faf0-42d0-4b93-ae3c-94eceb969fcd
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_existing_customer_selling_won_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.opps_existing_customer_selling_won_amt' = ```
-			
+
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			     ssr_history[step_name] in {"Existing Customer Selling"}
-			    ) 
-			```
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
+			opps[trueai_is_won] = True,
+			ssr_history[step_name] in {"Existing Customer Selling"}
+			)
+	```
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: 111331cb-f7bd-4425-b319-a1c0b7cdd742
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_new_logo_selling_won_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.opps_new_logo_selling_won_amt' = ```
-			
+
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			    ssr_history[step_name] = "New Logo Selling"
-			    ) 
-			```
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
+			opps[trueai_is_won] = True,
+			ssr_history[step_name] = "New Logo Selling"
+			)
+	```
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: 9eab312a-8420-4bdd-ab53-bf08169e77e5
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_post_sales_support_won_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.opps_post_sales_support_won_amt' = ```
-			
+
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			     ssr_history[step_name] in {"Post-Sales Support"}
-			    ) 
-			```
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
+			opps[trueai_is_won] = True,
+			ssr_history[step_name] in {"Post-Sales Support"}
+			)
+	```
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: 6fec311e-00d4-437b-b8e5-82a3661b84be
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_prospecting_won_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.opps_prospecting_won_amt' = ```
-			
+
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			     ssr_history[step_name] in {"Prospecting"}
-			    ) 
-			```
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
+			opps[trueai_is_won] = True,
+			ssr_history[step_name] in {"Prospecting"}
+			)
+	```
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: c0905b74-1adb-4d7d-8437-3d27281bc94b
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_all_step_won_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.opps_all_step_won_amt' = ```
-			
+
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			     ssr_history[step_name] in {"New Logo Selling", "Prospecting", "Existing Customer Selling", "Post-Sales Support"}
-			    ) 
-			```
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
+			opps[trueai_is_won] = True,
+			ssr_history[step_name] in {"New Logo Selling", "Prospecting", "Existing Customer Selling", "Post-Sales Support"}
+			)
+	```
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: e4c8572b-5411-4add-9f95-1ad840289871
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_trueai_booking_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_trueai_booking_amt' = ```
-			
-			
+
+
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),
-			    FILTER(
-			        opps,
-			        COUNTROWS(RELATEDTABLE(opp_line_items)) > 0     // get the opps booking amt  
-			    )
+			SUM(opps[trueai_booking_amt]),
+			FILTER(
+			opps,
+			COUNTROWS(RELATEDTABLE(opp_line_items)) > 0     // get the opps booking amt
 			)
-			
-			```
+			)
+
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
 		lineageTag: 20fc4bb7-bc67-44ca-be7d-258a4215b929
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opp_line_items_trueai_booking_amt.
-	measure 'meas.opp_line_items_trueai_booking_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.opp_line_items_trueai_booking_amt' = 
 			
 			CALCULATE(
 			    SUM(opp_line_items[trueai_total_price]),
@@ -163,8 +202,11 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opp_book_amt_opp_line_book_amt_diff.
-	measure 'meas.opp_book_amt_opp_line_book_amt_diff' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.opp_book_amt_opp_line_book_amt_diff' = 
 			
 			var opps_amt = [meas.opps_trueai_booking_amt]   // get the opps booking amt
 			var oli_amt = [meas.opp_line_items_trueai_booking_amt]          // get the oli booking amt
@@ -178,8 +220,11 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_crm_booking_amt.
-	measure 'meas.opps_crm_booking_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_crm_booking_amt' = 
 			
 			CALCULATE(
 			    SUM(
@@ -190,116 +235,131 @@ table opps
 		displayFolder: _success_metrics
 		lineageTag: 3c033b02-a215-4b6c-a54f-4391f82c7cb0
 
-	/// Measure meas.open_opps_is_open.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.open_opps_is_open' = ```
-			
+
 			var  asof_date = date(2024,1,1) // the "current" date
-				
+
 			// filter down only open opps and associated history steps for that period (include anything started on or before the as if date and not finished on as of date
 			var res = CALCULATE(
-			    DISTINCTCOUNT(opps[_sys_doc_id]), 
-			    opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date 
+			DISTINCTCOUNT(opps[_sys_doc_id]),
+			opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date
 			)
-			return res 
-			```
+			return res
+	```
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 386df656-540e-4d43-90bf-29fe8a75c043
 
-	/// Measure meas.open_opps_order.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.open_opps_order' = ```
-			
-			
-			
-				// get th date we care about 
-				var  asof_date = date(2024,1,1) // the "current" date
-				
-				// filter down only open opps and associated history steps for that period (include anything started on or before the as if date and not finished on as of date
-				var tbl_curr_open_opps= CALCULATETABLE((opps),  opps[_sys_doc_id] <> "123"   && opps[trueai_stage] <> "123"   && opps[crm_stage_name] <> "123"  && opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date )
-			
-			
-			    // wnsure that end date is unique otherwise weird results
-				var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(tbl_curr_open_opps,
-						"oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(00, "00")
-				)
-					
-				// determine the number of prior steps present for the same opps
-				var tbl_curr_open_opps_prior_oh_entries = 
-				ADDCOLUMNS(
-			    tbl_curr_open_opps_unique_end_date,
-			    "opp_id_count", 
-			    VAR CurrentOppID = (opps[_sys_doc_id])
-				var tblTemp = tbl_curr_open_opps_unique_end_date
-			    RETURN COUNTX(filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date  ),[_sys_doc_id] ))
-			
-			    var oh_cnt = MAXx(tbl_curr_open_opps_prior_oh_entries, [opp_id_count])
-			
-			    return oh_cnt
-			
-			
-			```
+
+
+
+			// get th date we care about
+			var  asof_date = date(2024,1,1) // the "current" date
+
+			// filter down only open opps and associated history steps for that period (include anything started on or before the as if date and not finished on as of date
+			var tbl_curr_open_opps= CALCULATETABLE((opps),  opps[_sys_doc_id] <> "123"   && opps[trueai_stage] <> "123"   && opps[crm_stage_name] <> "123"  && opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date )
+
+
+			// wnsure that end date is unique otherwise weird results
+			var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(tbl_curr_open_opps,
+			"oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(00, "00")
+			)
+
+			// determine the number of prior steps present for the same opps
+			var tbl_curr_open_opps_prior_oh_entries =
+			ADDCOLUMNS(
+			tbl_curr_open_opps_unique_end_date,
+			"opp_id_count",
+			VAR CurrentOppID = (opps[_sys_doc_id])
+			var tblTemp = tbl_curr_open_opps_unique_end_date
+			RETURN COUNTX(filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date  ),[_sys_doc_id] ))
+
+			var oh_cnt = MAXx(tbl_curr_open_opps_prior_oh_entries, [opp_id_count])
+
+			return oh_cnt
+
+
+	```
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: f94ab53f-b321-4774-ade9-7010b94d9687
 
-	/// Measure meas.open_opps_rec.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.open_opps_rec' = ```
-			
-				var  asof_date = date(2024,1,1) // the "current" date
-				
-				// filter down only open opps and associated history steps for that period (include anything started on or before the as if date and not finished on as of date
-				var tbl_curr_open_opps= CALCULATETABLE(opps, opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date )
-			
-			
-			
+
+			var  asof_date = date(2024,1,1) // the "current" date
+
+			// filter down only open opps and associated history steps for that period (include anything started on or before the as if date and not finished on as of date
+			var tbl_curr_open_opps= CALCULATETABLE(opps, opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date )
+
+
+
 			var res  = countx(tbl_curr_open_opps, IF( LEFT([_sys_doc_id], 1) = "A", [_sys_doc_id], blank()) )
-			return res 
-			```
+			return res
+	```
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 8896c5d8-5860-4419-9167-539af4c288e4
 
-	/// Measure meas.open_opps_step_by_step.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.open_opps_step_by_step' = ```
-			
-			
+
+
 			var  asof_date = date(2024,1,1) // the "current" date
 			var ff =  CALCULATETABLE(opps)
 			var tbl_curr_open_opps= FIlter((ff),  opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date )
-			
-			
-			    // wnsure that end date is unique otherwise weird results
-				var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(tbl_curr_open_opps,
-						"oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(00, "00")
-			            // "oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(opps[_trueai_step_sequence], "00")
-				)
-					
-				// determine the number of prior steps present for the same opps
-				var tbl_curr_open_opps_prior_oh_entries = 
-				ADDCOLUMNS(
-			    tbl_curr_open_opps_unique_end_date,
-			    "oh_doc_id", 
-			    VAR CurrentOppID = (opps[_sys_doc_id])
-				var tblTemp = tbl_curr_open_opps_unique_end_date
-			    var doc_id =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date  ), opps[_sys_filt_end_date],FALSE), opps[_sys_doc_id])
-			    var doc_id2 =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID  ), opps[_sys_filt_end_date],True), opps[_sys_doc_id])
-			    var res_doc_id =If (doc_id = BLANK(), doc_id2, doc_id)
-			    RETURN res_doc_id)
-			
-			
-			
-			    var filter_tbl = FILTER(tbl_curr_open_opps_prior_oh_entries, [oh_doc_id] =[_sys_doc_id])
-			
-			    var res =    CALCULATE(count(opps[_sys_doc_id]), filter_tbl )
-			    return res
-			
-			```
+
+
+			// wnsure that end date is unique otherwise weird results
+			var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(tbl_curr_open_opps,
+			"oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(00, "00")
+			// "oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(opps[_trueai_step_sequence], "00")
+			)
+
+			// determine the number of prior steps present for the same opps
+			var tbl_curr_open_opps_prior_oh_entries =
+			ADDCOLUMNS(
+			tbl_curr_open_opps_unique_end_date,
+			"oh_doc_id",
+			VAR CurrentOppID = (opps[_sys_doc_id])
+			var tblTemp = tbl_curr_open_opps_unique_end_date
+			var doc_id =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date  ), opps[_sys_filt_end_date],FALSE), opps[_sys_doc_id])
+			var doc_id2 =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID  ), opps[_sys_filt_end_date],True), opps[_sys_doc_id])
+			var res_doc_id =If (doc_id = BLANK(), doc_id2, doc_id)
+			RETURN res_doc_id)
+
+
+
+			var filter_tbl = FILTER(tbl_curr_open_opps_prior_oh_entries, [oh_doc_id] =[_sys_doc_id])
+
+			var res =    CALCULATE(count(opps[_sys_doc_id]), filter_tbl )
+			return res
+
+	```
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 5c8c0dc1-4e98-4864-84aa-d8e220345f38
 
-	/// Measure meas.open_opps_step_by_step_amt.
-	measure 'meas.open_opps_step_by_step_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.open_opps_step_by_step_amt' = 
 			
 			
 			var tbl = filter((opps), LEFT(opps[_sys_doc_id],1) = "B")
@@ -313,74 +373,89 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.open_opps_step_by_step_slicer.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.open_opps_step_by_step_slicer' = ```
-			
-			
-			
+
+
+
 			var  asof_date = date(2024,1,1) // the "current" date
 			var tbl_curr_open_opps =  CALCULATETABLE(opps , opps[_sys_doc_id] <> "abc" && opps[_sys_doc_id] <> "abc" && opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date )
-			
-			
-			    // wnsure that end date is unique otherwise weird results
-				var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(tbl_curr_open_opps,
-						"oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(00, "00")
-			            // "oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(open_opps[oh_trueai_step_sequence], "00")
-				)
-					
-				// determine the number of prior steps present for the same opps
-				var tbl_curr_open_opps_prior_oh_entries = 
-				ADDCOLUMNS(
-			    tbl_curr_open_opps_unique_end_date,
-			    "oh_doc_id", 
-			    VAR CurrentOppID = (opps[_sys_doc_id])
-				var tblTemp = tbl_curr_open_opps_unique_end_date
-			    var doc_id =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date  ), opps[_sys_filt_end_date],FALSE), opps[_sys_doc_id])
-			    var doc_id2 =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID  ), opps[_sys_filt_end_date],True), opps[_sys_doc_id])
-			    var res_doc_id =If (doc_id = BLANK(), doc_id2, doc_id)
-			    RETURN res_doc_id)
-			
-			
-			
-			    var filter_tbl = FILTER(tbl_curr_open_opps_prior_oh_entries, [oh_doc_id] =[_sys_doc_id])
-			
-			    var res =    MAXX(filter_tbl,  [oh_doc_id])
-			    return res
-			
-			```
+
+
+			// wnsure that end date is unique otherwise weird results
+			var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(tbl_curr_open_opps,
+			"oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(00, "00")
+			// "oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(open_opps[oh_trueai_step_sequence], "00")
+			)
+
+			// determine the number of prior steps present for the same opps
+			var tbl_curr_open_opps_prior_oh_entries =
+			ADDCOLUMNS(
+			tbl_curr_open_opps_unique_end_date,
+			"oh_doc_id",
+			VAR CurrentOppID = (opps[_sys_doc_id])
+			var tblTemp = tbl_curr_open_opps_unique_end_date
+			var doc_id =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date  ), opps[_sys_filt_end_date],FALSE), opps[_sys_doc_id])
+			var doc_id2 =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID  ), opps[_sys_filt_end_date],True), opps[_sys_doc_id])
+			var res_doc_id =If (doc_id = BLANK(), doc_id2, doc_id)
+			RETURN res_doc_id)
+
+
+
+			var filter_tbl = FILTER(tbl_curr_open_opps_prior_oh_entries, [oh_doc_id] =[_sys_doc_id])
+
+			var res =    MAXX(filter_tbl,  [oh_doc_id])
+			return res
+
+	```
 		displayFolder: _open_opps_pipeline
 		lineageTag: d6a78e90-d5b6-4c05-8a4a-81b5971753f0
 
-	/// Measure meas.ssr_history_opps_is_open.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.ssr_history_opps_is_open' = ```
-			
+
 			var  asof_date = [meas.sel_date] // the "current" date
-				
+
 			// filter down only open opps and associated history steps for that period (include anything started on or before the as if date and not finished on as of date
 			var res = CALCULATE(
-			    count(opps[_sys_doc_id]), 
-			    opps[_sys_filt_end_date] > asof_date &&  opps[_sys_filt_start_date] < asof_date 
+			count(opps[_sys_doc_id]),
+			opps[_sys_filt_end_date] > asof_date &&  opps[_sys_filt_start_date] < asof_date
 			)
-			return res 
-			```
+			return res
+	```
 		formatString: 0
 		displayFolder: _opps
 		lineageTag: 10a98a67-885b-4ca7-aa63-5dd5d2e57d1b
 
-	/// Measure meas.total_opp_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.total_opp_count' = count(opps[_sys_doc_id])
 		formatString: 0
 		displayFolder: _opps
 		lineageTag: d17e8206-08e5-44bc-bc7a-e2ebbf39d72c
 
-	/// Measure meas.opps_name.
-	measure 'meas.opps_name' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_name' = 
 			CALCULATE(
 			    MAX(opps[crm_name])
 			)
 		lineageTag: ca7bd717-4604-47eb-963c-306b7343bb15
 
-	/// Measure meas.opps_booking_lost_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_booking_lost_amt' = CALCULATE(SUM(opps[trueai_booking_amt]),opps[trueai_is_won] = False ) // get the lost opps  booking amount
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
@@ -388,7 +463,10 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_avg_deal_size_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.opps_avg_deal_size_amt' = CALCULATE(Average(opps[trueai_booking_amt]), opps[trueai_booking_amt] > 0 )
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
@@ -396,15 +474,21 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.count_of_crm_deep_link.
-	measure 'meas.count_of_crm_deep_link' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.count_of_crm_deep_link' = 
 			
 			DISTINCTCOUNT(opps[crm_deep_link])
 		formatString: 0
 		lineageTag: 212bd76d-4e51-41b4-ba2f-ea7b7160fc31
 
-	/// Measure meas.opps_cust_num1.
-	measure 'meas.opps_cust_num1' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_cust_num1' = 
 			
 			SUM(opps[cust_num1])
 		displayFolder: _opps_verification
@@ -412,8 +496,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num2.
-	measure 'meas.opps_cust_num2' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_cust_num2' = 
 			
 			SUM(opps[cust_num2])
 		displayFolder: _opps_verification
@@ -421,8 +508,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num3.
-	measure 'meas.opps_cust_num3' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_cust_num3' = 
 			
 			SUM(opps[cust_num3])
 		displayFolder: _opps_verification
@@ -430,8 +520,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num4.
-	measure 'meas.opps_cust_num4' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_cust_num4' = 
 			
 			SUM(opps[cust_num4])
 		displayFolder: _opps_verification
@@ -439,8 +532,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num5.
-	measure 'meas.opps_cust_num5' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_cust_num5' = 
 			
 			SUM(opps[cust_num5])
 		displayFolder: _opps_verification
@@ -448,8 +544,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num6.
-	measure 'meas.opps_cust_num6' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_cust_num6' = 
 			
 			SUM(opps[cust_num6])
 		displayFolder: _opps_verification
@@ -457,8 +556,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num7.
-	measure 'meas.opps_cust_num7' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_cust_num7' = 
 			
 			SUM(opps[cust_num7])
 		displayFolder: _opps_verification
@@ -466,81 +568,114 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.won_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.won_amt' = CALCULATE(sum(opps[trueai_booking_amt]), opps[trueai_is_won] = true)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 79ef7551-1b06-4a8a-8b63-141ca9196a8c
 
-	/// Measure meas.won_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.won_count' = CALCULATE(count(opps[trueai_booking_amt]), opps[trueai_is_won] = true)
 		formatString: #,0
 		displayFolder: _opps
 		lineageTag: ec154535-f996-4fb0-a39a-ee15e2abb37c
 
-	/// Measure meas.opps_booking_amt_total.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_booking_amt_total' = ```
-			
+
 			CALCULATE(
-			    [meas.opps_booking_amt],
-			    ALLSELECTED() 
+			[meas.opps_booking_amt],
+			ALLSELECTED()
 			)
-			
-			```
+
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 3e4fd190-bb25-4c89-a94b-61cc9b045123
 
-	/// Measure meas.lost_count.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Whole number
 	measure 'meas.lost_count' = CALCULATE(count(opps[trueai_booking_amt]), opps[trueai_is_won] = false)
 		formatString: #,0
 		displayFolder: _opps
 		lineageTag: 00e5941e-43c3-4a97-92c3-a7760510aba7
 
-	/// Measure meas.opps_booking_amt_avg.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_booking_amt_avg' = CALCULATE(AVERAGE((opps[trueai_booking_amt])))
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 4a249f2a-182f-4d9d-a156-f5a27543751b
 
-	/// Measure meas.opps_sales_cycle_avg_days.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_sales_cycle_avg_days' = ```
-			
+
 			var res = CALCULATE(AVERAGE(opps[col.trueai_days]))
-			return res 
-			```
+			return res
+	```
 		formatString: #,##0" Days"
 		displayFolder: _opps
 		lineageTag: 575eeaba-caa4-408c-9594-805b91564343
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.lost_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.lost_amt' = CALCULATE(sum(opps[trueai_booking_amt]), opps[trueai_is_won] = false)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: bf734b04-1e82-434c-8912-c972ddb30ac3
 
-	/// Measure meas.opps_lost_amt_in_stage_pct.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
 	measure 'meas.opps_lost_amt_in_stage_pct' = DIVIDE([meas.opps_booking_lost_amt],[meas.opps_booking_amt])
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _success_metrics
 		lineageTag: 8ade373a-56e3-49bd-8f59-3c84379ba6f8
 
-	/// Measure meas.opps_booking_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_booking_amt' = CALCULATE( sum(opps[trueai_booking_amt]))
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 4529b0ce-1347-4c49-81c8-a51245ee0275
 
-	/// Measure meas.opps_booking_lost_amt_pct.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
 	measure 'meas.opps_booking_lost_amt_pct' = DIVIDE([meas.opps_booking_lost_amt], [meas.opps_booking_amt_total])
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _success_metrics
 		lineageTag: 585994fc-6fc1-4e21-bae3-2ee24c6e8902
 
-	/// Measure meas.opps_max_stages.
-	measure 'meas.opps_max_stages' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.opps_max_stages' = 
 			
 			SUMX(
 			    VALUES(opps[_sys_doc_id]),
@@ -553,65 +688,80 @@ table opps
 		displayFolder: _success_metrics
 		lineageTag: 40d5b9b3-a8b1-495b-95bb-dd379d53e138
 
-	/// Measure meas.opps_win_rate_value.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
 	measure 'meas.opps_win_rate_value' = DIVIDE([meas.won_amt],[meas.opps_booking_amt_total])
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _success_metrics
 		lineageTag: a94c7b43-59b3-4861-97be-92d7b828c957
 
-	/// Measure meas.opps_booking_amt_stage.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_booking_amt_stage' = ```
-			[meas.opps_booking_amt_total] - [meas.opps_booking_amt] 
-			```
+			[meas.opps_booking_amt_total] - [meas.opps_booking_amt]
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 04beffda-c477-4ae0-8bee-c4cf2fa5db12
 
-	/// Measure meas.opps_booking_amt_reached_next_stage.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_booking_amt_reached_next_stage' = ```
-			
+
 			VAR curIdx =
-			    MAX ( open_pipeline[trueai_sort_id] )
+			MAX ( open_pipeline[trueai_sort_id] )
 			VAR nextIdx =
-			    CALCULATE (
-			        MINX (
-			            FILTER ( ALL ( open_pipeline[trueai_sort_id] ),
-			                open_pipeline[trueai_sort_id] > curIdx
-			            ),
-			            open_pipeline[trueai_sort_id]
-			        )
-			    )
+			CALCULATE (
+			MINX (
+			FILTER ( ALL ( open_pipeline[trueai_sort_id] ),
+			open_pipeline[trueai_sort_id] > curIdx
+			),
+			open_pipeline[trueai_sort_id]
+			)
+			)
 			RETURN
 			IF (
-			    ISBLANK ( nextIdx ),
-			    BLANK(),
-			    CALCULATE (
-			        [meas.opps_booking_amt],
-			        REMOVEFILTERS (
-			            open_pipeline[trueai_sort_id],
-			            open_pipeline[trueai_stage],
-			            open_pipeline[trueai_stage_name],
-			            open_pipeline[trueai_stage_num]
-			        ),
-			        open_pipeline[trueai_stage_name] <> "Closed Lost",
-			         open_pipeline[trueai_stage_name] <> "Closed Won",
-			        TREATAS ( { nextIdx }, open_pipeline[trueai_sort_id] )
-			    )
+			ISBLANK ( nextIdx ),
+			BLANK(),
+			CALCULATE (
+			[meas.opps_booking_amt],
+			REMOVEFILTERS (
+			open_pipeline[trueai_sort_id],
+			open_pipeline[trueai_stage],
+			open_pipeline[trueai_stage_name],
+			open_pipeline[trueai_stage_num]
+			),
+			open_pipeline[trueai_stage_name] <> "Closed Lost",
+			open_pipeline[trueai_stage_name] <> "Closed Won",
+			TREATAS ( { nextIdx }, open_pipeline[trueai_sort_id] )
 			)
-			
-			```
+			)
+
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
 		lineageTag: aa23b27a-3667-4817-9d76-eca8052fa0b2
 
-	/// Measure meas.opps_total_crm_booking_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_total_crm_booking_amt' = SUM(opps[crm_booking_amt])
 		lineageTag: 9f546c8e-a727-4045-b9a7-e88973fb9cd1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_optimal_disc_level.
-	measure 'meas.opps_optimal_disc_level' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_optimal_disc_level' = 
 			
 			VAR TierStats =
 			    ADDCOLUMNS (
@@ -658,8 +808,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_optimal_discount_deal_count_pct.
-	measure 'meas.opps_optimal_discount_deal_count_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.opps_optimal_discount_deal_count_pct' = 
 			
 			-- Step 1: Get the result from your existing "Optimal Discount Level" measure
 			VAR BestTier = [meas.opps_optimal_disc_level]   -- e.g. returns "30–40%"
@@ -684,8 +837,11 @@ table opps
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 4088315a-082d-4abf-93a2-2fafde065533
 
-	/// Measure meas.opps_over_discounted_deal_pct.
-	measure 'meas.opps_over_discounted_deal_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.opps_over_discounted_deal_pct' = 
 			
 			-- Step 1: Get the optimal discount tier (e.g. "30-40%" or "40%+")
 			VAR BestTier = [meas.opps_optimal_disc_level]
@@ -750,8 +906,11 @@ table opps
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 63b0aff0-9501-46ad-a241-5c4d4be19b7d
 
-	/// Measure meas.opps_no_discount_count.
-	measure 'meas.opps_no_discount_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_no_discount_count' = 
 			
 			CALCULATE(
 			    [meas.ssr_history_step_count],                 -- or COUNT of opps if you prefer
@@ -761,8 +920,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_over_discount_deal_count.
-	measure 'meas.opps_over_discount_deal_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_over_discount_deal_count' = 
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			
@@ -787,8 +949,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_optimal_discount_deal_count.
-	measure 'meas.opps_optimal_discount_deal_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.opps_optimal_discount_deal_count' = 
 			
 			VAR BestTier = [meas.opps_optimal_disc_level]
 			RETURN
@@ -799,8 +964,11 @@ table opps
 		formatString: 0
 		lineageTag: 3df4757a-4c6f-4c6e-b5a8-fb9c558fe44f
 
-	/// Measure meas.opps_no_discount_pct.
-	measure 'meas.opps_no_discount_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_no_discount_pct' = 
 			
 			VAR NoDiscDeals =
 			    CALCULATE(
@@ -818,8 +986,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_under_discount_deal_count.
-	measure 'meas.opps_under_discount_deal_count' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_under_discount_deal_count' = 
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			
@@ -844,8 +1015,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_under_discount_deal_pct.
-	measure 'meas.opps_under_discount_deal_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_under_discount_deal_pct' = 
 			
 			VAR UnderCount = [meas.opps_under_discount_deal_count]
 			VAR TotalCount =
@@ -859,8 +1033,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.optimal_discount_tier_background.
-	measure 'meas.optimal_discount_tier_background' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.optimal_discount_tier_background' = 
 			
 			VAR OptimalSortKey =
 			    CALCULATE(
@@ -886,8 +1063,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_optimal_discount_pct.
-	measure 'meas.opps_optimal_discount_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_optimal_discount_pct' = 
 			
 			-- Get the optimal discount tier text (e.g. "30-40%")
 			VAR TierText = [meas.opps_optimal_disc_level]
@@ -924,8 +1104,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_over_discount_amount.
-	measure 'meas.opps_over_discount_amount' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_over_discount_amount' = 
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			
@@ -950,8 +1133,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_under_discount_amount.
-	measure 'meas.opps_under_discount_amount' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.opps_under_discount_amount' = 
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			
@@ -975,8 +1161,11 @@ table opps
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 3b0c2120-0320-4b5f-b0ee-169487a43ba8
 
-	/// Measure meas.opps_discount_avg_pct.
-	measure 'meas.opps_discount_avg_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_discount_avg_pct' = 
 			
 			AVERAGEX(
 			    VALUES('opps'[_sys_doc_id]),
@@ -995,28 +1184,37 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.trueai_discount_avg_pct.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.trueai_discount_avg_pct' = ```
-			
-			VAR list_price = CALCULATE(SUM (opps[col.trueai_list_price_amt])) 
-			VAR booking = CALCULATE(SUM (opps[trueai_booking_amt])) 
-			VAR res = DIVIDE(list_price - booking, list_price, BLANK()) 
+
+			VAR list_price = CALCULATE(SUM (opps[col.trueai_list_price_amt]))
+			VAR booking = CALCULATE(SUM (opps[trueai_booking_amt]))
+			VAR res = DIVIDE(list_price - booking, list_price, BLANK())
 			RETURN res
-			```
+	```
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 6e72aa0a-1689-423c-a601-75d453bd1b16
 
-	/// Measure meas.opps_avg_discount_pct.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: Tables: opps
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.opps_avg_discount_pct' = ```
-			
-			AVERAGE('opps'[trueai_discount_pct]) 
-			```
+
+			AVERAGE('opps'[trueai_discount_pct])
+	```
 		lineageTag: d7195d3c-688d-44b8-94cb-20117f9b2a55
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas._diagnostic_delta_test.
-	measure 'meas._diagnostic_delta_test' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas._diagnostic_delta_test' = 
 			
 			VAR SuccessRate = CALCULATE([meas.ssr_history_success_rate], KEEPFILTERS(opps))
 			VAR ExpectedRate = CALCULATE([meas.ssr_history_success_prob_avg], KEEPFILTERS(opps))
@@ -1026,8 +1224,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_over_discounted_total.
-	measure 'meas.opps_over_discounted_total' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.opps_over_discounted_total' = 
 			
 			CALCULATE(
 			    SUMX(
@@ -1042,15 +1243,21 @@ table opps
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 49d051de-1b3e-4ab6-82a4-f958870a76bf
 
-	/// Measure meas.trueai_disc_avg_pct.
-	measure 'meas.trueai_disc_avg_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.trueai_disc_avg_pct' = 
 			
 			AVERAGE(opps[trueai_discount_pct])
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: b02b6b3e-be61-49ab-bceb-67e1d3616691
 
-	/// Measure meas.opp_valid_amount.
-	measure 'meas.opp_valid_amount' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_valid_amount' = 
 			
 			IF (
 			    MAX('ssr_history'[opp_won_amt]) > 0,
@@ -1061,8 +1268,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_optimal_disc_label.
-	measure 'meas.opps_optimal_disc_label' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_optimal_disc_label' = 
 			
 			VAR BestSortKey =
 			    CALCULATE(
@@ -1078,8 +1288,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_deals_in_optimal_tier.
-	measure 'meas.opps_deals_in_optimal_tier' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_deals_in_optimal_tier' = 
 			
 			VAR BestSortKey =
 			    CALCULATE ( [meas.opps_optimal_disc_level], REMOVEFILTERS( opps ) )
@@ -1109,8 +1322,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_excess_over_discount_amount.
-	measure 'meas.opps_excess_over_discount_amount' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_excess_over_discount_amount' = 
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			
@@ -1139,8 +1355,11 @@ table opps
 			)
 		lineageTag: 69403608-0911-41c1-8e07-1730d51bcb9a
 
-	/// Measure meas.optimal_discount_pct_midpoint.
-	measure 'meas.optimal_discount_pct_midpoint' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.optimal_discount_pct_midpoint' = 
 			
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			RETURN
@@ -1152,8 +1371,11 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_excess_over_discount_amount_by_tier.
-	measure 'meas.opps_excess_over_discount_amount_by_tier' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_excess_over_discount_amount_by_tier' = 
 			
 			VAR BestSortKey =
 			    CALCULATE ( [meas.opps_optimal_disc_level], REMOVEFILTERS( opps ) )
@@ -1185,82 +1407,112 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_nd_amt.
-	measure 'meas.opp_nd_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_nd_amt' = 
 			
 			SUM ( opps[trueai_nd_amt] )
 		lineageTag: 03045633-016e-4492-9659-cc27636d00bb
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_nnb_amt.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
 	measure 'meas.opp_nnb_amt' = ```
-			
+
 			SUM ( opps[trueai_nnb_amt] )
-			
-			```
+
+	```
 		lineageTag: efe1d8fb-30b1-4ab3-89e7-804be31fb5dd
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_downgrade_amt.
-	measure 'meas.opp_downgrade_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_downgrade_amt' = 
 			
 			SUM ( opps[trueai_downgrade_amt] )
 		lineageTag: 6f61a270-93c2-4d9b-a3b6-0d9401d9dfb8
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_cross_sale_amt.
-	measure 'meas.opp_cross_sale_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_cross_sale_amt' = 
 			
 			SUM ( opps[trueai_cross_sale_amt] )
 		lineageTag: a5c87d1c-4dcc-4ec0-8f2b-63b6fb6bfb77
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_renewal_amt.
-	measure 'meas.opp_renewal_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_renewal_amt' = 
 			
 			SUM ( opps[trueai_renewal_amt] )
 		lineageTag: 4ac06b0a-b120-4372-8791-aad52081fe68
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_arr_amt.
-	measure 'meas.opp_arr_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_arr_amt' = 
 			
 			SUM ( opps[trueai_arr_amt] )
 		lineageTag: d14fb762-ef99-4ec6-9aa4-04f50d08f0cb
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_one_time_amt.
-	measure 'meas.opp_one_time_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_one_time_amt' = 
 			
 			SUM ( opps[trueai_one_time_amt] )
 		lineageTag: 73387f7c-1bdc-4587-9605-88d477f6790c
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_mrr_amt.
-	measure 'meas.opp_mrr_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_mrr_amt' = 
 			
 			DIVIDE( [meas.opp_arr_amt], 12 )
 		lineageTag: 2f7a6496-8c0e-4236-bc17-b61e4a8c2e85
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_expansion_amt.
-	measure 'meas.opp_expansion_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opp_expansion_amt' = 
 			
 			SUM ( opps[trueai_expansion_amt] )
 		lineageTag: 3eb58e07-0156-413b-b2f8-efcbf9ec8cff
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_non_nnb_amt.
-	measure 'meas.opps_non_nnb_amt' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.opps_non_nnb_amt' = 
 			
 			[meas.opps_booking_amt] - [meas.opp_nnb_amt]
 		lineageTag: ede2a06f-8f34-430d-889a-82b9010afa15

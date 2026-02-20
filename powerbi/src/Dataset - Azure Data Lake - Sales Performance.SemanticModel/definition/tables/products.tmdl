@@ -2,8 +2,11 @@
 table products
 	lineageTag: 40b9c0cb-f2d0-4937-88d6-57242cf9d494
 
-	/// Measure meas.product_family_unique_accounts.
-	measure 'meas.product_family_unique_accounts' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.product_family_unique_accounts' = 
 			
 			CALCULATE(
 			    DISTINCTCOUNT(
@@ -14,8 +17,11 @@ table products
 		displayFolder: _product_family_screen
 		lineageTag: 67ed0c15-661b-48cc-bce6-2ad1c8b456eb
 
-	/// Measure meas.product_family_unique_deals.
-	measure 'meas.product_family_unique_deals' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.product_family_unique_deals' = 
 			
 			CALCULATE(
 			    DISTINCTCOUNT(
@@ -26,36 +32,45 @@ table products
 		displayFolder: _product_family_screen
 		lineageTag: 3669683d-1215-4526-8258-d717340b2d21
 
-	/// Measure meas.product_family_total_price.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.product_family_total_price' = ```
-			
+
 			CALCULATE(
-			    SUM(
-			        opp_line_items[trueai_total_price]              // get the total sum 
-			    )
+			SUM(
+			opp_line_items[trueai_total_price]              // get the total sum
 			)
-			```
+			)
+	```
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _product_family_screen
 		lineageTag: fa69cd79-aadb-49d4-8bb8-5518cdbb2364
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.product_family_avg_qty.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.product_family_avg_qty' = ```
-			
+
 			CALCULATE(
-			    AVERAGE(
-			        opp_line_items[trueai_qty]      // get the average qty of the opp line items 
-			    )
+			AVERAGE(
+			opp_line_items[trueai_qty]      // get the average qty of the opp line items
 			)
-			```
+			)
+	```
 		formatString: 0.00
 		displayFolder: _product_family_screen
 		lineageTag: 2827e35a-98ac-4e68-8efb-3d73c5ab166f
 
-	/// Measure meas.product_family_avg_list_price.
-	measure 'meas.product_family_avg_list_price' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.product_family_avg_list_price' = 
 			
 			CALCULATE(
 			    AVERAGE(
@@ -66,8 +81,11 @@ table products
 		displayFolder: _product_family_screen
 		lineageTag: 0d5c6350-bece-4e5f-87ca-f565b988385a
 
-	/// Measure meas.product_family_avg_unit_price.
-	measure 'meas.product_family_avg_unit_price' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.product_family_avg_unit_price' = 
 			
 			CALCULATE(
 			    AVERAGE(
@@ -78,8 +96,11 @@ table products
 		displayFolder: _product_family_screen
 		lineageTag: bd2bbeee-6bb7-48fc-8714-76c18e5150e1
 
-	/// Measure meas.product_family_total_list_price.
-	measure 'meas.product_family_total_list_price' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.product_family_total_list_price' = 
 			
 			CALCULATE(
 			    SUMX(
@@ -91,8 +112,11 @@ table products
 		displayFolder: _product_family_screen
 		lineageTag: a5428bcf-0692-491a-946c-1a037fba6693
 
-	/// Measure meas.product_family_avg_sales_cycle.
-	measure 'meas.product_family_avg_sales_cycle' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Text
+	measure 'meas.product_family_avg_sales_cycle' = 
 			
 			CALCULATE(
 			    AVERAGE(
@@ -105,8 +129,11 @@ table products
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.product_family_avg_time_spent_hrs.
-	measure 'meas.product_family_avg_time_spent_hrs' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.product_family_avg_time_spent_hrs' = 
 			
 			CALCULATE(
 			    AVERAGE(
@@ -119,49 +146,58 @@ table products
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.product_family_total_time_spent_hrs.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.product_family_total_time_spent_hrs' = ```
-			
+
 			CALCULATE(
-			    SUMX(
-			        ssr_history,
-			        ssr_history[stkhlds_all_adj_dur]        // get the total adjusted duration of the stkhlds
-			    )
-			)/3600      // convert the duration into hrs 
-			```
+			SUMX(
+			ssr_history,
+			ssr_history[stkhlds_all_adj_dur]        // get the total adjusted duration of the stkhlds
+			)
+			)/3600      // convert the duration into hrs
+	```
 		formatString: #,##0" hrs"
 		displayFolder: _product_family_screen
 		lineageTag: ee99d7e9-07ee-406a-bba8-27a51c0e95c5
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.product_family_booking_pct.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.product_family_booking_pct' = ```
-			
+
 			var total_price = CALCULATE(
-			    SUM(
-			        opp_line_items[trueai_total_price]              // get the total sum  removing all filters
-			    ),
-			    ALL(opp_line_items)
+			SUM(
+			opp_line_items[trueai_total_price]              // get the total sum  removing all filters
+			),
+			ALL(opp_line_items)
 			)
-			
-			var _prodct_price = [meas.product_family_total_price]   // get the product price 
-			
+
+			var _prodct_price = [meas.product_family_total_price]   // get the product price
+
 			var res = DIVIDE(
-			    _prodct_price,
-			    total_price,
-			    0
+			_prodct_price,
+			total_price,
+			0
 			)       // get the ratio
-			
+
 			RETURN
 			res
-			```
+	```
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: _product_family_screen
 		lineageTag: 28d441be-1f36-40c1-91fb-b4d6a82b39bc
 
-	/// Measure meas.product_family_account_penetration_pct.
-	measure 'meas.product_family_account_penetration_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.product_family_account_penetration_pct' = 
 			
 			var _total_acc = CALCULATE(
 			    DISTINCTCOUNT(
@@ -184,34 +220,40 @@ table products
 		displayFolder: _product_family_screen
 		lineageTag: 29489642-76e8-4b94-b39a-8201d290eba8
 
-	/// Measure meas.product_family_included_won_deals_pct.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.product_family_included_won_deals_pct' = ```
-			
-			
+
+
 			var _total_deals = CALCULATE(
-			    DISTINCTCOUNT(
-			        opps[_sys_doc_id]   // get the disticnt count of _sys_doc_id as unique deals removed all filtrs from product table
-			    ),
-			    ALL(products)
+			DISTINCTCOUNT(
+			opps[_sys_doc_id]   // get the disticnt count of _sys_doc_id as unique deals removed all filtrs from product table
+			),
+			ALL(products)
 			)
-			
+
 			var _deals = [meas.product_family_unique_deals]         // get the unique counts product wise
-			
+
 			var res = DIVIDE(
-			    _deals,
-			    _total_deals,       // get the ratio 
-			    0
+			_deals,
+			_total_deals,       // get the ratio
+			0
 			)
-			
+
 			RETURN
 			res
-			```
+	```
 		formatString: 0%;-0%;0%
 		displayFolder: _product_family_screen
 		lineageTag: 146208f2-5b08-4bbb-bcca-b7800a76fd98
 
-	/// Measure meas.product_family_all_won_deals.
-	measure 'meas.product_family_all_won_deals' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.product_family_all_won_deals' = 
 			
 			CALCULATE(
 			    DISTINCTCOUNT(
@@ -223,8 +265,11 @@ table products
 		displayFolder: _product_family_screen
 		lineageTag: b0aefd2a-0119-4726-9652-18e4338db9f0
 
-	/// Measure meas.product_family_win_deals_pct.
-	measure 'meas.product_family_win_deals_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.product_family_win_deals_pct' = 
 			
 			var total_won = CALCULATE(
 			    DISTINCTCOUNT(
@@ -246,8 +291,11 @@ table products
 		displayFolder: _product_family_screen
 		lineageTag: fdb3ea90-281d-45fb-ba9b-7487dad25a15
 
-	/// Measure meas.product_family_avg_expected_win_rate_pct.
-	measure 'meas.product_family_avg_expected_win_rate_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.product_family_avg_expected_win_rate_pct' = 
 			
 			CALCULATE(
 			    AVERAGE(

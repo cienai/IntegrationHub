@@ -2,48 +2,48 @@
 table dupe_summary
 	lineageTag: f7b99aab-df1a-410a-affa-c6c31f68180a
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (tbl_scores, temp, dupe_ratio, res) used later in the expression. Dependencies: Columns: dupe_summary[_sys_docid], dupe_summary[is_dupe], dupe_summary[max_acceptable_pct], dupe_summary[problem] | Measures: [prob_rec_count], [rec_count].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0.00
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Decimal
 	measure 'meas.crm_dupe_score' = ```
-			
+
 			//calculate ratio
-			
-			var tbl_scores = CALCULATETABLE(SUMMARIZE(dupe_summary, dupe_summary[problem], 
-			"rec_count", COUNT(dupe_summary[_sys_docid]), 
-			"prob_rec_count", COUNTX(dupe_summary,IF (dupe_summary[is_dupe] =true, dupe_summary[_sys_docid])), 
+
+			var tbl_scores = CALCULATETABLE(SUMMARIZE(dupe_summary, dupe_summary[problem],
+			"rec_count", COUNT(dupe_summary[_sys_docid]),
+			"prob_rec_count", COUNTX(dupe_summary,IF (dupe_summary[is_dupe] =true, dupe_summary[_sys_docid])),
 			"max_acceptable_pct", MAX(dupe_summary[max_acceptable_pct])
 			))  // summarize by problem area
-			
+
 			--var temp = SUMX(tbl_scores, [prob_rec_count]) -- just a test
-			
-			var dupe_ratio = AVERAGEX(tbl_scores, 
-			    IF((DIVIDE(DIVIDE([prob_rec_count], [rec_count]), [max_acceptable_pct]))> 1,
-			    0.99,DIVIDE(DIVIDE([prob_rec_count], [rec_count]), [max_acceptable_pct]))
+
+			var dupe_ratio = AVERAGEX(tbl_scores,
+			IF((DIVIDE(DIVIDE([prob_rec_count], [rec_count]), [max_acceptable_pct]))> 1,
+			0.99,DIVIDE(DIVIDE([prob_rec_count], [rec_count]), [max_acceptable_pct]))
 			) // get the problem record rate divided by the acceptable rate per summarized category and then avg those scores in an avg score (the trick is to calculate per record)
-			
+
 			var res = 1 - dupe_ratio -- invert to get the score
-			
+
 			return
 			IF(
-			    res=BLANK(),
-			    0,
-			    res
+			res=BLANK(),
+			0,
+			res
 			)
-			
-			```
+
+	```
 		formatString: 0.00
 		displayFolder: _dupe_score
 		lineageTag: acf77ee7-4191-4d2b-b5c6-2595509ce4e5
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.crm_dupe_score_industry_avg_display' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.crm_dupe_score_industry_avg_display' = 
 			//0.55 * 100
 			var _score = CALCULATE(
 			    MAX(metadata_reference_values[value]),
@@ -56,24 +56,24 @@ table dupe_summary
 		displayFolder: _dupe_score
 		lineageTag: d0e5e2bd-776d-4c12-bb76-0981cde94199
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (all_recs, prob_recs, non_prob_recs, avg_conf, res) used later in the expression. Dependencies: Columns: dupe_summary[dupe_conf] | Measures: [meas.crm_records], [meas.crm_dupe_problem_records].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Modifies filter context via CALCULATE filters.
+	/// ?? Format/Type: Text
 	measure 'meas.trueai_dupe_score' = ```
-			
+
 			var all_recs =  [meas.crm_records]
 			var prob_recs =  [meas.crm_dupe_problem_records] // get the problematic records
 			var non_prob_recs = all_recs - prob_recs  // get the ok records
-			var avg_conf = CALCULATE(AVERAGE(dupe_summary[dupe_conf])) // get the avg confidence for corrected records 
-			var res = Divide((non_prob_recs * 1 ) +  (prob_recs * avg_conf) , all_recs) // dedeuct by conf for corrected recrods 
-			return 
+			var avg_conf = CALCULATE(AVERAGE(dupe_summary[dupe_conf])) // get the avg confidence for corrected records
+			var res = Divide((non_prob_recs * 1 ) +  (prob_recs * avg_conf) , all_recs) // dedeuct by conf for corrected recrods
+			return
 			IF(
-			    res=BLANK(),
-			    0,
-			    res
+			res=BLANK(),
+			0,
+			res
 			)
-			```
+	```
 		displayFolder: _dupe_score
 		lineageTag: 3b35d7b9-f525-4ad5-8374-7ee283d722de
 
@@ -81,29 +81,29 @@ table dupe_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (trueai_score, crm_score, imp, res) used later in the expression. Dependencies: Measures: [meas.trueai_dupe_score_display], [meas.crm_dupe_score_display].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: +#%;-#%;0%
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
 	measure 'meas.trueai_dupe_score_improvement' = ```
-			
+
 			var trueai_score = ROUND([meas.trueai_dupe_score_display],2)      // get the trueai dupe score
-			var crm_score = ROUND([meas.crm_dupe_score_display],2)               // get the crm score 
+			var crm_score = ROUND([meas.crm_dupe_score_display],2)               // get the crm score
 			var imp = divide(trueai_score - crm_score,  crm_score, blank())
 			var res = imp
 			return res
-			```
+	```
 		formatString: +#%;-#%;0%
 		displayFolder: _dupe_score
 		lineageTag: 0b69f420-2ae6-44c0-bf93-9769337276a2
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: #,0
-	measure 'meas.crm_dupe_problem_records' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.crm_dupe_problem_records' = 
 			
 			var _count = CALCULATE(COUNT(dupe_summary[_sys_docid]), dupe_summary[is_dupe] = true)
 			var res = IF(
@@ -120,11 +120,11 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0.0%;-0.0%;0.0%
-	measure 'meas.crm_dupe_problem_records_pct' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Decimal
+	measure 'meas.crm_dupe_problem_records_pct' = 
 			
 			var res = divide ([meas.crm_dupe_problem_records], [meas.crm_records] )
 			
@@ -138,11 +138,11 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: #,0
-	measure 'meas.crm_records' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.crm_records' = 
 			
 			var _count = CALCULATE(COUNT(dupe_summary[_sys_docid]))
 			
@@ -160,11 +160,11 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: #,0
-	measure 'meas.trueai_corrected_records' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.trueai_corrected_records' = 
 			
 			var _count = CALCULATE(count(dupe_summary[_sys_docid]), dupe_summary[is_master] = true)
 			var res = IF(
@@ -181,10 +181,10 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Measures: [meas.crm_dupe_score].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
 	measure 'meas.crm_dupe_score_display' = [meas.crm_dupe_score] * 100
 		formatString: 0
 		displayFolder: _dupe_score
@@ -192,11 +192,11 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.trueai_dupe_score_display' =
+	/// ?? Purpose: Compute the measure result from the DAX expression.
+	/// ?? Dependencies: See model references
+	/// ?? Dynamic Behavior: Respects current filter context.
+	/// ?? Format/Type: Whole number
+	measure 'meas.trueai_dupe_score_display' = 
 			
 			var _crm_score = [meas.crm_dupe_score_display]              // get the crm sciore(before)
 			var _trueai_score = [meas.trueai_dupe_score]*100                // get the after score
