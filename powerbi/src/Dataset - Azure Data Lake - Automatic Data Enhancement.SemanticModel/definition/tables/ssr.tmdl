@@ -2,61 +2,63 @@
 table ssr
 	lineageTag: cb48d9a8-ea61-48bb-845c-67eb596f90f7
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (total, res) used later in the expression. Dependencies: Columns: ssr_history[_sys_ssr_id] | Measures: [meas.ssr_trueai_converted_count].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0.0%;-0.0%;0.0%
-	measure 'meas.ssr_trueai_conversion_rate' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.ssr_trueai_conversion_rate' = 
 			
 			var total =CALCULATE(DISTINCTCount(ssr_history[_sys_ssr_id])  )  +0
 			var res =Divide([meas.ssr_trueai_converted_count] , total)
 			
 			return res 
-			```
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: _ssr_analysis
 		lineageTag: a946bddd-5ee9-4adf-a031-0bb4bbb7b204
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_name], ssr_history[step_success].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: #,0
-	measure 'meas.ssr_trueai_converted_count' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_trueai_converted_count' = 
 			
 			 var res =CALCULATE(DISTINCTCount(ssr_history[_sys_ssr_id]), ssr_history[step_success] = True && ssr_history[step_name] = "Prospecting")  +0
 			 return IF(ISBLANK(res), 0,res)
-			```
 		formatString: #,0
 		displayFolder: _ssr_analysis
 		lineageTag: f64fb9f1-a6d6-4e35-ade9-42652b127317
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (val) used later in the expression. Dependencies: Columns: ssr[_sys_doc_id], ssr[crm_lead_count], ssr[trueai_leadsource].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0
-	measure 'meas.ssr_trueai_no_leadsource_count' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_trueai_no_leadsource_count' = 
 			
 			var val = CALCULATE(count(ssr[_sys_doc_id]), or(ISBLANK(ssr[trueai_leadsource]) = TRUE(),ssr[trueai_leadsource]= "ND" && ssr[crm_lead_count] >0 ))
 			return if(ISBLANK(val), 0, val)
 			
-			```
 		formatString: 0
 		displayFolder: _ssr_analysis
 		lineageTag: 9ff987e5-24d2-453a-8420-d58519669d3c
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: ssr[_sys_doc_id], ssr[crm_lead_count] | Measures: [meas.ssr_trueai_no_leadsource_count].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0.0%;-0.0%;0.0%
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.ssr_trueai_no_leadsource_rate' = [meas.ssr_trueai_no_leadsource_count] / CALCULATE(count(ssr[_sys_doc_id]),  ssr[crm_lead_count] >0 ) // only include the ones w/ leads
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: _ssr_analysis
 		lineageTag: 688b74be-7bd5-49c2-ac7d-734bc28f3627
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.crm_has_leads_and_accounts_count' =
 			
 			var res = CALCULATE(Count(ssr[_sys_doc_id]), ssr[col.crm_has_accounts] = TRUE() && ssr[col.crm_has_leads] = TRUE())
@@ -65,23 +67,24 @@ table ssr
 		displayFolder: _ssr_analysis
 		lineageTag: e2098939-2a9f-4d2e-9dd5-292cfef21a57
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Columns: ssr[_sys_doc_id], ssr[col.crm_has_leads], ssr[trueai_account_is_master].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0
-	measure 'meas.ssr_unique_with_only_accounts' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_unique_with_only_accounts' = 
 			
 			 var res = CALCULATE(COUNT(ssr[_sys_doc_id]), ssr[col.crm_has_leads] = False && (ssr[trueai_account_is_master] = True || isblank(ssr[trueai_account_is_master]) = True))
 			 return if(ISBLANK(res), 0, res)
-			```
 		formatString: 0
 		displayFolder: _ssr_analysis
 		lineageTag: 95b81281-f2e6-4de1-8655-2037de1db979
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.ssr_non_unique_with_only_accounts' =
 			
 			var res =CALCULATE(COUNT(ssr[_sys_doc_id]), ssr[col.crm_has_leads] = False && (ssr[trueai_account_is_master] = False || ssr[trueai_account_is_master] = True || isblank(ssr[trueai_account_is_master]) = True))
@@ -90,23 +93,24 @@ table ssr
 		displayFolder: _ssr_analysis
 		lineageTag: 716b3cc6-253d-4225-9134-518a3c569eab
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: ssr[_sys_doc_id].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: #,0
-	measure 'meas.ssr_leads_accts_counts' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_leads_accts_counts' = 
 			
 			CALCULATE(
 			    COUNT(ssr[_sys_doc_id])     // get the count of the ssr doc id count as leads_accts_counts 
 			)
-			```
 		formatString: #,0
 		lineageTag: fe308ad8-fcd9-4cbb-806a-29492fd84183
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: General Date
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
 	measure 'Last Data Date' =
 			
 			CALCULATE(

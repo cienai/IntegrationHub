@@ -2,10 +2,11 @@
 table sales_process_summary
 	lineageTag: ef2e46a4-dc53-4296-88d6-ed05ebba1fa7
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.crm_sales_process_score_display' =
 			
 			var res = round([meas.crm_sales_process_score]  * 100,0)  // just multiply by 100 and remove decimals
@@ -16,10 +17,11 @@ table sales_process_summary
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.crm_sales_process_score_industry_avg' =
 			//47
 			var _score = CALCULATE(
@@ -33,10 +35,11 @@ table sales_process_summary
 		displayFolder: _sales_process_score
 		lineageTag: 34aa2bb1-687e-4824-8c2e-417e2bd4ba26
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.trueai_sales_process_score_display' =
 			
 			var _before = [meas.crm_sales_process_score_display]                    // get the before score
@@ -53,10 +56,11 @@ table sales_process_summary
 		displayFolder: _sales_process_score
 		lineageTag: 1021f740-fe87-4306-8ad1-a0d7b8ce2b29
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: +#%;-#%;0%
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.trueai_sales_process_score_improvement' =
 			
 			var trueai_score = ROUND([meas.trueai_sales_process_score_display],2)
@@ -70,11 +74,12 @@ table sales_process_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (score, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[meas.crm_act_capt_score], completeness_summary[meas.crm_completeness_score_display], consistency_summary[meas.crm_consistency_score_display], dupe_summary[meas.crm_dupe_score_display], sales_process_summary[meas.crm_sales_process_score_display].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.crm_all_ade_score_display' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.crm_all_ade_score_display' = 
 			
 			var score = (dupe_summary[meas.crm_dupe_score_display] + completeness_summary[meas.crm_completeness_score_display] + consistency_summary[meas.crm_consistency_score_display] + sales_process_summary[meas.crm_sales_process_score_display] + act_capture_level_summary[meas.crm_act_capt_score]
 			) / 5 
@@ -82,16 +87,16 @@ table sales_process_summary
 			var res = round(score, 0)
 			return res
 			
-			```
 		formatString: 0
 		displayFolder: _all_ade_score
 		lineageTag: 1cfa7cf6-b17d-4810-98ac-00713451dee9
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (score, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[meas.crm_act_capt_score_industry_avg], completeness_summary[meas.crm_completeness_score_industry_avg], consistency_summary[meas.crm_consistency_score_industry_avg], dupe_summary[meas.crm_dupe_score_industry_avg_display], sales_process_summary[meas.crm_sales_process_score_industry_avg].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.crm_all_ade_score_industry_avg' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.crm_all_ade_score_industry_avg' = 
 			
 			var score = (dupe_summary[meas.crm_dupe_score_industry_avg_display] + completeness_summary[meas.crm_completeness_score_industry_avg] + consistency_summary[meas.crm_consistency_score_industry_avg] 
 			+ sales_process_summary[meas.crm_sales_process_score_industry_avg]
@@ -101,16 +106,16 @@ table sales_process_summary
 			var res = round(score, 0)
 			return res
 			
-			```
 		formatString: 0
 		displayFolder: _all_ade_score
 		lineageTag: ac155e8c-fcdf-4362-bacd-b0a63f1c66aa
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (score, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[meas.trueai_act_capt_score], ai_conf_pred_qual_summary[meas.ai_conf_overall_score], completeness_summary[meas.trueai_completeness_score], consistency_summary[meas.trueai_consistency_score_display], dupe_summary[meas.trueai_dupe_score_display], sales_process_summary[meas.trueai_sales_process_score_display].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.trueai_all_ade_score_display' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.trueai_all_ade_score_display' = 
 			
 			var score = (dupe_summary[meas.trueai_dupe_score_display] + completeness_summary[meas.trueai_completeness_score] 
 			+ consistency_summary[meas.trueai_consistency_score_display] 
@@ -122,7 +127,6 @@ table sales_process_summary
 			var res = round(score, 0)
 			return res
 			
-			```
 		formatString: 0
 		displayFolder: _all_ade_score
 		lineageTag: 748ba898-0069-4b13-a51b-a5cf7129cc13
@@ -131,11 +135,12 @@ table sales_process_summary
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (trueai_score, crm_score, imp, res) used later in the expression. Dependencies: Measures: [meas.trueai_all_ade_score_display], [meas.crm_all_ade_score_display].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: +#%;-#%;0%
-	measure 'meas.trueai_all_ade_score_improvement' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.trueai_all_ade_score_improvement' = 
 			
 			var trueai_score = ROUND([meas.trueai_all_ade_score_display],2)
 			var crm_score = ROUND([meas.crm_all_ade_score_display],2)
@@ -144,17 +149,17 @@ table sales_process_summary
 			return res
 			
 			
-			```
 		formatString: +#%;-#%;0%
 		displayFolder: _all_ade_score
 		lineageTag: 3ac790cd-26eb-4104-a7bb-3b6f71aa4131
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: Not specified.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
 	measure 'meas.crm_sales_process_score' =
 			
 			
@@ -169,10 +174,11 @@ table sales_process_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0.00
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.trueai_sales_process_score' =
 			
 			
@@ -189,10 +195,11 @@ table sales_process_summary
 		displayFolder: _sales_process_score
 		lineageTag: ee1995a9-f95e-48ad-835f-dd308716cbbf
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: Not specified.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
 	measure 'meas.crm_sales_process_any_rules_count' =
 			
 			
@@ -204,11 +211,12 @@ table sales_process_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, std_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_owner_rule].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
-	measure 'meas.crm_sales_process_ownership_rules_std_count' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
+	measure 'meas.crm_sales_process_ownership_rules_std_count' = 
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
 			//var dd = COUNTROWS(tbl_crm_rules) // check the count
@@ -216,17 +224,17 @@ table sales_process_summary
 			var std_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
 			var res = std_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
-			```
 		displayFolder: _sales_process_score
 		lineageTag: 0decf15d-bf95-4158-b2d9-7687b44193b8
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, sdt_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_owner_rule].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0
-	measure 'meas.crm_sales_process_ownership_rules_non_std_count' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.crm_sales_process_ownership_rules_non_std_count' = 
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
 			//var dd = COUNTROWS(tbl_crm_rules) // check the count
@@ -234,16 +242,16 @@ table sales_process_summary
 			var sdt_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
 			var res = sdt_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
-			```
 		formatString: 0
 		displayFolder: _sales_process_score
 		lineageTag: 97d25616-7fe7-412d-9397-c0075aa44e42
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, sdt_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_end_rule].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0
-	measure 'meas.crm_sales_process_end_rules_non_std_count' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.crm_sales_process_end_rules_non_std_count' = 
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
 			//var dd = COUNTROWS(tbl_crm_rules) // check the count
@@ -251,16 +259,16 @@ table sales_process_summary
 			var sdt_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
 			var res = sdt_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
-			```
 		formatString: 0
 		displayFolder: _sales_process_score
 		lineageTag: 9dfa3fc6-d190-452a-8b64-e8d9a6a0aff5
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, std_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_end_rule].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
-	measure 'meas.crm_sales_process_end_rules_std_count ' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
+	measure 'meas.crm_sales_process_end_rules_std_count ' = 
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
 			//var dd = COUNTROWS(tbl_crm_rules) // check the count
@@ -268,17 +276,17 @@ table sales_process_summary
 			var std_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
 			var res = std_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
-			```
 		displayFolder: _sales_process_score
 		lineageTag: f7cd03d7-0290-46f8-95d3-4867b0bc66e4
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, sdt_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_outcome_rule].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0
-	measure 'meas.crm_sales_process_outcome_rules_non_std_count' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.crm_sales_process_outcome_rules_non_std_count' = 
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
 			//var dd = COUNTROWS(tbl_crm_rules) // check the count
@@ -286,16 +294,16 @@ table sales_process_summary
 			var sdt_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
 			var res = sdt_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
-			```
 		formatString: 0
 		displayFolder: _sales_process_score
 		lineageTag: a657c9cb-8377-4d32-81d7-f6ff96382fdc
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, std_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_outcome_rule].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
-	measure 'meas.crm_sales_process_outcome_rules_std_count' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
+	measure 'meas.crm_sales_process_outcome_rules_std_count' = 
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
 			//var dd = COUNTROWS(tbl_crm_rules) // check the count
@@ -303,16 +311,16 @@ table sales_process_summary
 			var std_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
 			var res = std_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
-			```
 		displayFolder: _sales_process_score
 		lineageTag: 705de9ee-9abe-4371-8cc4-6b0bce5ce92a
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.crm_sales_process_any_rules_non_std_count' =
 			
 			var res = sales_process_summary[meas.crm_sales_process_any_rules_count] - sales_process_summary[meas.crm_sales_process_any_rules_std_count] // just get the diff
@@ -321,11 +329,12 @@ table sales_process_summary
 		displayFolder: _sales_process_score
 		lineageTag: 23b67383-b0af-4194-bba9-cd2a8ab33bae
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (tbl_crm_rules, dd, filt, sdt_rules_applied, res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id], ssr_history[step_end_rule], ssr_history[step_outcome_rule], ssr_history[step_owner_rule].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0
-	measure 'meas.crm_sales_process_any_rules_std_count' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.crm_sales_process_any_rules_std_count' = 
 			
 			
 			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
@@ -342,7 +351,6 @@ table sales_process_summary
 			
 			
 			return If(IsBlank(res), 0,res)
-			```
 		formatString: 0
 		displayFolder: _sales_process_score
 		lineageTag: ed668400-4a42-436c-9090-ddde1589f0a7

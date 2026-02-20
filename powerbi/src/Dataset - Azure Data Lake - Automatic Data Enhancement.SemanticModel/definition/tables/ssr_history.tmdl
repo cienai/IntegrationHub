@@ -2,50 +2,53 @@
 table ssr_history
 	lineageTag: c2ee1095-155a-44f5-a5af-efb2bc2dc2c5
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[_sys_doc_id], ssr_history[step_success].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
-	measure 'meas.ssr_history_success_count' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_history_success_count' = 
 			CALCULATE(count(ssr_history[_sys_doc_id]),ssr_history[step_success] = true)  
-			```
 		formatString: 0
 		displayFolder: _ssr_history_analyis
 		lineageTag: fbf78099-2fdd-4373-9016-2af11cc5f240
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[_sys_doc_id] | Measures: [meas.ssr_history_success_count].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0.00%;-0.00%;0.00%
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.ssr_history_success_rate' = DIVIDE([meas.ssr_history_success_count], count(ssr_history[_sys_doc_id]))
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _ssr_history_analyis
 		lineageTag: cda20e0e-69cf-402d-9516-347d9e518aa3
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[step_owner_user_role].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: Not specified.
-	measure 'meas.ssr_history_step_summary' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.ssr_history_step_summary' = 
 			// get the step owner user role
 			CALCULATE(MAX(ssr_history[step_owner_user_role])) 
-			```
 		displayFolder: _ssr_history_analyis
 		lineageTag: 6abc5488-273b-4e5d-b362-1ba28618566c
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_name].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.ssr_history_touched_accounts' = CALCULATE(DISTINCTCOUNT(ssr_history[_sys_ssr_id]), ssr_history[step_name] ="Prospecting")
 		formatString: 0
 		displayFolder: _ssr_history_analyis
 		lineageTag: 3ed7eb07-019d-4902-b108-7fddffd138fd
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0.00
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.ssr_history_adj_dur_conf' =
 			// this comment is for check the github  version check
 			
