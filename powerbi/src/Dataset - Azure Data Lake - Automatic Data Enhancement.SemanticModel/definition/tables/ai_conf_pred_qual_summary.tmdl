@@ -15,6 +15,13 @@ table ai_conf_pred_qual_summary
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks AI conf overall score.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.nlp_score], [meas.pred_qual_trueai_score], [meas.skills_score]; Columns: 'ai_conf_nlp_summary'[meas.nlp_sco...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: cb94e22d-e69e-420a-9626-b712c33e1a9f
@@ -32,6 +39,13 @@ table ai_conf_pred_qual_summary
 			
 			RETURN
 			_score
+		description: """
+Purpose: Tracks AI conf overall score instry average.
+Logic: Returns an extreme value from metadata_reference_values[value] under filters.
+Dependencies: Columns: metadata_reference_values[value], metadata_reference_values[_sys_doc_id]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 7616300d-cae6-467a-8352-84608e038164
@@ -46,6 +60,13 @@ table ai_conf_pred_qual_summary
 			var res = If (score >= 95, "Excellent", if(score >= 85,  "Great",If(score >= 75, "Good",If(score >= 50, "Fair", "Limited" ))))
 			return  res 
 			```
+		description: """
+Purpose: Tracks AI conf overall score text.
+Logic: Sums ai_conf_pred_qual_summary[meas.ai_conf_overall_score] under filters.
+Dependencies: Measures: [meas.ai_conf_overall_score]; Columns: ai_conf_pred_qual_summary[meas.ai_conf_overall_score]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		displayFolder: _ai_scores
 		lineageTag: 39b4e86c-460e-4a33-9eb4-a5bf45f38f7b
 
@@ -59,6 +80,13 @@ table ai_conf_pred_qual_summary
 			var res = If (score >= 95, "Excellent", if(score >= 85,  "Great",If(score >= 75, "Good",If(score >= 50, "Fair", "Limited" ))))
 			return  res 
 			```
+		description: """
+Purpose: Tracks AI conf score text.
+Logic: Sums ai_conf_pred_qual_summary[meas.ai_conf_overall_score] under filters.
+Dependencies: Measures: [meas.ai_conf_overall_score]; Columns: ai_conf_pred_qual_summary[meas.ai_conf_overall_score]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		displayFolder: _ai_scores
 		lineageTag: 915fade2-d8df-4076-b918-0739d09e5eaa
 
@@ -72,6 +100,13 @@ table ai_conf_pred_qual_summary
 			var res = If (score >= 95, "Excellent", if(score >= 85,  "Great",If(score >= 75, "Good",If(score >= 50, "Fair", "Limited" ))))
 			return  res 
 			```
+		description: """
+Purpose: Tracks pred qual score text.
+Logic: Sums ai_conf_pred_qual_summary[meas.pred_qual_trueai_score] under filters.
+Dependencies: Measures: [meas.pred_qual_trueai_score]; Columns: ai_conf_pred_qual_summary[meas.pred_qual_trueai_score]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		displayFolder: _ai_scores
 		lineageTag: 72f176ba-aefb-4f5e-a69c-aa67a8b54ba1
 
@@ -82,6 +117,13 @@ table ai_conf_pred_qual_summary
 	measure 'meas.pred_qual_trueai_score' =
 			
 			AVERAGE(ai_conf_pred_qual_summary[pred_qual_score]) * 100
+		description: """
+Purpose: Tracks pred qual trueai score.
+Logic: Averages ai_conf_pred_qual_summary[pred_qual_score] under filters.
+Dependencies: Columns: ai_conf_pred_qual_summary[pred_qual_score]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 7483542d-1a68-4c60-a713-ed796df5673b

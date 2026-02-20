@@ -21,6 +21,13 @@ table strat_summary
 			
 			
 			```
+		description: """
+Purpose: Tracks strat summary delta prev period.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.context_date_max], [meas.context_date_min], [meas.context_prev_period_max], [meas.context_prev_period_min];...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: +0%;-0%;0%
 		lineageTag: 82e43cdd-6fc2-467b-bb4c-7674b260c804
 
@@ -43,6 +50,13 @@ table strat_summary
 			
 			
 			```
+		description: """
+Purpose: Tracks strat summary score.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_me...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: d24f1d2f-3b43-4850-a366-3df70aa26def
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -60,6 +74,13 @@ table strat_summary
 			
 			
 			```
+		description: """
+Purpose: Tracks strat summary trend score.
+Logic: Averages strat_summary[key_metric_trend_coeff] under filters.
+Dependencies: Measures: [meas.strat_summary_delta_prev_period]; Columns: strat_summary[key_metric_trend_coeff]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: 3d5b6690-0192-4c58-9bb5-4bdd921b2202
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -69,6 +90,13 @@ table strat_summary
 			strat_summary[meas.strat_summary_score] * 100
 			
 			```
+		description: """
+Purpose: Tracks strat summary display score.
+Logic: Sums strat_summary[meas.strat_summary_score] under filters.
+Dependencies: Measures: [meas.strat_summary_score]; Columns: strat_summary[meas.strat_summary_score]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		lineageTag: 900adbfe-b098-46b6-9e52-d2c67154d556
 
@@ -78,6 +106,13 @@ table strat_summary
 	measure 'meas.strat_summary_display_key_metric_pct' =
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_value]) )
+		description: """
+Purpose: Tracks strat summary display key metric percentage.
+Logic: Averages strat_summary[key_metric_value] under filters.
+Dependencies: Columns: strat_summary[key_metric_value]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: f0422331-3943-4ca3-9d2f-58d99b0c36ac
 
@@ -101,6 +136,13 @@ table strat_summary
 			
 			
 			```
+		description: """
+Purpose: Tracks strat summary score display eop.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_me...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		lineageTag: e2526f51-ac84-4165-94ac-3bafd28f860a
 
@@ -114,6 +156,13 @@ table strat_summary
 			
 			var res = CALCULATE(AVERAGE(strat_summary[key_metric_value]),filt) -- just get the avg value for the key metric
 			return res
+		description: """
+Purpose: Tracks strat summary key metric display percentage eop.
+Logic: Averages cal_end_dates[meas.context_date_max] under filters.
+Dependencies: Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_me...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0%;-0%;0%
 		lineageTag: 4fe3646e-f707-40da-8b35-26c270e96e09
 
@@ -123,6 +172,13 @@ table strat_summary
 	measure 'meas.strat_summary_display_reference_pct' =
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
+		description: """
+Purpose: Tracks strat summary display reference percentage.
+Logic: Averages strat_summary[key_metric_reference] under filters.
+Dependencies: Columns: strat_summary[key_metric_reference]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0%;-0%;0%
 		lineageTag: a77c2788-c85b-428c-8253-13e25284ee52
 
@@ -147,6 +203,13 @@ table strat_summary
 			
 			
 			```
+		description: """
+Purpose: Tracks strat summary delta 12mo eop.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.context_date_max]; Columns: strat_summary[key_metric_value], cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: +0%;-0%;0%
 		lineageTag: d15bb079-82a5-4e6b-a51b-bf25c3739dc5
 
@@ -160,6 +223,13 @@ table strat_summary
 			
 			var res = CALCULATE(AVERAGE(strat_summary[key_metric_value]),filt) -- just get the avg value for the key metric
 			return res
+		description: """
+Purpose: Tracks strat summary key metric display ratio eop.
+Logic: Averages cal_end_dates[meas.context_date_max] under filters.
+Dependencies: Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_me...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		formatString: #.0 ":1"
 		lineageTag: cf15f1d9-55f4-4ce3-b3ef-8a6785348e61
 
@@ -171,6 +241,13 @@ table strat_summary
 	measure 'meas.strat_summary_display_reference_ratio' =
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
+		description: """
+Purpose: Tracks strat summary display reference ratio.
+Logic: Averages strat_summary[key_metric_reference] under filters.
+Dependencies: Columns: strat_summary[key_metric_reference]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: 0":1"
 		lineageTag: 1bc2643f-9c54-4121-aa0e-0a47687a4d7e
 
@@ -185,6 +262,13 @@ table strat_summary
 			var res = (val_score * val_trend_score ) ^ 0.5  
 			return res
 			```
+		description: """
+Purpose: Tracks strat summary concern score.
+Logic: Sums strat_summary[meas.strat_summary_score] under filters.
+Dependencies: Measures: [meas.strat_summary_score], [meas.strat_summary_trend_score]; Columns: strat_summary[meas.strat_summary_score], s...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: 4fe7cef8-6834-4cd2-afde-02df60c2998a
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -194,6 +278,13 @@ table strat_summary
 			
 			var res = IF([meas.strat_summary_concern_score] > 0.66, "Low", IF([meas.strat_summary_concern_score] > 0.33, "Medium", "High"))
 			return res
+		description: """
+Purpose: Tracks strat summary concern score display.
+Logic: Sums values under filters.
+Dependencies: Measures: [meas.strat_summary_concern_score]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: e8d32342-6ef1-4d93-88c4-986a1f524e93
 
 	/// Measure meas.strat_summary_trend_display.
@@ -201,10 +292,24 @@ table strat_summary
 			
 			var res = IF([meas.strat_summary_trend_score] > 0.66, "Improving", IF([meas.strat_summary_trend_score] > 0.33, "Steady", "Declining"))
 			return res
+		description: """
+Purpose: Tracks strat summary trend display.
+Logic: Sums values under filters.
+Dependencies: Measures: [meas.strat_summary_trend_score]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: 9432771d-5fb2-467d-924b-fa9d6c1041b4
 
 	/// Measure measure.strat_summary_industry_score_display.
 	measure 'measure.strat_summary_industry_score_display' = 52
+		description: """
+Purpose: Tracks measure strat summary industry score display.
+Logic: Derived from model references under current filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		lineageTag: 18b3dd43-84ac-49f4-8cd7-d2283175eed2
 
@@ -216,6 +321,13 @@ table strat_summary
 			
 			var res = CALCULATE(AVERAGE(strat_summary[key_metric_value]),filt) -- just get the avg value for the key metric
 			return res
+		description: """
+Purpose: Tracks strat summary key metric display hrs eop.
+Logic: Averages cal_end_dates[meas.context_date_max] under filters.
+Dependencies: Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_me...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		formatString: #,##0.0"hrs"
 		lineageTag: dfea2bbc-332f-4098-8a4b-cebd5355a568
 
@@ -231,6 +343,13 @@ table strat_summary
 			
 			var res = CALCULATE(AVERAGE(strat_summary[key_metric_value]),filt) -- just get the avg value for the key metric
 			return res
+		description: """
+Purpose: Tracks strat summary key metric display decimal eop.
+Logic: Averages cal_end_dates[meas.context_date_max] under filters.
+Dependencies: Measures: [meas.context_date_max]; Columns: cal_end_dates[meas.context_date_max], cal_end_dates[Date], strat_summary[key_me...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		formatString: #,##0.0
 		lineageTag: 902ffaec-2d1d-40ef-8d4d-ed18e1f89e6f
 
@@ -242,6 +361,13 @@ table strat_summary
 	measure 'meas.strat_summary_display_reference_hrs' =
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
+		description: """
+Purpose: Tracks strat summary display reference hrs.
+Logic: Averages strat_summary[key_metric_reference] under filters.
+Dependencies: Columns: strat_summary[key_metric_reference]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		formatString: #,##0.0" hrs"
 		lineageTag: 288edd56-dc77-461f-a6b8-4e5f3325257b
 
@@ -251,6 +377,13 @@ table strat_summary
 	measure 'meas.strat_summary_display_reference_decimal' =
 			
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
+		description: """
+Purpose: Tracks strat summary display reference decimal.
+Logic: Averages strat_summary[key_metric_reference] under filters.
+Dependencies: Columns: strat_summary[key_metric_reference]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		formatString: #,##0.0
 		lineageTag: 0b85899b-d33f-4316-a84f-85b3efc5acb3
 
@@ -265,6 +398,13 @@ table strat_summary
 			)
 			
 			```
+		description: """
+Purpose: Tracks strat summary score display eop existing customer exp.
+Logic: Sums 'strat_summary'[summary_cat] under filters.
+Dependencies: Measures: [meas.strat_summary_score_display_eop]; Columns: 'strat_summary'[summary_cat]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: 33430290-9c5e-405b-84e7-3d2a0a289077
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -278,6 +418,13 @@ table strat_summary
 			)
 			
 			```
+		description: """
+Purpose: Tracks strat summary score display eop for new logo sales.
+Logic: Sums 'strat_summary'[summary_cat] under filters.
+Dependencies: Measures: [meas.strat_summary_score_display_eop]; Columns: 'strat_summary'[summary_cat]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: e4fcb2ff-37fa-470d-8456-9a2498a9ffa7
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -291,6 +438,13 @@ table strat_summary
 			)
 			
 			```
+		description: """
+Purpose: Tracks strat summary score display eop for rep perf.
+Logic: Sums 'strat_summary'[summary_cat] under filters.
+Dependencies: Measures: [meas.strat_summary_score_display_eop]; Columns: 'strat_summary'[summary_cat]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: 54bad410-5b58-49e4-b157-b94643407276
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -305,6 +459,13 @@ table strat_summary
 			)
 			
 			```
+		description: """
+Purpose: Tracks strat summary score display eop for sales and market.
+Logic: Sums 'strat_summary'[summary_cat] under filters.
+Dependencies: Measures: [meas.strat_summary_score_display_eop]; Columns: 'strat_summary'[summary_cat]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: b0a32b4e-3082-45c3-89da-dd1861e01461
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -318,6 +479,13 @@ table strat_summary
 			)
 			
 			```
+		description: """
+Purpose: Tracks strat summary score display eop for target and segment.
+Logic: Sums 'strat_summary'[summary_cat] under filters.
+Dependencies: Measures: [meas.strat_summary_score_display_eop]; Columns: 'strat_summary'[summary_cat]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: 9dcc1a6a-d26e-4dee-b408-a3f118fc332b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -335,6 +503,13 @@ table strat_summary
 			return res
 			
 			```
+		description: """
+Purpose: Tracks strat summary all score.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.strat_summary_score_display_eop_existing_cust_exp], [meas.strat_summary_score_display_eop_for_new_logo_sale...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: 7d990357-1036-46de-b650-2b9a15e8103f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}

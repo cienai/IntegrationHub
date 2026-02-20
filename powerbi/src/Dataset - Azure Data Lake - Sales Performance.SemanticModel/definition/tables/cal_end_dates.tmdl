@@ -424,6 +424,13 @@ table cal_end_dates
 			return 
 			res
 			```
+		description: """
+Purpose: Tracks filter string full.
+Logic: Counts rows using cal_end_dates[Date] under filters.
+Dependencies: Measures: [meas.aliasing_labels_accounts_cust_field_1], [meas.aliasing_labels_accounts_cust_field_2], [meas.aliasing_labels...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 3c24663e-f9df-402c-afeb-239cbdbf6b15
 
@@ -550,17 +557,38 @@ table cal_end_dates
 			)
 			
 			```
+		description: """
+Purpose: Tracks dumpfilters cal end dates.
+Logic: Counts rows using cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date], cal_end_dates[date_as_integer], cal_end_dates[day_of_week]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: __needs_attention
 		lineageTag: 53a59e30-5a64-4b49-8c66-ce6f79152608
 
 	measure 'meas.dynamic_date_period' = ```
 			Max(cal_end_dates[Date]) 
 			```
+		description: """
+Purpose: Tracks dynamic date period.
+Logic: Returns an extreme value from cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: General Date
 		displayFolder: __needs_attention
 		lineageTag: e7904eee-f3a8-43c6-b6ec-758aaa9647ac
 
 	measure 'meas.context_date_min' = CALCULATE(min([Date]))
+		description: """
+Purpose: Tracks context date min.
+Logic: Returns an extreme value under filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: 664001d6-8baa-437f-b358-0192734268cf
@@ -568,6 +596,13 @@ table cal_end_dates
 		changedProperty = FormatString
 
 	measure 'meas.context_date_max' = CALCULATE(max([Date])) -- the max date of a period
+		description: """
+Purpose: Tracks context date max.
+Logic: Returns an extreme value under filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: 4e92afda-ceaf-42c9-8b98-7c09d1a8dccb
@@ -586,6 +621,13 @@ table cal_end_dates
 			
 			
 			```
+		description: """
+Purpose: Tracks context prev period max.
+Logic: Returns an extreme value under filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: ff71e57c-ddd1-448e-9bc2-e103ffdbf5a8
@@ -604,6 +646,13 @@ table cal_end_dates
 			
 			
 			```
+		description: """
+Purpose: Tracks context prev period min.
+Logic: Returns an extreme value under filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: 3dbf3f5d-68a8-426f-824b-75751aebb196
@@ -611,6 +660,13 @@ table cal_end_dates
 		changedProperty = FormatString
 
 	measure 'meas.first_filt_date' = date(2010,01,01)
+		description: """
+Purpose: Tracks first filt date.
+Logic: Derived from model references under current filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: General Date
 		displayFolder: __needs_attention
 		lineageTag: 8061d3ce-bc08-42a4-8ffa-8b0d7253cabe
@@ -620,6 +676,13 @@ table cal_end_dates
 			var asof_prevyear = Year(MAX(ssr[_sys_as_of])) -1
 			var res = date(asof_prevyear,12,31)
 			return res
+		description: """
+Purpose: Tracks end of prev year as of.
+Logic: Returns an extreme value from ssr[_sys_as_of] under filters.
+Dependencies: Columns: ssr[_sys_as_of]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: 438fecb4-807d-4ca3-9f8e-24197be82673
@@ -661,6 +724,13 @@ table cal_end_dates
 			    res
 			)
 			```
+		description: """
+Purpose: Tracks filter string.
+Logic: Counts rows using cal_end_dates[Date] under filters.
+Dependencies: Measures: [meas.criteria_active_filters_count]; Columns: cal_end_dates[Date], filter_start_table[Date], users[trueai_user_r...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 0e9f4d40-1128-4ca5-ada9-417fa063d10d
 
@@ -674,6 +744,13 @@ table cal_end_dates
 			var res = rel_period
 			return res 
 			```
+		description: """
+Purpose: Tracks relative year.
+Logic: Returns an extreme value under filters.
+Dependencies: Measures: [meas.context_date_max], [meas.filter_date_max]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: f5ac0b22-bebb-4965-bcea-73be44b4e6c0
@@ -686,6 +763,13 @@ table cal_end_dates
 			
 			
 			```
+		description: """
+Purpose: Tracks filter date max.
+Logic: Returns an extreme value from cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: General Date
 		displayFolder: _date_helpers
 		lineageTag: ea526ed6-3776-4dcc-94a6-36856278b0bc
@@ -698,6 +782,13 @@ table cal_end_dates
 			var res = rel_period
 			return res 
 			```
+		description: """
+Purpose: Tracks relative month.
+Logic: Returns an extreme value under filters.
+Dependencies: Measures: [meas.context_date_max], [meas.filter_date_max]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 3ae7b508-2cd4-4af3-bc5c-5124b75128e2
@@ -710,6 +801,13 @@ table cal_end_dates
 			var res = rel_period
 			return res 
 			```
+		description: """
+Purpose: Tracks relative qtr.
+Logic: Returns an extreme value under filters.
+Dependencies: Measures: [meas.context_date_max], [meas.filter_date_max]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 0a42b663-9ce6-4528-8dea-88502a2358eb
@@ -722,6 +820,13 @@ table cal_end_dates
 			var res = rel_period
 			return res 
 			```
+		description: """
+Purpose: Tracks relative week.
+Logic: Returns an extreme value under filters.
+Dependencies: Measures: [meas.context_date_max], [meas.filter_date_max]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 969c62b9-5485-4f67-b1ac-ea5590007180
@@ -734,6 +839,13 @@ table cal_end_dates
 			var res = rel_period
 			return res 
 			```
+		description: """
+Purpose: Tracks relative day.
+Logic: Returns an extreme value under filters.
+Dependencies: Measures: [meas.context_date_max], [meas.filter_date_max]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 1bb41c93-8141-4c96-a44b-dcd1b7f8518f
@@ -747,10 +859,24 @@ table cal_end_dates
 			var date_str =  Year([meas.filter_date_min]) &  " - " &  Year([meas.filter_date_max]) & ""
 			var res =  date_str
 			return res
+		description: """
+Purpose: Tracks filter first of year date string.
+Logic: Returns an extreme value from cal_end_dates[first_of_year_date] under filters.
+Dependencies: Measures: [meas.filter_date_max], [meas.filter_date_min]; Columns: cal_end_dates[first_of_year_date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 0a8552ea-34ce-4249-b450-939e6c3e0b1c
 
 	measure 'meas.filter_year' = Year([meas.filter_date_max]) & ""
+		description: """
+Purpose: Tracks filter year.
+Logic: Returns an extreme value under filters.
+Dependencies: Measures: [meas.filter_date_max]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 9e1f9e43-9e18-4e3d-8f09-6599b4e97631
 
@@ -762,6 +888,13 @@ table cal_end_dates
 			
 			
 			```
+		description: """
+Purpose: Tracks filter date min.
+Logic: Returns an extreme value from cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: General Date
 		displayFolder: _date_helpers
 		lineageTag: 33a44e1e-5dd2-4860-8ca3-ff716c6b2544
@@ -778,10 +911,24 @@ table cal_end_dates
 			)
 			return res * 1
 			```
+		description: """
+Purpose: Tracks data logs user new terminations pos.
+Logic: Counts distinct values in users_history[_sys_user_id] under filters.
+Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_term...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		lineageTag: da3d37b7-d270-4d82-a183-7092ad11bb0b
 
 	measure 'meas.prior_year' = YEAR(MAX(cal_end_dates[Date]))
+		description: """
+Purpose: Tracks prior year.
+Logic: Returns an extreme value from cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		lineageTag: 11707a90-f9fe-4e34-8794-bf5aa4facfe6
 
@@ -822,12 +969,26 @@ table cal_end_dates
 			    res
 			)
 			```
+		description: """
+Purpose: Tracks active user filter string.
+Logic: Counts rows using cal_end_dates[Date] under filters.
+Dependencies: Measures: [meas.criteria_active_filters_count]; Columns: cal_end_dates[Date], filter_start_table[Date], cal_start_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: e6db8f05-3598-4f7c-ae2c-360591df6c38
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'meas.current_page_filter_string' = CALCULATE(Max(cal_end_dates[Date]))
+		description: """
+Purpose: Tracks current page filter string.
+Logic: Returns an extreme value from cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: Short Date
 		displayFolder: _filter_helpers
 		lineageTag: 25384dcf-0901-4fb5-a134-31612f5d3f98
@@ -847,6 +1008,13 @@ table cal_end_dates
 			    alias_str
 			)
 			```
+		description: """
+Purpose: Tracks aliasing labels accounts customer field 1.
+Logic: Counts rows using metadata_aliasing[alias] under filters.
+Dependencies: Columns: metadata_aliasing[alias], metadata_aliasing[label], metadata_aliasing[model]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 84f61f78-e3dd-4d3d-bf74-190860b35b02
 
@@ -865,6 +1033,13 @@ table cal_end_dates
 			    alias_str
 			)
 			```
+		description: """
+Purpose: Tracks aliasing labels accounts customer field 2.
+Logic: Counts rows using metadata_aliasing[alias] under filters.
+Dependencies: Columns: metadata_aliasing[alias], metadata_aliasing[label], metadata_aliasing[model]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 6a326ead-c9bc-4c2e-901a-f832145e701e
 
@@ -883,6 +1058,13 @@ table cal_end_dates
 			    alias_str
 			)
 			```
+		description: """
+Purpose: Tracks aliasing labels accounts customer field 3.
+Logic: Counts rows using metadata_aliasing[alias] under filters.
+Dependencies: Columns: metadata_aliasing[alias], metadata_aliasing[label], metadata_aliasing[model]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: b700819b-a3c3-4a42-814a-febb88f0cfd8
 
@@ -902,6 +1084,13 @@ table cal_end_dates
 			    alias_str
 			)
 			```
+		description: """
+Purpose: Tracks aliasing labels opportunities customer field 1.
+Logic: Derived from model references under current filters.
+Dependencies: Columns: metadata_aliasing[alias], metadata_aliasing[label], metadata_aliasing[model]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: a15ccfa1-33da-4632-a2fc-47b0cf2abd9f
 
@@ -920,6 +1109,13 @@ table cal_end_dates
 			    alias_str
 			)
 			```
+		description: """
+Purpose: Tracks aliasing labels opportunities customer field 2.
+Logic: Derived from model references under current filters.
+Dependencies: Columns: metadata_aliasing[alias], metadata_aliasing[label], metadata_aliasing[model]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 8c4b5a7f-bed6-4bad-8f2e-2eac34b97e34
 
@@ -939,6 +1135,13 @@ table cal_end_dates
 			    alias_str
 			)
 			```
+		description: """
+Purpose: Tracks aliasing labels opportunities customer field 3.
+Logic: Derived from model references under current filters.
+Dependencies: Columns: metadata_aliasing[alias], metadata_aliasing[label], metadata_aliasing[model]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 1e3014e6-c531-4de9-9ed8-179f46bfc30f
 
@@ -1346,6 +1549,13 @@ table cal_end_dates
 			return 
 			res
 			```
+		description: """
+Purpose: Tracks filter string full updated.
+Logic: Counts rows using cal_end_dates[Date] under filters.
+Dependencies: Measures: [meas.aliasing_labels_accounts_cust_field_1], [meas.aliasing_labels_accounts_cust_field_2], [meas.aliasing_labels...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: a2bda876-e250-4cd4-9846-85a4c87a34c1
 
@@ -1387,6 +1597,13 @@ table cal_end_dates
 			    res
 			)
 			```
+		description: """
+Purpose: Tracks target screen filter string.
+Logic: Counts rows using cal_end_dates[Date] under filters.
+Dependencies: Measures: [meas.criteria_active_filters_count]; Columns: cal_end_dates[Date], filter_start_table[Date], cal_start_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: de33efac-38fd-4361-94e8-7fdc39fd008b
 
@@ -1425,6 +1642,13 @@ table cal_end_dates
 			RETURN
 			total_active_slicer
 			```
+		description: """
+Purpose: Tracks criteria active filters count.
+Logic: Counts rows using cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date], users[trueai_group], users[trueai_user_role_alias]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: dcc5f402-4104-4713-ac64-5c4dcc6f7d69
 
@@ -1446,6 +1670,13 @@ table cal_end_dates
 			RETURN
 			res
 			```
+		description: """
+Purpose: Tracks SSR history success count lead gen w thresh.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: ssr_history[_sys_doc_id], ssr_history[step_name], ssr_history[step_success]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: 8799b9a6-ea2a-46c0-a672-0fa61c9c8751
@@ -1465,6 +1696,13 @@ table cal_end_dates
 			var res  = IF(ratio >= thresh, 1, 0)
 			return res
 			```
+		description: """
+Purpose: Tracks SSR history threshold filter less than 3%.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: ssr_history[_sys_ssr_id], users[trueai_group], users[trueai_user_role_function]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: 61f7cfca-1076-41cc-bfd0-cd87890decb7
@@ -1491,6 +1729,13 @@ table cal_end_dates
 			RETURN
 			res
 			```
+		description: """
+Purpose: Tracks SSR history threshold filter lead less than 3%.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: ssr_history[_sys_doc_id], ssr_history[step_name], ssr_history[_sys_ssr_id]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: 0bdda3b4-1e58-4e90-bb18-0f9f31c289a0
@@ -1510,6 +1755,13 @@ table cal_end_dates
 			var res  = IF(ratio >= thresh, 1, 0)
 			return res
 			```
+		description: """
+Purpose: Tracks SSR history threshold filter less than 3% updated.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_name]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: d1b55725-3709-43a0-9d85-d40ee4c96aea
@@ -1542,6 +1794,13 @@ table cal_end_dates
 			RETURN
 			    PreviousQuarterEnd
 			```
+		description: """
+Purpose: Tracks last date of previous quarter.
+Logic: Returns an extreme value from cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: b62ca725-ab2e-40a1-a299-249d22d5960b
@@ -1556,6 +1815,13 @@ table cal_end_dates
 			)
 			
 			```
+		description: """
+Purpose: Tracks last date previous quarter.
+Logic: Returns an extreme value from cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: 01ca9ba2-a222-4b43-9752-c5b262cb7f73
@@ -1568,6 +1834,13 @@ table cal_end_dates
 			
 			RETURN
 			end_date & "---" &  start_date
+		description: """
+Purpose: Tracks check dates.
+Logic: Derived from model references under current filters.
+Dependencies: Measures: [meas.last_date_of_previous_quarter]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _date_helpers
 		lineageTag: f37aa444-9c80-4b2a-9b7a-dae543b49450
 
@@ -1586,6 +1859,13 @@ table cal_end_dates
 			    alias_str
 			)
 			```
+		description: """
+Purpose: Tracks aliasing labels leads customer fiel 1.
+Logic: Derived from model references under current filters.
+Dependencies: Columns: metadata_aliasing[alias], metadata_aliasing[label], metadata_aliasing[model]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 4e68e0b4-0812-48b1-a5af-89c61c138593
 
@@ -1604,6 +1884,13 @@ table cal_end_dates
 			    alias_str
 			)
 			```
+		description: """
+Purpose: Tracks aliasing labels leads customer fiel 2.
+Logic: Derived from model references under current filters.
+Dependencies: Columns: metadata_aliasing[alias], metadata_aliasing[label], metadata_aliasing[model]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: b76717ef-b77d-4c6f-bd9e-445ba7e18770
 
@@ -1622,6 +1909,13 @@ table cal_end_dates
 			    alias_str
 			)
 			```
+		description: """
+Purpose: Tracks aliasing labels leads customer fiel 3.
+Logic: Derived from model references under current filters.
+Dependencies: Columns: metadata_aliasing[alias], metadata_aliasing[label], metadata_aliasing[model]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: bb86cea1-8ab0-4556-837d-c74c2e7eb9e8
 
@@ -1636,6 +1930,13 @@ table cal_end_dates
 			var res  = alias_str & " " & txt
 			RETURN
 			res
+		description: """
+Purpose: Tracks user role aliased effectiveness title.
+Logic: Returns an extreme value from users[trueai_user_role] under filters.
+Dependencies: Columns: users[trueai_user_role]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 775e95ef-42eb-4a1a-835f-7ed41d0ed499
 
@@ -1647,6 +1948,13 @@ table cal_end_dates
 			var res  = _aliased_role & " " & txt
 			RETURN
 			res
+		description: """
+Purpose: Tracks user role aliased performance title.
+Logic: Returns an extreme value from users[trueai_user_role_alias] under filters.
+Dependencies: Columns: users[trueai_user_role_alias]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: f0c111df-549d-48ea-838d-d165d677a3c7
 
@@ -1659,6 +1967,13 @@ table cal_end_dates
 			
 			RETURN
 			alias_str
+		description: """
+Purpose: Tracks aliasing user role.
+Logic: Derived from model references under current filters.
+Dependencies: Columns: metadata_aliasing[alias], metadata_aliasing[label]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: c9ab31eb-f0be-4b70-8ded-1329bb876fd2
 
@@ -1668,6 +1983,13 @@ table cal_end_dates
 			VAR res = MAXX (CALCULATETABLE(ALLSELECTED ( cal_end_dates )), cal_end_dates[Date]) // get the selected start dagte
 			RETURN
 			res
+		description: """
+Purpose: Tracks cal end sel date.
+Logic: Returns an extreme value from cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: General Date
 		lineageTag: 1b45670c-d196-4083-8c1e-1bf35c9400a8
 
@@ -1709,6 +2031,13 @@ table cal_end_dates
 			    res
 			)
 			```
+		description: """
+Purpose: Tracks open pipeline filter string.
+Logic: Counts rows using cal_end_dates[Date] under filters.
+Dependencies: Measures: [meas.criteria_active_filters_count]; Columns: cal_end_dates[Date], filter_start_table[Date], cal_start_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 0d62af9a-ef4b-4249-902b-5fe229d4796d
 
@@ -1722,6 +2051,13 @@ table cal_end_dates
 			)
 			
 			```
+		description: """
+Purpose: Tracks current context min date.
+Logic: Returns an extreme value from 'cal_end_dates'[Date] under filters.
+Dependencies: Columns: 'cal_end_dates'[Date], 'cal_end_dates'[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: General Date
 		displayFolder: _filter_helpers
 		lineageTag: c5a39642-9bc6-4868-adfe-0b6fa1c15ed9
@@ -1729,6 +2065,13 @@ table cal_end_dates
 	measure 'meas.current_context_max_date' =
 			
 			LASTDATE(cal_end_dates[Date])
+		description: """
+Purpose: Tracks current context max date.
+Logic: Derived from model references under current filters.
+Dependencies: Columns: cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: General Date
 		displayFolder: _filter_helpers
 		lineageTag: fe3da003-12d9-4c41-a4eb-4e09c8084cf5
@@ -1742,6 +2085,13 @@ table cal_end_dates
 			RETURN
 			res
 			```
+		description: """
+Purpose: Tracks filter string as of.
+Logic: Returns an extreme value from cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 4aaf52ad-1ce1-4a47-9fc1-fe03ea71b7fb
 
@@ -1753,6 +2103,13 @@ table cal_end_dates
 			
 			RETURN
 			date_str
+		description: """
+Purpose: Tracks date filter string.
+Logic: Returns an extreme value from cal_end_dates[Date] under filters.
+Dependencies: Columns: cal_end_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: 6610e67f-0a8d-4a64-bf04-34e8c044cab5
 
@@ -1794,6 +2151,13 @@ table cal_end_dates
 			    res
 			)
 			```
+		description: """
+Purpose: Tracks filter string as of full.
+Logic: Counts rows using cal_end_dates[Date] under filters.
+Dependencies: Measures: [meas.criteria_active_filters_count]; Columns: cal_end_dates[Date], filter_start_table[Date], cal_start_dates[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _filter_helpers
 		lineageTag: eef60dbc-6ba5-4dd9-ad28-601b2abb6533
 

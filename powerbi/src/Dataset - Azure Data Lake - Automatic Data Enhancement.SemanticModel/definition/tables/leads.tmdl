@@ -10,6 +10,13 @@ table leads
 			
 			var res = ( CALCULATE(count(leads[_sys_docid]), leads[crm_converted_opp_id] <> "" ))
 			return if(ISBLANK(res), 0, res)
+		description: """
+Purpose: Tracks lead CRM converted count.
+Logic: Counts rows using leads[_sys_docid] under filters.
+Dependencies: Columns: leads[_sys_docid], leads[crm_converted_opp_id]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: #,0
 		lineageTag: dc3fc272-4fc0-4cd3-8fba-b7a7f678c286
 
@@ -18,6 +25,13 @@ table leads
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0.0%;-0.0%;0.0%
 	measure 'meas.lead_crm_conversion_rate' = [meas.lead_crm_converted_count] / CALCULATE(count(leads[_sys_docid]))
+		description: """
+Purpose: Tracks lead CRM conversion rate.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.lead_crm_converted_count]; Columns: leads[_sys_docid]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 39248331-9a8b-40c1-b9df-e4d4341fde51
 
@@ -31,6 +45,13 @@ table leads
 			return if(ISBLANK(val), 0, val)
 			
 			```
+		description: """
+Purpose: Tracks lead CRM no leadsource count.
+Logic: Counts rows using leads[_sys_docid] under filters.
+Dependencies: Columns: leads[_sys_docid], leads[crm_leadsource]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: #,0
 		lineageTag: c6c29d01-f327-4b4f-aea7-8b8f28c5e688
 
@@ -39,6 +60,13 @@ table leads
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0.0%;-0.0%;0.0%
 	measure 'meas.lead_crm_no_leadsource_rate' = [meas.lead_crm_no_leadsource_count] / CALCULATE(count(leads[_sys_docid]))
+		description: """
+Purpose: Tracks lead CRM no leadsource rate.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.lead_crm_no_leadsource_count]; Columns: leads[_sys_docid]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 94c5df5a-30ec-4cfe-b8af-5e1e2c2d8f7a
 
@@ -47,6 +75,13 @@ table leads
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0.00%;-0.00%;0.00%
 	measure 'meas.lead_trueai_dupe_rate' = CALCULATE(DISTINCTCOUNT(leads[trueai_lead_dupe_id]) / CALCULATE(count(leads[_sys_docid])))
+		description: """
+Purpose: Tracks lead trueai dupe rate.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: leads[trueai_lead_dupe_id], leads[_sys_docid]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: b828a8e6-91f0-4563-a2df-e83b275345c5
 
@@ -55,6 +90,13 @@ table leads
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0.00%;-0.00%;0.00%
 	measure 'meas.lead_trueai_company_dupe_rate' = CALCULATE(COUNT(leads[trueai_company_dupe_id]) / CALCULATE(count(leads[_sys_docid])))
+		description: """
+Purpose: Tracks lead trueai company dupe rate.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: leads[trueai_company_dupe_id], leads[_sys_docid]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 43225ccc-8ed9-439b-95d1-44bcc74dee82
 
@@ -71,6 +113,13 @@ table leads
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks lead trueai completeness improvement.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0 %
 		lineageTag: 6a763818-4ecf-40ff-9b1b-28b75532a269
 
@@ -79,6 +128,13 @@ table leads
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.lead_trueai_dupe_counts' = calculate(COUNT(leads[trueai_lead_dupe_id]))
+		description: """
+Purpose: Tracks lead trueai dupe counts.
+Logic: Counts rows using leads[trueai_lead_dupe_id] under filters.
+Dependencies: Columns: leads[trueai_lead_dupe_id]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		lineageTag: 9606d997-f205-475d-ac36-7d79084cf08c
 
@@ -87,6 +143,13 @@ table leads
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.lead_trueai_non_dupe_counts' = calculate(COUNT(leads[_sys_docid]), leads[trueai_is_master] = true ||  ISBLANK(leads[trueai_is_master]) = true )
+		description: """
+Purpose: Tracks lead trueai non dupe counts.
+Logic: Counts rows using leads[_sys_docid] under filters.
+Dependencies: Columns: leads[_sys_docid], leads[trueai_is_master]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		lineageTag: 03b6db32-8906-4539-b414-5a8674d52849
 
@@ -97,6 +160,13 @@ table leads
 	measure 'meas.leads_trueai_unique_company_count' = ```
 			calculate(DISTINCTCOUNT(leads[_sys_ssr_id])) 
 			```
+		description: """
+Purpose: Tracks leads trueai unique company count.
+Logic: Counts distinct values in leads[_sys_ssr_id] under filters.
+Dependencies: Columns: leads[_sys_ssr_id]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		lineageTag: ab74326a-f655-49ee-a97a-d9df51cb6946
 
@@ -109,6 +179,13 @@ table leads
 			CALCULATE(
 			    COUNT(leads[_sys_docid])        // get the count of the leads
 			)
+		description: """
+Purpose: Tracks leads count.
+Logic: Counts rows using leads[_sys_docid] under filters.
+Dependencies: Columns: leads[_sys_docid]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: #,0
 		lineageTag: 385bb1e3-0994-43d5-b273-0035f959e00d
 

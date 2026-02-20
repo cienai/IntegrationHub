@@ -13,6 +13,13 @@ table ssr
 			
 			return res 
 			```
+		description: """
+Purpose: Tracks SSR trueai conversion rate.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.ssr_trueai_converted_count]; Columns: ssr_history[_sys_ssr_id]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: _ssr_analysis
 		lineageTag: a946bddd-5ee9-4adf-a031-0bb4bbb7b204
@@ -26,6 +33,13 @@ table ssr
 			 var res =CALCULATE(DISTINCTCount(ssr_history[_sys_ssr_id]), ssr_history[step_success] = True && ssr_history[step_name] = "Prospecting")  +0
 			 return IF(ISBLANK(res), 0,res)
 			```
+		description: """
+Purpose: Tracks SSR trueai converted count.
+Logic: Counts distinct values in ssr_history[_sys_ssr_id] under filters.
+Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_success], ssr_history[step_name]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: #,0
 		displayFolder: _ssr_analysis
 		lineageTag: f64fb9f1-a6d6-4e35-ade9-42652b127317
@@ -40,6 +54,13 @@ table ssr
 			return if(ISBLANK(val), 0, val)
 			
 			```
+		description: """
+Purpose: Tracks SSR trueai no leadsource count.
+Logic: Counts rows using ssr[_sys_doc_id] under filters.
+Dependencies: Columns: ssr[_sys_doc_id], ssr[trueai_leadsource], ssr[crm_lead_count]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _ssr_analysis
 		lineageTag: 9ff987e5-24d2-453a-8420-d58519669d3c
@@ -49,6 +70,13 @@ table ssr
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0.0%;-0.0%;0.0%
 	measure 'meas.ssr_trueai_no_leadsource_rate' = [meas.ssr_trueai_no_leadsource_count] / CALCULATE(count(ssr[_sys_doc_id]),  ssr[crm_lead_count] >0 ) // only include the ones w/ leads
+		description: """
+Purpose: Tracks SSR trueai no leadsource rate.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.ssr_trueai_no_leadsource_count]; Columns: ssr[_sys_doc_id], ssr[crm_lead_count]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: _ssr_analysis
 		lineageTag: 688b74be-7bd5-49c2-ac7d-734bc28f3627
@@ -61,6 +89,13 @@ table ssr
 			
 			var res = CALCULATE(Count(ssr[_sys_doc_id]), ssr[col.crm_has_accounts] = TRUE() && ssr[col.crm_has_leads] = TRUE())
 			return IF(ISBLANK(res), 0,res)
+		description: """
+Purpose: Tracks CRM has leads and accounts count.
+Logic: Counts rows using ssr[_sys_doc_id] under filters.
+Dependencies: Columns: ssr[_sys_doc_id], ssr[col.crm_has_accounts], ssr[col.crm_has_leads]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _ssr_analysis
 		lineageTag: e2098939-2a9f-4d2e-9dd5-292cfef21a57
@@ -74,6 +109,13 @@ table ssr
 			 var res = CALCULATE(COUNT(ssr[_sys_doc_id]), ssr[col.crm_has_leads] = False && (ssr[trueai_account_is_master] = True || isblank(ssr[trueai_account_is_master]) = True))
 			 return if(ISBLANK(res), 0, res)
 			```
+		description: """
+Purpose: Tracks SSR unique with only accounts.
+Logic: Counts rows using ssr[_sys_doc_id] under filters.
+Dependencies: Columns: ssr[_sys_doc_id], ssr[col.crm_has_leads], ssr[trueai_account_is_master]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _ssr_analysis
 		lineageTag: 95b81281-f2e6-4de1-8655-2037de1db979
@@ -86,6 +128,13 @@ table ssr
 			
 			var res =CALCULATE(COUNT(ssr[_sys_doc_id]), ssr[col.crm_has_leads] = False && (ssr[trueai_account_is_master] = False || ssr[trueai_account_is_master] = True || isblank(ssr[trueai_account_is_master]) = True))
 			return if(ISBLANK(res), 0, res)
+		description: """
+Purpose: Tracks SSR non unique with only accounts.
+Logic: Counts rows using ssr[_sys_doc_id] under filters.
+Dependencies: Columns: ssr[_sys_doc_id], ssr[col.crm_has_leads], ssr[trueai_account_is_master]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _ssr_analysis
 		lineageTag: 716b3cc6-253d-4225-9134-518a3c569eab
@@ -100,6 +149,13 @@ table ssr
 			    COUNT(ssr[_sys_doc_id])     // get the count of the ssr doc id count as leads_accts_counts 
 			)
 			```
+		description: """
+Purpose: Tracks SSR leads accounts counts.
+Logic: Counts rows using ssr[_sys_doc_id] under filters.
+Dependencies: Columns: ssr[_sys_doc_id]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: #,0
 		lineageTag: fe308ad8-fcd9-4cbb-806a-29492fd84183
 
@@ -113,6 +169,13 @@ table ssr
 			    MAX(ssr[_sys_as_of]),
 			    REMOVEFILTERS(ssr)
 			)
+		description: """
+Purpose: Tracks last data date.
+Logic: Returns an extreme value from ssr[_sys_as_of] under filters.
+Dependencies: Columns: ssr[_sys_as_of]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: General Date
 		lineageTag: 4f9f0a3e-3d2a-4b98-9c4b-4bb7f6c8a8f5
 

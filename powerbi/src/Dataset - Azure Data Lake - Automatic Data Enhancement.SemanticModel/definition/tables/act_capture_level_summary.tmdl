@@ -14,6 +14,13 @@ table act_capture_level_summary
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks act capt act per step average.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: act_capture_level_summary[crm_activity_count], act_capture_level_summary[steps]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _acl_scores
 		lineageTag: 16207cf0-5e26-48aa-a104-df98fb1f2476
@@ -33,6 +40,13 @@ table act_capture_level_summary
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks act capt duration per step average.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: act_capture_level_summary[total_duration], act_capture_level_summary[steps]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		formatString: 0.0"  hrs"
 		displayFolder: _acl_scores
 		lineageTag: a40542a2-5ae3-4406-9b52-6a626a8786db
@@ -54,6 +68,13 @@ table act_capture_level_summary
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks act capt expected duration per step average.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: act_capture_level_summary[expected_duration], act_capture_level_summary[steps]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		formatString: 0.0"  hrs"
 		displayFolder: _acl_scores
 		lineageTag: d9ee9d7b-1381-44fa-979e-a67f73ac0777
@@ -75,6 +96,13 @@ table act_capture_level_summary
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks act capt duration.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: act_capture_level_summary[capped_duration]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: 0"  hrs"
 		displayFolder: _acl_scores
 		lineageTag: 09eba839-9cf4-451b-92e6-039b5c2bda85
@@ -96,6 +124,13 @@ table act_capture_level_summary
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks act capt expected duration.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: act_capture_level_summary[expected_duration]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: 0"  hrs"
 		displayFolder: _acl_scores
 		lineageTag: 24a29e7e-20f0-4791-809e-b832d47a0339
@@ -111,6 +146,13 @@ table act_capture_level_summary
 	measure 'meas.act_capture' =
 			
 			divide(SUM(act_capture_level_summary[capped_duration]),SUM(act_capture_level_summary[expected_duration]))
+		description: """
+Purpose: Tracks act capture.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: act_capture_level_summary[capped_duration], act_capture_level_summary[expected_duration]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		formatString: #,0.00
 		displayFolder: _acl_scores
 		lineageTag: 8e90b6fc-50af-4cda-aa88-8e9ce3d90e83
@@ -132,6 +174,13 @@ table act_capture_level_summary
 			var res =   round(val * 2 , 0) / 2 // round to closest 0.5 and format w/ format string "#.0hrs/week"
 			return res
 			```
+		description: """
+Purpose: Tracks act capt duration weekly rep average.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.act_capt_applicable_reps]; Columns: act_capture_level_summary[capped_duration], act_capture_level_summary[_...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		formatString: #.0" hrs"
 		displayFolder: _acl_scores
 		lineageTag: e44d402a-28ad-472f-9ffb-4c9c23412f3e
@@ -155,6 +204,13 @@ table act_capture_level_summary
 			var res =   round(val * 2 , 0) / 2 // round to closest 0.5 and format w/ format string "#.0hrs/week"
 			return val
 			```
+		description: """
+Purpose: Tracks act capt expected duration weekly rep average.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.act_capt_applicable_reps]; Columns: act_capture_level_summary[expected_duration], act_capture_level_summary...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		displayFolder: _acl_scores
 		lineageTag: 0b5ebe13-d803-4116-b8de-dd52ee14d8df
 
@@ -171,6 +227,13 @@ table act_capture_level_summary
 			var crm_capture_level = [meas.act_capture]
 			var res  = round(crm_capture_level * 100,0)
 			return res
+		description: """
+Purpose: Tracks CRM act capt score.
+Logic: Derived from model references under current filters.
+Dependencies: Measures: [meas.act_capture]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _acl_scores
 		lineageTag: 4afafcb3-593b-4adb-8956-99da37a8f1f6
@@ -192,6 +255,13 @@ table act_capture_level_summary
 			
 			RETURN
 			_score
+		description: """
+Purpose: Tracks CRM act capt score industry average.
+Logic: Returns an extreme value from metadata_reference_values[value] under filters.
+Dependencies: Columns: metadata_reference_values[value], metadata_reference_values[_sys_doc_id]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _acl_scores
 		lineageTag: 25caccab-5c62-4871-8096-7c890988147a
@@ -229,6 +299,13 @@ table act_capture_level_summary
 			RETURN res
 			
 			```
+		description: """
+Purpose: Tracks trueai act capt score.
+Logic: Averages ssr_history[step_name] under filters.
+Dependencies: Measures: [meas.crm_act_capt_score]; Columns: ssr_history[step_name], ssr_history[stkhlds_all_adj_dur_rule]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _acl_scores
 		lineageTag: fbbac8e0-05bb-41a5-8e39-2343fc1b4f37
@@ -246,6 +323,13 @@ table act_capture_level_summary
 			var imp = divide(trueai_score - crm_score,  crm_score, 0)
 			var res = imp
 			return res
+		description: """
+Purpose: Tracks trueai act capt score improvement.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.crm_act_capt_score], [meas.trueai_act_capt_score]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: +#%;-#%;0%
 		displayFolder: _acl_scores
 		lineageTag: 235e9aad-68ad-45cf-b962-a4412234d120
@@ -257,6 +341,13 @@ table act_capture_level_summary
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0.0
 	measure 'meas.act_capture_adjustment_factor' = divide(1, [meas.act_capture])
+		description: """
+Purpose: Tracks act capture adjustment factor.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.act_capture]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		formatString: 0.0
 		displayFolder: _acl_scores
 		lineageTag: 4bf4da47-0c5e-455f-b690-534812ebe055
@@ -283,6 +374,13 @@ table act_capture_level_summary
 			return res
 			
 			```
+		description: """
+Purpose: Tracks act capt applicable reps.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Columns: act_capture_level_summary[_sys_user_id], act_capture_level_summary[_sys_filter_start_date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: _acl_scores
 		lineageTag: 33577b57-cda0-4543-974a-8756bee44e7b
 
@@ -300,6 +398,13 @@ table act_capture_level_summary
 			
 			// act_tot_count --> ci_time_alloc_tot_dur
 			```
+		description: """
+Purpose: Tracks act capt activity count.
+Logic: Counts rows using 'cal_end_dates'[date] under filters.
+Dependencies: Columns: 'cal_end_dates'[date], 'cal_end_dates'[date], users_history[ci_time_alloc_tot_dur]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: _acl_scores
 		displayFolder: 0
 		lineageTag: ee680742-49b5-4460-aa06-85524f4fbb59
@@ -315,6 +420,13 @@ table act_capture_level_summary
 			        act_capture_level_summary[time_alloc_eng]       // get the average eng time allocation
 			    )
 			)
+		description: """
+Purpose: Tracks act capt lvl summary time alloc eng.
+Logic: Averages act_capture_level_summary[time_alloc_eng] under filters.
+Dependencies: Columns: act_capture_level_summary[time_alloc_eng]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: #" hrs/week"
 		displayFolder: _time_allocation
 		lineageTag: 644d9112-46ce-4307-9e3a-b10b5306237a
@@ -332,6 +444,13 @@ table act_capture_level_summary
 			        act_capture_level_summary[time_alloc_no_eng]        // get the non eng time alloc
 			    )
 			)
+		description: """
+Purpose: Tracks act capt lvl summary time alloc non eng.
+Logic: Averages act_capture_level_summary[time_alloc_no_eng] under filters.
+Dependencies: Columns: act_capture_level_summary[time_alloc_no_eng]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: #" hrs/week"
 		displayFolder: _time_allocation
 		lineageTag: 422619fa-5693-4106-98e7-acc2ef92b223
@@ -352,6 +471,13 @@ table act_capture_level_summary
 			
 			RETURN
 			res
+		description: """
+Purpose: Tracks no activities count.
+Logic: Sums users_history[ci_act_capt_lvl_pi_prospecting_owner_act] under filters.
+Dependencies: Columns: users_history[ci_act_capt_lvl_pi_prospecting_owner_act], users_history[ci_act_capt_lvl_pi_new_logo_owner_act], use...
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		lineageTag: b8ec6df0-1df6-41d1-b949-fcb80cb1af48
 

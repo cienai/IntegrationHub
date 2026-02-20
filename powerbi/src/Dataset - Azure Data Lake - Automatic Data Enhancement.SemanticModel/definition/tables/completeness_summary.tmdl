@@ -7,6 +7,13 @@ table completeness_summary
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.crm_completeness_score_display' = CALCULATE(AVERAGE([crm_completeness])  * 100)
+		description: """
+Purpose: Tracks CRM completeness score display.
+Logic: Averages values under filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _completeness_score
 		lineageTag: 25d350dc-3b66-4cb2-83ae-59852cd3198b
@@ -28,6 +35,13 @@ table completeness_summary
 			
 			RETURN
 			res
+		description: """
+Purpose: Tracks trueai completeness score.
+Logic: Averages values under filters.
+Dependencies: Measures: [meas.crm_completeness_score_display]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _completeness_score
 		lineageTag: 220faaec-56c9-48ef-870f-4244580439c6
@@ -45,6 +59,13 @@ table completeness_summary
 			
 			RETURN
 			_score
+		description: """
+Purpose: Tracks CRM completeness score industry average.
+Logic: Returns an extreme value from metadata_reference_values[value] under filters.
+Dependencies: Columns: metadata_reference_values[value], metadata_reference_values[_sys_doc_id]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: _completeness_score
 		lineageTag: 295be6f7-5568-467e-ada1-cb24b46e2ed9
@@ -62,6 +83,13 @@ table completeness_summary
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks trueai completeness improvement.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _completeness_score
 		lineageTag: 8cf3d72c-fedc-4ef5-970d-57580fe4ba53
 
@@ -78,6 +106,13 @@ table completeness_summary
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks trueai completeness geo improvement.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _completeness_score
 		lineageTag: 8f49df2a-bdc7-43e0-aa92-36030435c286
@@ -95,6 +130,13 @@ table completeness_summary
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks trueai completeness marketing improvement.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _completeness_score
 		lineageTag: 82d8b5b9-38ea-4989-9adf-d76ea2f2af22
@@ -112,6 +154,13 @@ table completeness_summary
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks trueai completeness contact improvement.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		displayFolder: _completeness_score
 		lineageTag: 7cf2b251-0b10-4d7d-ada9-772238f7d953
 
@@ -128,6 +177,13 @@ table completeness_summary
 			return res 
 			
 			```
+		description: """
+Purpose: Tracks trueai completeness contact method improvement.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _completeness_score
 		lineageTag: 770b89c9-ad28-48c3-8957-004b46ed2d56
@@ -143,6 +199,13 @@ table completeness_summary
 			var imp = divide(trueai_score - crm_score,  crm_score, 0)
 			var res = imp
 			return res
+		description: """
+Purpose: Tracks trueai completeness score improvement.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.crm_completeness_score_display], [meas.trueai_completeness_score]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: +#%;-#%;0%
 		displayFolder: _completeness_score
 		lineageTag: f444042a-587c-402b-a3c6-222e0aed0d89

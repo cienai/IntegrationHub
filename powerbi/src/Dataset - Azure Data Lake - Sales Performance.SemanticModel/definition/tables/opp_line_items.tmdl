@@ -9,6 +9,13 @@ table opp_line_items
 			RETURN
 			res
 			```
+		description: """
+Purpose: Tracks opportunity line item discount amount.
+Logic: Counts rows under filters.
+Dependencies: Measures: [meas.opp_line_item_total_price_after_discount], [meas.opp_line_item_total_price_before_discount]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: -$#,##0;-$#,##0;$0
 		displayFolder: discount opp
 		lineageTag: c58a9bec-10b0-4753-95d5-905afcfe0653
@@ -23,6 +30,13 @@ table opp_line_items
 			
 			RETURN
 			res
+		description: """
+Purpose: Tracks opportunity line item discount percentage.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.opp_line_item_discount_amt], [meas.opp_line_item_total_price_before_discount]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0%;-0%;0%
 		displayFolder: discount opp
 		lineageTag: dd1dba57-2410-444e-b287-68ada1efc23c
@@ -31,6 +45,13 @@ table opp_line_items
 	measure 'meas.discount_line_opps' =
 			
 			IF([meas.opp_line_item_discount_pct] = 0, 0,BLANK())
+		description: """
+Purpose: Tracks discount line opportunities.
+Logic: Counts rows under filters.
+Dependencies: Measures: [meas.opp_line_item_discount_pct]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: discount opp
 		lineageTag: 55bd8ea0-eb11-461f-b799-99a4f1e6e0ac
@@ -42,6 +63,13 @@ table opp_line_items
 			var actual_cost = SUMX(opp_line_items, [trueai_unit_price]*[trueai_qty])            // get the actual cost
 			var res = DIVIDE(orig_cost -actual_cost, orig_cost)             // get the pct
 			RETURN res
+		description: """
+Purpose: Tracks opportunity line item dis percentage.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0%;-0%;0%
 		displayFolder: discount opp
 		lineageTag: b5f83928-e12e-4884-aa64-e29f8c0e2b70
@@ -54,6 +82,13 @@ table opp_line_items
 			var new_price = SUMX(tbl, [trueai_unit_price] * [trueai_qty])  // calculating the new price
 			RETURN
 			new_price
+		description: """
+Purpose: Tracks opportunity line item total price after discount.
+Logic: Sums values under filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: 982b866e-1a68-4089-9f0b-fff63419a571
@@ -68,6 +103,13 @@ table opp_line_items
 			var res = DIVIDE(actual_cost - orig_cost, orig_cost)        // get the pct 
 			RETURN ABS(res)
 			```
+		description: """
+Purpose: Tracks opportunity lines item discount percentage.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0%;-0%;0%
 		displayFolder: discount opp
 		lineageTag: 92f502aa-be60-41d1-a075-d98ed0682e74
@@ -81,6 +123,13 @@ table opp_line_items
 			var res = wonAmt * pct
 			RETURN res
 			```
+		description: """
+Purpose: Tracks delta expected booking amount.
+Logic: Derived from model references under current filters.
+Dependencies: Measures: [meas.opps_delta_expected_pct], [meas.ssr_history_won_amt]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: fdd8ec9f-4d49-4be5-9806-37f53f5183ba
@@ -91,6 +140,13 @@ table opp_line_items
 	measure 'meas.opps_average_discount_pct' =
 			
 			ABS(CALCULATE(AVERAGE(opps[trueai_discount_pct])))     // get the abs of avg discount pct
+		description: """
+Purpose: Tracks opportunities average discount percentage.
+Logic: Counts rows using opps[trueai_discount_pct] under filters.
+Dependencies: Columns: opps[trueai_discount_pct]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		displayFolder: discount opp
 		lineageTag: 4521bdd7-92e5-4444-a254-49f7cccf9560
 
@@ -103,6 +159,13 @@ table opp_line_items
 			var totdeals = [meas.ssr_history_step_count]            // total deals count
 			var res = DIVIDE(Amt, totdeals)
 			RETURN res
+		description: """
+Purpose: Tracks opportunities average deals amount.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.opps_deal_discount_amt], [meas.ssr_history_step_count], [meas.ssr_history_won_amt]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: discount opp
 		lineageTag: 52ee46c4-60c9-4a29-b4f2-aea0ea173086
@@ -123,6 +186,13 @@ table opp_line_items
 			RETURN disAmt
 			
 			```
+		description: """
+Purpose: Tracks opportunities deal discount amount.
+Logic: Counts rows under filters.
+Dependencies: Measures: [meas.opp_line_item_discount_pct], [meas.opps_average_discount_pct], [meas.ssr_history_won_amt]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: a7e40876-f224-4016-b137-855d4e4bb99c
@@ -136,6 +206,13 @@ table opp_line_items
 			var res = DIVIDE(stepCount, disdeals)           // getb the pct
 			
 			RETURN res
+		description: """
+Purpose: Tracks opportunities deals percentage.
+Logic: Calculated as a ratio of two values with any applied filters.
+Dependencies: Measures: [meas.ssr_history_step_count]; Columns: opps[_sys_doc_id], opps[trueai_discount_pct_tier]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0%;-0%;0%
 		displayFolder: discount opp
 		lineageTag: c7df8b8f-3864-41d9-94e5-b44b2836158f
@@ -155,6 +232,13 @@ table opp_line_items
 			    )
 			RETURN
 			    SuccessRate - ExpectedRate
+		description: """
+Purpose: Tracks opportunities delta expected percentage.
+Logic: Derived from model references under current filters.
+Dependencies: Measures: [meas.ssr_history_success_prob_avg], [meas.ssr_history_success_rate]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Percentage
+		"""
 		formatString: 0%;-0%;0%
 		displayFolder: discount opp
 		lineageTag: 9d875de2-fc0a-47b4-86e6-f717b75bf26f
@@ -163,6 +247,13 @@ table opp_line_items
 	measure 'meas.opps_tot_deals' =
 			
 			CALCULATE(COUNT(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK()) // get the total deals count
+		description: """
+Purpose: Tracks opportunities tot deals.
+Logic: Counts rows using opps[_sys_doc_id] under filters.
+Dependencies: Columns: opps[_sys_doc_id], opps[trueai_discount_pct_tier]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		formatString: 0
 		displayFolder: discount opp
 		lineageTag: ba127637-f77b-4fbe-8646-8ee9fea3c6a3
@@ -174,6 +265,13 @@ table opp_line_items
 			        opps[trueai_discount_pct]      // get the average discount pct
 			    )
 			)
+		description: """
+Purpose: Tracks opportunity line items average discount percentage.
+Logic: Counts rows using opps[trueai_discount_pct] under filters.
+Dependencies: Columns: opps[trueai_discount_pct]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		displayFolder: discount opp
 		lineageTag: e2d54ef3-1fa1-4cc1-9829-3af4c599ee90
 
@@ -185,6 +283,13 @@ table opp_line_items
 			var tbl = CALCULATETABLE(opp_line_items)        // get the calculatd table
 			var orig_cost = SUMX(tbl, [trueai_list_price] * [trueai_qty])  // calculating the original price
 			RETURN orig_cost
+		description: """
+Purpose: Tracks opportunity line item total price before discount.
+Logic: Sums values under filters.
+Dependencies: See model references
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: 568debc5-0da7-4041-92d2-ee578af4f58b
@@ -197,6 +302,13 @@ table opp_line_items
 			CALCULATE(
 			    MAX(opp_line_items[trueai_list_price])
 			)
+		description: """
+Purpose: Tracks opportunity line items trueai list price.
+Logic: Returns an extreme value from opp_line_items[trueai_list_price] under filters.
+Dependencies: Columns: opp_line_items[trueai_list_price]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Text
+		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: 317da6da-348b-4ea6-96ac-5b2f9dc328a9
@@ -231,6 +343,13 @@ table opp_line_items
 			
 			RETURN
 			    EndValue - StartValue
+		description: """
+Purpose: Tracks average discount percentage change.
+Logic: Counts rows using 'cal_end_dates'[Date] under filters.
+Dependencies: Measures: [meas.opp_line_items_avg_discount_pct]; Columns: 'cal_end_dates'[Date], 'cal_end_dates'[Date], 'cal_end_dates'[Date]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Whole number
+		"""
 		lineageTag: 60809788-e731-4fbf-a298-65c5f0ddb9d6
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -241,6 +360,13 @@ table opp_line_items
 			CALCULATE(
 			    SUM ( opp_line_items[trueai_total_price] )
 			)
+		description: """
+Purpose: Tracks opportunity line items trueai total price.
+Logic: Sums opp_line_items[trueai_total_price] under filters.
+Dependencies: Columns: opp_line_items[trueai_total_price]
+Context: Evaluated in the current filter context unless explicitly overridden in DAX.
+Output: Decimal
+		"""
 		lineageTag: 06d38a15-526f-4563-8dc8-9d781cfd3b81
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
