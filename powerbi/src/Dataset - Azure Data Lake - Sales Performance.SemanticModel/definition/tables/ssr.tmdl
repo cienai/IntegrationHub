@@ -2,36 +2,55 @@
 table ssr
 	lineageTag: cb48d9a8-ea61-48bb-845c-67eb596f90f7
 
-	/// Measure meas.ssr_trueai_conversion_rate.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.ssr_trueai_conversion_rate' = [meas.ssr_trueai_converted_count] / CALCULATE(count(ssr[_sys_doc_id]))
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: __needs_attention
 		lineageTag: a946bddd-5ee9-4adf-a031-0bb4bbb7b204
 
-	/// Measure meas.ssr_trueai_converted_count.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.ssr_trueai_converted_count' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="Prospecting" && ssr_history[step_success] =True )
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: f64fb9f1-a6d6-4e35-ade9-42652b127317
 
-	/// Measure meas.ssr_trueai_no_leadsource_count.
-	measure 'meas.ssr_trueai_no_leadsource_count' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_trueai_no_leadsource_count' = 
 			
 			var val = CALCULATE(count(ssr[_sys_doc_id]), or(ISBLANK(ssr[trueai_leadsource]) = TRUE(),ssr[trueai_leadsource]= "ND" ))
 			return if(ISBLANK(val), 0, val)
 			
-			```
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: 9ff987e5-24d2-453a-8420-d58519669d3c
 
-	/// Measure meas.ssr_trueai_no_leadsource_rate.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.ssr_trueai_no_leadsource_rate' = [meas.ssr_trueai_no_leadsource_count] / CALCULATE(count(ssr[_sys_doc_id]))
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: __needs_attention
 		lineageTag: 688b74be-7bd5-49c2-ac7d-734bc28f3627
 
-	/// Measure measure.ssr_touched_accounts.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'measure.ssr_touched_accounts' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="Untouched" && ssr_history[step_success] =True )
 		formatString: #,0
 		displayFolder: __needs_attention
@@ -39,32 +58,47 @@ table ssr
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.ssr_new_logo_won_count.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.ssr_new_logo_won_count' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="New Logo Selling" && ssr_history[step_success] =True )
 		formatString: #,0
 		displayFolder: __needs_attention
 		lineageTag: cd0cea50-3fac-4990-8fc2-b523aa9dc032
 
-	/// Measure meas.ssr_hsitory_accounts_per_prospecting_rep.
-	measure 'meas.ssr_hsitory_accounts_per_prospecting_rep' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
+	measure 'meas.ssr_hsitory_accounts_per_prospecting_rep' = 
 			
 			var accounts = calculate(DISTINCTCOUNT(ssr_history[_sys_ssr_id]))
 			var reps = calculate(DISTINCTCOUNT(ssr_history[step_owner_id]), ssr_history[step_name] = "Prospecting")
 			var res = divide (accounts, reps,BLANK())
 			return res
 			
-			```
 		displayFolder: __needs_attention
 		lineageTag: 9c9c697b-63fb-4798-b59e-6ba7fc7bef9f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ssr_touch_count.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.ssr_touch_count' = calculate(count(ssr[trueai_first_touch]))
 		formatString: 0
 		lineageTag: b668fd30-f94c-43db-9460-63b5490155f1
 
-	/// Measure meas.ssr_crm_opp_count.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.ssr_crm_opp_count' =
 			CALCULATE(
 			    SUM(ssr[crm_opp_count])
@@ -72,7 +106,11 @@ table ssr
 		formatString: 0
 		lineageTag: fec59036-1e4c-4a53-b0b8-1c0ff6536bf8
 
-	/// Measure meas.leadsource_record_count_sort.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.leadsource_record_count_sort' =
 			
 			var rnk = RANKX(
@@ -96,14 +134,22 @@ table ssr
 			res
 		lineageTag: d08183c0-78aa-4f8d-9ac4-9313e5df3ff7
 
-	/// Measure meas.record_counts.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.record_counts' =
 			
 			COUNT(ssr[_sys_doc_id])
 		formatString: #,0
 		lineageTag: 956cc13c-ee6e-4031-97bd-2dfccee84e0d
 
-	/// Measure meas.ssr_crm_contact_count.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.ssr_crm_contact_count' =
 			
 			SUM(
@@ -112,7 +158,11 @@ table ssr
 		formatString: 0
 		lineageTag: 786b0571-6412-45e9-881f-0e927e48c9e6
 
-	/// Measure meas.ssr_crm_lead_count.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.ssr_crm_lead_count' =
 			
 			SUM(
@@ -121,7 +171,11 @@ table ssr
 		formatString: 0
 		lineageTag: 5187e7df-f760-4af9-8277-9b5e39ff2c76
 
-	/// Measure meas.ssr_crm_account_count.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.ssr_crm_account_count' =
 			
 			SUM(
@@ -130,7 +184,11 @@ table ssr
 		formatString: 0
 		lineageTag: f70335cc-8680-4df2-8f61-b5b70e973046
 
-	/// Measure meas.ssr_trueai_potential_acv.
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.ssr_trueai_potential_acv' =
 			
 			CALCULATE(

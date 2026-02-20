@@ -2,11 +2,12 @@
 table opps
 	lineageTag: 4277295b-2fd7-47a1-b82b-5de4b447fb12
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_complt], [trueai_complt].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0 %
-	measure 'meas.opp_trueai_completeness_improvement' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.opp_trueai_completeness_improvement' = 
 			
 			var crmval = CALCULATE(AVERAGE([crm_complt]))
 			var aival = CALCULATE(AVERAGE([trueai_complt]))
@@ -14,7 +15,6 @@ table opps
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
 			return res 
 			
-			```
 		formatString: 0 %
 		lineageTag: 7282e887-bcaf-41aa-b41c-9e863ab86f59
 

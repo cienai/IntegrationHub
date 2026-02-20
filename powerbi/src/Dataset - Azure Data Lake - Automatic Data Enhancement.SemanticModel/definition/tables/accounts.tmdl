@@ -2,19 +2,21 @@
 table accounts
 	lineageTag: a6327903-d2c7-49aa-94b9-d45c52607f22
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: accounts[_sys_docid], accounts[trueai_account_dupe_id].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0.00%;-0.00%;0.00%
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.account_trueai_dupe_rate' = CALCULATE(DISTINCTCOUNT(accounts[trueai_account_dupe_id]) / CALCULATE(count(accounts[_sys_docid])))
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 78562b48-eb24-4c22-9628-a15da188859a
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_complt], [trueai_complt].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0 %
-	measure 'meas.account_trueai_completeness_improvement' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.account_trueai_completeness_improvement' = 
 			
 			var crmval = CALCULATE(AVERAGE([crm_complt]))
 			var aival = CALCULATE(AVERAGE([trueai_complt]))
@@ -22,15 +24,15 @@ table accounts
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
 			return res 
 			
-			```
 		formatString: 0 %
 		lineageTag: 8e3a434f-82f7-400f-88ee-ac2551a93985
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Columns: accounts[_sys_docid], accounts[trueai_is_master].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
-	measure 'meas.accounts_trueai_non_dupe_counts' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.accounts_trueai_non_dupe_counts' = 
 			
 			
 			var res = calculate(COUNT(accounts[_sys_docid]) , accounts[trueai_is_master] = true || isblank(accounts[trueai_is_master]) = true )
@@ -58,7 +60,6 @@ table accounts
 			*/
 			
 			return res
-			```
 		formatString: 0
 		lineageTag: ef16364d-0133-48cc-bbbf-e0b706ffe258
 

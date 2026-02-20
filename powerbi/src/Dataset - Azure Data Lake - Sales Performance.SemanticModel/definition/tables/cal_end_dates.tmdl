@@ -1,7 +1,12 @@
 table cal_end_dates
 	lineageTag: 0c87fa54-b3b7-47c2-9154-a95fcfb4b586
 
-	measure 'meas.filter_string_full' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.filter_string_full' = 
 			
 			
 			var max_filters =15
@@ -423,11 +428,15 @@ table cal_end_dates
 			
 			return 
 			res
-			```
 		displayFolder: _filter_helpers
 		lineageTag: 3c24663e-f9df-402c-afeb-239cbdbf6b15
 
-	measure 'DumpFilters cal_end_dates' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'DumpFilters cal_end_dates' = 
 			
 			VAR MaxFilters = 3
 			RETURN
@@ -549,17 +558,25 @@ table cal_end_dates
 			    RETURN ___x & UNICHAR(13) & UNICHAR(10)
 			)
 			
-			```
 		displayFolder: __needs_attention
 		lineageTag: 53a59e30-5a64-4b49-8c66-ce6f79152608
 
-	measure 'meas.dynamic_date_period' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.dynamic_date_period' = 
 			Max(cal_end_dates[Date]) 
-			```
 		formatString: General Date
 		displayFolder: __needs_attention
 		lineageTag: e7904eee-f3a8-43c6-b6ec-758aaa9647ac
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.context_date_min' = CALCULATE(min([Date]))
 		formatString: Short Date
 		displayFolder: _date_helpers
@@ -567,6 +584,11 @@ table cal_end_dates
 
 		changedProperty = FormatString
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.context_date_max' = CALCULATE(max([Date])) -- the max date of a period
 		formatString: Short Date
 		displayFolder: _date_helpers
@@ -574,7 +596,12 @@ table cal_end_dates
 
 		changedProperty = FormatString
 
-	measure 'meas.context_prev_period_max' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.context_prev_period_max' = 
 			
 			var period_start =  CALCULATE(min([Date]))
 			var period_end =  CALCULATE(max([Date]))
@@ -585,14 +612,18 @@ table cal_end_dates
 			return res
 			
 			
-			```
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: ff71e57c-ddd1-448e-9bc2-e103ffdbf5a8
 
 		changedProperty = FormatString
 
-	measure 'meas.context_prev_period_min' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.context_prev_period_min' = 
 			
 			var period_start =  CALCULATE(min([Date]))
 			var period_end =  CALCULATE(max([Date]))
@@ -603,18 +634,27 @@ table cal_end_dates
 			return res
 			
 			
-			```
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: 3dbf3f5d-68a8-426f-824b-75751aebb196
 
 		changedProperty = FormatString
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.first_filt_date' = date(2010,01,01)
 		formatString: General Date
 		displayFolder: __needs_attention
 		lineageTag: 8061d3ce-bc08-42a4-8ffa-8b0d7253cabe
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.end_of_prev_year_as_of' =
 			
 			var asof_prevyear = Year(MAX(ssr[_sys_as_of])) -1
@@ -624,7 +664,12 @@ table cal_end_dates
 		displayFolder: _date_helpers
 		lineageTag: 438fecb4-807d-4ca3-9f8e-24197be82673
 
-	measure 'meas.filter_string' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
+	measure 'meas.filter_string' = 
 			
 			
 			VAR _active_slicer_count = [meas.criteria_active_filters_count]
@@ -660,84 +705,112 @@ table cal_end_dates
 			    res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
 			    res
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: 0e9f4d40-1128-4ca5-ada9-417fa063d10d
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.relative_year' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.relative_year' = 
 			
 			var max_date = [meas.filter_date_max]
 			var curr_context_date = [meas.context_date_max]
 			var rel_period = DATEDIFF(  max_date, curr_context_date, YEAR)
 			var res = rel_period
 			return res 
-			```
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: f5ac0b22-bebb-4965-bcea-73be44b4e6c0
 
-	measure 'meas.filter_date_max' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.filter_date_max' = 
 			
 			
 			VAR res = MAXX (CALCULATETABLE(ALLSELECTED ( cal_end_dates )), cal_end_dates[Date]) 
 			Return res
 			
 			
-			```
 		formatString: General Date
 		displayFolder: _date_helpers
 		lineageTag: ea526ed6-3776-4dcc-94a6-36856278b0bc
 
-	measure 'meas.relative_month' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.relative_month' = 
 			
 			var max_date = [meas.filter_date_max]
 			var curr_context_date = [meas.context_date_max]
 			var rel_period = DATEDIFF(  max_date, curr_context_date, MONTH)
 			var res = rel_period
 			return res 
-			```
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 3ae7b508-2cd4-4af3-bc5c-5124b75128e2
 
-	measure 'meas.relative_qtr' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.relative_qtr' = 
 			
 			var max_date = [meas.filter_date_max]
 			var curr_context_date = [meas.context_date_max]
 			var rel_period = DATEDIFF(  max_date, curr_context_date, QUARTER)
 			var res = rel_period
 			return res 
-			```
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 0a42b663-9ce6-4528-8dea-88502a2358eb
 
-	measure 'meas.relative_week' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.relative_week' = 
 			
 			var max_date = [meas.filter_date_max]
 			var curr_context_date = [meas.context_date_max]
 			var rel_period = DATEDIFF(  max_date, curr_context_date, WEEK)
 			var res = rel_period
 			return res 
-			```
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 969c62b9-5485-4f67-b1ac-ea5590007180
 
-	measure 'meas.relative_day' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.relative_day' = 
 			
 			var max_date = [meas.filter_date_max]
 			var curr_context_date = [meas.context_date_max]
 			var rel_period = DATEDIFF(  max_date, curr_context_date, DAY)
 			var res = rel_period
 			return res 
-			```
 		formatString: 0
 		displayFolder: _date_helpers
 		lineageTag: 1bb41c93-8141-4c96-a44b-dcd1b7f8518f
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
 	measure 'meas.filter_first_of_year_date_string' =
 			
 			
@@ -750,23 +823,37 @@ table cal_end_dates
 		displayFolder: _filter_helpers
 		lineageTag: 0a8552ea-34ce-4249-b450-939e6c3e0b1c
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
 	measure 'meas.filter_year' = Year([meas.filter_date_max]) & ""
 		displayFolder: _filter_helpers
 		lineageTag: 9e1f9e43-9e18-4e3d-8f09-6599b4e97631
 
-	measure 'meas.filter_date_min' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.filter_date_min' = 
 			
 			
 			VAR res = MINX (CALCULATETABLE(ALLSELECTED ( cal_end_dates )), cal_end_dates[Date]) 
 			Return res
 			
 			
-			```
 		formatString: General Date
 		displayFolder: _date_helpers
 		lineageTag: 33a44e1e-5dd2-4860-8ca3-ff716c6b2544
 
-	measure 'meas.data_logs_user_new_terminations_pos' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_new_terminations_pos' = 
 			
 			
 			
@@ -777,15 +864,24 @@ table cal_end_dates
 			           users_history[trueai_termination_date] >= fromDate &&     users_history[trueai_termination_date]  <= toDate 
 			)
 			return res * 1
-			```
 		formatString: 0
 		lineageTag: da3d37b7-d270-4d82-a183-7092ad11bb0b
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.prior_year' = YEAR(MAX(cal_end_dates[Date]))
 		formatString: 0
 		lineageTag: 11707a90-f9fe-4e34-8794-bf5aa4facfe6
 
-	measure 'meas.active_user_filter_string' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
+	measure 'meas.active_user_filter_string' = 
 			
 			VAR _active_slicer_count = [meas.criteria_active_filters_count]
 			
@@ -821,18 +917,27 @@ table cal_end_dates
 			    res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
 			    res
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: e6db8f05-3598-4f7c-ae2c-360591df6c38
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.current_page_filter_string' = CALCULATE(Max(cal_end_dates[Date]))
 		formatString: Short Date
 		displayFolder: _filter_helpers
 		lineageTag: 25384dcf-0901-4fb5-a134-31612f5d3f98
 
-	measure 'meas.aliasing_labels_accounts_cust_field_1' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.aliasing_labels_accounts_cust_field_1' = 
 			
 			 // needs to be filterd by correct model/field to show the right data
 			 var alias_str = CALCULATE(
@@ -846,11 +951,15 @@ table cal_end_dates
 			    "Custom Field 1 (Not Used)",
 			    alias_str
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: 84f61f78-e3dd-4d3d-bf74-190860b35b02
 
-	measure 'meas.aliasing_labels_accounts_cust_field_2' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.aliasing_labels_accounts_cust_field_2' = 
 			
 			 // needs to be filterd by correct model/field to show the right data
 			 var alias_str = CALCULATE(
@@ -864,11 +973,15 @@ table cal_end_dates
 			    "Custom Field 2 (Not Used)",
 			    alias_str
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: 6a326ead-c9bc-4c2e-901a-f832145e701e
 
-	measure 'meas.aliasing_labels_accounts_cust_field_3' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.aliasing_labels_accounts_cust_field_3' = 
 			
 			 // needs to be filterd by correct model/field to show the right data
 			 var alias_str = CALCULATE(
@@ -882,11 +995,15 @@ table cal_end_dates
 			    "Custom Field 3 (Not Used)",
 			    alias_str
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: b700819b-a3c3-4a42-814a-febb88f0cfd8
 
-	measure 'meas.aliasing_labels_opps_cust_field_1' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.aliasing_labels_opps_cust_field_1' = 
 			
 			 // needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
@@ -901,11 +1018,15 @@ table cal_end_dates
 			    "Custom Field 1 (Not Used)",
 			    alias_str
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: a15ccfa1-33da-4632-a2fc-47b0cf2abd9f
 
-	measure 'meas.aliasing_labels_opps_cust_field_2' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.aliasing_labels_opps_cust_field_2' = 
 			
 			 // needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
@@ -919,11 +1040,15 @@ table cal_end_dates
 			    "Custom Field 2 (Not Used)",
 			    alias_str
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: 8c4b5a7f-bed6-4bad-8f2e-2eac34b97e34
 
-	measure 'meas.aliasing_labels_opps_cust_field_3' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.aliasing_labels_opps_cust_field_3' = 
 			
 			 // needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
@@ -938,11 +1063,15 @@ table cal_end_dates
 			    "Custom Field 3 (Not Used)",
 			    alias_str
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: 1e3014e6-c531-4de9-9ed8-179f46bfc30f
 
-	measure 'meas.filter_string_full_updated' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.filter_string_full_updated' = 
 			
 			
 			var max_filters =15
@@ -1345,11 +1474,15 @@ table cal_end_dates
 			
 			return 
 			res
-			```
 		displayFolder: _filter_helpers
 		lineageTag: a2bda876-e250-4cd4-9846-85a4c87a34c1
 
-	measure 'meas.target_screen_filter_string' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.target_screen_filter_string' = 
 			
 			
 			VAR _active_slicer_count = [meas.criteria_active_filters_count]
@@ -1386,11 +1519,15 @@ table cal_end_dates
 			    res & " " & "Add’l filters applied: " & _active_slicer_count,
 			    res
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: de33efac-38fd-4361-94e8-7fdc39fd008b
 
-	measure 'meas.criteria_active_filters_count' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
+	measure 'meas.criteria_active_filters_count' = 
 			
 			VAR _date = IF(ISFILTERED(cal_end_dates[Date]), 1, 0)
 			VAR _group = IF(ISFILTERED(users[trueai_group]),1,0)
@@ -1424,13 +1561,17 @@ table cal_end_dates
 			
 			RETURN
 			total_active_slicer
-			```
 		displayFolder: _filter_helpers
 		lineageTag: dcc5f402-4104-4713-ac64-5c4dcc6f7d69
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.ssr_history_success_count_lead_gen_w_thresh' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_history_success_count_lead_gen_w_thresh' = 
 			
 			//this measure helps you filter out small segments of a result so they don't "pollute" the result. Use this is a filter measure and make the condition "greater than 0"
 			// first get the current count but remove the groupiing filter context 
@@ -1445,12 +1586,16 @@ table cal_end_dates
 			var res  = IF(ratio >= thresh, 1, 0)
 			RETURN
 			res
-			```
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: 8799b9a6-ea2a-46c0-a672-0fa61c9c8751
 
-	measure 'meas.ssr_history_threshold_filter_less_than_3%' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_history_threshold_filter_less_than_3%' = 
 			
 			//this measure helps you filter out small segments of a result so they don't "pollute" the result. Use this is a filter measure and make the condition "greater than 0"
 			// first get the current count but remove the groupiing filter context 
@@ -1464,12 +1609,16 @@ table cal_end_dates
 			// determine if the ratio is over the threshhold and resturn o
 			var res  = IF(ratio >= thresh, 1, 0)
 			return res
-			```
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: 61f7cfca-1076-41cc-bfd0-cd87890decb7
 
-	measure 'meas.ssr_history_threshold_filter_lead_less_than_3%' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_history_threshold_filter_lead_less_than_3%' = 
 			
 			//this measure helps you filter out small segments of a result so they don't "pollute" the result. Use this is a filter measure and make the condition "greater than 0"
 			// first get the current count but remove the groupiing filter context 
@@ -1490,12 +1639,16 @@ table cal_end_dates
 			var res  = IF(ratio >= thresh, 1, 0)
 			RETURN
 			res
-			```
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: 0bdda3b4-1e58-4e90-bb18-0f9f31c289a0
 
-	measure 'meas.ssr_history_threshold_filter_less_than_3%_updated' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_history_threshold_filter_less_than_3%_updated' = 
 			
 			//this measure helps you filter out small segments of a result so they don't "pollute" the result. Use this is a filter measure and make the condition "greater than 0"
 			// first get the current count but remove the groupiing filter context 
@@ -1509,12 +1662,16 @@ table cal_end_dates
 			// determine if the ratio is over the threshhold and resturn o
 			var res  = IF(ratio >= thresh, 1, 0)
 			return res
-			```
 		formatString: 0
 		displayFolder: spec_filter_helper
 		lineageTag: d1b55725-3709-43a0-9d85-d40ee4c96aea
 
-	measure 'meas.last_date_of_previous_quarter' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
+	measure 'meas.last_date_of_previous_quarter' = 
 			
 			// -- Measure to get the end date of the current quarter
 			
@@ -1541,12 +1698,16 @@ table cal_end_dates
 			    )
 			RETURN
 			    PreviousQuarterEnd
-			```
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: b62ca725-ab2e-40a1-a299-249d22d5960b
 
-	measure 'meas.last_date_previous_quarter' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.last_date_previous_quarter' = 
 			
 			// -- Measure to get the end date of the current quarter
 			
@@ -1555,11 +1716,15 @@ table cal_end_dates
 			    PREVIOUSQUARTER(cal_end_dates[Date])
 			)
 			
-			```
 		formatString: Short Date
 		displayFolder: _date_helpers
 		lineageTag: 01ca9ba2-a222-4b43-9752-c5b262cb7f73
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
 	measure 'meas.check_dates' =
 			
 			var end_date = [meas.last_date_of_previous_quarter]
@@ -1571,7 +1736,12 @@ table cal_end_dates
 		displayFolder: _date_helpers
 		lineageTag: f37aa444-9c80-4b2a-9b7a-dae543b49450
 
-	measure 'meas.aliasing_labels_leads_cust_fiel_1' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.aliasing_labels_leads_cust_fiel_1' = 
 			
 			 // needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
@@ -1585,11 +1755,15 @@ table cal_end_dates
 			    "Custom Field 1 (Not Used)",
 			    alias_str
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: 4e68e0b4-0812-48b1-a5af-89c61c138593
 
-	measure 'meas.aliasing_labels_leads_cust_fiel_2' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.aliasing_labels_leads_cust_fiel_2' = 
 			
 			 // needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
@@ -1603,11 +1777,15 @@ table cal_end_dates
 			    "Custom Field 2 (Not Used)",
 			    alias_str
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: b76717ef-b77d-4c6f-bd9e-445ba7e18770
 
-	measure 'meas.aliasing_labels_leads_cust_fiel_3' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.aliasing_labels_leads_cust_fiel_3' = 
 			
 			 // needs to be filterd by correct model/field to show the right data
 			var alias_str = CALCULATE(
@@ -1621,10 +1799,14 @@ table cal_end_dates
 			    "Custom Field 3 (Not Used)",
 			    alias_str
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: bb86cea1-8ab0-4556-837d-c74c2e7eb9e8
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
 	measure 'meas.user_role_aliased_effectiveness_title' =
 			
 			var alias_str = CALCULATE(
@@ -1639,6 +1821,11 @@ table cal_end_dates
 		displayFolder: _filter_helpers
 		lineageTag: 775e95ef-42eb-4a1a-835f-7ed41d0ed499
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
 	measure 'meas.user_role_aliased_performance_title' =
 			
 			var _aliased_role = CALCULATE(MAX(users[trueai_user_role_alias]))        // get the user role aliased
@@ -1650,6 +1837,11 @@ table cal_end_dates
 		displayFolder: _filter_helpers
 		lineageTag: f0c111df-549d-48ea-838d-d165d677a3c7
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
 	measure 'meas.aliasing_user_role' =
 			
 			var alias_str = CALCULATE(
@@ -1662,6 +1854,11 @@ table cal_end_dates
 		displayFolder: _filter_helpers
 		lineageTag: c9ab31eb-f0be-4b70-8ded-1329bb876fd2
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.cal_end_sel_date' =
 			
 			
@@ -1671,7 +1868,12 @@ table cal_end_dates
 		formatString: General Date
 		lineageTag: 1b45670c-d196-4083-8c1e-1bf35c9400a8
 
-	measure 'meas.open_pipeline_filter_string' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
+	measure 'meas.open_pipeline_filter_string' = 
 			
 			VAR _active_slicer_count = [meas.criteria_active_filters_count]
 			
@@ -1708,24 +1910,32 @@ table cal_end_dates
 			    res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
 			    res
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: 0d62af9a-ef4b-4249-902b-5fe229d4796d
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.current_context_min_date' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.current_context_min_date' = 
 			
 			CALCULATE (
 			    MAX('cal_end_dates'[Date]),
 			    TOPN(1, 'cal_end_dates', 'cal_end_dates'[Date], ASC)
 			)
 			
-			```
 		formatString: General Date
 		displayFolder: _filter_helpers
 		lineageTag: c5a39642-9bc6-4868-adfe-0b6fa1c15ed9
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.current_context_max_date' =
 			
 			LASTDATE(cal_end_dates[Date])
@@ -1733,7 +1943,12 @@ table cal_end_dates
 		displayFolder: _filter_helpers
 		lineageTag: fe3da003-12d9-4c41-a4eb-4e09c8084cf5
 
-	measure 'meas.filter_string_as_of' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
+	measure 'meas.filter_string_as_of' = 
 			
 			
 			var date_str =  "As of: " & Max(cal_end_dates[Date])
@@ -1741,10 +1956,14 @@ table cal_end_dates
 			var res =  date_str 
 			RETURN
 			res
-			```
 		displayFolder: _filter_helpers
 		lineageTag: 4aaf52ad-1ce1-4a47-9fc1-fe03ea71b7fb
 
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Text
 	measure 'meas.date_filter_string' =
 			
 			
@@ -1756,7 +1975,12 @@ table cal_end_dates
 		displayFolder: _filter_helpers
 		lineageTag: 6610e67f-0a8d-4a64-bf04-34e8c044cab5
 
-	measure 'meas.filter_string_as_of_full' = ```
+	/// Purpose: Returns the business metric for this measure.
+	/// Logic: Computes the metric from its underlying model references.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Boolean
+	measure 'meas.filter_string_as_of_full' = 
 			
 			VAR _active_slicer_count = [meas.criteria_active_filters_count]
 			
@@ -1793,7 +2017,6 @@ table cal_end_dates
 			    res & "  |  "  & "Add’l filters applied:  " &  _active_slicer_count,
 			    res
 			)
-			```
 		displayFolder: _filter_helpers
 		lineageTag: eef60dbc-6ba5-4dd9-ad28-601b2abb6533
 
