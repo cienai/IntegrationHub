@@ -4,26 +4,12 @@ table ssr
 
 	/// Measure meas.ssr_trueai_conversion_rate.
 	measure 'meas.ssr_trueai_conversion_rate' = [meas.ssr_trueai_converted_count] / CALCULATE(count(ssr[_sys_doc_id]))
-		description: """
-Purpose: Tracks SSR trueai conversion rate.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.ssr_trueai_converted_count]; Columns: ssr[_sys_doc_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: __needs_attention
 		lineageTag: a946bddd-5ee9-4adf-a031-0bb4bbb7b204
 
 	/// Measure meas.ssr_trueai_converted_count.
 	measure 'meas.ssr_trueai_converted_count' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="Prospecting" && ssr_history[step_success] =True )
-		description: """
-Purpose: Tracks SSR trueai converted count.
-Logic: Counts distinct values in ssr_history[_sys_ssr_id] under filters.
-Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_name], ssr_history[step_success]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: f64fb9f1-a6d6-4e35-ade9-42652b127317
@@ -35,39 +21,18 @@ Output: Whole number
 			return if(ISBLANK(val), 0, val)
 			
 			```
-		description: """
-Purpose: Tracks SSR trueai no leadsource count.
-Logic: Counts rows using ssr[_sys_doc_id] under filters.
-Dependencies: Columns: ssr[_sys_doc_id], ssr[trueai_leadsource]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: 9ff987e5-24d2-453a-8420-d58519669d3c
 
 	/// Measure meas.ssr_trueai_no_leadsource_rate.
 	measure 'meas.ssr_trueai_no_leadsource_rate' = [meas.ssr_trueai_no_leadsource_count] / CALCULATE(count(ssr[_sys_doc_id]))
-		description: """
-Purpose: Tracks SSR trueai no leadsource rate.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.ssr_trueai_no_leadsource_count]; Columns: ssr[_sys_doc_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: __needs_attention
 		lineageTag: 688b74be-7bd5-49c2-ac7d-734bc28f3627
 
 	/// Measure measure.ssr_touched_accounts.
 	measure 'measure.ssr_touched_accounts' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="Untouched" && ssr_history[step_success] =True )
-		description: """
-Purpose: Tracks measure SSR touched accounts.
-Logic: Counts distinct values in ssr_history[_sys_ssr_id] under filters.
-Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_name], ssr_history[step_success]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: __needs_attention
 		lineageTag: 9462abf4-4c76-4f8d-8e7f-6b8baac3f495
@@ -76,13 +41,6 @@ Output: Whole number
 
 	/// Measure meas.ssr_new_logo_won_count.
 	measure 'meas.ssr_new_logo_won_count' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="New Logo Selling" && ssr_history[step_success] =True )
-		description: """
-Purpose: Tracks SSR new logo won count.
-Logic: Counts distinct values in ssr_history[_sys_ssr_id] under filters.
-Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_name], ssr_history[step_success]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: __needs_attention
 		lineageTag: cd0cea50-3fac-4990-8fc2-b523aa9dc032
@@ -96,13 +54,6 @@ Output: Whole number
 			return res
 			
 			```
-		description: """
-Purpose: Tracks SSR hsitory accounts per prospecting rep.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_owner_id], ssr_history[step_name]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: __needs_attention
 		lineageTag: 9c9c697b-63fb-4798-b59e-6ba7fc7bef9f
 
@@ -110,13 +61,6 @@ Output: Decimal
 
 	/// Measure meas.ssr_touch_count.
 	measure 'meas.ssr_touch_count' = calculate(count(ssr[trueai_first_touch]))
-		description: """
-Purpose: Tracks SSR touch count.
-Logic: Counts rows using ssr[trueai_first_touch] under filters.
-Dependencies: Columns: ssr[trueai_first_touch]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		lineageTag: b668fd30-f94c-43db-9460-63b5490155f1
 
@@ -125,13 +69,6 @@ Output: Whole number
 			CALCULATE(
 			    SUM(ssr[crm_opp_count])
 			)
-		description: """
-Purpose: Tracks SSR CRM opportunity count.
-Logic: Counts rows using ssr[crm_opp_count] under filters.
-Dependencies: Columns: ssr[crm_opp_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		lineageTag: fec59036-1e4c-4a53-b0b8-1c0ff6536bf8
 
@@ -157,26 +94,12 @@ Output: Whole number
 			var res = MAX(ssr[trueai_leadsource]) & rnk
 			RETURN
 			res
-		description: """
-Purpose: Tracks leadsource record count sort.
-Logic: Counts rows using ssr[crm_leadsource] under filters.
-Dependencies: Columns: ssr[crm_leadsource], ssr[_sys_doc_id], ssr[trueai_leadsource]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		lineageTag: d08183c0-78aa-4f8d-9ac4-9313e5df3ff7
 
 	/// Measure meas.record_counts.
 	measure 'meas.record_counts' =
 			
 			COUNT(ssr[_sys_doc_id])
-		description: """
-Purpose: Tracks record counts.
-Logic: Counts rows using ssr[_sys_doc_id] under filters.
-Dependencies: Columns: ssr[_sys_doc_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		lineageTag: 956cc13c-ee6e-4031-97bd-2dfccee84e0d
 
@@ -186,13 +109,6 @@ Output: Whole number
 			SUM(
 			    ssr[crm_contact_count]
 			)
-		description: """
-Purpose: Tracks SSR CRM contact count.
-Logic: Counts rows using ssr[crm_contact_count] under filters.
-Dependencies: Columns: ssr[crm_contact_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		lineageTag: 786b0571-6412-45e9-881f-0e927e48c9e6
 
@@ -202,13 +118,6 @@ Output: Whole number
 			SUM(
 			    ssr[crm_lead_count]     // sum of crm_lead_count
 			)
-		description: """
-Purpose: Tracks SSR CRM lead count.
-Logic: Counts rows using ssr[crm_lead_count] under filters.
-Dependencies: Columns: ssr[crm_lead_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		lineageTag: 5187e7df-f760-4af9-8277-9b5e39ff2c76
 
@@ -218,13 +127,6 @@ Output: Whole number
 			SUM(
 			    ssr[crm_account_count]     // sum of crm_account_count
 			)
-		description: """
-Purpose: Tracks SSR CRM account count.
-Logic: Counts rows using ssr[crm_account_count] under filters.
-Dependencies: Columns: ssr[crm_account_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		lineageTag: f70335cc-8680-4df2-8f61-b5b70e973046
 
@@ -234,13 +136,6 @@ Output: Whole number
 			CALCULATE(
 			    SUM(ssr[trueai_potential_acv])          // get the sum of trueai potential acv
 			)
-		description: """
-Purpose: Tracks SSR trueai potential acv.
-Logic: Sums ssr[trueai_potential_acv] under filters.
-Dependencies: Columns: ssr[trueai_potential_acv]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 9389b41e-30c0-412b-b08e-23d024be1d28
 

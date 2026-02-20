@@ -17,13 +17,6 @@ table users_history
 			
 			return res // return the res :)
 			```
-		description: """
-Purpose: Tracks data logs user mgr count eop.
-Logic: Counts rows using users_history[_sys_filt_start_date] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_filt_start_date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: b37dd8bf-3abb-4c71-b2b1-02d86db3fea8
@@ -43,13 +36,6 @@ Output: Whole number
 			)
 			return If(isblank( res), 0, res)
 			```
-		description: """
-Purpose: Tracks data logs user new hires reached performer within 12 months.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: +0
 		displayFolder: _perf_analysis
 		lineageTag: a2dee853-9dbc-44fa-8056-38f45ee80945
@@ -72,13 +58,6 @@ Output: Text
 			    res * -1
 			)
 			```
-		description: """
-Purpose: Tracks data logs user new terminations.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_term...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: bde20ead-06ce-47fd-a172-f24a25d9b9c4
@@ -89,13 +68,6 @@ Output: Whole number
 			[meas.data_logs_user_count_eop_for_all_sales_roles]  - [meas.data_logs_user_count_eop_for_mgr] 
 			
 			```
-		description: """
-Purpose: Tracks data logs user individual contrib count eop.
-Logic: Counts rows under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop_for_all_sales_roles], [meas.data_logs_user_count_eop_for_mgr]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 190042ed-5ba8-4940-b3a0-4223f7d6d03b
@@ -116,13 +88,6 @@ Output: Whole number
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks data logs user rep mgr ratio.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop], [meas.data_logs_user_count_eop_for_mgr], [meas.data_logs_user_individual_contrib...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: #.#:1
 		displayFolder: _rep_count_analysis
 		lineageTag: 1ccfb892-9120-428d-af84-a6829c8cb2ae
@@ -146,13 +111,6 @@ Output: Decimal
 			
 			return res // return the res :)
 			```
-		description: """
-Purpose: Tracks data logs user count eop.
-Logic: Counts rows using users_history[_sys_filt_start_date] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_filt_start_date], users_history[tru...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 0d53230b-70a9-4c33-923e-97f01c07267f
@@ -170,13 +128,6 @@ Output: Whole number
 			           users_history[trueai_termination_date] >= fromDate &&  users_history[trueai_termination_date]  <= toDate  && users_history[trueai_tenure] < 13)
 			return res * -1
 			```
-		description: """
-Purpose: Tracks data logs user new terminations within 12 months.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_term...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: 1b315d56-3418-4f57-83da-95dd0f39299c
@@ -191,13 +142,6 @@ Output: Whole number
 			var res = Round(users_in_perf_tier_dec ,0) 
 			return res
 			```
-		description: """
-Purpose: Tracks data logs ci perf tier count.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Columns: users_history[col.ci.perf_qtly_performance_tier], users_history[_sys_user_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _perf_analysis
 		lineageTag: c8771d48-9a93-446a-b576-b1cae3318ddc
@@ -206,13 +150,6 @@ Output: Whole number
 	measure 'meas.data_logs_user_net_new_users' = ```
 			[meas.data_logs_user_new_hires] + [meas.data_logs_user_new_terminations] 
 			```
-		description: """
-Purpose: Tracks data logs user net new users.
-Logic: Returns an extreme value under filters.
-Dependencies: Measures: [meas.data_logs_user_new_hires], [meas.data_logs_user_new_terminations]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 1103f6b8-a2c1-47f7-82b8-8f911720ebe9
@@ -226,13 +163,6 @@ Output: Whole number
 			return res * 4 // annual number
 			
 			```
-		description: """
-Purpose: Tracks data logs ci perf annual average bookings.
-Logic: Averages users_history[ci_perf_qtly_avg_bookings_peers] under filters.
-Dependencies: Measures: [meas.companies_history_reference_date]; Columns: users_history[ci_perf_qtly_avg_bookings_peers], cal_end_dates[D...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _perf_analysis
 		lineageTag: e8d0ba55-4ac1-4b2d-9735-21fbf43528cc
@@ -254,26 +184,12 @@ Output: Text
 			
 			return res // return the res :)
 			```
-		description: """
-Purpose: Tracks data logs user count bop.
-Logic: Counts rows using users_history[_sys_filt_start_date] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_filt_start_date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 23c2187f-b803-4f66-a9bb-b218861c778f
 
 	/// Measure meas.data_logs_user_count_change.
 	measure 'meas.data_logs_user_count_change' = divide([meas.data_logs_user_new_hires] , [meas.data_logs_user_count_bop], BLANK())
-		description: """
-Purpose: Tracks data logs user count change.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_bop], [meas.data_logs_user_new_hires]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: +#,##0%;-#,##0%
 		displayFolder: _rep_count_analysis
 		lineageTag: c2d4b16c-eba9-4e44-a36b-88f0439a492c
@@ -293,13 +209,6 @@ Output: Percentage
 			           
 			return if(isblank(res), 0, res)
 			```
-		description: """
-Purpose: Tracks data logs user new hires.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 71c8d155-d6fc-42de-b47d-f7c9060e54a1
@@ -318,13 +227,6 @@ Output: Whole number
 			
 			return res
 			```
-		description: """
-Purpose: Tracks data logs user new terminations within 12 months average tenure.
-Logic: Averages users_history[trueai_termination_date] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[trueai_termination_date], users_history[...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: 0.0
 		displayFolder: _ramp_analysis
 		lineageTag: 75d0f25d-3377-4efe-b39e-2e5fcc6393ab
@@ -348,26 +250,12 @@ Output: Decimal
 			    res
 			)
 			```
-		description: """
-Purpose: Tracks data logs user new hires reached performer success rate.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_new_hires], [meas.user_history_user_new_hires_reached_perf_in_12_month]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _perf_analysis
 		lineageTag: c9422a55-f07e-46d0-8b7d-e7073208b629
 
 	/// Measure meas.data_logs_user_new_terminations_within_12_months_failure_rate.
 	measure 'meas.data_logs_user_new_terminations_within_12_months_failure_rate' = divide( -1 * [meas.data_logs_user_new_terminations_within_12_months],  [meas.data_logs_user_new_hires] , BLANK())
-		description: """
-Purpose: Tracks data logs user new terminations within 12 months failure rate.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_new_hires], [meas.data_logs_user_new_terminations_within_12_months]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: #,0%;-#,0%;#,0%
 		displayFolder: _ramp_analysis
 		lineageTag: 29a4c52e-0ac6-4eb5-8258-ac1cac98ccae
@@ -394,13 +282,6 @@ Output: Percentage
 			RETURN
 			IF(res = BLANK(), "-", res)
 			```
-		description: """
-Purpose: Tracks data logs user new hires reached performer within 12 months average tenure.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[trueai_hire_date], users_history[col.per...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: #,##0.0" Mos."
 		displayFolder: _perf_analysis
 		lineageTag: 13df22da-2a25-4c0d-beca-5c550610123e
@@ -420,13 +301,6 @@ Output: Decimal
 			
 			
 			```
-		description: """
-Purpose: Tracks data logs ci perf annual average pipeline created.
-Logic: Averages users_history[col.ci.perf_qtly_avg_pipeline_peers] under filters.
-Dependencies: Measures: [meas.companies_history_reference_date]; Columns: users_history[col.ci.perf_qtly_avg_pipeline_peers], cal_end_dat...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _perf_analysis
 		lineageTag: a71bba55-020c-4658-b8f1-53fffc283958
@@ -449,26 +323,12 @@ Output: Text
 			
 			return res // return the res :)
 			```
-		description: """
-Purpose: Tracks users history ramping reps count eop.
-Logic: Counts rows using users_history[col.ci.perf_ramping_status] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[col.ci.perf_ramping_status], users_histo...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _skills_analysis
 		lineageTag: 443a145f-8199-4a8d-bba8-a3b1556b6100
 
 	/// Measure meas.user_history_period_count.
 	measure 'meas.user_history_period_count' = CALCULATE(DISTINCTCOUNT(users_history[_sys_filt_start_date]))
-		description: """
-Purpose: Tracks user history period count.
-Logic: Counts distinct values in users_history[_sys_filt_start_date] under filters.
-Dependencies: Columns: users_history[_sys_filt_start_date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _helper
 		lineageTag: a95dbb11-f9e5-4d93-950a-5d9a776941b0
@@ -480,13 +340,6 @@ Output: Whole number
 			var val_all_time = CALCULATE(Sum(users_history[vi_value_received_tot]),cal_end_dates[Date] > Date(1900,1,1) && cal_end_dates[Date] <= max_date) // override all prior time until max date
 			var res = val_all_time
 			return res
-		description: """
-Purpose: Tracks users history vi value received all prior time.
-Logic: Sums cal_end_dates[Date] under filters.
-Dependencies: Columns: cal_end_dates[Date], users_history[vi_value_received_tot]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _vi_analysis
 		lineageTag: dd1e1348-9c8f-433d-b1d8-5597a5c57e16
@@ -510,13 +363,6 @@ Output: Text
 			var res = if(ISBLANK(perf_reps), 0, perf_reps)
 			return res
 			```
-		description: """
-Purpose: Tracks user history user new hires reached perf in 12 month.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: d7c2bfef-6936-47f3-b6c3-3453a31b2971
@@ -536,13 +382,6 @@ Output: Whole number
 			var res = if(ISBLANK(perf_reps), 0, perf_reps)
 			return res
 			```
-		description: """
-Purpose: Tracks user history user new hires didnt reach perf in 12 month.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: cbad2d08-9be8-4635-a80e-1fb33bbc5488
@@ -560,13 +399,6 @@ Output: Whole number
 			var res = if(isblank(termed_within12),0,termed_within12 )
 			return res * -1
 			```
-		description: """
-Purpose: Tracks user history user new hires terminated in 12 month.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: 1aea2f21-f4e1-4f4d-bc08-8849f865a4c8
@@ -579,13 +411,6 @@ Output: Whole number
 			var avg_rep_attain = AVERAGEX(tbl_reps, DIVIDE([rep_sum],[peer_sum]))
 			var res  = avg_rep_attain
 			return res
-		description: """
-Purpose: Tracks users history ci perf average attainment.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Columns: users_history[ci_perf_qtly_avg_bookings_peers], users_history[_sys_user_id], users_history[col.ci.perf_qtly_bookin...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _ramp_
 		lineageTag: ed0257f9-3179-461b-8e0b-bd32762b95f9
@@ -600,13 +425,6 @@ Output: Percentage
 			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "AE" 
 			)
 			```
-		description: """
-Purpose: Tracks data logs user count eop for ae.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department], users_history[trueai_user_r...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 0f5821e3-d7cc-4ce4-ae7f-9f760cba5013
@@ -627,13 +445,6 @@ Output: Whole number
 			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "AM" 
 			)
 			```
-		description: """
-Purpose: Tracks data logs user count eop for am.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department], users_history[trueai_user_r...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 851eef1a-e954-4e31-91a7-0aaf4d2959b1
@@ -654,13 +465,6 @@ Output: Whole number
 			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "SDR" 
 			)
 			```
-		description: """
-Purpose: Tracks data logs user count eop for sdr.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department], users_history[trueai_user_r...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: bc734f70-1e1a-414c-8344-0db6935738ea
@@ -681,13 +485,6 @@ Output: Whole number
 			    users_history[trueai_user_role_department] = "SALES" 
 			)
 			```
-		description: """
-Purpose: Tracks data logs user count eop for all sales roles.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 5e4e7b8f-4fec-4aef-aad0-58359508545c
@@ -708,13 +505,6 @@ Output: Whole number
 			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "MGMT" 
 			        )
 			```
-		description: """
-Purpose: Tracks data logs user count eop for mgr.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department], users_history[trueai_user_r...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 85f4c5b8-e1fe-4183-b591-4ef4151f7ee6
@@ -726,13 +516,6 @@ Output: Whole number
 			    [meas.data_logs_user_count_eop]+0,
 			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "OTHER ROLES"
 			)
-		description: """
-Purpose: Tracks data logs user count eop for other.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department], users_history[trueai_user_r...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 264b9cb9-f0ce-4764-8abe-39c27f7e8175
@@ -744,13 +527,6 @@ Output: Whole number
 			    [meas.data_logs_user_count_eop],
 			    users_history[trueai_user_role_department] IN { "MKT" }
 			)
-		description: """
-Purpose: Tracks data logs user count eop for dept mkt.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 7e8c4b48-a945-4fc5-a092-43358df3fa62
@@ -770,13 +546,6 @@ Output: Whole number
 			    [meas.data_logs_user_count_eop]+0,
 			    users_history[trueai_user_role_department] IN { "SALES" }
 			)
-		description: """
-Purpose: Tracks data logs user count eop for dept sales.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 31ce84f9-bae7-4b16-abad-55e7cea9405c
@@ -796,13 +565,6 @@ Output: Whole number
 			    [meas.data_logs_user_count_eop]+0,
 			    users_history[trueai_user_role_department] IN { "OTHER DEPTS" }
 			)
-		description: """
-Purpose: Tracks data logs user count eop for dept other.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: c5ee2d2f-a382-44a5-b694-7c76dd98edd0
@@ -822,13 +584,6 @@ Output: Whole number
 			VAR __VALUE_TO_COMPARE = [meas.data_logs_user_count_eop]
 			RETURN
 				DIVIDE(__VALUE_TO_COMPARE - __BASELINE_VALUE, __BASELINE_VALUE)
-		description: """
-Purpose: Tracks data logs user count change percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_bop], [meas.data_logs_user_count_eop]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _rep_count_analysis
 		lineageTag: 2bc1cb9f-ae11-4a3c-ac45-7147c60c679d
@@ -849,13 +604,6 @@ Output: Percentage
 			    users_history[trueai_user_role]
 			        IN { "ND" }
 			)
-		description: """
-Purpose: Tracks data logs user count eop for nd.
-Logic: Counts rows using users_history[trueai_user_role] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 7bcb8763-96e0-4db1-b039-349dbd1c0eec
@@ -871,13 +619,6 @@ Output: Whole number
 			
 			
 			```
-		description: """
-Purpose: Tracks reps w actlvl percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.reps_w_actlvl_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _acl_ta_analysis
 		lineageTag: a812b715-d8de-41ae-bfc8-aa462a01927b
@@ -889,13 +630,6 @@ Output: Percentage
 			
 			CALCULATE(DISTINCTCOUNT([_sys_user_id]), (users_history[ci_act_capt_lvl] > 0)
 			)
-		description: """
-Purpose: Tracks reps w actlvl count.
-Logic: Counts distinct values in users_history[ci_act_capt_lvl] under filters.
-Dependencies: Columns: users_history[ci_act_capt_lvl]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _acl_ta_analysis
 		lineageTag: cb1894d2-ba0e-4792-8b22-f9f580f4b5e6
@@ -908,13 +642,6 @@ Output: Whole number
 			
 			var res = DIVIDE(reps_w_ta, reps_tot)
 			return res
-		description: """
-Purpose: Tracks reps w time allocation percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop], [meas.reps_w_time_allocation_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _acl_ta_analysis
 		lineageTag: cf3b1586-2449-41dd-8a8a-325aecdcf614
@@ -942,26 +669,12 @@ Output: Percentage
 			
 			return res // return the res :)
 			```
-		description: """
-Purpose: Tracks reps w time allocation count.
-Logic: Counts rows using users_history[_sys_filt_start_date] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_filt_start_date], users_history[tru...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: 390d2dd9-6f68-455a-a819-a36c90a9703c
 
 	/// Measure meas.users_history_row_filler.
 	measure 'meas.users_history_row_filler' = ""
-		description: """
-Purpose: Tracks users history row filler.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: 6ddcb848-f676-401c-a8b8-ee85f6065845
 
@@ -972,13 +685,6 @@ Output: Decimal
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "AM" }
 			)
-		description: """
-Purpose: Tracks sys user id for am.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: e13717b1-4053-45c3-8c69-b95248010273
@@ -996,13 +702,6 @@ Output: Whole number
 			    SUM(ssr_history[opp_won_amt])+0,
 			    [meas.sys.user_id_for_am]
 			)
-		description: """
-Purpose: Tracks di trueai opportunities won amount am average.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.sys.user_id_for_am]; Columns: ssr_history[opp_won_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: 672dae6d-f8c4-4494-ad53-bf9b1cb93fb6
@@ -1022,13 +721,6 @@ Output: Text
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "AE" }
 			)
-		description: """
-Purpose: Tracks sys user id for ae.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: 443717c6-2617-4712-9ee1-236180210cdb
@@ -1040,13 +732,6 @@ Output: Whole number
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "SDR" }
 			)
-		description: """
-Purpose: Tracks sys user id for sdr.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: b95fcde4-0bcd-4deb-8ac0-ef02a18103d6
@@ -1058,13 +743,6 @@ Output: Whole number
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "ND" }
 			)
-		description: """
-Purpose: Tracks sys user id for nd.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: 60ef9f77-bd16-4f97-a5b9-a3d8fd5f0927
@@ -1076,13 +754,6 @@ Output: Whole number
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "OTHER" }
 			)
-		description: """
-Purpose: Tracks sys user id for other.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: a67bea40-cc9d-4b93-b763-4082390316e3
@@ -1094,13 +765,6 @@ Output: Whole number
 			    SUM(ssr_history[opp_won_amt])+0,
 			    [meas.sys.user_id_for_ae]
 			)
-		description: """
-Purpose: Tracks di trueai opportunities won amount ae average.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.sys.user_id_for_ae]; Columns: ssr_history[opp_won_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: 4e7673c7-6ba5-4aaa-8092-0bb53c634fad
@@ -1114,13 +778,6 @@ Output: Text
 			    SUM(ssr_history[opp_won_amt])+0,
 			    [meas.sys.user_id_for_sdr]
 			)
-		description: """
-Purpose: Tracks di trueai opportunities won amount sdr average.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.sys.user_id_for_sdr]; Columns: ssr_history[opp_won_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: 98385d82-fa66-49df-896d-e5ab747667eb
@@ -1134,13 +791,6 @@ Output: Text
 			    SUM(ssr_history[opp_won_amt])+0,
 			    [meas.sys.user_id_for_nd]
 			)
-		description: """
-Purpose: Tracks di trueai opportunities won amount nd average.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.sys.user_id_for_nd]; Columns: ssr_history[opp_won_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _results_analysis
 		lineageTag: 225d81ac-2ee8-468b-b631-d57e12f9c289
 
@@ -1153,13 +803,6 @@ Output: Decimal
 			    SUM(ssr_history[opp_won_amt])+0,
 			    [meas.sys.user_id_for_mgr]
 			)
-		description: """
-Purpose: Tracks di trueai opportunities won amount mgr average.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.sys.user_id_for_mgr]; Columns: ssr_history[opp_won_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _results_analysis
 		lineageTag: adeb39fc-4055-4ab4-8198-862c0d190999
 
@@ -1172,13 +815,6 @@ Output: Decimal
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "MGMT" }
 			)
-		description: """
-Purpose: Tracks sys user id for mgr.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: 8421e203-c9d1-468b-affe-165f59ada1ae
@@ -1190,13 +826,6 @@ Output: Whole number
 			    SUM(ssr_history[opp_won_amt])+0,
 			    [meas.sys.user_id_for_other]
 			)
-		description: """
-Purpose: Tracks di trueai opportunities won amount other average.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.sys.user_id_for_other]; Columns: ssr_history[opp_won_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: e4a86f1b-abb3-4193-95f4-fcbed163093b
@@ -1215,13 +844,6 @@ Output: Text
 			)
 			return res 
 			```
-		description: """
-Purpose: Tracks count trueai user role account executive.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_user_role]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: f9380111-412f-4044-b400-0d2ca99a2968
@@ -1238,13 +860,6 @@ Output: Whole number
 			)
 			return res 
 			```
-		description: """
-Purpose: Tracks count trueai user role account manager.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: 5569d550-425e-4fd9-99b5-14bb55a3efff
@@ -1261,13 +876,6 @@ Output: Whole number
 			)
 			return res 
 			```
-		description: """
-Purpose: Tracks count trueai user role sales manager.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: b6ac59ea-d721-4ef6-8c5b-230bf0de8e09
@@ -1284,13 +892,6 @@ Output: Whole number
 			)
 			return res 
 			```
-		description: """
-Purpose: Tracks count trueai user role nd.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 42d75b4a-4848-4708-8151-7a0816e02c31
@@ -1306,13 +907,6 @@ Output: Whole number
 			)
 			return res 
 			```
-		description: """
-Purpose: Tracks count trueai user role sales development rep.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: be269a0b-7718-4e82-ac59-c6b6bda76360
@@ -1324,13 +918,6 @@ Output: Whole number
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_department] IN { "SALES" }
 			)
-		description: """
-Purpose: Tracks user history count dept sales.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_department]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 7f8f335e-b7db-4e7c-b4f8-42e49526f783
@@ -1348,13 +935,6 @@ Output: Whole number
 			    [meas.count_trueai_user_role_account_executive],
 			    users_history[trueai_group] IN { "ND" }
 			)
-		description: """
-Purpose: Tracks count trueai user role account executive in group nd.
-Logic: Counts rows using users_history[trueai_group] under filters.
-Dependencies: Measures: [meas.count_trueai_user_role_account_executive]; Columns: users_history[trueai_group]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 9ca49175-64b3-4320-a764-4d0ddba97eed
@@ -1379,13 +959,6 @@ Output: Whole number
 			return res 
 			
 			```
-		description: """
-Purpose: Tracks count trueai user role all salesteam.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 5ba6ff62-c218-4a8c-a401-b26f5bbba04f
@@ -1401,13 +974,6 @@ Output: Whole number
 			)
 			return res 
 			```
-		description: """
-Purpose: Tracks count trueai user role other.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role_function]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 2096bd64-ff8b-4b2f-8629-80b6e89051cb
@@ -1424,13 +990,6 @@ Output: Whole number
 			)
 			return res 
 			```
-		description: """
-Purpose: Tracks count trueai user role sales executive.
-Logic: Counts distinct values in 'users_history'[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 32655af9-d185-476f-9a78-27fbb9ffbcb5
@@ -1442,13 +1001,6 @@ Output: Whole number
 			    [meas.data_logs_user_count_eop]+0,
 			    users_history[trueai_user_role_department] IN { "SUPPORT" }
 			)
-		description: """
-Purpose: Tracks data logs user count eop for dept support.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 1e6d0ed8-aaae-4efe-b4d3-51a8c8c2b16c
@@ -1460,13 +1012,6 @@ Output: Whole number
 			    [meas.data_logs_user_count_eop]+0,
 			    users_history[trueai_user_role_department] IN { "OPS" }
 			)
-		description: """
-Purpose: Tracks data logs user count eop for dept ops.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: e9b2eb17-1691-4b12-825c-1f151ac84361
@@ -1478,13 +1023,6 @@ Output: Whole number
 			    [meas.data_logs_user_count_eop]+0,
 			    users_history[trueai_user_role_department] IN { "ND" }
 			)
-		description: """
-Purpose: Tracks data logs user count eop for dept nd.
-Logic: Counts rows using users_history[trueai_user_role_department] under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: b7c20247-953b-46d0-b3ca-169b075bde67
@@ -1496,13 +1034,6 @@ Output: Whole number
 				SUM(ssr_history[opp_won_amt]),
 				[meas.data_logs_user_count_eop]
 			)
-		description: """
-Purpose: Tracks data logs won amount user eop average.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: ssr_history[opp_won_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: c630a93b-07a9-455d-8f3a-3c935cffedba
@@ -1522,13 +1053,6 @@ Output: Text
 			        SUM('ssr_history'[opp_pipeline_amt]),
 			        [meas.data_logs_user_count_eop]
 			)
-		description: """
-Purpose: Tracks data logs pipeline amount user eop average.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: 'ssr_history'[opp_pipeline_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _results_analysis
 		lineageTag: e3899a10-a1ed-4134-b2f9-aa52c0d6645e
 
@@ -1545,13 +1069,6 @@ Output: Decimal
 			var res = DIVIDE(won_amt, reps)
 			return res 
 			```
-		description: """
-Purpose: Tracks data logs won amount user eop average for new logo selling.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: ssr_history[opp_won_amt], ssr_history[step_name]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: e942f6df-814c-42d0-a743-58d166e9dce8
@@ -1576,13 +1093,6 @@ Output: Text
 			var res = DIVIDE(won_amt, reps)
 			return res 
 			```
-		description: """
-Purpose: Tracks data logs won amount user eop average for existing acv.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: ssr_history[opp_won_amt], ssr_history[step_name], ssr_history[col.opp_a...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _results_analysis
 		lineageTag: 5fcf4a6a-efa3-4459-988e-6eb31406c216
@@ -1599,13 +1109,6 @@ Output: Decimal
 			var res = DIVIDE(won_amt, reps)
 			return res 
 			```
-		description: """
-Purpose: Tracks data logs won amount user eop average for new acv.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: ssr_history[opp_won_amt], ssr_history[step_name], ssr_history[col.opp_a...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: 0b8c546c-cfa8-4fad-9bdc-f3d297110235
@@ -1633,13 +1136,6 @@ Output: Text
 			var res = if(isblank(termed_within12),0,termed_within12 )
 			return res
 			```
-		description: """
-Purpose: Tracks user history user new hires terminated in 12 month pos.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: 640150f5-397a-4029-bd36-e53852d020d0
@@ -1653,13 +1149,6 @@ Output: Whole number
 			var res = DIVIDE(won_amt, reps)
 			return res 
 			```
-		description: """
-Purpose: Tracks data logs won amount user eop average for existing customer selling.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop]; Columns: ssr_history[opp_won_amt], ssr_history[step_name]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: f32bbee9-a90c-45cb-abb0-8f9a96ef2221
@@ -1668,169 +1157,71 @@ Output: Text
 
 	/// Measure meas.users_history_row_filler2.
 	measure 'meas.users_history_row_filler2' = ""
-		description: """
-Purpose: Tracks users history row filler2.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: edeb15e2-b186-459d-8646-a21595bab838
 
 	/// Measure meas.users_history_row_filler3.
 	measure 'meas.users_history_row_filler3' = ""
-		description: """
-Purpose: Tracks users history row filler3.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: fb5ce7e1-3b57-4caa-b47c-75f38cf431ca
 
 	/// Measure meas.users_history_row_filler4.
 	measure 'meas.users_history_row_filler4' = ""
-		description: """
-Purpose: Tracks users history row filler4.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: 8980361f-9d0f-4b4f-a5b9-adfe40234d48
 
 	/// Measure meas.users_history_row_filler5.
 	measure 'meas.users_history_row_filler5' = ""
-		description: """
-Purpose: Tracks users history row filler5.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: c1e1b654-df56-4f96-a7f2-b175c3e859ef
 
 	/// Measure meas.users_history_row_filler6.
 	measure 'meas.users_history_row_filler6' = ""
-		description: """
-Purpose: Tracks users history row filler6.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: 2f5a5d5a-b880-4048-a7c5-e5d12008ee28
 
 	/// Measure meas.users_history_row_filler7.
 	measure 'meas.users_history_row_filler7' = ""
-		description: """
-Purpose: Tracks users history row filler7.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: 3e1bb5f9-21ff-4763-b675-e056bebbc144
 
 	/// Measure meas.users_history_row_filler8.
 	measure 'meas.users_history_row_filler8' = ""
-		description: """
-Purpose: Tracks users history row filler8.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: 7aa1bc6d-19ee-4f88-8447-c4ebd53bf512
 
 	/// Measure meas.users_history_row_filler9.
 	measure 'meas.users_history_row_filler9' = ""
-		description: """
-Purpose: Tracks users history row filler9.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: 969c4058-2234-4575-ba9f-0cc3d76a47ce
 
 	/// Measure meas.users_history_row_filler10.
 	measure 'meas.users_history_row_filler10' = ""
-		description: """
-Purpose: Tracks users history row filler10.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: f362c584-a411-4e49-bbf6-31cb18a66a80
 
 	/// Measure meas.users_history_row_filler11.
 	measure 'meas.users_history_row_filler11' = ""
-		description: """
-Purpose: Tracks users history row filler11.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: a6884327-0fed-4df0-8827-faaeeda5986f
 
 	/// Measure meas.users_history_row_filler12.
 	measure 'meas.users_history_row_filler12' = ""
-		description: """
-Purpose: Tracks users history row filler12.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: 13189c9e-d0d2-42cd-a41c-e2969b8dab74
 
 	/// Measure meas.users_history_row_filler13.
 	measure 'meas.users_history_row_filler13' = ""
-		description: """
-Purpose: Tracks users history row filler13.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: 68cc992c-591e-4f1f-9386-89571ceb05af
 
 	/// Measure meas.users_history_row_filler14.
 	measure 'meas.users_history_row_filler14' = ""
-		description: """
-Purpose: Tracks users history row filler14.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: 272625e7-1621-4db5-a38a-56e0f218088a
 
 	/// Measure meas.users_history_row_filler15.
 	measure 'meas.users_history_row_filler15' = ""
-		description: """
-Purpose: Tracks users history row filler15.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _filler
 		lineageTag: bce5d1d3-b76b-4858-862e-46f081a4d53b
 
@@ -1847,13 +1238,6 @@ Output: Decimal
 			    0,
 			    res
 			)
-		description: """
-Purpose: Tracks data logs user turnover percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_bop], [meas.data_logs_user_new_terminations_pos]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _rep_count_analysis
 		lineageTag: c17b7b54-4e31-4d1e-bf1c-4aea962f150d
@@ -1868,13 +1252,6 @@ Output: Percentage
 	measure 'meas.time_allocation_total_not_eng' =
 			
 			AVERAGE('users_history'[ci_time_alloc_tot]) - AVERAGE('users_history'[ci_time_alloc_tot_eng])
-		description: """
-Purpose: Tracks time allocation total not eng.
-Logic: Averages 'users_history'[ci_time_alloc_tot] under filters.
-Dependencies: Columns: 'users_history'[ci_time_alloc_tot], 'users_history'[ci_time_alloc_tot_eng]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _ta_analysis
 		lineageTag: 73db7ecd-c91c-482b-93eb-8deebec2a09f
 
@@ -1897,13 +1274,6 @@ Output: Decimal
 			return res
 			
 			```
-		description: """
-Purpose: Tracks users history ta potential vs actual.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Columns: users_history[ci_time_alloc_tot], users_history[ci_time_alloc_month_to_week_adjustment], users_history[col.ci_ta_p...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _ta_analysis
 		lineageTag: dd9b7816-b83c-4d60-bfb1-f374cc0531f5
@@ -1920,13 +1290,6 @@ Output: Percentage
 			
 			RETURN
 			ABS(res)
-		description: """
-Purpose: Tracks data logs user turnover percentage regrettable.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_bop], [meas.data_logs_user_new_terminations_regrettable]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _rep_count_analysis
 		lineageTag: 36204f55-92aa-45d3-846e-38ef4694b4bb
@@ -1942,13 +1305,6 @@ Output: Percentage
 			
 			
 			```
-		description: """
-Purpose: Tracks data logs user new terminations regrettable.
-Logic: Counts rows using users_history[_sys_user_id] under filters.
-Dependencies: Measures: [meas.data_logs_user_new_terminations]; Columns: users_history[_sys_user_id], users_history[_sys_doc_id], users_h...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: 64a5d1ae-0403-49d9-b03e-a8ef509b3d19
@@ -1977,13 +1333,6 @@ Output: Whole number
 			
 			
 			```
-		description: """
-Purpose: Tracks users history user role function concat w count eop.
-Logic: Counts rows using users_history[_sys_filt_start_date] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_filt_start_date], users[_sys_doc_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		lineageTag: d413b1b6-88bb-4362-ba1f-b09ba6abc6ae
 
 	/// Measure meas.exp_rpts_all_avg_perf_tier.
@@ -1993,78 +1342,36 @@ Output: Text
 			var res = if(isblank(calc), blank(),calc)
 			return res
 			```
-		description: """
-Purpose: Tracks exp rpts all average perf tier.
-Logic: Averages users_history[ci_perf_qtly_performance_tier_num] under filters.
-Dependencies: Columns: users_history[ci_perf_qtly_performance_tier_num]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: ae176c1b-1966-4b3d-bbf0-fa4cbe7fc464
 
 	/// Measure meas.exp_rpts_last_year_avg_perf_tier.
 	measure 'meas.exp_rpts_last_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "LAST_YEAR")
-		description: """
-Purpose: Tracks exp rpts last year average perf tier.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.exp_rpts_all_avg_perf_tier]; Columns: users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[fil...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: 4cab50c1-511d-439f-89d3-669c0173ffcc
 
 	/// Measure meas.exp_rpts_prior_to_last_year_avg_perf_tier.
 	measure 'meas.exp_rpts_prior_to_last_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "PRIOR_TO_LAST_YEAR")
-		description: """
-Purpose: Tracks exp rpts prior to last year average perf tier.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.exp_rpts_all_avg_perf_tier]; Columns: users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[fil...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: c7aef491-020f-4a36-abf4-ec5b554a1bfa
 
 	/// Measure meas.exp_rpts_current_year_avg_perf_tier.
 	measure 'meas.exp_rpts_current_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "CURRENT_YEAR")
-		description: """
-Purpose: Tracks exp rpts current year average perf tier.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.exp_rpts_all_avg_perf_tier]; Columns: users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[fil...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: db51bd07-3023-4d79-b5df-64359d2834ba
 
 	/// Measure meas.data_logs_user_count_all.
 	measure 'meas.data_logs_user_count_all' = [meas.data_logs_user_count_eop_for_dept_mkt]+[meas.data_logs_user_count_eop_for_dept_nd]+[meas.data_logs_user_count_eop_for_dept_ops]+[meas.data_logs_user_count_eop_for_dept_other]+[meas.data_logs_user_count_eop_for_dept_sales]+[meas.data_logs_user_count_eop_for_dept_support]
-		description: """
-Purpose: Tracks data logs user count all.
-Logic: Counts rows under filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop_for_dept_mkt], [meas.data_logs_user_count_eop_for_dept_nd], [meas.data_logs_user_c...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: bd7a4307-ed50-4555-bd87-089699d608ba
 
 	/// Measure meas.calibration_user_role_title.
 	measure 'meas.calibration_user_role_title' = "User Roles - " & [meas.prior_year] & " Full Calendar Year"
-		description: """
-Purpose: Tracks calibration user role title.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.prior_year]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		displayFolder: _rep_count_analysis
 		lineageTag: b46bd447-2ddc-4adc-a282-c0bd8c15171d
 
@@ -2077,13 +1384,6 @@ Output: Text
 			return res * 4 // annual number
 			
 			```
-		description: """
-Purpose: Tracks data logs ci perf annual average bookings account executive.
-Logic: Counts rows using users_history[ci_perf_qtly_avg_bookings_peers] under filters.
-Dependencies: Measures: [meas.companies_history_reference_date]; Columns: users_history[ci_perf_qtly_avg_bookings_peers], cal_end_dates[D...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _perf_analysis
 		lineageTag: 03cf934b-81ba-444c-87f7-f0d6df3312dd
@@ -2099,13 +1399,6 @@ Output: Decimal
 			return res * 4 // annual number
 			
 			```
-		description: """
-Purpose: Tracks data logs ci perf annual average bookings account manager.
-Logic: Counts rows using users_history[ci_perf_qtly_avg_bookings_peers] under filters.
-Dependencies: Measures: [meas.companies_history_reference_date]; Columns: users_history[ci_perf_qtly_avg_bookings_peers], cal_end_dates[D...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _perf_analysis
 		lineageTag: f48cadb1-b2f6-4fb7-ba35-e7ebc413f6c9
@@ -2119,13 +1412,6 @@ Output: Decimal
 			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
 			var res =  CALCULATE(AVERAGE(users_history[col.ci.perf_qtly_avg_pipeline_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date, users_history[trueai_user_role]="Sales Development Rep") // qtly number
 			return res * 4 // annual number
-		description: """
-Purpose: Tracks data logs ci perf annual average pipeline created sdr.
-Logic: Averages users_history[col.ci.perf_qtly_avg_pipeline_peers] under filters.
-Dependencies: Measures: [meas.companies_history_reference_date]; Columns: users_history[col.ci.perf_qtly_avg_pipeline_peers], cal_end_dat...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _perf_analysis
 		lineageTag: b40da212-94ff-4335-a3c8-1110586f6e22
@@ -2134,37 +1420,16 @@ Output: Decimal
 
 	/// Measure meas.perf_consider_mrasure.
 	measure 'meas.perf_consider_mrasure' = "To be considered a Performer, a rep needs to fall within +/- 35% of AAB / AAPC"
-		description: """
-Purpose: Tracks perf consider mrasure.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _perf_analysis
 		lineageTag: e36df813-494b-4999-a2d5-0c02c594db11
 
 	/// Measure meas.calibration_department_title.
 	measure 'meas.calibration_department_title' = "Department - " & [meas.prior_year] & " Full Calendar Year"
-		description: """
-Purpose: Tracks calibration department title.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.prior_year]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		displayFolder: _rep_count_analysis
 		lineageTag: 6f133e82-cd13-456d-ba5f-2bb46c770268
 
 	/// Measure meas.calibration_group_title.
 	measure 'meas.calibration_group_title' = "Group - " & [meas.prior_year] & " Full Calendar Year"
-		description: """
-Purpose: Tracks calibration group title.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.prior_year]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		displayFolder: _rep_count_analysis
 		lineageTag: f1b13f39-437e-469b-977e-2ef145c2c495
 
@@ -2193,13 +1458,6 @@ Output: Text
 			    rounded_num = 3, "Overperformer"
 			)
 			```
-		description: """
-Purpose: Tracks data logs ci perf status.
-Logic: Averages cal_end_dates[Date] under filters.
-Dependencies: Columns: cal_end_dates[Date], users_history[ci_perf_qtly_performance_tier_num], users_history[_sys_filt_end_date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _perf_analysis
 		lineageTag: a97b7deb-0320-4928-9344-62e8b0ac287e
 
@@ -2242,13 +1500,6 @@ Output: Decimal
 			    )
 			 )
 			```
-		description: """
-Purpose: Tracks data logs user 12 mos ci perf status.
-Logic: Averages users_history[ci_perf_qtly_performance_tier_num] under filters.
-Dependencies: Measures: [meas.data_logs_users_ramping_status], [meas.last_date_of_previous_quarter]; Columns: users_history[ci_perf_qtly_...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		displayFolder: _perf_analysis
 		lineageTag: 7866caef-955b-4d57-9415-64d9df49695c
 
@@ -2270,26 +1521,12 @@ Output: Text
 			
 			return res // return the res :)
 			```
-		description: """
-Purpose: Tracks data logs user count rep eop.
-Logic: Counts rows using cal_end_dates[Date] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: cal_end_dates[Date], users_history[_sys_filt_start_dat...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: aa4e48f7-647a-4d50-ae41-06df2fbef33f
 
 	/// Measure meas.ramping_reps_details_title.
 	measure 'meas.ramping_reps_details_title' = "Ramping Reps -   " & [meas.step_owner_user_role_aliased]
-		description: """
-Purpose: Tracks ramping reps details title.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.step_owner_user_role_aliased]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		displayFolder: _ramp_analysis
 		lineageTag: 2ab3c61d-7f9a-43c9-9555-deafb52b42f8
 
@@ -2297,13 +1534,6 @@ Output: Text
 	measure 'meas.reps_w_time_allocation_prospecting_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_prospecting])>0)
-		description: """
-Purpose: Tracks reps w time allocation prospecting count.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Columns: users_history[_sys_user_id], users_history[ci_time_alloc_prospecting]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: b9a4709c-76f5-444a-93e1-043c6fba0ff5
@@ -2316,13 +1546,6 @@ Output: Whole number
 			
 			var res = DIVIDE(reps_w_ta, reps_tot)
 			return res
-		description: """
-Purpose: Tracks reps w time allocation prospecting percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.reps_w_time_allocation_prospecting_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _acl_ta_analysis
 		lineageTag: 95eb85ee-1b16-496a-b04a-aa3042687603
@@ -2331,13 +1554,6 @@ Output: Percentage
 	measure 'meas.reps_w_time_allocation_new_logo_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_new_logo])>0)
-		description: """
-Purpose: Tracks reps w time allocation new logo count.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Columns: users_history[_sys_user_id], users_history[ci_time_alloc_new_logo]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: dff9104a-517d-4d51-b63b-64e65bacf531
@@ -2350,13 +1566,6 @@ Output: Whole number
 			
 			var res = DIVIDE(reps_w_ta, reps_tot)
 			return res
-		description: """
-Purpose: Tracks reps w time allocation new logo percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.reps_w_time_allocation_new_logo_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _acl_ta_analysis
 		lineageTag: 59a3a1e0-40af-42fd-8513-123844687a12
@@ -2369,13 +1578,6 @@ Output: Percentage
 			
 			var res = DIVIDE(reps_w_ta, reps_tot)
 			return res
-		description: """
-Purpose: Tracks reps w time allocation prospect percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.reps_w_time_allocation_count], [meas.ssr_history_reps_prospecting]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _acl_ta_analysis
 		lineageTag: c95cc6f4-094d-425d-8174-a1e11580c6ff
@@ -2384,13 +1586,6 @@ Output: Percentage
 	measure 'meas.reps_all_time_allocation_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]))
-		description: """
-Purpose: Tracks reps all time allocation count.
-Logic: Counts distinct values in users_history[_sys_user_id] under filters.
-Dependencies: Columns: users_history[_sys_user_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: aa4c3717-11a2-45fc-b083-3d1126f1fc90
@@ -2410,13 +1605,6 @@ Output: Whole number
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks data logs user rep mgr ratio updated.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.data_logs_user_count_eop], [meas.data_logs_user_count_eop_for_mgr]; Columns: users_history[trueai_user_role...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: 0.0
 		displayFolder: _rep_count_analysis
 		lineageTag: 12898c88-6b57-432c-b8f8-c7a8c8bbb2c4
@@ -2441,13 +1629,6 @@ Output: Decimal
 			RETURN
 			tenure_status
 			```
-		description: """
-Purpose: Tracks data logs users tenure.
-Logic: Returns an extreme value from users_history[trueai_tenure] under filters.
-Dependencies: Measures: [meas.last_date_of_previous_quarter]; Columns: users_history[trueai_tenure], cal_end_dates[Date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: #,##0" Mos."
 		displayFolder: _perf_analysis
 		lineageTag: 65db4a01-5803-4f39-b98e-2d3164d16f6d
@@ -2474,13 +1655,6 @@ Output: Decimal
 			RETURN
 			_status
 			```
-		description: """
-Purpose: Tracks data logs users ramping status.
-Logic: Returns an extreme value from users_history[ci_perf_ramping_status] under filters.
-Dependencies: Measures: [meas.last_date_of_previous_quarter]; Columns: users_history[ci_perf_ramping_status], cal_end_dates[Date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _perf_analysis
 		lineageTag: a73a5ff6-d27e-40cf-b459-57c7e93a4a0e
 
@@ -2492,13 +1666,6 @@ Output: Decimal
 			        users_history[ci_time_alloc_existing_customer_selling]      // get the aVERAGE time for existing customer selling
 			    )
 			)
-		description: """
-Purpose: Tracks users history ci time alloca average existing customer selling.
-Logic: Averages users_history[ci_time_alloc_existing_customer_selling] under filters.
-Dependencies: Columns: users_history[ci_time_alloc_existing_customer_selling]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _perf_analysis
 		lineageTag: 62dae6ec-b5a6-4618-8717-82729a078884
 
@@ -2510,13 +1677,6 @@ Output: Decimal
 			var avg_value = AVERAGE(users_history[ci_time_alloc_conf])    // get the avg of ci time allocation confidence
 			
 			RETURN avg_value
-		description: """
-Purpose: Tracks users history time allocation confidence.
-Logic: Averages users_history[ci_time_alloc_conf] under filters.
-Dependencies: Columns: users_history[ci_time_alloc_conf]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _acl_ta_analysis
 		lineageTag: 2059d007-20a9-4cd1-aa99-3c038ce2dd8d
 
@@ -2552,13 +1712,6 @@ Output: Decimal
 			)
 			
 			```
-		description: """
-Purpose: Tracks users history time allocation confidence status.
-Logic: Averages users_history[ci_time_alloc_conf] under filters.
-Dependencies: Columns: users_history[ci_time_alloc_conf]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: ebe06221-1ce3-4e18-9db4-d9701923fee8
@@ -2593,61 +1746,26 @@ Output: Whole number
 			)
 			
 			```
-		description: """
-Purpose: Tracks time allocation confidence.
-Logic: Averages users_history[ci_time_alloc_conf] under filters.
-Dependencies: Columns: users_history[ci_time_alloc_conf]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		displayFolder: _acl_ta_analysis
 		lineageTag: 30522698-ba19-4d59-a3c0-a10e54a3a4ae
 
 	/// Measure meas.peek_inside_text_supports_aab.
 	measure 'meas.peek_inside_text_supports_aab' = "AAB"
-		description: """
-Purpose: Tracks peek inside text supports aab.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _helper
 		lineageTag: 43c5b6e1-ce31-496d-8af8-614ac968bdde
 
 	/// Measure meas.peek_inside_text_supports_aapc.
 	measure 'meas.peek_inside_text_supports_aapc' = "AAPC"
-		description: """
-Purpose: Tracks peek inside text supports aapc.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _helper
 		lineageTag: 22918bb7-2e2d-4dfd-98b3-17eb6b7a6c9b
 
 	/// Measure meas.peek_inside_text_supports_ramping_time.
 	measure 'meas.peek_inside_text_supports_ramping_time' = "Ramping Time"
-		description: """
-Purpose: Tracks peek inside text supports ramping time.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _helper
 		lineageTag: ffd6401d-0cfb-4cf4-bcb1-a7739b744def
 
 	/// Measure meas.peek_inside_text_supports_trueai_reference_date.
 	measure 'meas.peek_inside_text_supports_trueai_reference_date' = "TrueAI Reference Date"
-		description: """
-Purpose: Tracks peek inside text supports trueai reference date.
-Logic: Derived from model references under current filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Boolean
-		"""
 		displayFolder: _helper
 		lineageTag: 2bda97e6-525d-43bf-9132-5dac7a60b10b
 
@@ -2695,13 +1813,6 @@ Output: Boolean
 			    _status_
 			)
 			```
-		description: """
-Purpose: Tracks users history R2 bg color.
-Logic: Returns an extreme value from ssr_history[step_name] under filters.
-Dependencies: Measures: [meas.quality_bucket__new_logo_r2], [meas.quality_bucket__prospecting_r2], [meas.quality_bucket_existing_customer...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: b9a6f5fd-0e8e-4a17-99f6-68bb6955b805
@@ -2750,13 +1861,6 @@ Output: Whole number
 			    _status_
 			)
 			```
-		description: """
-Purpose: Tracks users history AUC bg color.
-Logic: Returns an extreme value from ssr_history[step_name] under filters.
-Dependencies: Measures: [meas.quality_bucket_existing_customer_selling_auc], [meas.quality_bucket_new_logo_auc], [meas.quality_bucket_pos...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: ebc1dec3-4c25-49a1-b757-cc84b583ae72
@@ -2782,13 +1886,6 @@ Output: Whole number
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks users history average act capt lvl.
-Logic: Averages cal_end_dates[Date] under filters.
-Dependencies: Measures: [meas.context_date_max], [meas.context_date_min]; Columns: cal_end_dates[Date], users_history[ci_act_capt_lvl]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _acl_ta_analysis
 		lineageTag: 3b0377cc-1f96-47ec-95c0-2878eb5243bd
 
@@ -2802,13 +1899,6 @@ Output: Decimal
 			        users_history[ci_time_alloc_prospecting]      // get the aVERAGE time for prospecting
 			    )
 			)
-		description: """
-Purpose: Tracks users history ci time alloca average prospecting.
-Logic: Averages users_history[ci_time_alloc_prospecting] under filters.
-Dependencies: Columns: users_history[ci_time_alloc_prospecting]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: 0.0
 		displayFolder: _perf_analysis
 		lineageTag: 363287f9-8e11-4afb-a36a-636b9f8eb0c9
@@ -2821,13 +1911,6 @@ Output: Decimal
 			        users_history[ci_time_alloc_new_logo]      // get the aVERAGE time for NEW LOGO SELLING
 			    )
 			)
-		description: """
-Purpose: Tracks users history ci time alloca average new logo selling.
-Logic: Averages users_history[ci_time_alloc_new_logo] under filters.
-Dependencies: Columns: users_history[ci_time_alloc_new_logo]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _perf_analysis
 		lineageTag: 0f273889-0f09-4cf7-a177-586dde98d57d
 
@@ -2841,13 +1924,6 @@ Output: Decimal
 			        users_history[ci_time_alloc_post_sales]      // get the aVERAGE time for post sales support
 			    )
 			)
-		description: """
-Purpose: Tracks users history ci time alloca average post sales support.
-Logic: Averages users_history[ci_time_alloc_post_sales] under filters.
-Dependencies: Columns: users_history[ci_time_alloc_post_sales]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _perf_analysis
 		lineageTag: a2e9401e-6bbc-412c-86ff-d210bab347b1
 
@@ -2861,13 +1937,6 @@ Output: Decimal
 			        users_history[ci_time_alloc_internal]      // get the aVERAGE time for internel
 			    )
 			)
-		description: """
-Purpose: Tracks users history ci time alloca average internel.
-Logic: Averages users_history[ci_time_alloc_internal] under filters.
-Dependencies: Columns: users_history[ci_time_alloc_internal]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _perf_analysis
 		lineageTag: 076d5fc9-0c65-4ddc-8328-ad90a7ae1d0f
 
@@ -2879,13 +1948,6 @@ Output: Decimal
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]), users_history[ci_act_capt_lvl]=BLANK())
 			RETURN
 			reps_tot
-		description: """
-Purpose: Tracks reps without act lvl count.
-Logic: Counts distinct values in users_history[ci_act_capt_lvl] under filters.
-Dependencies: Columns: users_history[ci_act_capt_lvl]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: 823b6167-9d31-4002-92a5-8ef055257123
@@ -2898,13 +1960,6 @@ Output: Whole number
 			var res = DIVIDE(reps_w_acl, reps_tot)
 			RETURN
 			res
-		description: """
-Purpose: Tracks reps without act lvl percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.reps_without_act_lvl_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _acl_ta_analysis
 		lineageTag: b4f7597e-76a9-497e-9c04-10bad1c384ba
@@ -2920,13 +1975,6 @@ Output: Percentage
 			)
 			RETURN
 			res
-		description: """
-Purpose: Tracks reps has ci act capt lvl.
-Logic: Returns an extreme value from users_history[ci_act_capt_lvl] under filters.
-Dependencies: Columns: users_history[ci_act_capt_lvl]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: f7c7a23d-abf3-4d19-83f8-b9268e8cd6cb
@@ -2941,13 +1989,6 @@ Output: Whole number
 			
 			RETURN
 			_prospect_count+_new_logo_count+_post_sales_count+_exist_count
-		description: """
-Purpose: Tracks ci act capt lvl PI owner act.
-Logic: Counts rows using users_history[ci_act_capt_lvl_pi_prospecting_owner_act] under filters.
-Dependencies: Columns: users_history[ci_act_capt_lvl_pi_prospecting_owner_act], users_history[ci_act_capt_lvl_pi_new_logo_owner_act], use...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		lineageTag: a9dc1dca-80f1-4459-bf59-70b7dc8b07fe
 
@@ -2958,13 +1999,6 @@ Output: Whole number
 			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the under performer annual average
 			    users_history[col.ci.perf_annual_performance_tier]="Underperformer"
 			)
-		description: """
-Purpose: Tracks underperformer annual average.
-Logic: Averages users_history[col.ci.perf_annual_performance_tier] under filters.
-Dependencies: Measures: [meas.data_logs_ci_perf_annual_avg_bookings]; Columns: users_history[col.ci.perf_annual_performance_tier]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _rep_overview
 		lineageTag: e36c1779-b7a1-4178-aba2-048b42a3657f
@@ -2978,13 +2012,6 @@ Output: Decimal
 			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the performer annual average
 			    users_history[col.ci.perf_annual_performance_tier]="Performer"
 			)
-		description: """
-Purpose: Tracks performer annual average.
-Logic: Averages users_history[col.ci.perf_annual_performance_tier] under filters.
-Dependencies: Measures: [meas.data_logs_ci_perf_annual_avg_bookings]; Columns: users_history[col.ci.perf_annual_performance_tier]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _rep_overview
 		lineageTag: b65fd732-3ba1-4caf-8147-8e81f722dbd1
@@ -2998,13 +2025,6 @@ Output: Decimal
 			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the over performer annual average
 			    users_history[col.ci.perf_annual_performance_tier]="Overperformer"
 			)
-		description: """
-Purpose: Tracks overperformer annual average.
-Logic: Averages users_history[col.ci.perf_annual_performance_tier] under filters.
-Dependencies: Measures: [meas.data_logs_ci_perf_annual_avg_bookings]; Columns: users_history[col.ci.perf_annual_performance_tier]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _rep_overview
 		lineageTag: 7f890585-40c8-496c-8997-1a9984b5c8f5
@@ -3018,13 +2038,6 @@ Output: Decimal
 			    VALUES(users_history[trueai_user_role_alias]),
 			    users_history[trueai_user_role_alias]
 			)
-		description: """
-Purpose: Tracks min user role alias.
-Logic: Returns an extreme value from users_history[trueai_user_role_alias] under filters.
-Dependencies: Columns: users_history[trueai_user_role_alias]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Boolean
-		"""
 		lineageTag: 4ebf3e77-dde2-4068-b567-e41f84e4e937
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}

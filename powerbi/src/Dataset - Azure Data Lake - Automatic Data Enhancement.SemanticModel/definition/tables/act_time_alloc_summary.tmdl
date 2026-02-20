@@ -7,13 +7,6 @@ table act_time_alloc_summary
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.act_time_alloc_reps' = CALCULATE(DISTINCTCOUNT(act_time_alloc_summary[_sys_user_id]))
-		description: """
-Purpose: Tracks act time alloc reps.
-Logic: Counts distinct values in act_time_alloc_summary[_sys_user_id] under filters.
-Dependencies: Columns: act_time_alloc_summary[_sys_user_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _tl_analysis
 		lineageTag: 7b3aa411-fbb6-4366-893f-6222d570fa8f
@@ -28,13 +21,6 @@ Output: Whole number
 			return if(ISBLANK(res) , 0, res)
 			
 			```
-		description: """
-Purpose: Tracks act time alloc reps w act capt level.
-Logic: Sums act_time_alloc_summary[act_capt_lvl_adjustment] under filters.
-Dependencies: Measures: [meas.act_time_alloc_reps]; Columns: act_time_alloc_summary[act_capt_lvl_adjustment]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _tl_analysis
 		lineageTag: 41b390ab-c2d0-487d-8c76-f569e1464fe6
@@ -47,13 +33,6 @@ Output: Whole number
 			
 			var res = CALCULATE(Sum(act_time_alloc_summary[act_dur]) / 3600)
 			return IF(ISBLANK(res), 0, res)
-		description: """
-Purpose: Tracks act time alloc captured durations h.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Columns: act_time_alloc_summary[act_dur]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: ###,###,###0.0" hrs"
 		displayFolder: _tl_analysis
 		lineageTag: 87c56af4-3aca-4a61-bab1-c500e9f3ae15
@@ -83,13 +62,6 @@ Output: Decimal
 			
 			return
 			res
-		description: """
-Purpose: Tracks act time alloc adjusted durations h.
-Logic: Averages act_time_alloc_summary[act_capt_lvl_adjustment] under filters.
-Dependencies: Measures: [meas.act_time_alloc_captured_durations_h]; Columns: act_time_alloc_summary[act_capt_lvl_adjustment], act_time_al...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: ###,###,###" hrs"
 		displayFolder: _tl_analysis
 		lineageTag: a9976925-1bc8-4b96-9b93-8ad1465e02a1
@@ -103,13 +75,6 @@ Output: Text
 			var capt_tot  = CALCULATE(Sum(act_time_alloc_summary[act_tot_count]))
 			var res =  DIVIDE(capt_dur_min,capt_tot)
 			return IF(ISBLANK(res), 0, res)
-		description: """
-Purpose: Tracks act time alloc average duration.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Columns: act_time_alloc_summary[act_dur], act_time_alloc_summary[act_tot_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: ###,###,###" min"
 		displayFolder: _tl_analysis
 		lineageTag: af4127e5-1a22-4bde-aa1e-9a4d03d1a80a
@@ -124,13 +89,6 @@ Output: Text
 			return res
 			
 			```
-		description: """
-Purpose: Tracks act time rep w act capt level percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.act_time_alloc_reps], [meas.act_time_alloc_reps_w_act_capt_level]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _tl_analysis
 		lineageTag: 32b18e31-82ff-4240-a15b-d8ff9447d912
@@ -168,13 +126,6 @@ Output: Percentage
 			res
 			
 			```
-		description: """
-Purpose: Tracks act time alloc hours weekly.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.act_time_alloc_adj_durations_h], [meas.act_time_alloc_captured_durations_h], [meas.act_time_alloc_reps_w_ac...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: ###,###,###"  hrs/week"
 		displayFolder: _tl_analysis
 		lineageTag: 9ec1357c-9789-4e43-a71d-00c31ed960dd
@@ -192,13 +143,6 @@ Output: Text
 			CALCULATE(count( act_time_alloc_summary[_sys_docid]), act_time_alloc_summary[act_capt_lvl_adjustment] > 0, act_time_alloc_summary[act_capt_lvl_adjustment] > 0)
 			
 			```
-		description: """
-Purpose: Tracks act time alloc user months w time alloc.
-Logic: Counts rows using act_time_alloc_summary[_sys_docid] under filters.
-Dependencies: Columns: act_time_alloc_summary[_sys_docid], act_time_alloc_summary[act_capt_lvl_adjustment]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _tl_analysis
 		lineageTag: 49d72214-dc8d-4f17-a750-cb340feba375
@@ -210,13 +154,6 @@ Output: Whole number
 	measure 'meas.act_time_alloc_capture_lvl' =
 			
 			divide(1,calculate(AVERAGE(act_time_alloc_summary[act_capt_lvl_adjustment])))
-		description: """
-Purpose: Tracks act time alloc capture lvl.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Columns: act_time_alloc_summary[act_capt_lvl_adjustment]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _tl_analysis
 		lineageTag: 6825710f-355b-49bf-93b6-549ccf1e0f89
@@ -234,13 +171,6 @@ Output: Percentage
 			var res = DIVIDE ( reps_act_capture, reps)
 			return res 
 			```
-		description: """
-Purpose: Tracks act time rep act capture value percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.act_time_alloc_reps]; Columns: act_time_alloc_summary[act_capt_lvl]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _tl_analysis
 		lineageTag: bdd26b8c-ef42-408e-8984-52b78f930c41
@@ -250,13 +180,6 @@ Output: Percentage
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.tot_count' = CALCULATE(SUM(users_activities[trueai_count]))
-		description: """
-Purpose: Tracks tot count.
-Logic: Counts rows using users_activities[trueai_count] under filters.
-Dependencies: Columns: users_activities[trueai_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _tl_analysis
 		lineageTag: ad57e66a-3b39-4ea3-b2f6-0b6ed7e07337
@@ -281,13 +204,6 @@ Output: Whole number
 			var res = DIVIDE(_total_duration, (week_count * _reps_w_ta) )
 			RETURN
 			res
-		description: """
-Purpose: Tracks act time alloc hours weekly test.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.act_time_alloc_captured_durations_h], [meas.act_time_alloc_reps_w_act_capt_level]; Columns: act_time_alloc_...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _tl_analysis
 		lineageTag: c04f4aa8-43c4-4305-b135-3d99b59e3891
 

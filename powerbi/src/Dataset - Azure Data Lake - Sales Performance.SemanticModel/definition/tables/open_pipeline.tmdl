@@ -25,13 +25,6 @@ table open_pipeline
 			Var res  = AVERAGEX(filter_tbl,[trueai_act_dur] )
 			RETURN res/3600
 			```
-		description: """
-Purpose: Tracks open opportunities duration hrs.
-Logic: Averages opps[_sys_filt_end_date] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: opps[_sys_filt_end_date], open_pipeline[trueai_sort_id], open_pipeline[crm_opp_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: #,##0.0" hrs"
 		displayFolder: _open_opps_pipeline
 		lineageTag: 6a45d4e5-bc9f-4cbc-a81a-7ca586f55139
@@ -67,13 +60,6 @@ Output: Decimal
 			RETURN
 			res+0
 			```
-		description: """
-Purpose: Tracks open opportunities engagement ratio.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.sel_date]; Columns: opps[_sys_filt_end_date], open_pipeline[trueai_sort_id], open_pipeline[crm_opp_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _open_opps_pipeline
 		lineageTag: d0568ec4-480e-4596-8dfa-b70cc86cc8a5
@@ -91,13 +77,6 @@ Output: Percentage
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks open opportunities last eng days.
-Logic: Returns an extreme value from opps[crm_last_act_time] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: opps[crm_last_act_time]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: """+""#"" days"";""-""#"" days"";""-"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: e2b00476-ab70-45d6-931d-701631f83f49
@@ -137,13 +116,6 @@ Output: Text
 			res
 			
 			```
-		description: """
-Purpose: Tracks open opportunities sel date count.
-Logic: Counts rows using opps[_sys_filt_end_date] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: opps[_sys_filt_end_date], open_pipeline[trueai_sort_id], open_pipeline[crm_opp_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: e9d52ce3-8497-4ab0-94db-791065dcd7bb
@@ -177,13 +149,6 @@ Output: Whole number
 			RETURN res
 			
 			```
-		description: """
-Purpose: Tracks open opportunity sel date count rob.
-Logic: Counts rows using ssr_history[_sys_doc_id] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: ssr_history[_sys_doc_id], opps[_sys_filt_end_date], open_pipeline[trueai_sort_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: e2464022-caf0-4ce8-bdf3-5bd3ae240186
@@ -198,13 +163,6 @@ Output: Whole number
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks open opportunities last eng act.
-Logic: Returns an extreme value from cal_start_dates[Date] under filters.
-Dependencies: Columns: cal_start_dates[Date], open_pipeline[trueai_last_eng_act]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: Short Date
 		displayFolder: _open_opps_pipeline
 		lineageTag: eb720c10-21e8-4cd2-b827-189df4909e8e
@@ -213,13 +171,6 @@ Output: Text
 	measure 'meas.open_opps_stkhlds_involved' =
 			
 			MAX(ssr_history[stkhlds_all_contacts_count])
-		description: """
-Purpose: Tracks open opportunities stkhlds involved.
-Logic: Counts rows using ssr_history[stkhlds_all_contacts_count] under filters.
-Dependencies: Columns: ssr_history[stkhlds_all_contacts_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 10044456-c905-4aaf-bb68-c235a7242c78
@@ -229,13 +180,6 @@ Output: Whole number
 			
 			Var res  = MAXX(opps, opps[trueai_propensity] )
 			RETURN res
-		description: """
-Purpose: Tracks open opportunities quality bucket.
-Logic: Returns an extreme value from opps[trueai_propensity] under filters.
-Dependencies: Columns: opps[trueai_propensity]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Boolean
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: a0f1fe2d-9a8c-4f78-997c-e3802c7c466d
 
@@ -244,13 +188,6 @@ Output: Boolean
 			
 			Var res  = MAXX(open_pipeline, open_pipeline[trueai_stage] )
 			RETURN res
-		description: """
-Purpose: Tracks open opportunities pipeline current stage.
-Logic: Returns an extreme value from open_pipeline[trueai_stage] under filters.
-Dependencies: Columns: open_pipeline[trueai_stage]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Boolean
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 10887f14-fee8-45c1-9ec1-2e1f778a459c
 
@@ -264,13 +201,6 @@ Output: Boolean
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks open opportunities tbl title.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.sel_date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 3fed2c8f-0873-44c6-8b3f-b26f87d92022
 
@@ -282,13 +212,6 @@ Output: Text
 			var _expected_amount = _pipeline_amt*_win_prob
 			RETURN
 			_expected_amount
-		description: """
-Purpose: Tracks open opportunities expected value.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.open_opps_avg_win_prob], [meas.open_opps_pipeline_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _open_opps_pipeline
 		lineageTag: 4672c69a-d174-4726-ae84-a7811ec79108
@@ -305,13 +228,6 @@ Output: Decimal
 			_expected_amount
 			
 			```
-		description: """
-Purpose: Tracks open opportunities total expected value.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.open_opps_avg_win_prob], [meas.open_opps_pipeline_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: f6f5f311-dee6-4166-82e4-5396749b8afb
@@ -333,13 +249,6 @@ Output: Text
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities total expected value sply diff.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_opps_total_expected_value], [meas.open_opps_total_expected_value_sply]; Columns: open_pipeline[trueai_...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: +0 %;-0 %;"-"
 		displayFolder: _open_opps_pipeline
 		lineageTag: bcf22a5a-dc4a-4dd5-95a6-6140f6154c4e
@@ -372,13 +281,6 @@ Output: Percentage
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities average win prob.
-Logic: Averages opps[_sys_filt_end_date] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: opps[_sys_filt_end_date], open_pipeline[trueai_sort_id], open_pipeline[crm_opp_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _open_opps_pipeline
 		lineageTag: 09563c27-7a16-47f1-b1db-9b88b120a9c1
@@ -391,13 +293,6 @@ Output: Percentage
 			var _expected_amount = _pipeline_amt*_win_prob
 			RETURN
 			_expected_amount
-		description: """
-Purpose: Tracks open opportunities total expected value sply.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.open_opps_avg_win_prob_sply], [meas.open_opps_pipeline_amt_sply]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 27bc090d-3507-41d7-ab3a-2678f1aaa5d0
@@ -430,13 +325,6 @@ Output: Text
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities count.
-Logic: Counts rows using opps[_sys_filt_end_date] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: opps[_sys_filt_end_date], open_pipeline[trueai_sort_id], open_pipeline[crm_opp_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 5887f433-2566-4a32-b1b4-3fce64f6b252
@@ -449,13 +337,6 @@ Output: Whole number
 			    open_pipeline[trueai_stage] in {"Early", "Mid", "Late"},
 			    SAMEPERIODLASTYEAR(cal_start_dates[Date])
 			)
-		description: """
-Purpose: Tracks open opportunities count sply.
-Logic: Counts rows using open_pipeline[trueai_stage] under filters.
-Dependencies: Measures: [meas.open_opps_count]; Columns: open_pipeline[trueai_stage], cal_start_dates[Date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: #,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 1364f987-e2fc-4a19-aa1a-6793b825a130
@@ -473,13 +354,6 @@ Output: Whole number
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks open opportunities count sply diff.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_opps_count], [meas.open_opps_count_sply]; Columns: open_pipeline[trueai_stage]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: +0 %;-0 %;"-"
 		displayFolder: _open_opps_pipeline
 		lineageTag: 847f07b1-8fa4-449e-b982-0b4257a69757
@@ -494,13 +368,6 @@ Output: Percentage
 			    open_pipeline[trueai_stage] in {"Early", "Mid", "Late"},
 			    DATEADD(cal_start_dates[Date], -1, YEAR)
 			)
-		description: """
-Purpose: Tracks open opportunities average win prob sply.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.open_opps_avg_win_prob]; Columns: open_pipeline[trueai_stage], cal_start_dates[Date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _open_opps_pipeline
 		lineageTag: bec26611-00c2-4632-a584-4ba4e1d29146
@@ -518,13 +385,6 @@ Output: Percentage
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks open opportunities average win prob sply diff.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_opps_avg_win_prob], [meas.open_opps_avg_win_prob_sply]; Columns: open_pipeline[trueai_stage]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: +0 %;-0 %;"-"
 		displayFolder: _open_opps_pipeline
 		lineageTag: bf752ab9-241b-4989-a052-9cdb5a8b1615
@@ -559,13 +419,6 @@ Output: Percentage
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities pipeline amount.
-Logic: Sums opps[_sys_filt_end_date] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: opps[_sys_filt_end_date], open_pipeline[trueai_sort_id], open_pipeline[crm_opp_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _open_opps_pipeline
 		lineageTag: ee5a9b16-a525-485b-a196-4a906df32704
@@ -580,13 +433,6 @@ Output: Decimal
 			    open_pipeline[trueai_stage] in {"Early", "Mid", "Late"},
 			    SAMEPERIODLASTYEAR(cal_start_dates[Date])
 			)
-		description: """
-Purpose: Tracks open opportunities pipeline amount sply.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.open_opps_pipeline_amt]; Columns: open_pipeline[trueai_stage], cal_start_dates[Date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _open_opps_pipeline
 		lineageTag: dd4d4f41-a8cb-431f-af87-090fffea3092
@@ -617,13 +463,6 @@ Output: Decimal
 			RETURN res
 			
 			```
-		description: """
-Purpose: Tracks open opportunities pushed pulled day.
-Logic: Averages opps[_sys_filt_end_date] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: opps[_sys_filt_end_date], open_pipeline[trueai_sort_id], open_pipeline[crm_opp_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: """+""#"" days"";""-""#"" days"";""-"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 0a3752cf-4a5e-495f-b062-18254a01d722
@@ -637,13 +476,6 @@ Output: Text
 			    [meas.open_opps_pushed_pulled_day],             // get the sply open opps pipeline amt
 			    DATEADD(cal_start_dates[Date], -1, YEAR)
 			)
-		description: """
-Purpose: Tracks open opportunities pushed pulled day sply.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.open_opps_pushed_pulled_day]; Columns: cal_start_dates[Date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: """+""#"" days"";""-""#"" days"";""-"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 0fdc3b1b-d2b2-466f-88fa-5b5212fa2ab2
@@ -663,13 +495,6 @@ Output: Text
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks open opportunities pushed pulled day sply diff.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_opps_pushed_pulled_day], [meas.open_opps_pushed_pulled_day_sply]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: +0 %;-0 %;"-"
 		displayFolder: _open_opps_pipeline
 		lineageTag: 503232e7-d329-4f73-ab02-afe03361dcc7
@@ -694,13 +519,6 @@ Output: Percentage
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks open opportunities average pace score.
-Logic: Averages get the rounded avg of [trueai_pace_score] under filters.
-Dependencies: Columns: get the rounded avg of [trueai_pace_score]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 2cd78355-abb5-4625-b982-0a2fc4036aff
 
@@ -724,13 +542,6 @@ Output: Decimal
 			RETURN  
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities items trueai stage.
-Logic: Returns an extreme value from opps[_sys_as_of] under filters.
-Dependencies: Columns: opps[_sys_as_of], opps[trueai_stage], open_pipeline[_sys_as_of]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Boolean
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 776d0094-a304-43f4-a8d7-79ccd778ca7c
 
@@ -740,13 +551,6 @@ Output: Boolean
 			var dur = calculate(sum(open_pipeline[trueai_act_dur])) / 3600 // turn to hours
 			var res  = dur
 			return res
-		description: """
-Purpose: Tracks open opportunities list duration hrs.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Columns: open_pipeline[trueai_act_dur]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: #,##0.0" hrs"
 		displayFolder: _open_opps_pipeline
 		lineageTag: 2a7338c6-36d5-46af-9656-83ca8abf9e9b
@@ -775,13 +579,6 @@ Output: Decimal
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities average pace score sply.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.trueai_pace_score]; Columns: cal_start_dates[Date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Boolean
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: e7cd5e66-6316-4e65-a0ca-8afcbaddce17
 
@@ -805,13 +602,6 @@ Output: Boolean
 			RETURN
 			res+0
 			```
-		description: """
-Purpose: Tracks open opportunities average pace score sply diff.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.trueai_pace_score]; Columns: cal_start_dates[Date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: +0 %;-0 %;"0%"
 		displayFolder: _open_opps_pipeline
 		lineageTag: 41d3a2d1-6046-441d-a9fa-40eebb66c5a5
@@ -842,13 +632,6 @@ Output: Percentage
 			RETURN 
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities act count.
-Logic: Counts rows using opps[_sys_filt_end_date] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: opps[_sys_filt_end_date], open_pipeline[trueai_sort_id], open_pipeline[crm_opp_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 6a434a8f-008e-4cae-9c06-610797cb5790
@@ -867,13 +650,6 @@ Output: Whole number
 			)
 			RETURN
 			res
-		description: """
-Purpose: Tracks open opportunities pipeline amount sply diff.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_opps_pipeline_amt], [meas.open_opps_pipeline_amt_sply]; Columns: open_pipeline[trueai_stage]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: +0 %;-0 %;"-"
 		displayFolder: _open_opps_pipeline
 		lineageTag: d6256281-bb95-4002-b9dc-f549b83adb97
@@ -887,13 +663,6 @@ Output: Percentage
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks open opportunities age days.
-Logic: Returns an extreme value from opps[col.opp_age] under filters.
-Dependencies: Columns: opps[col.opp_age]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: #" days"
 		displayFolder: _open_opps_pipeline
 		lineageTag: ad1da48a-6e54-4e91-a08c-c7bc384cc905
@@ -910,13 +679,6 @@ Output: Text
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities age days sply.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.open_opps_age_days]; Columns: cal_start_dates[Date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: #" days"
 		displayFolder: _open_opps_pipeline
 		lineageTag: 20796ce7-2bb9-4d4f-aff7-29c4f18cf0f2
@@ -936,13 +698,6 @@ Output: Text
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks open opportunities age days sply diff.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_opps_age_days], [meas.open_opps_age_days_sply]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: +0 %;-0 %;"-"
 		displayFolder: _open_opps_pipeline
 		lineageTag: e0d8f8e6-07e4-438e-bc93-43c5cb5bc567
@@ -953,13 +708,6 @@ Output: Percentage
 	measure 'meas.open_opps_initial_close_date' =
 			
 			CALCULATE(MAX(open_pipeline[trueai_init_close_date]))
-		description: """
-Purpose: Tracks open opportunities initial close date.
-Logic: Returns an extreme value from open_pipeline[trueai_init_close_date] under filters.
-Dependencies: Columns: open_pipeline[trueai_init_close_date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: Short Date
 		displayFolder: _open_opps_pipeline
 		lineageTag: 666cb7ed-c316-4ced-91d8-b12470cd140d
@@ -970,13 +718,6 @@ Output: Text
 			CALCULATE(
 			    SUM(open_pipeline[trueai_act_count])
 			)
-		description: """
-Purpose: Tracks open opportunities items all act count.
-Logic: Counts rows using open_pipeline[trueai_act_count] under filters.
-Dependencies: Columns: open_pipeline[trueai_act_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: 5351b99b-b4f0-4a02-8a1c-1c05896763fb
@@ -987,13 +728,6 @@ Output: Whole number
 			CALCULATE(
 			    SUM(open_pipeline[trueai_act_eng_count])
 			)
-		description: """
-Purpose: Tracks open opportunities items all act eng count.
-Logic: Counts rows using open_pipeline[trueai_act_eng_count] under filters.
-Dependencies: Columns: open_pipeline[trueai_act_eng_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: 562e4c2a-cc4b-490a-a288-8d995335aa69
@@ -1004,13 +738,6 @@ Output: Whole number
 			CALCULATE(
 			    MAX(opps[trueai_sale_type])
 			)
-		description: """
-Purpose: Tracks opportunities detail sale type.
-Logic: Returns an extreme value from opps[trueai_sale_type] under filters.
-Dependencies: Columns: opps[trueai_sale_type]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Boolean
-		"""
 		displayFolder: _opps_details
 		lineageTag: 86fe027a-e93e-4386-b548-e6b4c760d472
 
@@ -1020,13 +747,6 @@ Output: Boolean
 			CALCULATE(
 			    MAX(open_pipeline[trueai_stage])
 			)
-		description: """
-Purpose: Tracks open opportunities trueai stage.
-Logic: Returns an extreme value from open_pipeline[trueai_stage] under filters.
-Dependencies: Columns: open_pipeline[trueai_stage]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Boolean
-		"""
 		displayFolder: _opps_details
 		lineageTag: c2aee211-195c-4a6d-a5b3-137bd1443ee5
 
@@ -1036,13 +756,6 @@ Output: Boolean
 			CALCULATE(
 			    SUM(open_pipeline[trueai_act_type_meeting_count])
 			)
-		description: """
-Purpose: Tracks open opportunities items meeting act count.
-Logic: Counts rows using open_pipeline[trueai_act_type_meeting_count] under filters.
-Dependencies: Columns: open_pipeline[trueai_act_type_meeting_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: ff73db87-015f-42d0-8c66-7f7b9b86f4cc
@@ -1053,13 +766,6 @@ Output: Whole number
 			CALCULATE(
 			    SUM(open_pipeline[trueai_act_type_meeting_eng_count])
 			)
-		description: """
-Purpose: Tracks open opportunities items meeting act eng count.
-Logic: Counts rows using open_pipeline[trueai_act_type_meeting_eng_count] under filters.
-Dependencies: Columns: open_pipeline[trueai_act_type_meeting_eng_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: e284c69f-4727-47a1-8c86-d4a75cd2d286
@@ -1070,13 +776,6 @@ Output: Whole number
 			CALCULATE(
 			    SUM(open_pipeline[trueai_act_type_call_count])
 			)
-		description: """
-Purpose: Tracks open opportunities items phone act count.
-Logic: Counts rows using open_pipeline[trueai_act_type_call_count] under filters.
-Dependencies: Columns: open_pipeline[trueai_act_type_call_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: ed3ac908-6a96-432a-bc09-6e6cbb6d6bc7
@@ -1087,13 +786,6 @@ Output: Whole number
 			CALCULATE(
 			    SUM(open_pipeline[trueai_act_type_call_eng_count])
 			)
-		description: """
-Purpose: Tracks open opportunities items phone act eng count.
-Logic: Counts rows using open_pipeline[trueai_act_type_call_eng_count] under filters.
-Dependencies: Columns: open_pipeline[trueai_act_type_call_eng_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: 68a59106-ced4-4531-9692-5b9c2766f25d
@@ -1104,13 +796,6 @@ Output: Whole number
 			CALCULATE(
 			    SUM(open_pipeline[trueai_act_type_email_count])
 			)
-		description: """
-Purpose: Tracks open opportunities items email act count.
-Logic: Counts rows using open_pipeline[trueai_act_type_email_count] under filters.
-Dependencies: Columns: open_pipeline[trueai_act_type_email_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: 5b2295a4-b13a-4594-801f-de41eb83f281
@@ -1121,13 +806,6 @@ Output: Whole number
 			CALCULATE(
 			    SUM(open_pipeline[trueai_act_type_email_eng_count])
 			)
-		description: """
-Purpose: Tracks open opportunities items email act eng count.
-Logic: Counts rows using open_pipeline[trueai_act_type_email_eng_count] under filters.
-Dependencies: Columns: open_pipeline[trueai_act_type_email_eng_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: 6925d7b9-faf4-4665-89f6-3a97c20739bd
@@ -1138,13 +816,6 @@ Output: Whole number
 			CALCULATE(
 			    SUM(open_pipeline[trueai_act_type_social_count])
 			)
-		description: """
-Purpose: Tracks open opportunities items social act count.
-Logic: Counts rows using open_pipeline[trueai_act_type_social_count] under filters.
-Dependencies: Columns: open_pipeline[trueai_act_type_social_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: a09784e8-3f24-46db-a1c2-6e5b74ffcc18
@@ -1155,13 +826,6 @@ Output: Whole number
 			CALCULATE(
 			    SUM(open_pipeline[trueai_act_type_social_eng_count])
 			)
-		description: """
-Purpose: Tracks open opportunities items social act eng count.
-Logic: Counts rows using open_pipeline[trueai_act_type_social_eng_count] under filters.
-Dependencies: Columns: open_pipeline[trueai_act_type_social_eng_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: ba11a93f-9048-4bea-b2f0-6fee3754c1cf
@@ -1176,13 +840,6 @@ Output: Whole number
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities items all act-non eng count.
-Logic: Counts rows under filters.
-Dependencies: Measures: [meas.open_opps_items_all_act_count], [meas.open_opps_items_all_act_eng_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: 9b8f7cff-0382-4b11-bdf0-7e343e55d69f
@@ -1197,13 +854,6 @@ Output: Whole number
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities items phone act-non eng count.
-Logic: Counts rows under filters.
-Dependencies: Measures: [meas.open_opps_items_phone_act_count], [meas.open_opps_items_phone_act_eng_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: 49836b2b-33de-4e7b-9379-d4e695c67745
@@ -1218,13 +868,6 @@ Output: Whole number
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities items email act-non eng count.
-Logic: Counts rows under filters.
-Dependencies: Measures: [meas.open_opps_items_email_act_count], [meas.open_opps_items_email_act_eng_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: f393c148-a960-480e-9a2c-393abd7eb640
@@ -1239,13 +882,6 @@ Output: Whole number
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities items meeting act-non eng count.
-Logic: Counts rows under filters.
-Dependencies: Measures: [meas.open_opps_items_meeting_act_count], [meas.open_opps_items_meeting_act_eng_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: 345deff2-6a35-4fa5-b7dc-9672dbd4c758
@@ -1260,13 +896,6 @@ Output: Whole number
 			RETURN
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities items social act-non eng count.
-Logic: Counts rows under filters.
-Dependencies: Measures: [meas.open_opps_items_social_act_count], [meas.open_opps_items_social_act_eng_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: 6bfaea9e-b5e3-430d-9ac4-7824f78d80f6
@@ -1282,13 +911,6 @@ Output: Whole number
 			    MAX(all_act_support[order])=4, [meas.open_opps_items_meeting_act_eng_count],
 			    MAX(all_act_support[order])=5, [meas.open_opps_items_social_act_eng_count]
 			)
-		description: """
-Purpose: Tracks open opportunities items act eng counts.
-Logic: Counts rows using all_act_support[order] under filters.
-Dependencies: Measures: [meas.open_opps_items_all_act_eng_count], [meas.open_opps_items_email_act_eng_count], [meas.open_opps_items_meeti...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: cb8a841a-7579-4716-997f-4d32193b4f51
@@ -1304,13 +926,6 @@ Output: Whole number
 			    MAX(all_act_support[order])=4, [meas.open_opps_items_meeting_act-non_eng_count],
 			    MAX(all_act_support[order])=5, [meas.open_opps_items_social_act-non_eng_count]
 			)
-		description: """
-Purpose: Tracks open opportunities items act non eng counts.
-Logic: Counts rows using all_act_support[order] under filters.
-Dependencies: Measures: [meas.open_opps_items_all_act-non_eng_count], [meas.open_opps_items_email_act-non_eng_count], [meas.open_opps_ite...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: 9b0454a2-e77d-45a6-acf0-2e9e84b9639a
@@ -1324,13 +939,6 @@ Output: Whole number
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks open opportunities items act eng rate.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_opps_items_all_act_count], [meas.open_opps_items_all_act_eng_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0%;-0%;0%
 		displayFolder: _opps_details
 		lineageTag: bc15b784-1974-4c5a-a31d-e5c14f89a0ef
@@ -1352,13 +960,6 @@ Output: Percentage
 			RETURN
 			    _age
 			```
-		description: """
-Purpose: Tracks closed opportunities age days.
-Logic: Averages opps[col.opp_age] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: opps[col.opp_age]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: #" days"
 		displayFolder: _opps_details
 		lineageTag: 41a9e006-5351-4ec8-a506-fd7469bcf761
@@ -1367,13 +968,6 @@ Output: Text
 
 	/// Measure meas.step_sub_type.
 	measure 'meas.step_sub_type' = CALCULATE(MAX(ssr_history[step_sub_type]))
-		description: """
-Purpose: Tracks step sub type.
-Logic: Returns an extreme value from ssr_history[step_sub_type] under filters.
-Dependencies: Columns: ssr_history[step_sub_type]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _opps_details
 		lineageTag: b47a791b-611d-4c41-bed6-d76b0df5fe8c
 
@@ -1382,13 +976,6 @@ Output: Decimal
 			CALCULATE(
 			    MAX(opps[col.creator_name])
 			)
-		description: """
-Purpose: Tracks opportunities creator name.
-Logic: Returns an extreme value from opps[col.creator_name] under filters.
-Dependencies: Columns: opps[col.creator_name]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _opps_details
 		lineageTag: e8050285-8de1-458d-9c75-d7bfaa7f7806
 
@@ -1414,13 +1001,6 @@ Output: Decimal
 			RETURN
 			_cond
 			```
-		description: """
-Purpose: Tracks opportunities details screen age.
-Logic: Returns an extreme value from 'cal_start_dates'[Date] under filters.
-Dependencies: Measures: [meas.closed_opps_age_days]; Columns: 'cal_start_dates'[Date], 'open_pipeline'[crm_created_on], ssr_history[step_...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: #" days"
 		displayFolder: _opps_details
 		lineageTag: 739619e9-cbe2-42f5-ab90-fc0688874c9e
@@ -1445,13 +1025,6 @@ Output: Text
 			
 			RETURN
 			_cond
-		description: """
-Purpose: Tracks opportunities details screen pushed pulled.
-Logic: Returns an extreme value from ssr_history[step_outcome] under filters.
-Dependencies: Measures: [meas.open_opps_pushed_pulled_day]; Columns: ssr_history[step_outcome], ssr_history[trueai_days_pushed_pulled]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: """+""#"" days"";""-""#"" days"";""-"""
 		displayFolder: _opps_details
 		lineageTag: 09e0b95c-4799-473c-a99c-6f69f3bfb86e
@@ -1476,13 +1049,6 @@ Output: Text
 			
 			
 			```
-		description: """
-Purpose: Tracks open opportunities last eng date filter.
-Logic: Returns an extreme value from 'open_pipeline'[crm_created_on] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: 'open_pipeline'[crm_created_on], cal_start_dates[Date], open_pipeline[trueai_last_eng_act]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Boolean
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 3cf39ace-fd7b-4393-b313-238b3d23680b
 
@@ -1490,13 +1056,6 @@ Output: Boolean
 
 	/// Measure meas.closed_opps_pushed_pulled_days.
 	measure 'meas.closed_opps_pushed_pulled_days' = CALCULATE(MAX(ssr_history[step_days_pushed_pulled]))
-		description: """
-Purpose: Tracks closed opportunities pushed pulled days.
-Logic: Returns an extreme value from ssr_history[step_days_pushed_pulled] under filters.
-Dependencies: Columns: ssr_history[step_days_pushed_pulled]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: e493b4b2-b983-453f-b401-dcd092339cf5
@@ -1510,13 +1069,6 @@ Output: Whole number
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks opportunities CRM deep link.
-Logic: Returns an extreme value from opps[crm_deep_link] under filters.
-Dependencies: Columns: opps[crm_deep_link]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _opps_details
 		lineageTag: 78bf53a1-8293-4c3c-b17b-9476ef792ed5
 
@@ -1527,13 +1079,6 @@ Output: Decimal
 			    DISTINCTCOUNT(ssr_history[step_owner_id]),
 			    REMOVEFILTERS(ssr_history[step_name])
 			)
-		description: """
-Purpose: Tracks opportunity details opportunities rep involved.
-Logic: Counts distinct values in ssr_history[step_owner_id] under filters.
-Dependencies: Columns: ssr_history[step_owner_id], ssr_history[step_name]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _opps_details
 		lineageTag: 87aae354-3872-4fc5-ba22-bb59bbceb983
@@ -1544,13 +1089,6 @@ Output: Whole number
 			CALCULATE(
 			    MAX(ssr[crm_name])
 			)
-		description: """
-Purpose: Tracks open opportunities account name.
-Logic: Returns an extreme value from ssr[crm_name] under filters.
-Dependencies: Columns: ssr[crm_name]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 3398574e-569e-43e9-b8fd-6ace23959662
 
@@ -1574,13 +1112,6 @@ Output: Whole number
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks opportunity details most recent step outcome.
-Logic: Returns an extreme value from ssr_history[step_sequence] under filters.
-Dependencies: Columns: ssr_history[step_sequence], ssr_history[step_outcome]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _opps_details
 		lineageTag: aa15574a-fd7d-482f-a3cd-7eab0b46de95
 
@@ -1596,13 +1127,6 @@ Output: Decimal
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks opportunity details most recent step sub type.
-Logic: Returns an extreme value from ssr_history[step_sequence] under filters.
-Dependencies: Columns: ssr_history[step_sequence], ssr_history[step_sub_type]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _opps_details
 		lineageTag: 1fbb5ddc-25e3-4ee3-ba4c-8c4ff9c461d2
 
@@ -1638,13 +1162,6 @@ Output: Decimal
 			res
 			
 			```
-		description: """
-Purpose: Tracks open opportunities count tbl filter.
-Logic: Counts rows using cal_start_dates[Date] under filters.
-Dependencies: Columns: cal_start_dates[Date], opps[_sys_filt_start_date], opps[_sys_filt_end_date]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 2ca20c71-4d42-4429-98e2-916ffaec97bc
@@ -1653,13 +1170,6 @@ Output: Whole number
 	measure 'meas.open_pipeline_concate_measure' =
 			
 			MAX(open_pipeline[crm_stage_name]) & " (" & MAX(open_pipeline[trueai_stage]) & ") "
-		description: """
-Purpose: Tracks open pipeline concate measure.
-Logic: Returns an extreme value from open_pipeline[crm_stage_name] under filters.
-Dependencies: Columns: open_pipeline[crm_stage_name], open_pipeline[trueai_stage]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 915b5124-4bd9-48e1-8943-5510c93e3cbe
 
@@ -1684,13 +1194,6 @@ Output: Text
 			   _age+0
 			
 			```
-		description: """
-Purpose: Tracks open opportunities age days filter.
-Logic: Averages opps[crm_created_on] under filters.
-Dependencies: Measures: [meas.sel_date]; Columns: opps[crm_created_on]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 2c01d1ac-22ff-4dae-8709-b616872b9996
@@ -1706,13 +1209,6 @@ Output: Whole number
 			    )
 			
 			```
-		description: """
-Purpose: Tracks days difference.
-Logic: Averages 'cal_start_dates'[Date] under filters.
-Dependencies: Columns: 'cal_start_dates'[Date], 'open_pipeline'[crm_created_on]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 84e7f3d8-2a2e-47d3-a51b-f715450dda50
 
@@ -1720,13 +1216,6 @@ Output: Decimal
 
 	/// Measure meas.open_opps_trueai_booking_amt.
 	measure 'meas.open_opps_trueai_booking_amt' = sum(open_pipeline[trueai_booking_amt])
-		description: """
-Purpose: Tracks open opportunities trueai booking amount.
-Logic: Sums open_pipeline[trueai_booking_amt] under filters.
-Dependencies: Columns: open_pipeline[trueai_booking_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 95540529-8f00-4fa5-977f-e450852f352c
@@ -1751,13 +1240,6 @@ Output: Text
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks opportunity details most recent sales type.
-Logic: Returns an extreme value from ssr_history[step_sequence] under filters.
-Dependencies: Columns: ssr_history[step_sequence], ssr_history[opp_sale_type]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _opps_details
 		lineageTag: eef20aec-590d-4d8c-aaea-4ff2369b0fee
 
@@ -1769,13 +1251,6 @@ Output: Decimal
 			
 			RETURN
 			_avg
-		description: """
-Purpose: Tracks trueai pace score.
-Logic: Averages get the rounded avg of [trueai_pace_score] under filters.
-Dependencies: Columns: get the rounded avg of [trueai_pace_score]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 67d7db70-6bf3-4fd8-8315-2e7cefc258f4
 
@@ -1799,13 +1274,6 @@ Output: Decimal
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks opportunities details average pace score.
-Logic: Averages values under filters.
-Dependencies: See model references
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _opps_details
 		lineageTag: 7a4fcb97-150c-44be-9490-680fa978ba2f
 
@@ -1819,13 +1287,6 @@ Output: Decimal
 			RETURN  
 			res
 			```
-		description: """
-Purpose: Tracks open opportunities items trueai booking amount.
-Logic: Returns an extreme value from open_pipeline[_sys_as_of] under filters.
-Dependencies: Columns: open_pipeline[_sys_as_of], open_pipeline[trueai_booking_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _open_opps_pipeline
 		lineageTag: f86e3bdf-05a5-4e3a-8fe9-7889136e011e
@@ -1848,13 +1309,6 @@ Output: Decimal
 			
 			RETURN
 			res
-		description: """
-Purpose: Tracks trueai pace score test.
-Logic: Averages get the rounded avg of [trueai_pace_score] under filters.
-Dependencies: Columns: get the rounded avg of [trueai_pace_score]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _open_opps_pipeline
 		lineageTag: 227888e3-aabf-42c0-9433-a0c33babd0aa
 
@@ -1868,13 +1322,6 @@ Output: Decimal
 			var res  = avg_seq + close_boost
 			return res
 			```
-		description: """
-Purpose: Tracks open pipeline stage sort index.
-Logic: Averages open_pipeline[trueai_step_sequence] under filters.
-Dependencies: Columns: open_pipeline[trueai_step_sequence], open_pipeline[trueai_is_closed]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		lineageTag: bfe9fd21-6834-4474-b340-ffb9829e416f
 
@@ -1883,13 +1330,6 @@ Output: Whole number
 			
 			var res = CALCULATE(AVERAGE(open_pipeline[trueai_days_in_stage]))
 			return res
-		description: """
-Purpose: Tracks open pipeline average days in stage.
-Logic: Averages open_pipeline[trueai_days_in_stage] under filters.
-Dependencies: Columns: open_pipeline[trueai_days_in_stage]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		lineageTag: 8421c8c5-50f2-4b5d-96d9-77f070c95c08
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -1912,13 +1352,6 @@ Output: Decimal
 			    )
 			
 			RETURN reached_stage_count + 0
-		description: """
-Purpose: Tracks open pipeline deals reached next stage count.
-Logic: Counts distinct values in open_pipeline[trueai_avg_step_sequence] under filters.
-Dependencies: Columns: open_pipeline[trueai_avg_step_sequence], open_pipeline[crm_opp_id], open_pipeline[trueai_is_closed]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 45f80dbb-99fb-49e4-a0ca-804b1a6dc6b0
@@ -1931,13 +1364,6 @@ Output: Whole number
 			return reached_stage_count + 0
 			
 			```
-		description: """
-Purpose: Tracks open pipeline deals reached stage count.
-Logic: Counts distinct values in open_pipeline[trueai_avg_step_sequence] under filters.
-Dependencies: Columns: open_pipeline[trueai_avg_step_sequence], open_pipeline[crm_opp_id], open_pipeline[trueai_is_closed]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 5b76cd85-e359-444f-920b-8bccf3a3081d
@@ -1946,13 +1372,6 @@ Output: Whole number
 	measure 'meas.open_pipeline_lost_deals_in_stage_tot_pct' =
 			
 			DIVIDE( [meas.open_pipeline_lost_deals_in_stage], [meas.open_pipeline_total_deals])
-		description: """
-Purpose: Tracks open pipeline lost deals in stage tot percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_pipeline_lost_deals_in_stage], [meas.open_pipeline_total_deals]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _open_opps_pipeline
 		lineageTag: 387d7496-7688-434e-930b-dd08ae451126
@@ -1962,13 +1381,6 @@ Output: Percentage
 			
 			var res = [meas.open_pipeline_deals_reached_stage_count] - [meas.open_pipeline_deals_reached_next_stage_count]
 			return res
-		description: """
-Purpose: Tracks open pipeline lost deals in stage.
-Logic: Counts rows under filters.
-Dependencies: Measures: [meas.open_pipeline_deals_reached_next_stage_count], [meas.open_pipeline_deals_reached_stage_count]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 9ce4e60f-1a95-4b12-aedf-0822ef95bdde
@@ -1986,130 +1398,60 @@ Output: Whole number
 			        		open_pipeline[trueai_stage_name] <> "abc"
 			    			)
 							RETURN res
-		description: """
-Purpose: Tracks open pipeline total deals.
-Logic: Counts distinct values in open_pipeline[trueai_avg_step_sequence] under filters.
-Dependencies: Columns: open_pipeline[trueai_avg_step_sequence], open_pipeline[crm_opp_id], open_pipeline[trueai_stage_num]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 6edf0fca-e41a-4470-9a2e-7c396135f38b
 
 	/// Measure meas.open_pipeline_lost_amt.
 	measure 'meas.open_pipeline_lost_amt' = CALCULATE(sum(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = false)
-		description: """
-Purpose: Tracks open pipeline lost amount.
-Logic: Sums open_pipeline[trueai_booking_amt] under filters.
-Dependencies: Columns: open_pipeline[trueai_booking_amt], open_pipeline[trueai_is_won]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: 41ec1f6d-2ebd-499d-b232-7de1b984e328
 
 	/// Measure meas.open_pipeline_won_count.
 	measure 'meas.open_pipeline_won_count' = CALCULATE(count(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = true)
-		description: """
-Purpose: Tracks open pipeline won count.
-Logic: Counts rows using open_pipeline[trueai_booking_amt] under filters.
-Dependencies: Columns: open_pipeline[trueai_booking_amt], open_pipeline[trueai_is_won]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 8f56ffd7-2b00-478e-98ab-5f9e7bd66765
 
 	/// Measure meas.open_pipeline_lost_count.
 	measure 'meas.open_pipeline_lost_count' = CALCULATE(count(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = false)
-		description: """
-Purpose: Tracks open pipeline lost count.
-Logic: Counts rows using open_pipeline[trueai_booking_amt] under filters.
-Dependencies: Columns: open_pipeline[trueai_booking_amt], open_pipeline[trueai_is_won]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 4a836a7c-fa82-462b-9d0f-4bd5a72bd987
 
 	/// Measure meas.open_pipeline_booking_amt.
 	measure 'meas.open_pipeline_booking_amt' = CALCULATE(sum(open_pipeline[trueai_booking_amt]))
-		description: """
-Purpose: Tracks open pipeline booking amount.
-Logic: Sums open_pipeline[trueai_booking_amt] under filters.
-Dependencies: Columns: open_pipeline[trueai_booking_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: a852f06f-7ef4-4074-a500-b847c05e29e6
 
 	/// Measure meas.open_pipeline_won_amt.
 	measure 'meas.open_pipeline_won_amt' = CALCULATE(sum(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = true)
-		description: """
-Purpose: Tracks open pipeline won amount.
-Logic: Sums open_pipeline[trueai_booking_amt] under filters.
-Dependencies: Columns: open_pipeline[trueai_booking_amt], open_pipeline[trueai_is_won]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: 9b11582e-23e3-4c87-b262-f2c6c548bda0
 
 	/// Measure meas.open_pipeline_booking_amt_avg.
 	measure 'meas.open_pipeline_booking_amt_avg' = CALCULATE(AVERAGE((open_pipeline[trueai_booking_amt])))
-		description: """
-Purpose: Tracks open pipeline booking amount average.
-Logic: Averages open_pipeline[trueai_booking_amt] under filters.
-Dependencies: Columns: open_pipeline[trueai_booking_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: 461b9e80-02df-467a-a442-d4a22edefb0c
 
 	/// Measure meas.open_pipeline_count_id.
 	measure 'meas.open_pipeline_count_id' = COUNT(open_pipeline[_sys_doc_id])
-		description: """
-Purpose: Tracks open pipeline count id.
-Logic: Counts rows using open_pipeline[_sys_doc_id] under filters.
-Dependencies: Columns: open_pipeline[_sys_doc_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 45a2df27-31e4-4b0f-9e84-bce4843d7a29
 
 	/// Measure meas.open_pipeline_discount_id.
 	measure 'meas.open_pipeline_discount_id' = DISTINCTCOUNT(open_pipeline[_sys_doc_id])
-		description: """
-Purpose: Tracks open pipeline discount id.
-Logic: Counts distinct values in open_pipeline[_sys_doc_id] under filters.
-Dependencies: Columns: open_pipeline[_sys_doc_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 1b1912dd-eaf7-4d0a-9f3c-e7837c30a89e
 
 	/// Measure meas.open_pipeline_crm_opp_id.
 	measure 'meas.open_pipeline_crm_opp_id' = CALCULATE(DISTINCTCOUNT(open_pipeline[crm_opp_id]))
-		description: """
-Purpose: Tracks open pipeline CRM opportunity id.
-Logic: Counts distinct values in open_pipeline[crm_opp_id] under filters.
-Dependencies: Columns: open_pipeline[crm_opp_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 7b6292df-4f86-40ec-a3a8-8a9126a9c3ee
@@ -2118,13 +1460,6 @@ Output: Whole number
 	measure 'meas.open_pipeline_deals_reached_stage_count_pct' =
 			
 			DIVIDE( [meas.open_pipeline_deals_reached_stage_count], [meas.open_pipeline_total_deals])
-		description: """
-Purpose: Tracks open pipeline deals reached stage count percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_pipeline_deals_reached_stage_count], [meas.open_pipeline_total_deals]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _open_pipeline
 		lineageTag: b1343ea0-8007-4eed-aebf-3aa0716f50fa
@@ -2133,26 +1468,12 @@ Output: Percentage
 	measure 'meas.open_pipeline_lost_deals_in_stage_pct' =
 			
 			DIVIDE( [meas.open_pipeline_lost_deals_in_stage], [meas.open_pipeline_deals_reached_stage_count])
-		description: """
-Purpose: Tracks open pipeline lost deals in stage percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_pipeline_deals_reached_stage_count], [meas.open_pipeline_lost_deals_in_stage]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _open_pipeline
 		lineageTag: 69c96034-6487-4773-aeb2-26c2adbde284
 
 	/// Measure meas.open_pipeline_lost_booking_amt_in_stage.
 	measure 'meas.open_pipeline_lost_booking_amt_in_stage' = [meas.opps_booking_lost_amt] - [meas.opps_booking_amt_reached_next_stage]
-		description: """
-Purpose: Tracks open pipeline lost booking amount in stage.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.opps_booking_amt_reached_next_stage], [meas.opps_booking_lost_amt]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Text
-		"""
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 7cfad227-8096-4d3c-867e-ecb6cb164339
@@ -2164,13 +1485,6 @@ Output: Text
 			    [meas.opps_max_stages],
 			    [meas.opps_deals_won_count]
 			)
-		description: """
-Purpose: Tracks open pipeline stages average.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.opps_deals_won_count], [meas.opps_max_stages]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		formatString: 0.00
 		displayFolder: _open_pipeline
 		lineageTag: 10d10955-21db-49f5-9e8d-c442e26e9976
@@ -2182,26 +1496,12 @@ Output: Decimal
 			    [meas.open_pipeline_deals_reached_stage_count],
 			     opps[col.trueai_opp_stages_recorded] < 5
 			)
-		description: """
-Purpose: Tracks open pipeline deals skip count.
-Logic: Counts rows using opps[col.trueai_opp_stages_recorded] under filters.
-Dependencies: Measures: [meas.open_pipeline_deals_reached_stage_count]; Columns: opps[col.trueai_opp_stages_recorded]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 857f871b-8f2b-4feb-9647-751d2205a62d
 
 	/// Measure meas.open_pipeline_deals_skip_pct.
 	measure 'meas.open_pipeline_deals_skip_pct' = DIVIDE([meas.open_pipeline_deals_skip_count],[meas.open_pipeline_total_deals])
-		description: """
-Purpose: Tracks open pipeline deals skip percentage.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_pipeline_deals_skip_count], [meas.open_pipeline_total_deals]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _open_pipeline
 		lineageTag: 7f9662b6-0c94-479c-a6be-031d130f7b5e
@@ -2214,13 +1514,6 @@ Output: Percentage
 			    CALCULATE ( [meas.open_pipeline_total_deals], ALL (opps) ),
 			    0
 			)
-		description: """
-Purpose: Tracks open pipeline win rate.
-Logic: Calculated as a ratio of two values with any applied filters.
-Dependencies: Measures: [meas.open_pipeline_deals_stage_count_won], [meas.open_pipeline_total_deals]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Percentage
-		"""
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _open_pipeline
 		lineageTag: 331c9e02-103a-4157-8d38-3973872187be
@@ -2230,13 +1523,6 @@ Output: Percentage
 			
 			CALCULATE( [meas.open_pipeline_total_deals],
 			            open_pipeline[trueai_is_won] = true)
-		description: """
-Purpose: Tracks open pipeline total deals won.
-Logic: Derived from model references under current filters.
-Dependencies: Measures: [meas.open_pipeline_total_deals]; Columns: open_pipeline[trueai_is_won]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: d708d33c-4eb9-4961-9c8e-b3a39fd4c457
@@ -2247,13 +1533,6 @@ Output: Whole number
 			var res = CALCULATE( open_pipeline[meas.open_pipeline_deals_reached_stage_count], opps[trueai_is_won] = TRUE()) 
 			return res
 			```
-		description: """
-Purpose: Tracks open pipeline deals stage count won.
-Logic: Counts rows using open_pipeline[meas.open_pipeline_deals_reached_stage_count] under filters.
-Dependencies: Measures: [meas.open_pipeline_deals_reached_stage_count]; Columns: open_pipeline[meas.open_pipeline_deals_reached_stage_cou...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: b44ee7e1-dd92-49fa-8551-420880d4e58d
@@ -2266,13 +1545,6 @@ Output: Whole number
 			'open_pipeline'[trueai_avg_step_sequence] <= CurIdx ), CALCULATE ( [meas.ssr_history_duration_hrs_new_logo] + [meas.ssr_history_duration_hrs_existing_customer_selling] )
 			)
 			```
-		description: """
-Purpose: Tracks SSR history duration hrs deals accumulated.
-Logic: Sums 'open_pipeline'[trueai_avg_step_sequence] under filters.
-Dependencies: Measures: [meas.ssr_history_duration_hrs_existing_customer_selling], [meas.ssr_history_duration_hrs_new_logo]; Columns: 'op...
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		displayFolder: _open_pipeline
 		lineageTag: d82ce027-846a-4f66-b154-2612252fd977
 
@@ -2292,13 +1564,6 @@ Output: Decimal
 			var res = str_crm_vals -- output string
 			return res
 			```
-		description: """
-Purpose: Tracks opportunities histories CRM stage names.
-Logic: Counts rows using open_pipeline[_sys_doc_id] under filters.
-Dependencies: Columns: open_pipeline[_sys_doc_id]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		displayFolder: opps_histories_To_open_pipeline
 		lineageTag: f1f1de1f-d2b1-440d-9e81-9ec440e9d3d0
 
@@ -2324,13 +1589,6 @@ Output: Whole number
 			    )
 			RETURN
 			    _cond
-		description: """
-Purpose: Tracks opportunities details screen trueai pushed pulled.
-Logic: Averages open_pipeline[trueai_days_pushed_pulled] under filters.
-Dependencies: Columns: open_pipeline[trueai_days_pushed_pulled], ssr_history[step_outcome], ssr_history[trueai_days_pushed_pulled]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Decimal
-		"""
 		lineageTag: c5ec0e68-cb24-4f7f-afa1-0d61eb1d2a5c
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -2342,13 +1600,6 @@ Output: Decimal
 			    var res = SUM(open_pipeline[trueai_days_in_stage])
 			    return res
 			```
-		description: """
-Purpose: Tracks open pipeline sum days in stage.
-Logic: Sums open_pipeline[trueai_days_in_stage] under filters.
-Dependencies: Columns: open_pipeline[trueai_days_in_stage]
-Context: Evaluated in the current filter context unless explicitly overridden in DAX.
-Output: Whole number
-		"""
 		formatString: 0
 		lineageTag: f53163da-522b-4c02-b6f5-eb0518a27cb5
 
