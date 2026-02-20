@@ -24,6 +24,11 @@ table act_capture_level_summary
 	/// Calculation Logic: VAR blocks define intermediate values (act_count, step_count, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[steps], act_capture_level_summary[total_duration].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0.0\"  hrs\"
+		annotation AgentPurpose = "Tracks act capt act per step average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: act_capture_level_summary[crm_activity_count], act_capture_level_summary[steps]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.act_capt_dur_per_step_avg' = ```
 			
 			var act_count = calculate(Sum(act_capture_level_summary[total_duration]))
@@ -45,6 +50,11 @@ table act_capture_level_summary
 	/// Calculation Logic: VAR blocks define intermediate values (act_count, step_count, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[expected_duration], act_capture_level_summary[steps].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0.0\"  hrs\"
+		annotation AgentPurpose = "Tracks act capt duration per step average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: act_capture_level_summary[total_duration], act_capture_level_summary[steps]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_expected_dur_per_step_avg' = ```
 			
 			var act_count = calculate(Sum(act_capture_level_summary[expected_duration]))
@@ -66,6 +76,11 @@ table act_capture_level_summary
 	/// Calculation Logic: VAR blocks define intermediate values (act_dur, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[capped_duration].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0\"  hrs\"
+		annotation AgentPurpose = "Tracks act capt expected duration per step average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: act_capture_level_summary[expected_duration], act_capture_level_summary[steps]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_duration' = ```
 			
 			var act_dur = calculate(Sum(act_capture_level_summary[capped_duration]))
@@ -87,6 +102,11 @@ table act_capture_level_summary
 	/// Calculation Logic: VAR blocks define intermediate values (act_dur, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[expected_duration].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0\"  hrs\"
+		annotation AgentPurpose = "Tracks act capt duration."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: act_capture_level_summary[capped_duration]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.act_capt_expected_duration' = ```
 			
 			var act_dur = calculate(Sum(act_capture_level_summary[expected_duration]))
@@ -108,6 +128,11 @@ table act_capture_level_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: #,0.00
+		annotation AgentPurpose = "Tracks act capt expected duration."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: act_capture_level_summary[expected_duration]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.act_capture' =
 			
 			divide(SUM(act_capture_level_summary[capped_duration]),SUM(act_capture_level_summary[expected_duration]))
@@ -121,6 +146,11 @@ table act_capture_level_summary
 	/// Calculation Logic: VAR blocks define intermediate values (dur, months, weeks, reps, val, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[_sys_filter_start_date], act_capture_level_summary[capped_duration], act_capture_level_summary[month_to_week_adjustment] | Measures: [meas.act_capt_applicable_reps].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: #.0\" hrs\"
+		annotation AgentPurpose = "Tracks act capture."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: act_capture_level_summary[capped_duration], act_capture_level_summary[expected_duration]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_duration_weekly_rep_avg' = ```
 			
 			// way to calculate the avg weekly rep time spent on the current "selection"
@@ -144,6 +174,11 @@ table act_capture_level_summary
 	/// Calculation Logic: VAR blocks define intermediate values (dur, months, weeks, reps, val, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[_sys_filter_start_date], act_capture_level_summary[expected_duration], act_capture_level_summary[month_to_week_adjustment] | Measures: [meas.act_capt_applicable_reps].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: Not specified.
+		annotation AgentPurpose = "Tracks act capt duration weekly rep average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.act_capt_applicable_reps]; Columns: act_capture_level_summary[capped_duration], act_capture_level_summary[_sys_filter_start_date], act_capture_level_summary[month_to_week_adjustment]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_expected_duration_weekly_rep_avg' = ```
 			
 			// way to calculate the avg weekly rep time spent on the current "selection"
@@ -166,6 +201,11 @@ table act_capture_level_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks act capt expected duration weekly rep average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.act_capt_applicable_reps]; Columns: act_capture_level_summary[expected_duration], act_capture_level_summary[_sys_filter_start_date], act_capture_level_summary[month_to_week_adjustment]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.crm_act_capt_score' =
 			
 			var crm_capture_level = [meas.act_capture]
@@ -183,6 +223,11 @@ table act_capture_level_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks CRM act capt score."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.act_capture]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.crm_act_capt_score_industry_avg' =
 			//0.48 * 100
 			var _score = CALCULATE(
@@ -200,6 +245,11 @@ table act_capture_level_summary
 	/// Calculation Logic: VAR blocks define intermediate values (_before, temp_tbl, score_res, _after, res) used later in the expression. Dependencies: Columns: ssr_history[step_name], ssr_history[stkhlds_all_adj_dur_rule] | Measures: [meas.crm_act_capt_score].
 	/// Dynamic Behavior: Uses SWITCH for conditional branching. Uses IF for conditional branching.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks CRM act capt score industry average."
+		annotation AgentLogic = "Returns an extreme value from metadata_reference_values[value] under filters."
+		annotation AgentDependencies = "Columns: metadata_reference_values[value], metadata_reference_values[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.trueai_act_capt_score' = ```
 			
 			VAR _before = [meas.crm_act_capt_score]
@@ -239,6 +289,11 @@ table act_capture_level_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: +#%;-#%;0%
+		annotation AgentPurpose = "Tracks trueai act capt score."
+		annotation AgentLogic = "Averages ssr_history[step_name] under filters."
+		annotation AgentDependencies = "Measures: [meas.crm_act_capt_score]; Columns: ssr_history[step_name], ssr_history[stkhlds_all_adj_dur_rule]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.trueai_act_capt_score_improvement' =
 			
 			var trueai_score = ROUND([meas.trueai_act_capt_score],2)
@@ -256,6 +311,11 @@ table act_capture_level_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: Measures: [meas.act_capture].
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0.0
+		annotation AgentPurpose = "Tracks trueai act capt score improvement."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.crm_act_capt_score], [meas.trueai_act_capt_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.act_capture_adjustment_factor' = divide(1, [meas.act_capture])
 		formatString: 0.0
 		displayFolder: _acl_scores
@@ -269,6 +329,11 @@ table act_capture_level_summary
 	/// Calculation Logic: VAR blocks define intermediate values (periods_tbl, reps_tbl, reps, res) used later in the expression. Dependencies: Columns: act_capture_level_summary[_sys_filter_start_date], act_capture_level_summary[_sys_user_id].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: _acl_scores
+		annotation AgentPurpose = "Tracks act capture adjustment factor."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.act_capture]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.act_capt_applicable_reps' = ```
 			
 			/*
@@ -292,6 +357,11 @@ table act_capture_level_summary
 	/// Calculation Logic: VAR blocks define intermediate values (act_count, res) used later in the expression. Dependencies: Columns: users_history[ci_time_alloc_tot_dur] | Measures: [date].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: _acl_scores
+		annotation AgentPurpose = "Tracks act capt applicable reps."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: act_capture_level_summary[_sys_user_id], act_capture_level_summary[_sys_filter_start_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.act_capt_activity_count' = ```
 			
 			var act_count = CALCULATE(SUM(users_history[ci_time_alloc_tot_dur]), 'cal_end_dates'[date] > date(1900,1,1) && 'cal_end_dates'[date] > date(210,1,1) )-- override the standard date filter 
@@ -308,6 +378,11 @@ table act_capture_level_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: #\" hrs/week\"
+		annotation AgentPurpose = "Tracks act capt activity count."
+		annotation AgentLogic = "Counts rows using 'cal_end_dates'[date] under filters."
+		annotation AgentDependencies = "Columns: 'cal_end_dates'[date], 'cal_end_dates'[date], users_history[ci_time_alloc_tot_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.act_capt_lvl_summary_time_alloc_eng' =
 			
 			CALCULATE(
@@ -325,6 +400,11 @@ table act_capture_level_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: #\" hrs/week\"
+		annotation AgentPurpose = "Tracks act capt lvl summary time alloc eng."
+		annotation AgentLogic = "Averages act_capture_level_summary[time_alloc_eng] under filters."
+		annotation AgentDependencies = "Columns: act_capture_level_summary[time_alloc_eng]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.act_capt_lvl_summary_time_alloc_non_eng' =
 			
 			CALCULATE(
@@ -342,6 +422,11 @@ table act_capture_level_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks act capt lvl summary time alloc non eng."
+		annotation AgentLogic = "Averages act_capture_level_summary[time_alloc_no_eng] under filters."
+		annotation AgentDependencies = "Columns: act_capture_level_summary[time_alloc_no_eng]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.no_activities_count' =
 			
 			var _prospect = SUM(users_history[ci_act_capt_lvl_pi_prospecting_owner_act])            // get prospecting act
@@ -356,6 +441,11 @@ table act_capture_level_summary
 		lineageTag: b8ec6df0-1df6-41d1-b949-fcb80cb1af48
 
 	/// Column _sys_docid.
+		annotation AgentPurpose = "Tracks no activities count."
+		annotation AgentLogic = "Sums users_history[ci_act_capt_lvl_pi_prospecting_owner_act] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_act_capt_lvl_pi_prospecting_owner_act], users_history[ci_act_capt_lvl_pi_new_logo_owner_act], users_history[ci_act_capt_lvl_pi_post_sales_owner_act]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	column _sys_docid
 		lineageTag: d4dc375b-3742-4a72-8021-282ef1deeb00
 		summarizeBy: none

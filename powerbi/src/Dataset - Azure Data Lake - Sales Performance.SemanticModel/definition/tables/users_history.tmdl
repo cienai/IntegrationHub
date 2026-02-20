@@ -22,6 +22,11 @@ table users_history
 		lineageTag: b37dd8bf-3abb-4c71-b2b1-02d86db3fea8
 
 	/// Measure meas.data_logs_user_new_hires_reached_performer_within_12_months.
+		annotation AgentPurpose = "Tracks data logs user mgr count eop."
+		annotation AgentLogic = "Counts rows using users_history[_sys_filt_start_date] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_filt_start_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months' = ```
 			
 			
@@ -41,6 +46,11 @@ table users_history
 		lineageTag: a2dee853-9dbc-44fa-8056-38f45ee80945
 
 	/// Measure meas.data_logs_user_new_terminations.
+		annotation AgentPurpose = "Tracks data logs user new hires reached performer within 12 months."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire_date], users_history[col.perf_date_first_reached]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.data_logs_user_new_terminations' = ```
 			
 			
@@ -63,6 +73,11 @@ table users_history
 		lineageTag: bde20ead-06ce-47fd-a172-f24a25d9b9c4
 
 	/// Measure meas.data_logs_user_individual_contrib_count_eop.
+		annotation AgentPurpose = "Tracks data logs user new terminations."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_termination_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_individual_contrib_count_eop' = ```
 			
 			[meas.data_logs_user_count_eop_for_all_sales_roles]  - [meas.data_logs_user_count_eop_for_mgr] 
@@ -73,6 +88,11 @@ table users_history
 		lineageTag: 190042ed-5ba8-4940-b3a0-4223f7d6d03b
 
 	/// Measure meas.data_logs_user_rep_mgr_ratio.
+		annotation AgentPurpose = "Tracks data logs user individual contrib count eop."
+		annotation AgentLogic = "Counts rows under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop_for_all_sales_roles], [meas.data_logs_user_count_eop_for_mgr]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_rep_mgr_ratio' =
 			//divide(users_history[meas.data_logs_user_individual_contrib_count_eop] ,users_history[meas.data_logs_user_count_eop_for_mgr])
 			
@@ -97,6 +117,11 @@ table users_history
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.data_logs_user_count_eop.
+		annotation AgentPurpose = "Tracks data logs user rep mgr ratio."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop], [meas.data_logs_user_count_eop_for_mgr], [meas.data_logs_user_individual_contrib_count_eop]; Columns: users_history[meas.data_logs_user_individual_contrib..."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_user_count_eop' = ```
 			
 			
@@ -116,6 +141,11 @@ table users_history
 		lineageTag: 0d53230b-70a9-4c33-923e-97f01c07267f
 
 	/// Measure meas.data_logs_user_new_terminations_within_12_months.
+		annotation AgentPurpose = "Tracks data logs user count eop."
+		annotation AgentLogic = "Counts rows using users_history[_sys_filt_start_date] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_filt_start_date], users_history[trueai_termination_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_new_terminations_within_12_months' = ```
 			
 			
@@ -133,6 +163,11 @@ table users_history
 		lineageTag: 1b315d56-3418-4f57-83da-95dd0f39299c
 
 	/// Measure meas.data_logs_ci_perf_tier_count.
+		annotation AgentPurpose = "Tracks data logs user new terminations within 12 months."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_termination_date], users_history[trueai_tenure]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_ci_perf_tier_count' = ```
 			
 			var month_instances = CALCULATE(COUNT(users_history[col.ci.perf_qtly_performance_tier]))  // how many months in this perf cat
@@ -147,6 +182,11 @@ table users_history
 		lineageTag: c8771d48-9a93-446a-b576-b1cae3318ddc
 
 	/// Measure meas.data_logs_user_net_new_users.
+		annotation AgentPurpose = "Tracks data logs ci perf tier count."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: users_history[col.ci.perf_qtly_performance_tier], users_history[_sys_user_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_net_new_users' = ```
 			[meas.data_logs_user_new_hires] + [meas.data_logs_user_new_terminations] 
 			```
@@ -155,6 +195,11 @@ table users_history
 		lineageTag: 1103f6b8-a2c1-47f7-82b8-8f911720ebe9
 
 	/// Measure meas.data_logs_ci_perf_annual_avg_bookings.
+		annotation AgentPurpose = "Tracks data logs user net new users."
+		annotation AgentLogic = "Returns an extreme value under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_new_hires], [meas.data_logs_user_new_terminations]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_ci_perf_annual_avg_bookings' = ```
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -170,6 +215,11 @@ table users_history
 		annotation PBI_FormatHint = {"currencyCulture":""}
 
 	/// Measure meas.data_logs_user_count_bop.
+		annotation AgentPurpose = "Tracks data logs ci perf annual average bookings."
+		annotation AgentLogic = "Averages users_history[ci_perf_qtly_avg_bookings_peers] under filters."
+		annotation AgentDependencies = "Measures: [meas.companies_history_reference_date]; Columns: users_history[ci_perf_qtly_avg_bookings_peers], cal_end_dates[Date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.data_logs_user_count_bop' = ```
 			
 			
@@ -189,6 +239,11 @@ table users_history
 		lineageTag: 23c2187f-b803-4f66-a9bb-b218861c778f
 
 	/// Measure meas.data_logs_user_count_change.
+		annotation AgentPurpose = "Tracks data logs user count bop."
+		annotation AgentLogic = "Counts rows using users_history[_sys_filt_start_date] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_filt_start_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_change' = divide([meas.data_logs_user_new_hires] , [meas.data_logs_user_count_bop], BLANK())
 		formatString: +#,##0%;-#,##0%
 		displayFolder: _rep_count_analysis
@@ -197,6 +252,11 @@ table users_history
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.data_logs_user_new_hires.
+		annotation AgentPurpose = "Tracks data logs user count change."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_bop], [meas.data_logs_user_new_hires]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.data_logs_user_new_hires' = ```
 			
 			
@@ -214,6 +274,11 @@ table users_history
 		lineageTag: 71c8d155-d6fc-42de-b47d-f7c9060e54a1
 
 	/// Measure meas.data_logs_user_new_terminations_within_12_months_avg_tenure.
+		annotation AgentPurpose = "Tracks data logs user new hires."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_new_terminations_within_12_months_avg_tenure' = ```
 			
 			
@@ -232,6 +297,11 @@ table users_history
 		lineageTag: 75d0f25d-3377-4efe-b39e-2e5fcc6393ab
 
 	/// Measure meas.data_logs_user_new_hires_reached_performer_success_rate.
+		annotation AgentPurpose = "Tracks data logs user new terminations within 12 months average tenure."
+		annotation AgentLogic = "Averages users_history[trueai_termination_date] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[trueai_termination_date], users_history[trueai_hire_date], users_history[trueai_tenure]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_user_new_hires_reached_performer_success_rate' = ```
 			
 			var tot_new_hires  = [meas.data_logs_user_new_hires]
@@ -255,12 +325,22 @@ table users_history
 		lineageTag: c9422a55-f07e-46d0-8b7d-e7073208b629
 
 	/// Measure meas.data_logs_user_new_terminations_within_12_months_failure_rate.
+		annotation AgentPurpose = "Tracks data logs user new hires reached performer success rate."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_new_hires], [meas.user_history_user_new_hires_reached_perf_in_12_month]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.data_logs_user_new_terminations_within_12_months_failure_rate' = divide( -1 * [meas.data_logs_user_new_terminations_within_12_months],  [meas.data_logs_user_new_hires] , BLANK())
 		formatString: #,0%;-#,0%;#,0%
 		displayFolder: _ramp_analysis
 		lineageTag: 29a4c52e-0ac6-4eb5-8258-ac1cac98ccae
 
 	/// Measure meas.data_logs_user_new_hires_reached_performer_within_12_months_avg_tenure.
+		annotation AgentPurpose = "Tracks data logs user new terminations within 12 months failure rate."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_new_hires], [meas.data_logs_user_new_terminations_within_12_months]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months_avg_tenure' = ```
 			
 			VAR fromDate = [meas.context_date_min]
@@ -291,6 +371,11 @@ table users_history
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.data_logs_ci_perf_annual_avg_pipeline_created.
+		annotation AgentPurpose = "Tracks data logs user new hires reached performer within 12 months average tenure."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[trueai_hire_date], users_history[col.perf_date_first_reached]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created' = ```
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -308,6 +393,11 @@ table users_history
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.users_history_ramping_reps_count_eop.
+		annotation AgentPurpose = "Tracks data logs ci perf annual average pipeline created."
+		annotation AgentLogic = "Averages users_history[col.ci.perf_qtly_avg_pipeline_peers] under filters."
+		annotation AgentDependencies = "Measures: [meas.companies_history_reference_date]; Columns: users_history[col.ci.perf_qtly_avg_pipeline_peers], cal_end_dates[Date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_history_ramping_reps_count_eop' = ```
 			
 			
@@ -328,12 +418,22 @@ table users_history
 		lineageTag: 443a145f-8199-4a8d-bba8-a3b1556b6100
 
 	/// Measure meas.user_history_period_count.
+		annotation AgentPurpose = "Tracks users history ramping reps count eop."
+		annotation AgentLogic = "Counts rows using users_history[col.ci.perf_ramping_status] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[col.ci.perf_ramping_status], users_history[_sys_filt_start_date], users_history[_sys_user_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.user_history_period_count' = CALCULATE(DISTINCTCOUNT(users_history[_sys_filt_start_date]))
 		formatString: #,0
 		displayFolder: _helper
 		lineageTag: a95dbb11-f9e5-4d93-950a-5d9a776941b0
 
 	/// Measure meas.users_history_vi_value_received_all_prior_time.
+		annotation AgentPurpose = "Tracks user history period count."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_filt_start_date] under filters."
+		annotation AgentDependencies = "Columns: users_history[_sys_filt_start_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_history_vi_value_received_all_prior_time' =
 			
 			var max_date = CALCULATE(max(cal_end_dates[Date]))
@@ -349,6 +449,11 @@ table users_history
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.user_history_user_new_hires_reached_perf_in_12_month.
+		annotation AgentPurpose = "Tracks users history vi value received all prior time."
+		annotation AgentLogic = "Sums cal_end_dates[Date] under filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], users_history[vi_value_received_tot]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.user_history_user_new_hires_reached_perf_in_12_month' = ```
 			
 			
@@ -368,6 +473,11 @@ table users_history
 		lineageTag: d7c2bfef-6936-47f3-b6c3-3453a31b2971
 
 	/// Measure meas.user_history_user_new_hires_didnt_reach_perf_in_12_month.
+		annotation AgentPurpose = "Tracks user history user new hires reached perf in 12 month."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire_date], users_history[col.perf_date_first_reached]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.user_history_user_new_hires_didnt_reach_perf_in_12_month' = ```
 			
 			
@@ -387,6 +497,11 @@ table users_history
 		lineageTag: cbad2d08-9be8-4635-a80e-1fb33bbc5488
 
 	/// Measure meas.user_history_user_new_hires_terminated_in_12_month.
+		annotation AgentPurpose = "Tracks user history user new hires didnt reach perf in 12 month."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire_date], users_history[col.perf_date_first_reached]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.user_history_user_new_hires_terminated_in_12_month' = ```
 			
 			
@@ -404,6 +519,11 @@ table users_history
 		lineageTag: 1aea2f21-f4e1-4f4d-bc08-8849f865a4c8
 
 	/// Measure meas.users_history_ci_perf_avg_attainment.
+		annotation AgentPurpose = "Tracks user history user new hires terminated in 12 month."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire_date], users_history[trueai_termination_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_history_ci_perf_avg_attainment' =
 			
 			
@@ -418,6 +538,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.data_logs_user_count_eop_for_ae.
+		annotation AgentPurpose = "Tracks users history ci perf average attainment."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: users_history[ci_perf_qtly_avg_bookings_peers], users_history[_sys_user_id], users_history[col.ci.perf_qtly_bookings_user]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.data_logs_user_count_eop_for_ae' = ```
 			
 			CALCULATE(
@@ -438,6 +563,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.data_logs_user_count_eop_for_am.
+		annotation AgentPurpose = "Tracks data logs user count eop for ae."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department], users_history[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_eop_for_am' = ```
 			
 			CALCULATE(
@@ -458,6 +588,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.data_logs_user_count_eop_for_sdr.
+		annotation AgentPurpose = "Tracks data logs user count eop for am."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department], users_history[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_eop_for_sdr' = ```
 			
 			CALCULATE(
@@ -478,6 +613,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.data_logs_user_count_eop_for_all_sales_roles.
+		annotation AgentPurpose = "Tracks data logs user count eop for sdr."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department], users_history[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_eop_for_all_sales_roles' = ```
 			
 			CALCULATE(
@@ -498,6 +638,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.data_logs_user_count_eop_for_mgr.
+		annotation AgentPurpose = "Tracks data logs user count eop for all sales roles."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_eop_for_mgr' = ```
 			
 			CALCULATE(
@@ -510,6 +655,11 @@ table users_history
 		lineageTag: 85f4c5b8-e1fe-4183-b591-4ef4151f7ee6
 
 	/// Measure meas.data_logs_user_count_eop_for_other.
+		annotation AgentPurpose = "Tracks data logs user count eop for mgr."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department], users_history[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_eop_for_other' =
 			
 			CALCULATE(
@@ -521,6 +671,11 @@ table users_history
 		lineageTag: 264b9cb9-f0ce-4764-8abe-39c27f7e8175
 
 	/// Measure meas.data_logs_user_count_eop_for_dept_mkt.
+		annotation AgentPurpose = "Tracks data logs user count eop for other."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department], users_history[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_eop_for_dept_mkt' =
 			
 			CALCULATE(
@@ -540,6 +695,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.data_logs_user_count_eop_for_dept_sales.
+		annotation AgentPurpose = "Tracks data logs user count eop for dept mkt."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_eop_for_dept_sales' =
 			
 			CALCULATE(
@@ -559,6 +719,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.data_logs_user_count_eop_for_dept_other.
+		annotation AgentPurpose = "Tracks data logs user count eop for dept sales."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_eop_for_dept_other' =
 			
 			CALCULATE(
@@ -578,6 +743,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.data_logs_user_count_change_perc.
+		annotation AgentPurpose = "Tracks data logs user count eop for dept other."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_change_perc' =
 			
 			VAR __BASELINE_VALUE = [meas.data_logs_user_count_bop]
@@ -597,6 +767,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.data_logs_user_count_eop_for_nd.
+		annotation AgentPurpose = "Tracks data logs user count change percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_bop], [meas.data_logs_user_count_eop]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.data_logs_user_count_eop_for_nd' =
 			
 			CALCULATE(
@@ -609,6 +784,11 @@ table users_history
 		lineageTag: 7bcb8763-96e0-4db1-b039-349dbd1c0eec
 
 	/// Measure meas.reps_w_actlvl_pct.
+		annotation AgentPurpose = "Tracks data logs user count eop for nd."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.reps_w_actlvl_pct' = ```
 			
 			var reps_w_acl = [meas.reps_w_actlvl_count]
@@ -626,6 +806,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.reps_w_actlvl_count.
+		annotation AgentPurpose = "Tracks reps w actlvl percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.reps_w_actlvl_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.reps_w_actlvl_count' =
 			
 			CALCULATE(DISTINCTCOUNT([_sys_user_id]), (users_history[ci_act_capt_lvl] > 0)
@@ -635,6 +820,11 @@ table users_history
 		lineageTag: cb1894d2-ba0e-4792-8b22-f9f580f4b5e6
 
 	/// Measure meas.reps_w_time_allocation_pct.
+		annotation AgentPurpose = "Tracks reps w actlvl count."
+		annotation AgentLogic = "Counts distinct values in users_history[ci_act_capt_lvl] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_act_capt_lvl]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.reps_w_time_allocation_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_count]
@@ -655,6 +845,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.reps_w_time_allocation_count.
+		annotation AgentPurpose = "Tracks reps w time allocation percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop], [meas.reps_w_time_allocation_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.reps_w_time_allocation_count' = ```
 			
 			
@@ -674,11 +869,21 @@ table users_history
 		lineageTag: 390d2dd9-6f68-455a-a819-a36c90a9703c
 
 	/// Measure meas.users_history_row_filler.
+		annotation AgentPurpose = "Tracks reps w time allocation count."
+		annotation AgentLogic = "Counts rows using users_history[_sys_filt_start_date] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_filt_start_date], users_history[trueai_termination_date], users_history[ci_time_alloc_tot]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_history_row_filler' = ""
 		displayFolder: _filler
 		lineageTag: 6ddcb848-f676-401c-a8b8-ee85f6065845
 
 	/// Measure meas.sys.user_id_for_am.
+		annotation AgentPurpose = "Tracks users history row filler."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.sys.user_id_for_am' =
 			
 			CALCULATE(
@@ -696,6 +901,11 @@ table users_history
 				}
 
 	/// Measure meas.di.trueai_opps_won_amt_am_avg.
+		annotation AgentPurpose = "Tracks sys user id for am."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.di.trueai_opps_won_amt_am_avg' =
 			
 			DIVIDE(
@@ -715,6 +925,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.sys.user_id_for_ae.
+		annotation AgentPurpose = "Tracks di trueai opportunities won amount am average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.sys.user_id_for_am]; Columns: ssr_history[opp_won_amt]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.sys.user_id_for_ae' =
 			
 			CALCULATE(
@@ -726,6 +941,11 @@ table users_history
 		lineageTag: 443717c6-2617-4712-9ee1-236180210cdb
 
 	/// Measure meas.sys.user_id_for_sdr.
+		annotation AgentPurpose = "Tracks sys user id for ae."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.sys.user_id_for_sdr' =
 			
 			CALCULATE(
@@ -737,6 +957,11 @@ table users_history
 		lineageTag: b95fcde4-0bcd-4deb-8ac0-ef02a18103d6
 
 	/// Measure meas.sys.user_id_for_nd.
+		annotation AgentPurpose = "Tracks sys user id for sdr."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.sys.user_id_for_nd' =
 			
 			CALCULATE(
@@ -748,6 +973,11 @@ table users_history
 		lineageTag: 60ef9f77-bd16-4f97-a5b9-a3d8fd5f0927
 
 	/// Measure meas.sys.user_id_for_other.
+		annotation AgentPurpose = "Tracks sys user id for nd."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.sys.user_id_for_other' =
 			
 			CALCULATE(
@@ -759,6 +989,11 @@ table users_history
 		lineageTag: a67bea40-cc9d-4b93-b763-4082390316e3
 
 	/// Measure meas.di.trueai_opps_won_amt_ae_avg.
+		annotation AgentPurpose = "Tracks sys user id for other."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.di.trueai_opps_won_amt_ae_avg' =
 			
 			DIVIDE(
@@ -772,6 +1007,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.di.trueai_opps_won_amt_sdr_avg.
+		annotation AgentPurpose = "Tracks di trueai opportunities won amount ae average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.sys.user_id_for_ae]; Columns: ssr_history[opp_won_amt]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.di.trueai_opps_won_amt_sdr_avg' =
 			
 			DIVIDE(
@@ -785,6 +1025,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.di.trueai_opps_won_amt_nd_avg.
+		annotation AgentPurpose = "Tracks di trueai opportunities won amount sdr average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.sys.user_id_for_sdr]; Columns: ssr_history[opp_won_amt]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.di.trueai_opps_won_amt_nd_avg' =
 			
 			DIVIDE(
@@ -797,6 +1042,11 @@ table users_history
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.di.trueai_opps_won_amt_mgr_avg.
+		annotation AgentPurpose = "Tracks di trueai opportunities won amount nd average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.sys.user_id_for_nd]; Columns: ssr_history[opp_won_amt]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.di.trueai_opps_won_amt_mgr_avg' =
 			
 			DIVIDE(
@@ -809,6 +1059,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.sys.user_id_for_mgr.
+		annotation AgentPurpose = "Tracks di trueai opportunities won amount mgr average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.sys.user_id_for_mgr]; Columns: ssr_history[opp_won_amt]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.sys.user_id_for_mgr' =
 			
 			CALCULATE(
@@ -820,6 +1075,11 @@ table users_history
 		lineageTag: 8421e203-c9d1-468b-affe-165f59ada1ae
 
 	/// Measure meas.di.trueai_opps_won_amt_other_avg.
+		annotation AgentPurpose = "Tracks sys user id for mgr."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.di.trueai_opps_won_amt_other_avg' =
 			
 			DIVIDE(
@@ -833,6 +1093,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// _rep
+		annotation AgentPurpose = "Tracks di trueai opportunities won amount other average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.sys.user_id_for_other]; Columns: ssr_history[opp_won_amt]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.count_trueai_user_role_account_executive' = ```
 			
 			var min_date = [meas.context_date_min]
@@ -849,6 +1114,11 @@ table users_history
 		lineageTag: f9380111-412f-4044-b400-0d2ca99a2968
 
 	/// _rep
+		annotation AgentPurpose = "Tracks count trueai user role account executive."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_user_role]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.count_trueai_user_role_account_manager' = ```
 			
 			var min_date = [meas.context_date_min]
@@ -865,6 +1135,11 @@ table users_history
 		lineageTag: 5569d550-425e-4fd9-99b5-14bb55a3efff
 
 	/// _rep
+		annotation AgentPurpose = "Tracks count trueai user role account manager."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.count_trueai_user_role_sales_manager' = ```
 			
 			var min_date = [meas.context_date_min] // get the min date of the period
@@ -881,6 +1156,11 @@ table users_history
 		lineageTag: b6ac59ea-d721-4ef6-8c5b-230bf0de8e09
 
 	/// _rep
+		annotation AgentPurpose = "Tracks count trueai user role sales manager."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.count_trueai_user_role_nd' = ```
 			
 			var min_date = [meas.context_date_min]
@@ -897,6 +1177,11 @@ table users_history
 		lineageTag: 42d75b4a-4848-4708-8151-7a0816e02c31
 
 	/// _rep
+		annotation AgentPurpose = "Tracks count trueai user role nd."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.count_trueai_user_role_sales_development_rep' = ```
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
@@ -912,6 +1197,11 @@ table users_history
 		lineageTag: be269a0b-7718-4e82-ac59-c6b6bda76360
 
 	/// Measure meas.user_history_count_dept_sales.
+		annotation AgentPurpose = "Tracks count trueai user role sales development rep."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.user_history_count_dept_sales' =
 			
 			CALCULATE(
@@ -929,6 +1219,11 @@ table users_history
 				}
 
 	/// _rep
+		annotation AgentPurpose = "Tracks user history count dept sales."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: 'users_history'[_sys_user_id], 'users_history'[trueai_user_role_department]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.count_trueai_user_role_account_executive_in_group_nd' =
 			
 			CALCULATE(
@@ -948,6 +1243,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// _rep
+		annotation AgentPurpose = "Tracks count trueai user role account executive in group nd."
+		annotation AgentLogic = "Counts rows using users_history[trueai_group] under filters."
+		annotation AgentDependencies = "Measures: [meas.count_trueai_user_role_account_executive]; Columns: users_history[trueai_group]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.count_trueai_user_role_all_salesteam' = ```
 			var min_date = [meas.context_date_min]
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date)
@@ -964,6 +1264,11 @@ table users_history
 		lineageTag: 5ba6ff62-c218-4a8c-a401-b26f5bbba04f
 
 	/// _rep
+		annotation AgentPurpose = "Tracks count trueai user role all salesteam."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.count_trueai_user_role_other' = ```
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
@@ -979,6 +1284,11 @@ table users_history
 		lineageTag: 2096bd64-ff8b-4b2f-8629-80b6e89051cb
 
 	/// _rep
+		annotation AgentPurpose = "Tracks count trueai user role other."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.count_trueai_user_role_sales_executive' = ```
 			
 			var min_date = [meas.context_date_min] // get the min date of the period
@@ -995,6 +1305,11 @@ table users_history
 		lineageTag: 32655af9-d185-476f-9a78-27fbb9ffbcb5
 
 	/// Measure meas.data_logs_user_count_eop_for_dept_support.
+		annotation AgentPurpose = "Tracks count trueai user role sales executive."
+		annotation AgentLogic = "Counts distinct values in 'users_history'[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_min]; Columns: 'users_history'[_sys_user_id], users_history[trueai_user_role]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_eop_for_dept_support' =
 			
 			CALCULATE(
@@ -1006,6 +1321,11 @@ table users_history
 		lineageTag: 1e6d0ed8-aaae-4efe-b4d3-51a8c8c2b16c
 
 	/// Measure meas.data_logs_user_count_eop_for_dept_ops.
+		annotation AgentPurpose = "Tracks data logs user count eop for dept support."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_eop_for_dept_ops' =
 			
 			CALCULATE(
@@ -1017,6 +1337,11 @@ table users_history
 		lineageTag: e9b2eb17-1691-4b12-825c-1f151ac84361
 
 	/// Measure meas.data_logs_user_count_eop_for_dept_nd.
+		annotation AgentPurpose = "Tracks data logs user count eop for dept ops."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_count_eop_for_dept_nd' =
 			
 			CALCULATE(
@@ -1028,6 +1353,11 @@ table users_history
 		lineageTag: b7c20247-953b-46d0-b3ca-169b075bde67
 
 	/// Measure meas.data_logs_won_amt_user_eop_avg.
+		annotation AgentPurpose = "Tracks data logs user count eop for dept nd."
+		annotation AgentLogic = "Counts rows using users_history[trueai_user_role_department] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: users_history[trueai_user_role_department]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_won_amt_user_eop_avg' =
 			
 			DIVIDE(
@@ -1047,6 +1377,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.data_logs_pipeline_amt_user_eop_avg.
+		annotation AgentPurpose = "Tracks data logs won amount user eop average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: ssr_history[opp_won_amt]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.data_logs_pipeline_amt_user_eop_avg' =
 			
 			DIVIDE(
@@ -1061,6 +1396,11 @@ table users_history
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.data_logs_won_amt_user_eop_avg_for_new_logo_selling.
+		annotation AgentPurpose = "Tracks data logs pipeline amount user eop average."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: 'ssr_history'[opp_pipeline_amt]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_logo_selling' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1084,6 +1424,11 @@ table users_history
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.data_logs_won_amt_user_eop_avg_for_existing_acv.
+		annotation AgentPurpose = "Tracks data logs won amount user eop average for new logo selling."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: ssr_history[opp_won_amt], ssr_history[step_name]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_acv' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1100,6 +1445,11 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.data_logs_won_amt_user_eop_avg_for_new_acv.
+		annotation AgentPurpose = "Tracks data logs won amount user eop average for existing acv."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: ssr_history[opp_won_amt], ssr_history[step_name], ssr_history[col.opp_acv_classification]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_acv' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1124,6 +1474,11 @@ table users_history
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.user_history_user_new_hires_terminated_in_12_month_pos.
+		annotation AgentPurpose = "Tracks data logs won amount user eop average for new acv."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: ssr_history[opp_won_amt], ssr_history[step_name], ssr_history[col.opp_acv_classification]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.user_history_user_new_hires_terminated_in_12_month_pos' = ```
 			
 			
@@ -1141,6 +1496,11 @@ table users_history
 		lineageTag: 640150f5-397a-4029-bd36-e53852d020d0
 
 	/// Measure meas.data_logs_won_amt_user_eop_avg_for_existing_customer_selling.
+		annotation AgentPurpose = "Tracks user history user new hires terminated in 12 month pos."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_user_id], users_history[trueai_hire_date], users_history[trueai_termination_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_customer_selling' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1156,76 +1516,151 @@ table users_history
 		changedProperty = FormatString
 
 	/// Measure meas.users_history_row_filler2.
+		annotation AgentPurpose = "Tracks data logs won amount user eop average for existing customer selling."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop]; Columns: ssr_history[opp_won_amt], ssr_history[step_name]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.users_history_row_filler2' = ""
 		displayFolder: _filler
 		lineageTag: edeb15e2-b186-459d-8646-a21595bab838
 
 	/// Measure meas.users_history_row_filler3.
+		annotation AgentPurpose = "Tracks users history row filler2."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler3' = ""
 		displayFolder: _filler
 		lineageTag: fb5ce7e1-3b57-4caa-b47c-75f38cf431ca
 
 	/// Measure meas.users_history_row_filler4.
+		annotation AgentPurpose = "Tracks users history row filler3."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler4' = ""
 		displayFolder: _filler
 		lineageTag: 8980361f-9d0f-4b4f-a5b9-adfe40234d48
 
 	/// Measure meas.users_history_row_filler5.
+		annotation AgentPurpose = "Tracks users history row filler4."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler5' = ""
 		displayFolder: _filler
 		lineageTag: c1e1b654-df56-4f96-a7f2-b175c3e859ef
 
 	/// Measure meas.users_history_row_filler6.
+		annotation AgentPurpose = "Tracks users history row filler5."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler6' = ""
 		displayFolder: _filler
 		lineageTag: 2f5a5d5a-b880-4048-a7c5-e5d12008ee28
 
 	/// Measure meas.users_history_row_filler7.
+		annotation AgentPurpose = "Tracks users history row filler6."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler7' = ""
 		displayFolder: _filler
 		lineageTag: 3e1bb5f9-21ff-4763-b675-e056bebbc144
 
 	/// Measure meas.users_history_row_filler8.
+		annotation AgentPurpose = "Tracks users history row filler7."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler8' = ""
 		displayFolder: _filler
 		lineageTag: 7aa1bc6d-19ee-4f88-8447-c4ebd53bf512
 
 	/// Measure meas.users_history_row_filler9.
+		annotation AgentPurpose = "Tracks users history row filler8."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler9' = ""
 		displayFolder: _filler
 		lineageTag: 969c4058-2234-4575-ba9f-0cc3d76a47ce
 
 	/// Measure meas.users_history_row_filler10.
+		annotation AgentPurpose = "Tracks users history row filler9."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler10' = ""
 		displayFolder: _filler
 		lineageTag: f362c584-a411-4e49-bbf6-31cb18a66a80
 
 	/// Measure meas.users_history_row_filler11.
+		annotation AgentPurpose = "Tracks users history row filler10."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler11' = ""
 		displayFolder: _filler
 		lineageTag: a6884327-0fed-4df0-8827-faaeeda5986f
 
 	/// Measure meas.users_history_row_filler12.
+		annotation AgentPurpose = "Tracks users history row filler11."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler12' = ""
 		displayFolder: _filler
 		lineageTag: 13189c9e-d0d2-42cd-a41c-e2969b8dab74
 
 	/// Measure meas.users_history_row_filler13.
+		annotation AgentPurpose = "Tracks users history row filler12."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler13' = ""
 		displayFolder: _filler
 		lineageTag: 68cc992c-591e-4f1f-9386-89571ceb05af
 
 	/// Measure meas.users_history_row_filler14.
+		annotation AgentPurpose = "Tracks users history row filler13."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler14' = ""
 		displayFolder: _filler
 		lineageTag: 272625e7-1621-4db5-a38a-56e0f218088a
 
 	/// Measure meas.users_history_row_filler15.
+		annotation AgentPurpose = "Tracks users history row filler14."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_row_filler15' = ""
 		displayFolder: _filler
 		lineageTag: bce5d1d3-b76b-4858-862e-46f081a4d53b
 
 	/// Measure meas.data_logs_user_turnover_pct.
+		annotation AgentPurpose = "Tracks users history row filler15."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_user_turnover_pct' =
 			
 			var res =DIVIDE(
@@ -1249,6 +1684,11 @@ table users_history
 				}
 
 	/// Measure meas.time_allocation_total_not_eng.
+		annotation AgentPurpose = "Tracks data logs user turnover percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_bop], [meas.data_logs_user_new_terminations_pos]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.time_allocation_total_not_eng' =
 			
 			AVERAGE('users_history'[ci_time_alloc_tot]) - AVERAGE('users_history'[ci_time_alloc_tot_eng])
@@ -1266,6 +1706,11 @@ table users_history
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_history_ta_potential_vs_actual.
+		annotation AgentPurpose = "Tracks time allocation total not eng."
+		annotation AgentLogic = "Averages 'users_history'[ci_time_alloc_tot] under filters."
+		annotation AgentDependencies = "Columns: 'users_history'[ci_time_alloc_tot], 'users_history'[ci_time_alloc_tot_eng]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_ta_potential_vs_actual' = ```
 			
 			var uh_filt_tbl = CALCULATETABLE(users_history, users_history[ci_time_alloc_tot] <> blank())
@@ -1279,6 +1724,11 @@ table users_history
 		lineageTag: dd9b7816-b83c-4d60-bfb1-f374cc0531f5
 
 	/// Measure meas.data_logs_user_turnover_pct_regrettable.
+		annotation AgentPurpose = "Tracks users history ta potential vs actual."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: users_history[ci_time_alloc_tot], users_history[ci_time_alloc_month_to_week_adjustment], users_history[col.ci_ta_potential_hours]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.data_logs_user_turnover_pct_regrettable' =
 			
 			
@@ -1295,6 +1745,11 @@ table users_history
 		lineageTag: 36204f55-92aa-45d3-846e-38ef4694b4bb
 
 	/// Measure meas.data_logs_user_new_terminations_regrettable.
+		annotation AgentPurpose = "Tracks data logs user turnover percentage regrettable."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_bop], [meas.data_logs_user_new_terminations_regrettable]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.data_logs_user_new_terminations_regrettable' = ```
 			
 			var tbl_perf_users = SUMMARIZE(users_history , users_history[_sys_user_id], "months", Count(users_history[_sys_doc_id]), "avg_perf_tier_num", AVERAGE(users_history[ci_perf_qtly_performance_tier_num])+ 0)
@@ -1310,6 +1765,11 @@ table users_history
 		lineageTag: 64a5d1ae-0403-49d9-b03e-a8ef509b3d19
 
 	/// Measure meas.users_history_user_role_function_concat_w_count_eop.
+		annotation AgentPurpose = "Tracks data logs user new terminations regrettable."
+		annotation AgentLogic = "Counts rows using users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_new_terminations]; Columns: users_history[_sys_user_id], users_history[_sys_doc_id], users_history[ci_perf_qtly_performance_tier_num]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_history_user_role_function_concat_w_count_eop' = ```
 			
 			
@@ -1336,6 +1796,11 @@ table users_history
 		lineageTag: d413b1b6-88bb-4362-ba1f-b09ba6abc6ae
 
 	/// Measure meas.exp_rpts_all_avg_perf_tier.
+		annotation AgentPurpose = "Tracks users history user role function concat w count eop."
+		annotation AgentLogic = "Counts rows using users_history[_sys_filt_start_date] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: users_history[_sys_filt_start_date], users[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.exp_rpts_all_avg_perf_tier' = ```
 			
 			 var calc = CALCULATE(AVERAGE(users_history[ci_perf_qtly_performance_tier_num]))
@@ -1347,35 +1812,65 @@ table users_history
 		lineageTag: ae176c1b-1966-4b3d-bbf0-fa4cbe7fc464
 
 	/// Measure meas.exp_rpts_last_year_avg_perf_tier.
+		annotation AgentPurpose = "Tracks exp rpts all average perf tier."
+		annotation AgentLogic = "Averages users_history[ci_perf_qtly_performance_tier_num] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_perf_qtly_performance_tier_num]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.exp_rpts_last_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "LAST_YEAR")
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: 4cab50c1-511d-439f-89d3-669c0173ffcc
 
 	/// Measure meas.exp_rpts_prior_to_last_year_avg_perf_tier.
+		annotation AgentPurpose = "Tracks exp rpts last year average perf tier."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.exp_rpts_all_avg_perf_tier]; Columns: users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.exp_rpts_prior_to_last_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "PRIOR_TO_LAST_YEAR")
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: c7aef491-020f-4a36-abf4-ec5b554a1bfa
 
 	/// Measure meas.exp_rpts_current_year_avg_perf_tier.
+		annotation AgentPurpose = "Tracks exp rpts prior to last year average perf tier."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.exp_rpts_all_avg_perf_tier]; Columns: users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.exp_rpts_current_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "CURRENT_YEAR")
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: db51bd07-3023-4d79-b5df-64359d2834ba
 
 	/// Measure meas.data_logs_user_count_all.
+		annotation AgentPurpose = "Tracks exp rpts current year average perf tier."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.exp_rpts_all_avg_perf_tier]; Columns: users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_user_count_all' = [meas.data_logs_user_count_eop_for_dept_mkt]+[meas.data_logs_user_count_eop_for_dept_nd]+[meas.data_logs_user_count_eop_for_dept_ops]+[meas.data_logs_user_count_eop_for_dept_other]+[meas.data_logs_user_count_eop_for_dept_sales]+[meas.data_logs_user_count_eop_for_dept_support]
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: bd7a4307-ed50-4555-bd87-089699d608ba
 
 	/// Measure meas.calibration_user_role_title.
+		annotation AgentPurpose = "Tracks data logs user count all."
+		annotation AgentLogic = "Counts rows under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop_for_dept_mkt], [meas.data_logs_user_count_eop_for_dept_nd], [meas.data_logs_user_count_eop_for_dept_ops], [meas.data_logs_user_count_eop_for_dept_other], [m..."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.calibration_user_role_title' = "User Roles - " & [meas.prior_year] & " Full Calendar Year"
 		displayFolder: _rep_count_analysis
 		lineageTag: b46bd447-2ddc-4adc-a282-c0bd8c15171d
 
 	/// Measure meas.data_logs_ci_perf_annual_avg_bookings_account_executive.
+		annotation AgentPurpose = "Tracks calibration user role title."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.prior_year]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_executive' = ```
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -1391,6 +1886,11 @@ table users_history
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.data_logs_ci_perf_annual_avg_bookings_account_manager.
+		annotation AgentPurpose = "Tracks data logs ci perf annual average bookings account executive."
+		annotation AgentLogic = "Counts rows using users_history[ci_perf_qtly_avg_bookings_peers] under filters."
+		annotation AgentDependencies = "Measures: [meas.companies_history_reference_date]; Columns: users_history[ci_perf_qtly_avg_bookings_peers], cal_end_dates[Date], users_history[trueai_user_role]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_manager' = ```
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -1406,6 +1906,11 @@ table users_history
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.data_logs_ci_perf_annual_avg_pipeline_created_sdr.
+		annotation AgentPurpose = "Tracks data logs ci perf annual average bookings account manager."
+		annotation AgentLogic = "Counts rows using users_history[ci_perf_qtly_avg_bookings_peers] under filters."
+		annotation AgentDependencies = "Measures: [meas.companies_history_reference_date]; Columns: users_history[ci_perf_qtly_avg_bookings_peers], cal_end_dates[Date], users_history[trueai_user_role]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created_sdr' =
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -1419,21 +1924,41 @@ table users_history
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.perf_consider_mrasure.
+		annotation AgentPurpose = "Tracks data logs ci perf annual average pipeline created sdr."
+		annotation AgentLogic = "Averages users_history[col.ci.perf_qtly_avg_pipeline_peers] under filters."
+		annotation AgentDependencies = "Measures: [meas.companies_history_reference_date]; Columns: users_history[col.ci.perf_qtly_avg_pipeline_peers], cal_end_dates[Date], users_history[trueai_user_role]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.perf_consider_mrasure' = "To be considered a Performer, a rep needs to fall within +/- 35% of AAB / AAPC"
 		displayFolder: _perf_analysis
 		lineageTag: e36df813-494b-4999-a2d5-0c02c594db11
 
 	/// Measure meas.calibration_department_title.
+		annotation AgentPurpose = "Tracks perf consider mrasure."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.calibration_department_title' = "Department - " & [meas.prior_year] & " Full Calendar Year"
 		displayFolder: _rep_count_analysis
 		lineageTag: 6f133e82-cd13-456d-ba5f-2bb46c770268
 
 	/// Measure meas.calibration_group_title.
+		annotation AgentPurpose = "Tracks calibration department title."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.prior_year]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.calibration_group_title' = "Group - " & [meas.prior_year] & " Full Calendar Year"
 		displayFolder: _rep_count_analysis
 		lineageTag: f1b13f39-437e-469b-977e-2ef145c2c495
 
 	/// Measure meas.data_logs_ci_perf_status.
+		annotation AgentPurpose = "Tracks calibration group title."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.prior_year]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.data_logs_ci_perf_status' = ```
 			
 			
@@ -1462,6 +1987,11 @@ table users_history
 		lineageTag: a97b7deb-0320-4928-9344-62e8b0ac287e
 
 	/// Measure meas.data_logs_user_12_Mos_ci_perf_status.
+		annotation AgentPurpose = "Tracks data logs ci perf status."
+		annotation AgentLogic = "Averages cal_end_dates[Date] under filters."
+		annotation AgentDependencies = "Columns: cal_end_dates[Date], users_history[ci_perf_qtly_performance_tier_num], users_history[_sys_filt_end_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_user_12_Mos_ci_perf_status' = ```
 			
 			
@@ -1504,6 +2034,11 @@ table users_history
 		lineageTag: 7866caef-955b-4d57-9415-64d9df49695c
 
 	/// Measure meas.data_logs_user_count_rep_eop.
+		annotation AgentPurpose = "Tracks data logs user 12 mos ci perf status."
+		annotation AgentLogic = "Averages users_history[ci_perf_qtly_performance_tier_num] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_users_ramping_status], [meas.last_date_of_previous_quarter]; Columns: users_history[ci_perf_qtly_performance_tier_num], cal_end_dates[Date], users[trueai_user_role_departm..."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.data_logs_user_count_rep_eop' = ```
 			
 			
@@ -1526,11 +2061,21 @@ table users_history
 		lineageTag: aa4e48f7-647a-4d50-ae41-06df2fbef33f
 
 	/// Measure meas.ramping_reps_details_title.
+		annotation AgentPurpose = "Tracks data logs user count rep eop."
+		annotation AgentLogic = "Counts rows using cal_end_dates[Date] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: cal_end_dates[Date], users_history[_sys_filt_start_date], users_history[trueai_termination_date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.ramping_reps_details_title' = "Ramping Reps -   " & [meas.step_owner_user_role_aliased]
 		displayFolder: _ramp_analysis
 		lineageTag: 2ab3c61d-7f9a-43c9-9555-deafb52b42f8
 
 	/// Measure meas.reps_w_time_allocation_prospecting_count.
+		annotation AgentPurpose = "Tracks ramping reps details title."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "Measures: [meas.step_owner_user_role_aliased]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.reps_w_time_allocation_prospecting_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_prospecting])>0)
@@ -1539,6 +2084,11 @@ table users_history
 		lineageTag: b9a4709c-76f5-444a-93e1-043c6fba0ff5
 
 	/// Measure meas.reps_w_time_allocation_prospecting_pct.
+		annotation AgentPurpose = "Tracks reps w time allocation prospecting count."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: users_history[_sys_user_id], users_history[ci_time_alloc_prospecting]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.reps_w_time_allocation_prospecting_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_prospecting_count]
@@ -1551,6 +2101,11 @@ table users_history
 		lineageTag: 95eb85ee-1b16-496a-b04a-aa3042687603
 
 	/// Measure meas.reps_w_time_allocation_new_logo_count.
+		annotation AgentPurpose = "Tracks reps w time allocation prospecting percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.reps_w_time_allocation_prospecting_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.reps_w_time_allocation_new_logo_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_new_logo])>0)
@@ -1559,6 +2114,11 @@ table users_history
 		lineageTag: dff9104a-517d-4d51-b63b-64e65bacf531
 
 	/// Measure meas.reps_w_time_allocation_new_logo_pct.
+		annotation AgentPurpose = "Tracks reps w time allocation new logo count."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: users_history[_sys_user_id], users_history[ci_time_alloc_new_logo]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.reps_w_time_allocation_new_logo_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_new_logo_count]
@@ -1571,6 +2131,11 @@ table users_history
 		lineageTag: 59a3a1e0-40af-42fd-8513-123844687a12
 
 	/// Measure meas.reps_w_time_allocation_prospect_pct.
+		annotation AgentPurpose = "Tracks reps w time allocation new logo percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.reps_w_time_allocation_new_logo_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.reps_w_time_allocation_prospect_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_count]
@@ -1583,6 +2148,11 @@ table users_history
 		lineageTag: c95cc6f4-094d-425d-8174-a1e11580c6ff
 
 	/// Measure meas.reps_all_time_allocation_count.
+		annotation AgentPurpose = "Tracks reps w time allocation prospect percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.reps_w_time_allocation_count], [meas.ssr_history_reps_prospecting]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.reps_all_time_allocation_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]))
@@ -1591,6 +2161,11 @@ table users_history
 		lineageTag: aa4c3717-11a2-45fc-b083-3d1126f1fc90
 
 	/// Measure meas.data_logs_user_rep_mgr_ratio_updated.
+		annotation AgentPurpose = "Tracks reps all time allocation count."
+		annotation AgentLogic = "Counts distinct values in users_history[_sys_user_id] under filters."
+		annotation AgentDependencies = "Columns: users_history[_sys_user_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.data_logs_user_rep_mgr_ratio_updated' =
 			
 			VAR _total_role = CALCULATE(
@@ -1610,6 +2185,11 @@ table users_history
 		lineageTag: 12898c88-6b57-432c-b8f8-c7a8c8bbb2c4
 
 	/// Measure meas.data_logs_users_tenure.
+		annotation AgentPurpose = "Tracks data logs user rep mgr ratio updated."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_user_count_eop], [meas.data_logs_user_count_eop_for_mgr]; Columns: users_history[trueai_user_role_function]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_users_tenure' = ```
 			
 			-- get the dates
@@ -1636,6 +2216,11 @@ table users_history
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.data_logs_users_ramping_status.
+		annotation AgentPurpose = "Tracks data logs users tenure."
+		annotation AgentLogic = "Returns an extreme value from users_history[trueai_tenure] under filters."
+		annotation AgentDependencies = "Measures: [meas.last_date_of_previous_quarter]; Columns: users_history[trueai_tenure], cal_end_dates[Date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.data_logs_users_ramping_status' = ```
 			
 			-- get the dates
@@ -1659,6 +2244,11 @@ table users_history
 		lineageTag: a73a5ff6-d27e-40cf-b459-57c7e93a4a0e
 
 	/// Measure meas.users_history_ci_time_alloca_avg_existing_cust_selling.
+		annotation AgentPurpose = "Tracks data logs users ramping status."
+		annotation AgentLogic = "Returns an extreme value from users_history[ci_perf_ramping_status] under filters."
+		annotation AgentDependencies = "Measures: [meas.last_date_of_previous_quarter]; Columns: users_history[ci_perf_ramping_status], cal_end_dates[Date]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_ci_time_alloca_avg_existing_cust_selling' =
 			
 			CALCULATE(
@@ -1672,6 +2262,11 @@ table users_history
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_history_time_allocation_confidence.
+		annotation AgentPurpose = "Tracks users history ci time alloca average existing customer selling."
+		annotation AgentLogic = "Averages users_history[ci_time_alloc_existing_customer_selling] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_time_alloc_existing_customer_selling]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_time_allocation_confidence' =
 			
 			var avg_value = AVERAGE(users_history[ci_time_alloc_conf])    // get the avg of ci time allocation confidence
@@ -1683,6 +2278,11 @@ table users_history
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_history_time_allocation_confidence_status.
+		annotation AgentPurpose = "Tracks users history time allocation confidence."
+		annotation AgentLogic = "Averages users_history[ci_time_alloc_conf] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_time_alloc_conf]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_time_allocation_confidence_status' = ```
 			
 			
@@ -1717,6 +2317,11 @@ table users_history
 		lineageTag: ebe06221-1ce3-4e18-9db4-d9701923fee8
 
 	/// Measure meas.time_allocation_confidence.
+		annotation AgentPurpose = "Tracks users history time allocation confidence status."
+		annotation AgentLogic = "Averages users_history[ci_time_alloc_conf] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_time_alloc_conf]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.time_allocation_confidence' = ```
 			
 			
@@ -1750,26 +2355,51 @@ table users_history
 		lineageTag: 30522698-ba19-4d59-a3c0-a10e54a3a4ae
 
 	/// Measure meas.peek_inside_text_supports_aab.
+		annotation AgentPurpose = "Tracks time allocation confidence."
+		annotation AgentLogic = "Averages users_history[ci_time_alloc_conf] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_time_alloc_conf]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.peek_inside_text_supports_aab' = "AAB"
 		displayFolder: _helper
 		lineageTag: 43c5b6e1-ce31-496d-8af8-614ac968bdde
 
 	/// Measure meas.peek_inside_text_supports_aapc.
+		annotation AgentPurpose = "Tracks peek inside text supports aab."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.peek_inside_text_supports_aapc' = "AAPC"
 		displayFolder: _helper
 		lineageTag: 22918bb7-2e2d-4dfd-98b3-17eb6b7a6c9b
 
 	/// Measure meas.peek_inside_text_supports_ramping_time.
+		annotation AgentPurpose = "Tracks peek inside text supports aapc."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.peek_inside_text_supports_ramping_time' = "Ramping Time"
 		displayFolder: _helper
 		lineageTag: ffd6401d-0cfb-4cf4-bcb1-a7739b744def
 
 	/// Measure meas.peek_inside_text_supports_trueai_reference_date.
+		annotation AgentPurpose = "Tracks peek inside text supports ramping time."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.peek_inside_text_supports_trueai_reference_date' = "TrueAI Reference Date"
 		displayFolder: _helper
 		lineageTag: 2bda97e6-525d-43bf-9132-5dac7a60b10b
 
 	/// Measure meas.users_history_r2_bg_color.
+		annotation AgentPurpose = "Tracks peek inside text supports trueai reference date."
+		annotation AgentLogic = "Derived from model references under current filters."
+		annotation AgentDependencies = "See model references"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Boolean"
 	measure 'meas.users_history_r2_bg_color' = ```
 			
 			var pros_r2 = [meas.quality_bucket__prospecting_r2]
@@ -1818,6 +2448,11 @@ table users_history
 		lineageTag: b9a6f5fd-0e8e-4a17-99f6-68bb6955b805
 
 	/// Measure meas.users_history_auc_bg_color.
+		annotation AgentPurpose = "Tracks users history R2 bg color."
+		annotation AgentLogic = "Returns an extreme value from ssr_history[step_name] under filters."
+		annotation AgentDependencies = "Measures: [meas.quality_bucket__new_logo_r2], [meas.quality_bucket__prospecting_r2], [meas.quality_bucket_existing_customer_selling_r2], [meas.quality_bucket_post_sales_r2]; Columns: ssr_history[st..."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_history_auc_bg_color' = ```
 			
 			var pros_auc = [meas.quality_bucket_prospecting_auc]
@@ -1866,6 +2501,11 @@ table users_history
 		lineageTag: ebc1dec3-4c25-49a1-b757-cc84b583ae72
 
 	/// Measure meas.users_history_avg_act_capt_lvl.
+		annotation AgentPurpose = "Tracks users history AUC bg color."
+		annotation AgentLogic = "Returns an extreme value from ssr_history[step_name] under filters."
+		annotation AgentDependencies = "Measures: [meas.quality_bucket_existing_customer_selling_auc], [meas.quality_bucket_new_logo_auc], [meas.quality_bucket_post_sales_auc], [meas.quality_bucket_prospecting_auc]; Columns: ssr_history[..."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.users_history_avg_act_capt_lvl' = ```
 			
 			 var _min_date = [meas.context_date_min]        // get the context min date
@@ -1892,6 +2532,11 @@ table users_history
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_history_ci_time_alloca_avg_prospecting.
+		annotation AgentPurpose = "Tracks users history average act capt lvl."
+		annotation AgentLogic = "Averages cal_end_dates[Date] under filters."
+		annotation AgentDependencies = "Measures: [meas.context_date_max], [meas.context_date_min]; Columns: cal_end_dates[Date], users_history[ci_act_capt_lvl]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_ci_time_alloca_avg_prospecting' =
 			
 			CALCULATE(
@@ -1904,6 +2549,11 @@ table users_history
 		lineageTag: 363287f9-8e11-4afb-a36a-636b9f8eb0c9
 
 	/// Measure meas.users_history_ci_time_alloca_avg_new_logo_selling.
+		annotation AgentPurpose = "Tracks users history ci time alloca average prospecting."
+		annotation AgentLogic = "Averages users_history[ci_time_alloc_prospecting] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_time_alloc_prospecting]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_ci_time_alloca_avg_new_logo_selling' =
 			
 			CALCULATE(
@@ -1917,6 +2567,11 @@ table users_history
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_history_ci_time_alloca_avg_post_sales_support.
+		annotation AgentPurpose = "Tracks users history ci time alloca average new logo selling."
+		annotation AgentLogic = "Averages users_history[ci_time_alloc_new_logo] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_time_alloc_new_logo]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_ci_time_alloca_avg_post_sales_support' =
 			
 			CALCULATE(
@@ -1930,6 +2585,11 @@ table users_history
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_history_ci_time_alloca_avg_internel.
+		annotation AgentPurpose = "Tracks users history ci time alloca average post sales support."
+		annotation AgentLogic = "Averages users_history[ci_time_alloc_post_sales] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_time_alloc_post_sales]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.users_history_ci_time_alloca_avg_internel' =
 			
 			CALCULATE(
@@ -1943,6 +2603,11 @@ table users_history
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.reps_without_act_lvl_count.
+		annotation AgentPurpose = "Tracks users history ci time alloca average internel."
+		annotation AgentLogic = "Averages users_history[ci_time_alloc_internal] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_time_alloc_internal]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.reps_without_act_lvl_count' =
 			
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]), users_history[ci_act_capt_lvl]=BLANK())
@@ -1953,6 +2618,11 @@ table users_history
 		lineageTag: 823b6167-9d31-4002-92a5-8ef055257123
 
 	/// Measure meas.reps_without_act_lvl_pct.
+		annotation AgentPurpose = "Tracks reps without act lvl count."
+		annotation AgentLogic = "Counts distinct values in users_history[ci_act_capt_lvl] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_act_capt_lvl]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.reps_without_act_lvl_pct' =
 			
 			var reps_w_acl = [meas.reps_without_act_lvl_count]
@@ -1965,6 +2635,11 @@ table users_history
 		lineageTag: b4f7597e-76a9-497e-9c04-10bad1c384ba
 
 	/// Measure meas.reps_has_ci_act_capt_lvl.
+		annotation AgentPurpose = "Tracks reps without act lvl percentage."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.reps_without_act_lvl_count]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.reps_has_ci_act_capt_lvl' =
 			
 			
@@ -1980,6 +2655,11 @@ table users_history
 		lineageTag: f7c7a23d-abf3-4d19-83f8-b9268e8cd6cb
 
 	/// Measure meas.ci_act_capt_lvl_pi_owner_act.
+		annotation AgentPurpose = "Tracks reps has ci act capt lvl."
+		annotation AgentLogic = "Returns an extreme value from users_history[ci_act_capt_lvl] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_act_capt_lvl]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.ci_act_capt_lvl_pi_owner_act' =
 			
 			var _prospect_count = SUM(users_history[ci_act_capt_lvl_pi_prospecting_owner_act])
@@ -1993,6 +2673,11 @@ table users_history
 		lineageTag: a9dc1dca-80f1-4459-bf59-70b7dc8b07fe
 
 	/// Measure meas.underperformer_annual_avg.
+		annotation AgentPurpose = "Tracks ci act capt lvl PI owner act."
+		annotation AgentLogic = "Counts rows using users_history[ci_act_capt_lvl_pi_prospecting_owner_act] under filters."
+		annotation AgentDependencies = "Columns: users_history[ci_act_capt_lvl_pi_prospecting_owner_act], users_history[ci_act_capt_lvl_pi_new_logo_owner_act], users_history[ci_act_capt_lvl_pi_post_sales_owner_act]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.underperformer_annual_avg' =
 			
 			CALCULATE(
@@ -2006,6 +2691,11 @@ table users_history
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.performer_annual_avg.
+		annotation AgentPurpose = "Tracks underperformer annual average."
+		annotation AgentLogic = "Averages users_history[col.ci.perf_annual_performance_tier] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_ci_perf_annual_avg_bookings]; Columns: users_history[col.ci.perf_annual_performance_tier]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.performer_annual_avg' =
 			
 			CALCULATE(
@@ -2019,6 +2709,11 @@ table users_history
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.overperformer_annual_avg.
+		annotation AgentPurpose = "Tracks performer annual average."
+		annotation AgentLogic = "Averages users_history[col.ci.perf_annual_performance_tier] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_ci_perf_annual_avg_bookings]; Columns: users_history[col.ci.perf_annual_performance_tier]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.overperformer_annual_avg' =
 			
 			CALCULATE(
@@ -2032,6 +2727,11 @@ table users_history
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Measure meas.min_user_role_alias.
+		annotation AgentPurpose = "Tracks overperformer annual average."
+		annotation AgentLogic = "Averages users_history[col.ci.perf_annual_performance_tier] under filters."
+		annotation AgentDependencies = "Measures: [meas.data_logs_ci_perf_annual_avg_bookings]; Columns: users_history[col.ci.perf_annual_performance_tier]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.min_user_role_alias' =
 			
 			MINX(
@@ -2043,6 +2743,11 @@ table users_history
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Column 'col.ci.perf_qtly_bookings_user' = ```.
+		annotation AgentPurpose = "Tracks min user role alias."
+		annotation AgentLogic = "Returns an extreme value from users_history[trueai_user_role_alias] under filters."
+		annotation AgentDependencies = "Columns: users_history[trueai_user_role_alias]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Boolean"
 	column 'col.ci.perf_qtly_bookings_user' = ```
 			
 			

@@ -23,6 +23,11 @@ table ai_conf_pred_qual_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks AI conf overall score."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.nlp_score], [meas.pred_qual_trueai_score], [meas.skills_score]; Columns: 'ai_conf_nlp_summary'[meas.nlp_score], ai_conf_pred_qual_summary[meas.pred_qual_trueai_score], ai_conf_skill..."
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.ai_conf_overall_score_instry_avg' =
 			//87
 			var _score = CALCULATE(
@@ -40,6 +45,11 @@ table ai_conf_pred_qual_summary
 	/// Calculation Logic: VAR blocks define intermediate values (score, res) used later in the expression. Dependencies: Columns: ai_conf_pred_qual_summary[meas.ai_conf_overall_score].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
+		annotation AgentPurpose = "Tracks AI conf overall score instry average."
+		annotation AgentLogic = "Returns an extreme value from metadata_reference_values[value] under filters."
+		annotation AgentDependencies = "Columns: metadata_reference_values[value], metadata_reference_values[_sys_doc_id]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	measure 'meas.ai_conf_overall_score_text' = ```
 			
 			var score = ai_conf_pred_qual_summary[meas.ai_conf_overall_score]
@@ -53,6 +63,11 @@ table ai_conf_pred_qual_summary
 	/// Calculation Logic: VAR blocks define intermediate values (score, res) used later in the expression. Dependencies: Columns: ai_conf_pred_qual_summary[meas.ai_conf_overall_score].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
+		annotation AgentPurpose = "Tracks AI conf overall score text."
+		annotation AgentLogic = "Sums ai_conf_pred_qual_summary[meas.ai_conf_overall_score] under filters."
+		annotation AgentDependencies = "Measures: [meas.ai_conf_overall_score]; Columns: ai_conf_pred_qual_summary[meas.ai_conf_overall_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.ai_conf_score_text' = ```
 			
 			var score = ai_conf_pred_qual_summary[meas.ai_conf_overall_score]
@@ -66,6 +81,11 @@ table ai_conf_pred_qual_summary
 	/// Calculation Logic: VAR blocks define intermediate values (score, res) used later in the expression. Dependencies: Columns: ai_conf_pred_qual_summary[meas.pred_qual_trueai_score].
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
+		annotation AgentPurpose = "Tracks AI conf score text."
+		annotation AgentLogic = "Sums ai_conf_pred_qual_summary[meas.ai_conf_overall_score] under filters."
+		annotation AgentDependencies = "Measures: [meas.ai_conf_overall_score]; Columns: ai_conf_pred_qual_summary[meas.ai_conf_overall_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.pred_qual_score_text' = ```
 			
 			var score = ai_conf_pred_qual_summary[meas.pred_qual_trueai_score]
@@ -79,6 +99,11 @@ table ai_conf_pred_qual_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+		annotation AgentPurpose = "Tracks pred qual score text."
+		annotation AgentLogic = "Sums ai_conf_pred_qual_summary[meas.pred_qual_trueai_score] under filters."
+		annotation AgentDependencies = "Measures: [meas.pred_qual_trueai_score]; Columns: ai_conf_pred_qual_summary[meas.pred_qual_trueai_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Decimal"
 	measure 'meas.pred_qual_trueai_score' =
 			
 			AVERAGE(ai_conf_pred_qual_summary[pred_qual_score]) * 100
@@ -91,6 +116,11 @@ table ai_conf_pred_qual_summary
 		annotation PBI_FormatHint = {"isDecimal":true}
 
 	/// Column _sys_docid.
+		annotation AgentPurpose = "Tracks pred qual trueai score."
+		annotation AgentLogic = "Averages ai_conf_pred_qual_summary[pred_qual_score] under filters."
+		annotation AgentDependencies = "Columns: ai_conf_pred_qual_summary[pred_qual_score]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Whole number"
 	column _sys_docid
 		lineageTag: 6e3f0a05-b2ad-49d8-9339-eb397adde317
 		summarizeBy: none

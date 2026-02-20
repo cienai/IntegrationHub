@@ -11,6 +11,11 @@ table ssr_history_stakeholders
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.stkhlds_last_act.
+		annotation AgentPurpose = "Tracks stkhlds first act."
+		annotation AgentLogic = "Returns an extreme value from ssr_history_stakeholders[trueai_first_act] under filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_first_act]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Date"
 	measure 'meas.stkhlds_last_act' = CALCULATE(MAX(ssr_history_stakeholders[trueai_last_act]))
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
@@ -19,6 +24,11 @@ table ssr_history_stakeholders
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.stkhlds_first_eng.
+		annotation AgentPurpose = "Tracks stkhlds last act."
+		annotation AgentLogic = "Returns an extreme value from ssr_history_stakeholders[trueai_last_act] under filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_last_act]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Date"
 	measure 'meas.stkhlds_first_eng' = CALCULATE(MAX(ssr_history_stakeholders[trueai_first_eng]))
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
@@ -27,6 +37,11 @@ table ssr_history_stakeholders
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.stkhlds_last_eng.
+		annotation AgentPurpose = "Tracks stkhlds first eng."
+		annotation AgentLogic = "Returns an extreme value from ssr_history_stakeholders[trueai_first_eng] under filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_first_eng]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Date"
 	measure 'meas.stkhlds_last_eng' = CALCULATE(MAX(ssr_history_stakeholders[trueai_last_eng]))
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
@@ -35,16 +50,31 @@ table ssr_history_stakeholders
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.stkhlds_seniority.
+		annotation AgentPurpose = "Tracks stkhlds last eng."
+		annotation AgentLogic = "Returns an extreme value from ssr_history_stakeholders[trueai_last_eng] under filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_last_eng]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Date"
 	measure 'meas.stkhlds_seniority' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_seniority]))
 		displayFolder: champion_stkhld
 		lineageTag: 137d542d-667c-4931-b89c-d7a8afbe6a78
 
 	/// Measure meas.stkhlds_title_dept.
+		annotation AgentPurpose = "Tracks stkhlds seniority."
+		annotation AgentLogic = "Returns an extreme value from ssr_history_stakeholders[trueai_title_seniority] under filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_title_seniority]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Boolean"
 	measure 'meas.stkhlds_title_dept' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]))
 		displayFolder: champion_stkhld
 		lineageTag: 742263c3-150e-4a72-9d14-0bec256467be
 
 	/// Measure meas.stkhlds_name_and_title.
+		annotation AgentPurpose = "Tracks stkhlds title dept."
+		annotation AgentLogic = "Returns an extreme value from ssr_history_stakeholders[trueai_title_department] under filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_title_department]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Boolean"
 	measure 'meas.stkhlds_name_and_title' = ```
 			
 			// make a concat name title
@@ -57,6 +87,11 @@ table ssr_history_stakeholders
 		lineageTag: 8f971e63-ce5a-4267-9229-0e84eadf1781
 
 	/// Measure meas.stkhlds_name_and_title_most_senior.
+		annotation AgentPurpose = "Tracks stkhlds name and title."
+		annotation AgentLogic = "Returns an extreme value from ssr_history_stakeholders[crm_first_name] under filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[crm_first_name], ssr_history_stakeholders[crm_last_name], ssr_history_stakeholders[crm_title]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.stkhlds_name_and_title_most_senior' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -71,6 +106,11 @@ table ssr_history_stakeholders
 		lineageTag: b63f829b-aaa0-40ee-8119-b6334c809800
 
 	/// Measure meas.stkhlds_most_senior_title_dept.
+		annotation AgentPurpose = "Tracks stkhlds name and title most senior."
+		annotation AgentLogic = "Returns an extreme value from ssr_history[stkhlds_all_max_title_seniority] under filters."
+		annotation AgentDependencies = "Measures: [meas.stkhlds_name_and_title]; Columns: ssr_history[stkhlds_all_max_title_seniority], ssr_history_stakeholders[trueai_title_seniority]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Boolean"
 	measure 'meas.stkhlds_most_senior_title_dept' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -83,6 +123,11 @@ table ssr_history_stakeholders
 		lineageTag: 4ad56e5e-839b-457c-bf56-f90f07d6b6a2
 
 	/// Measure meas.stkhlds_most_senior_first_act.
+		annotation AgentPurpose = "Tracks stkhlds most senior title dept."
+		annotation AgentLogic = "Returns an extreme value from ssr_history[stkhlds_all_max_title_seniority] under filters."
+		annotation AgentDependencies = "Measures: [meas.stkhlds_title_dept]; Columns: ssr_history[stkhlds_all_max_title_seniority], ssr_history_stakeholders[trueai_title_seniority]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Boolean"
 	measure 'meas.stkhlds_most_senior_first_act' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -98,6 +143,11 @@ table ssr_history_stakeholders
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.stkhlds_most_senior_last_act.
+		annotation AgentPurpose = "Tracks stkhlds most senior first act."
+		annotation AgentLogic = "Returns an extreme value from ssr_history[stkhlds_all_max_title_seniority] under filters."
+		annotation AgentDependencies = "Measures: [meas.stkhlds_first_act]; Columns: ssr_history[stkhlds_all_max_title_seniority], ssr_history_stakeholders[trueai_title_seniority]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Date"
 	measure 'meas.stkhlds_most_senior_last_act' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -113,6 +163,11 @@ table ssr_history_stakeholders
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.stkhlds_most_senior_last_eng.
+		annotation AgentPurpose = "Tracks stkhlds most senior last act."
+		annotation AgentLogic = "Returns an extreme value from ssr_history[stkhlds_all_max_title_seniority] under filters."
+		annotation AgentDependencies = "Measures: [meas.stkhlds_last_act]; Columns: ssr_history[stkhlds_all_max_title_seniority], ssr_history_stakeholders[trueai_title_seniority]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Date"
 	measure 'meas.stkhlds_most_senior_last_eng' = ```
 			
 			 
@@ -129,6 +184,11 @@ table ssr_history_stakeholders
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.stkhlds_most_senior_seniority.
+		annotation AgentPurpose = "Tracks stkhlds most senior last eng."
+		annotation AgentLogic = "Returns an extreme value from ssr_history[stkhlds_all_max_title_seniority] under filters."
+		annotation AgentDependencies = "Measures: [meas.stkhlds_last_eng]; Columns: ssr_history[stkhlds_all_max_title_seniority], ssr_history_stakeholders[trueai_title_seniority]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Date"
 	measure 'meas.stkhlds_most_senior_seniority' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -141,6 +201,11 @@ table ssr_history_stakeholders
 		lineageTag: 30eb9278-7c18-4d89-837d-b415ecec64cf
 
 	/// Measure meas.stkhlds_primary_dur_involvement.
+		annotation AgentPurpose = "Tracks stkhlds most senior seniority."
+		annotation AgentLogic = "Returns an extreme value from ssr_history[stkhlds_all_max_title_seniority] under filters."
+		annotation AgentDependencies = "Measures: [meas.stkhlds_seniority]; Columns: ssr_history[stkhlds_all_max_title_seniority], ssr_history_stakeholders[trueai_title_seniority]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Boolean"
 	measure 'meas.stkhlds_primary_dur_involvement' =
 			
 			var PrimDur = CALCULATE(SUM(ssr_history[stkhlds_primary_contact_dur])) // getting the secondary contact act duration
@@ -152,6 +217,11 @@ table ssr_history_stakeholders
 		lineageTag: f3b8a9d2-e05e-485e-8783-3422f1f289e0
 
 	/// Measure meas.stkhlds_secondary_dur_involvement.
+		annotation AgentPurpose = "Tracks stkhlds primary duration involvement."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: ssr_history[stkhlds_primary_contact_dur], ssr_history[stkhlds_all_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.stkhlds_secondary_dur_involvement' =
 			
 			var SecDur = CALCULATE(SUM(ssr_history[stkhlds_secondary_contact_dur])) // getting the secondary contact act duration
@@ -164,6 +234,11 @@ table ssr_history_stakeholders
 		lineageTag: 04f85556-5551-4042-b1e9-10981fd157e9
 
 	/// Measure meas.stkhlds_most_senior_dur_involvement.
+		annotation AgentPurpose = "Tracks stkhlds secondary duration involvement."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: ssr_history[stkhlds_secondary_contact_dur], ssr_history[stkhlds_all_dur]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.stkhlds_most_senior_dur_involvement' = ```
 			
 			
@@ -188,6 +263,11 @@ table ssr_history_stakeholders
 		lineageTag: 7b81a3c1-2f06-40e2-81d0-ea82cf4df10d
 
 	/// Measure meas.other_stkhlds_involv_dur.
+		annotation AgentPurpose = "Tracks stkhlds most senior duration involvement."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Measures: [meas.stkhlds_most_senior_title_dept]; Columns: ssr_history[stkhlds_all_max_title_seniority], ssr_history_stakeholders[trueai_act_dur], ssr_history_stakeholders[trueai_title_seniority]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.other_stkhlds_involv_dur' =
 			
 			var _dur = CALCULATE(Max(ssr_history_stakeholders[trueai_act_dur]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1, 2}))
@@ -200,6 +280,11 @@ table ssr_history_stakeholders
 		lineageTag: 0d1e49d5-8ac4-446e-ac00-84bc0eedcaf3
 
 	/// Measure meas.stkhlds_full_name.
+		annotation AgentPurpose = "Tracks other stkhlds involv duration."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_act_dur], ssr_history_stakeholders[trueai_stkhld_ranking]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.stkhlds_full_name' = ```
 			
 			
@@ -214,6 +299,11 @@ table ssr_history_stakeholders
 		lineageTag: aace1864-dfc9-414b-ac89-fa076f7b9612
 
 	/// Measure meas.other_stkhlds_title_dept.
+		annotation AgentPurpose = "Tracks stkhlds full name."
+		annotation AgentLogic = "Returns an extreme value from ssr_history_stakeholders[col.full_name] under filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[col.full_name], ssr_history_stakeholders[trueai_stkhld_ranking]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Boolean"
 	measure 'meas.other_stkhlds_title_dept' =
 			
 			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}) )  // get the  title dept filtering primary and secondary stakeholder
@@ -221,6 +311,11 @@ table ssr_history_stakeholders
 		lineageTag: 1f3c8d3c-eced-4f0f-b24b-2fdba44b5453
 
 	/// Measure meas.other_stkhlds_seniority.
+		annotation AgentPurpose = "Tracks other stkhlds title dept."
+		annotation AgentLogic = "Returns an extreme value from ssr_history_stakeholders[trueai_title_department] under filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_title_department], ssr_history_stakeholders[trueai_stkhld_ranking]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Boolean"
 	measure 'meas.other_stkhlds_seniority' =
 			
 			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_seniority]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}))
@@ -228,6 +323,11 @@ table ssr_history_stakeholders
 		lineageTag: bc7d75a2-edff-4a7b-a366-b6b65d2fe8c9
 
 	/// Measure meas.other_stkhlds_last_eng.
+		annotation AgentPurpose = "Tracks other stkhlds seniority."
+		annotation AgentLogic = "Returns an extreme value from ssr_history_stakeholders[trueai_title_seniority] under filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_title_seniority], ssr_history_stakeholders[trueai_stkhld_ranking]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Boolean"
 	measure 'meas.other_stkhlds_last_eng' =
 			
 			CALCULATE(MAX(ssr_history_stakeholders[trueai_last_eng]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}))  // filter out the primary and secondary stkhlds
@@ -236,6 +336,11 @@ table ssr_history_stakeholders
 		lineageTag: 173cf6a6-5668-4c8c-ab60-3ca3fc4b7d6a
 
 	/// Measure meas.prim_stkhlds_dur_involvement.
+		annotation AgentPurpose = "Tracks other stkhlds last eng."
+		annotation AgentLogic = "Returns an extreme value from ssr_history_stakeholders[trueai_last_eng] under filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_last_eng], ssr_history_stakeholders[trueai_stkhld_ranking]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Text"
 	measure 'meas.prim_stkhlds_dur_involvement' =
 			
 			var _dur = CALCULATE(sum(ssr_history_stakeholders[trueai_act_dur]), ssr_history_stakeholders[trueai_stkhld_ranking] in {1})
@@ -248,6 +353,11 @@ table ssr_history_stakeholders
 		lineageTag: 0cc030f4-fe8f-4343-851b-b7f959145666
 
 	/// Measure meas.sec_stkhlds_dur_involvement.
+		annotation AgentPurpose = "Tracks prim stkhlds duration involvement."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_act_dur], ssr_history_stakeholders[trueai_stkhld_ranking]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	measure 'meas.sec_stkhlds_dur_involvement' =
 			
 			var _dur = CALCULATE(sum(ssr_history_stakeholders[trueai_act_dur]), ssr_history_stakeholders[trueai_stkhld_ranking] in {2})
@@ -260,6 +370,11 @@ table ssr_history_stakeholders
 		lineageTag: a8feef57-bffd-4dc2-89b1-966bcb2c913e
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
+		annotation AgentPurpose = "Tracks sec stkhlds duration involvement."
+		annotation AgentLogic = "Calculated as a ratio of two values with any applied filters."
+		annotation AgentDependencies = "Columns: ssr_history_stakeholders[trueai_act_dur], ssr_history_stakeholders[trueai_stkhld_ranking]"
+		annotation AgentContext = "Evaluated in current filter context unless overridden in DAX."
+		annotation AgentOutput = "Percentage"
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 8d39f120-d62a-4708-95bf-1fdf91b782b3
