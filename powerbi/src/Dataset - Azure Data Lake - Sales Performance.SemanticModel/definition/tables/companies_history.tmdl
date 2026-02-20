@@ -3021,99 +3021,11 @@ table companies_history
 
 		annotation SummarizationSetBy = Automatic
 
-	column di_pred_prospecting_model_reset_on
-		dataType: string
-		lineageTag: 23ebc8af-5b65-4cc3-9f4e-6f62f0da1c17
-		summarizeBy: none
-		sourceColumn: di_pred_prospecting_model_reset_on
-
-		annotation SummarizationSetBy = Automatic
-
 	column ml_training_scores_value_pred_booking_amt_reset_on
 		dataType: string
 		lineageTag: 60efbd86-421a-4e66-a5cc-82af86c4a90d
 		summarizeBy: none
 		sourceColumn: ml_training_scores_value_pred_booking_amt_reset_on
-
-		annotation SummarizationSetBy = Automatic
-
-	column ml_training_scores_value_pred_close_date_if_won_reset_on
-		dataType: string
-		lineageTag: ee4d2847-6441-415e-a7a0-0b59c051f44f
-		summarizeBy: none
-		sourceColumn: ml_training_scores_value_pred_close_date_if_won_reset_on
-
-		annotation SummarizationSetBy = Automatic
-
-	column ml_training_scores_value_pred_close_date_if_lost_reset_on
-		dataType: string
-		lineageTag: d26f1852-8449-472c-a6f3-df60d152c1e1
-		summarizeBy: none
-		sourceColumn: ml_training_scores_value_pred_close_date_if_lost_reset_on
-
-		annotation SummarizationSetBy = Automatic
-
-	column ml_training_scores_value_pred_booking_amt_training
-		dataType: string
-		lineageTag: 6b3b8a14-6c80-47b3-bbc3-3c07c99344cb
-		summarizeBy: none
-		sourceColumn: ml_training_scores_value_pred_booking_amt_training
-
-		annotation SummarizationSetBy = Automatic
-
-	column ml_training_scores_value_pred_booking_amt_validation
-		dataType: string
-		lineageTag: c3cf91a4-5f3f-486f-8974-2d22cb58eeb4
-		summarizeBy: none
-		sourceColumn: ml_training_scores_value_pred_booking_amt_validation
-
-		annotation SummarizationSetBy = Automatic
-
-	column ml_training_scores_value_pred_booking_amt_test
-		dataType: string
-		lineageTag: f1e5e0f7-a20a-473b-a984-158cab6ae8b6
-		summarizeBy: none
-		sourceColumn: ml_training_scores_value_pred_booking_amt_test
-
-		annotation SummarizationSetBy = Automatic
-
-	column ml_training_scores_value_pred_close_date_if_won_training
-		dataType: string
-		lineageTag: b82a9f24-b835-4a3d-8cf7-c64f4ea5b404
-		summarizeBy: none
-		sourceColumn: ml_training_scores_value_pred_close_date_if_won_training
-
-		annotation SummarizationSetBy = Automatic
-
-	column ml_training_scores_value_pred_close_date_if_won_validation
-		dataType: string
-		lineageTag: 01d148cc-b5d8-4c30-922b-2256096efaca
-		summarizeBy: none
-		sourceColumn: ml_training_scores_value_pred_close_date_if_won_validation
-
-		annotation SummarizationSetBy = Automatic
-
-	column ml_training_scores_value_pred_close_date_if_won_test
-		dataType: string
-		lineageTag: e6b41625-88d3-4fdc-8d38-dc3dfdcea347
-		summarizeBy: none
-		sourceColumn: ml_training_scores_value_pred_close_date_if_won_test
-
-		annotation SummarizationSetBy = Automatic
-
-	column ml_training_scores_value_pred_close_date_if_lost_training
-		dataType: string
-		lineageTag: 87114776-8181-4c9f-a1ab-67b256aa0d52
-		summarizeBy: none
-		sourceColumn: ml_training_scores_value_pred_close_date_if_lost_training
-
-		annotation SummarizationSetBy = Automatic
-
-	column ml_training_scores_value_pred_close_date_if_lost_test
-		dataType: string
-		lineageTag: eca881f5-3cfc-4eb6-9b03-033d2b2eae01
-		summarizeBy: none
-		sourceColumn: ml_training_scores_value_pred_close_date_if_lost_test
 
 		annotation SummarizationSetBy = Automatic
 
@@ -3213,21 +3125,30 @@ table companies_history
 
 		annotation SummarizationSetBy = Automatic
 
-	column min_ext_match_confidence
-		dataType: string
-		lineageTag: 809292fd-05dc-4df9-adfd-ca4590d7d98e
-		summarizeBy: none
-		sourceColumn: min_ext_match_confidence
-
-		annotation SummarizationSetBy = Automatic
-
 	partition companies_history = m
 		mode: import
 		source =
 				let
+				    dbTable = getDBTable("companies_history"),
 				
-				  dbTable = getDBTable("companies_history"),
-				    #"Changed Type" = Table.TransformColumnTypes(dbTable,{
+				    // Ensure this column always exists in the output rowset (prevents Tabular "rowset column does not exist" errors)
+				    // If more missing columns show up, add them to this list.
+				    RequiredCols = {
+				        "ml_training_scores_value_pred_booking_amt_reset_on"
+				    },
+				
+				    #"Ensure Required Columns" =
+				        List.Accumulate(
+				            RequiredCols,
+				            dbTable,
+				            (state as table, colName as text) =>
+				                if List.Contains(Table.ColumnNames(state), colName)
+				                then state
+				                else Table.AddColumn(state, colName, each null, type nullable text)
+				        ),
+				
+				    // Sales Performance type mapping list (from the list you provided earlier)
+				    TypePairs = {
 				      {"_sys_as_of", type datetime},
 				      {"_sys_co_id", type text},
 				      {"_sys_doc_id", type text},
@@ -3349,10 +3270,26 @@ table companies_history
 				      {"users_non_match_hr_id_nd_group", Int64.Type},
 				      {"users_non_match_hr_id_pipeline", Int64.Type},
 				      {"users_non_match_hr_id_won_deals", Int64.Type},
-				      {"users_sales", Int64.Type}
-				    })
+				      {"users_sales", Int64.Type},
+				
+				      // Type the ensured column (it now always exists)
+				      {"ml_training_scores_value_pred_booking_amt_reset_on", type text}
+				    },
+				
+				    // Safe typing: only apply mappings for columns that exist at refresh time
+				    ExistingCols = Table.ColumnNames(#"Ensure Required Columns"),
+				    SafeTypePairs = List.Select(TypePairs, each List.Contains(ExistingCols, _{0})),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Ensure Required Columns", SafeTypePairs),
+				
+				    // Safe remove (won't error if missing)
+				    #"Removed Columns" =
+				        Table.RemoveColumns(
+				            #"Changed Type",
+				            {"di_pred_prospecting_model_reset_on"},
+				            MissingField.Ignore
+				        )
 				in
-				    #"Changed Type"
+				    #"Removed Columns"
 
 	annotation PBI_ResultType = Table
 

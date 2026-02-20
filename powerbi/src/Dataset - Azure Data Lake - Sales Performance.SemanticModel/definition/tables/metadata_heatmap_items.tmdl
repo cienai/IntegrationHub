@@ -3,46 +3,45 @@ table metadata_heatmap_items
 	lineageTag: 00dab9dc-0c89-4db4-8a5a-7354e75406d2
 
 	/// Measure meas.ai_score_kpi1.
-	measure 'meas.ai_score_kpi1' =
+	measure 'meas.ai_score_kpi1' = ```
 			
-			VAR _name   = MAX(metadata_heatmap_items[heatmap_kpi1_ai_score_name])
-			VAR _score  = [meas.kpi1_ai_score_trust_value]
-			VAR _bucket = [meas.KPI1_AI_score_bucket]
-			
-			VAR res =
-			    IF(
-			        ISBLANK(_name),
-			        "--",
-			        FORMAT(_score, "0") & " - " & _bucket
-			    )
-			
-			RETURN
-			res
+			    
+			    VAR _name   = MAX(metadata_heatmap_items[heatmap_kpi1_ai_score_name])
+			    VAR _score  = [meas.kpi1_ai_score_trust_value]
+			    VAR _bucket = [meas.KPI1_AI_score_bucket]
+			    
+			    VAR res =
+			        IF(
+			            ISBLANK(_name),
+			            "--",
+			            FORMAT(_score, "0") & " - " & _bucket
+			        )
+			    
+			    RETURN
+			    res
+			```
 		displayFolder: heatmap_kpis
 		lineageTag: 3b88c8ca-43e4-40ba-8362-3348a24d070e
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	/// Measure meas.ai_score_kpi2.
-	measure 'meas.ai_score_kpi2' =
+	measure 'meas.ai_score_kpi2' = ```
 			
-			VAR _name   = MAX(metadata_heatmap_items[heatmap_kpi2_ai_score_name])
-			VAR _score  = [meas.kpi2_ai_score_trust_value]
-			VAR _bucket = [meas.KPI2_AI_score_bucket]
-			
-			VAR res =
-			    IF(
-			        ISBLANK(_name),
-			        "--",
-			        FORMAT(_score, "0") & " - " & _bucket
-			    )
-			
-			RETURN
-			res
+			 VAR _name   = MAX(metadata_heatmap_items[heatmap_kpi2_ai_score_name])
+			    VAR _score  = [meas.kpi2_ai_score_trust_value]
+			    VAR _bucket = [meas.KPI2_AI_score_bucket]
+			    
+			    VAR res =
+			        IF(
+			            ISBLANK(_name),
+			            "--",
+			            FORMAT(_score, "0") & " - " & _bucket
+			        )
+			    
+			    RETURN
+			    res
+			```
 		displayFolder: heatmap_kpis
 		lineageTag: afcfa086-1bb4-48c3-b064-9bd05417b189
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.calc_hyp1_kpi1_denominator.
 	measure 'meas.calc_hyp1_kpi1_denominator' =
@@ -312,14 +311,15 @@ table metadata_heatmap_items
 			
 			var _max_date = [meas.context_date_max]
 			RETURN
-			    CALCULATE(
-			        DISTINCTCOUNT(ssr[_sys_doc_id]),
-			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK() || ssr[trueai_churned_on] >= DATE(YEAR(_max_date)+1,01,01)),
-			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK()),
-			        ssr_history[step_name]="Existing Customer Selling",
-			        ssr_history[opp_existing_customer_selling_cross_sale_won]=TRUE(),
-			        ALL(cal_end_dates)
-			    )
+			  CALCULATE(
+			    DISTINCTCOUNT(ssr[_sys_doc_id]),
+			    KEEPFILTERS(ssr[trueai_churned_on]=BLANK() || ssr[trueai_churned_on] >= DATE(YEAR(_max_date)+1,01,01)),
+			    KEEPFILTERS(ssr[trueai_churned_on]=BLANK()),
+			    ssr_history[step_name]="Existing Customer Selling",
+			    ssr_history[opp_existing_customer_selling_cross_sale]=TRUE(),
+			    ssr_history[step_success]=TRUE(),
+			    ALL(cal_end_dates)
+			)
 		formatString: 0
 		displayFolder: heatmap_kpis
 		lineageTag: 4c7ac747-8024-4d3c-a408-41770d0a8626
