@@ -2,7 +2,10 @@
 table users
 	lineageTag: a820f8fc-c2ef-41f8-bc42-b46f25fc4f43
 
-	/// Measure meas.users_user_roles_concat.
+	/// Purpose: Concatenates top user roles in the current filter context.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, SUMMARIZE, TOPN, COUNT, and CONCATENATEX.
+	/// Dynamic Behavior: Respects current filter context; responds to filters on users[trueai_user_role] and users[_sys_doc_id].
+	/// Format/Type: Unspecified
 	measure 'meas.users_user_roles_concat' = ```
 			
 			-- concats all the crm values for trueai value
@@ -19,7 +22,10 @@ table users
 		displayFolder: user_role_concats
 		lineageTag: 2e4a5f18-741d-4c16-9371-62736ec5de95
 
-	/// Measure meas.users_user_roles_concat_w_count.
+	/// Purpose: Concatenates top user role aliases with counts in the current context.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, SUMMARIZE, TOPN, COUNT, and CONCATENATEX.
+	/// Dynamic Behavior: Respects current filter context; responds to filters on users[trueai_user_role_alias] and users[_sys_doc_id].
+	/// Format/Type: Unspecified
 	measure 'meas.users_user_roles_concat_w_count' = ```
 			
 			-- concats all the crm values for trueai value
@@ -36,7 +42,10 @@ table users
 		displayFolder: user_role_concats
 		lineageTag: 90265a0f-91d1-49cd-876f-f521314ce19b
 
-	/// Measure meas.users_user_roles_concat_w_count_eop.
+	/// Purpose: Concatenates top user role aliases with counts (end-of-period context).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, LASTNONBLANK, SUMMARIZE, TOPN, COUNT, and CONCATENATEX.
+	/// Dynamic Behavior: Respects current filter context; responds to filters on users_history and users role aliases.
+	/// Format/Type: Unspecified
 	measure 'meas.users_user_roles_concat_w_count_eop' = ```
 			
 			-- concats all the crm values for trueai value for eop
@@ -55,7 +64,10 @@ table users
 		displayFolder: user_role_concats
 		lineageTag: e77c169f-e8d6-48e8-ab2e-87441d66a83b
 
-	/// Measure meas.users_user_roles_function_concat_w_count.
+	/// Purpose: Concatenates user role functions and aliases with counts in context.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, SUMMARIZE, TOPN, COUNT, and CONCATENATEX.
+	/// Dynamic Behavior: Respects current filter context; responds to filters on users[trueai_user_role_function] and users[trueai_user_role_alias].
+	/// Format/Type: Unspecified
 	measure 'meas.users_user_roles_function_concat_w_count' = ```
 			
 			-- concats all the crm values for trueai value
@@ -72,13 +84,19 @@ table users
 		displayFolder: user_role_concats
 		lineageTag: cf2e5ac8-6558-41ec-8060-fff13bff2cbd
 
-	/// Measure meas.users_rep_stats_bookings.
+	/// Purpose: Sums won amount for New Logo and Existing Customer Selling steps.
+	/// Calculation Logic: Uses CALCULATE with SUM over ssr_history[opp_won_amt] and a step_name filter.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters ssr_history[step_name].
+	/// Format/Type: \$#,0;(\$#,0);\$#,0
 	measure 'meas.users_rep_stats_bookings' = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] in {"New Logo Selling" , "Existing Customer Selling"})
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: rep_stats
 		lineageTag: 98abfde2-24b2-45d4-bff2-09d94f91f1aa
 
-	/// Measure meas.users_rep_stats_bookings 1.
+	/// Purpose: Returns bookings for a fixed date range (2020-01-01 to 2021-01-01).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE over [meas.users_rep_stats_bookings] and date filters.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters ssr_history[_sys_filt_end_date].
+	/// Format/Type: \$#,0;(\$#,0);\$#,0
 	measure 'meas.users_rep_stats_bookings 1' =
 			var start_date = date(2020,1,1)
 			var end_date = date(2021,1,1)
@@ -88,14 +106,20 @@ table users
 		displayFolder: rep_stats
 		lineageTag: 8359b751-d9bd-4138-80cc-d97135f2e6c8
 
-	/// Measure meas.users_table_row_count.
+	/// Purpose: Counts rows in the users table.
+	/// Calculation Logic: Uses COUNTROWS(Users).
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: 0
 	measure 'meas.users_table_row_count' =
 			
 			COUNTROWS(Users)
 		formatString: 0
 		lineageTag: 59d6070a-cbdb-4359-9c06-41be235e091e
 
-	/// Measure meas.users_is_active.
+	/// Purpose: Returns 1 if the user has no termination date, otherwise 0.
+	/// Calculation Logic: Uses VAR/RETURN with IF, ISBLANK, and MAX on users[trueai_termination_date].
+	/// Dynamic Behavior: Respects current filter context; responds to filters on users[trueai_termination_date].
+	/// Format/Type: 0
 	measure 'meas.users_is_active' =
 			
 			// var curr_date = CALCULATE(MAX(cal_end_dates[Date]))  // get  the current maximum date
@@ -112,12 +136,18 @@ table users
 		formatString: 0
 		lineageTag: 1431c953-2044-4fbb-97c2-b353ce241402
 
-	/// Measure meas.user_overview_title.
+	/// Purpose: Displays a static title for the Active Users Overview.
+	/// Calculation Logic: Direct constant string.
+	/// Dynamic Behavior: Not filter-dependent.
+	/// Format/Type: Unspecified
 	measure 'meas.user_overview_title' = "Active Users Overview"
 		displayFolder: _active_user_overview
 		lineageTag: db75255d-25c7-45bb-8d82-f23f4ca2fedc
 
-	/// Measure meas.users_overview_win_rate_mtd.
+	/// Purpose: Win rate for New Logo and Existing Customer Selling steps (MTD).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, COUNTX, and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; applies MTD date filters on cal_end_dates[Date] and step filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_win_rate_mtd' = ```
 			
 			
@@ -164,7 +194,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: 310a8955-0807-4928-a59d-3c8abc9da526
 
-	/// Measure meas.users_overview_win_rate_qtd.
+	/// Purpose: Win rate for New Logo and Existing Customer Selling steps (QTD).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, COUNTX, and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; applies QTD date filters on cal_end_dates[Date] and step filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_win_rate_qtd' = ```
 			
 			
@@ -213,7 +246,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: ebc4d37a-ed87-42fa-ae20-94ae49a81b47
 
-	/// Measure meas.users_overview_win_rate_ytd.
+	/// Purpose: Win rate for New Logo and Existing Customer Selling steps (YTD).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, COUNTX, and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; applies YTD date filters on cal_end_dates[Date] and step filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_win_rate_ytd' = ```
 			
 			
@@ -262,7 +298,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: 0fed3d7e-4822-429b-80b1-b6d73792eabe
 
-	/// Measure meas.users_overview_win_rate_mtd_sply.
+	/// Purpose: Win rate for New Logo and Existing Customer Selling steps (MTD SPLY).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, COUNTX, and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; applies SPLY MTD date filters on cal_end_dates[Date] and step filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_win_rate_mtd_sply' = ```
 			
 			
@@ -311,7 +350,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: eb3379cf-b461-48f9-9595-960b3626535f
 
-	/// Measure meas.users_overview_win_rate_mtd_sply_diff.
+	/// Purpose: Percent difference between MTD win rate and MTD SPLY win rate.
+	/// Calculation Logic: Uses VAR/RETURN with DIVIDE and IF to return "-" when blank.
+	/// Dynamic Behavior: Respects current filter context; responds to the win rate measures.
+	/// Format/Type: +0%;-0%;"-"
 	measure 'meas.users_overview_win_rate_mtd_sply_diff' = ```
 			
 			var res = DIVIDE([meas.users_overview_win_rate_mtd] - [meas.users_overview_win_rate_mtd_sply], [meas.users_overview_win_rate_mtd])
@@ -329,7 +371,10 @@ table users
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_overview_win_rate_qtd_sply.
+	/// Purpose: Win rate for New Logo and Existing Customer Selling steps (QTD SPLY).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, COUNTX, and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; applies SPLY QTD date filters on cal_end_dates[Date] and step filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_win_rate_qtd_sply' = ```
 			
 			
@@ -378,7 +423,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: 3f8bd10b-3cc4-4760-a4b5-8e732adaee1d
 
-	/// Measure meas.users_overview_win_rate_qtd_sply_diff.
+	/// Purpose: Percent difference between QTD win rate and QTD SPLY win rate.
+	/// Calculation Logic: Uses VAR/RETURN with DIVIDE and IF to return "-" when blank.
+	/// Dynamic Behavior: Respects current filter context; responds to the win rate measures.
+	/// Format/Type: +0%;-0%;"-"
 	measure 'meas.users_overview_win_rate_qtd_sply_diff' =
 			
 			var res = DIVIDE([meas.users_overview_win_rate_qtd] - [meas.users_overview_win_rate_qtd_sply], [meas.users_overview_win_rate_qtd])
@@ -396,7 +444,10 @@ table users
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_overview_win_rate_ytd_sply.
+	/// Purpose: Win rate for New Logo and Existing Customer Selling steps (YTD SPLY).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, COUNTX, and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; applies SPLY YTD date filters on cal_end_dates[Date] and step filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_win_rate_ytd_sply' = ```
 			
 			
@@ -445,7 +496,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: 07e8a5e9-84ce-4495-8914-7d40a27a3b10
 
-	/// Measure meas.users_overview_win_rate_ytd_sply_diff.
+	/// Purpose: Percent difference between YTD win rate and YTD SPLY win rate.
+	/// Calculation Logic: Uses VAR/RETURN with DIVIDE and IF to return "-" when blank.
+	/// Dynamic Behavior: Respects current filter context; responds to the win rate measures.
+	/// Format/Type: +0%;-0%;"-"
 	measure 'meas.users_overview_win_rate_ytd_sply_diff' = ```
 			
 			var res = DIVIDE(([meas.users_overview_win_rate_ytd]-[meas.users_overview_win_rate_ytd_sply]), [meas.users_overview_win_rate_ytd])
@@ -465,7 +519,10 @@ table users
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_mtd.
+	/// Purpose: Average predicted conversion rate for selected steps (MTD).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, and AVERAGEX over ssr_history[step_success_prob].
+	/// Dynamic Behavior: Respects current filter context; applies MTD date filters and step_name filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_avg_pred_conv_rate_mtd' = ```
 			
 			
@@ -502,7 +559,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: 948eb230-a8c7-4ff6-bcc4-06359fe0ba6d
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_mtd_sply.
+	/// Purpose: Average predicted conversion rate for selected steps (MTD SPLY).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, and AVERAGEX over ssr_history[step_success_prob].
+	/// Dynamic Behavior: Respects current filter context; applies SPLY MTD date filters and step_name filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_avg_pred_conv_rate_mtd_sply' = ```
 			
 			
@@ -539,7 +599,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: 7d964627-3956-4dbf-a6e3-d9d7bcfc2bf5
 
-	/// Measure meas.users_overview_avg_pred_conv_mtd_sply_diff.
+	/// Purpose: Percent difference between MTD and MTD SPLY predicted conversion rates.
+	/// Calculation Logic: Uses VAR/RETURN with DIVIDE and IF to return "-" when blank.
+	/// Dynamic Behavior: Respects current filter context; responds to predicted conversion rate measures.
+	/// Format/Type: +0%;-0%;"-"
 	measure 'meas.users_overview_avg_pred_conv_mtd_sply_diff' = ```
 			
 			var res = DIVIDE([meas.users_overview_avg_pred_conv_rate_mtd] - [meas.users_overview_avg_pred_conv_rate_mtd_sply], [meas.users_overview_avg_pred_conv_rate_mtd])
@@ -556,7 +619,10 @@ table users
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_qtd.
+	/// Purpose: Average predicted conversion rate for selected steps (QTD).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, and AVERAGEX over ssr_history[step_success_prob].
+	/// Dynamic Behavior: Respects current filter context; applies QTD date filters and step_name filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_avg_pred_conv_rate_qtd' = ```
 			
 			
@@ -593,7 +659,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: 7703ba0a-e9d0-4a81-ba9d-781cf350d54e
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_qtd_sply.
+	/// Purpose: Average predicted conversion rate for selected steps (QTD SPLY).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, and AVERAGEX over ssr_history[step_success_prob].
+	/// Dynamic Behavior: Respects current filter context; applies SPLY QTD date filters and step_name filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_avg_pred_conv_rate_qtd_sply' = ```
 			
 			
@@ -630,7 +699,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: 91dd19a6-1fa4-42e5-968a-db02bf828f0e
 
-	/// Measure meas.users_overview_avg_pred_conv_qtd_sply_diff.
+	/// Purpose: Percent difference between QTD and QTD SPLY predicted conversion rates.
+	/// Calculation Logic: Uses VAR/RETURN with DIVIDE and IF to return "-" when blank.
+	/// Dynamic Behavior: Respects current filter context; responds to predicted conversion rate measures.
+	/// Format/Type: +0%;-0%;"-"
 	measure 'meas.users_overview_avg_pred_conv_qtd_sply_diff' = ```
 			
 			var res = DIVIDE([meas.users_overview_avg_pred_conv_rate_qtd] - [meas.users_overview_avg_pred_conv_rate_qtd_sply], [meas.users_overview_avg_pred_conv_rate_qtd])
@@ -647,7 +719,10 @@ table users
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_ytd.
+	/// Purpose: Average predicted conversion rate for selected steps (YTD).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, and AVERAGEX over ssr_history[step_success_prob].
+	/// Dynamic Behavior: Respects current filter context; applies YTD date filters and step_name filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_avg_pred_conv_rate_ytd' = ```
 			
 			
@@ -684,7 +759,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: e3eece90-6448-45ce-9ea9-a89ed47c6414
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_ytd_sply.
+	/// Purpose: Average predicted conversion rate for selected steps (YTD SPLY).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, FILTER, and AVERAGEX over ssr_history[step_success_prob].
+	/// Dynamic Behavior: Respects current filter context; applies SPLY YTD date filters and step_name filters on ssr_history.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_overview_avg_pred_conv_rate_ytd_sply' = ```
 			
 			
@@ -721,7 +799,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: 92cb3110-77ea-42c3-b92b-6f1ebb40254a
 
-	/// Measure meas.users_overview_avg_pred_conv_ytd_sply_diff.
+	/// Purpose: Percent difference between YTD and YTD SPLY predicted conversion rates.
+	/// Calculation Logic: Uses VAR/RETURN with DIVIDE and IF to return "-" when blank.
+	/// Dynamic Behavior: Respects current filter context; responds to predicted conversion rate measures.
+	/// Format/Type: +0%;-0%;"-"
 	measure 'meas.users_overview_avg_pred_conv_ytd_sply_diff' = ```
 			
 			var res = DIVIDE([meas.users_overview_avg_pred_conv_rate_ytd] - [meas.users_overview_avg_pred_conv_rate_ytd_sply], [meas.users_overview_avg_pred_conv_rate_ytd])       // get the delta
@@ -738,7 +819,10 @@ table users
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.ssr_history_actual_win_rate.
+	/// Purpose: Overall win rate across SSR history (successful steps / total steps).
+	/// Calculation Logic: Uses VAR/RETURN with FILTER, COUNTX, and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; responds to filters on ssr_history and ssr_history[step_success].
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.ssr_history_actual_win_rate' = ```
 			
 			
@@ -768,7 +852,10 @@ table users
 		displayFolder: _active_user_overview
 		lineageTag: b697679b-3c93-4420-86f1-f25eb146002f
 
-	/// Measure meas.users_trueai_full_name.
+	/// Purpose: Returns the selected user's full name.
+	/// Calculation Logic: Uses SELECTEDVALUE on users[trueai_full_name].
+	/// Dynamic Behavior: Respects current filter context; responds to filters on users[trueai_full_name].
+	/// Format/Type: Unspecified
 	measure 'meas.users_trueai_full_name' =
 			
 			SELECTEDVALUE(users[trueai_full_name])
