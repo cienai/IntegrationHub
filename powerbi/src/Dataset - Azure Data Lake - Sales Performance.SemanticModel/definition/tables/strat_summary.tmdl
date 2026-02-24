@@ -2,7 +2,10 @@
 table strat_summary
 	lineageTag: ed1b27bf-eb0f-4e9b-b221-10ffd26ab22c
 
-	/// Measure meas.strat_summary_delta_prev_period.
+	/// Purpose: Returns percent change in key metric vs the previous period.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(AVERAGE) and DIVIDE over current vs previous period.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE applies date filters on cal_end_dates[Date].
+	/// Format/Type: +0%;-0%;0%
 	measure 'meas.strat_summary_delta_prev_period' = ```
 			
 			
@@ -26,7 +29,10 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_score.
+	/// Purpose: Returns a capped score based on actual vs reference key metric, with optional inversion.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(AVERAGE/MAX), DIVIDE, IF, MIN/MAX to derive score and apply coefficients.
+	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary metric fields.
+	/// Format/Type: Unspecified
 	measure 'meas.strat_summary_score' = ```
 			
 			--var max_date = cal_end_dates[meas.context_date_max] -- get the last date
@@ -47,7 +53,10 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_trend_score.
+	/// Purpose: Returns a trend score derived from prior period delta.
+	/// Calculation Logic: Uses VAR/RETURN with [meas.strat_summary_delta_prev_period], exponentiation, and MIN/MAX cap.
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the delta measure.
+	/// Format/Type: Unspecified
 	measure 'meas.strat_summary_trend_score' = ```
 			
 			
@@ -64,7 +73,10 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_display_score.
+	/// Purpose: Displays strat summary score as a percentage (score * 100).
+	/// Calculation Logic: Direct expression multiplying [meas.strat_summary_score] by 100.
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the score measure.
+	/// Format/Type: 0
 	measure 'meas.strat_summary_display_score' = ```
 			strat_summary[meas.strat_summary_score] * 100
 			
@@ -74,10 +86,9 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_display_key_metric_pct.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the average key metric value as a percentage.
+	/// Calculation Logic: Uses CALCULATE with AVERAGE over strat_summary[key_metric_value].
+	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary[key_metric_value].
 	/// Format/Type: 0.0%;-0.0%;0.0%
 	measure 'meas.strat_summary_display_key_metric_pct' =
 			
@@ -87,7 +98,10 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_score_display_eop.
+	/// Purpose: Returns end-of-period score displayed as a percentage.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(AVERAGE/MAX), DIVIDE, IF, MIN/MAX, and applies a 100x scale.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters cal_end_dates[Date] to the last day.
+	/// Format/Type: 0
 	measure 'meas.strat_summary_score_display_eop' = ```
 			
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
@@ -110,10 +124,9 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_key_metric_display_pct_eop.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns average key metric value over the last 30 days as a percentage.
+	/// Calculation Logic: Uses VAR/RETURN with FILTER and CALCULATE(AVERAGE).
+	/// Dynamic Behavior: Respects current filter context; CALCULATE applies a rolling 30-day filter on cal_end_dates[Date].
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.strat_summary_key_metric_display_pct_eop' =
 			
@@ -127,10 +140,9 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_display_reference_pct.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the average key metric reference value as a percentage.
+	/// Calculation Logic: Uses CALCULATE with AVERAGE over strat_summary[key_metric_reference].
+	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary[key_metric_reference].
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.strat_summary_display_reference_pct' =
 			
@@ -140,7 +152,10 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_delta_12mo_eop.
+	/// Purpose: Returns percent change vs the comparable prior period (12 months back).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(AVERAGE) and DIVIDE over current vs prior windows.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE applies date filters on cal_end_dates[Date].
+	/// Format/Type: +0%;-0%;0%
 	measure 'meas.strat_summary_delta_12mo_eop' = ```
 			
 			
@@ -164,10 +179,9 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_key_metric_display_ratio_eop.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns average key metric value over the last 30 days as a ratio display.
+	/// Calculation Logic: Uses VAR/RETURN with FILTER and CALCULATE(AVERAGE).
+	/// Dynamic Behavior: Respects current filter context; CALCULATE applies a rolling 30-day filter on cal_end_dates[Date].
 	/// Format/Type: #.0 ":1"
 	measure 'meas.strat_summary_key_metric_display_ratio_eop' =
 			
@@ -183,10 +197,9 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.strat_summary_display_reference_ratio.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the average key metric reference value as a ratio display.
+	/// Calculation Logic: Uses CALCULATE with AVERAGE over strat_summary[key_metric_reference].
+	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary[key_metric_reference].
 	/// Format/Type: 0":1"
 	measure 'meas.strat_summary_display_reference_ratio' =
 			
@@ -196,7 +209,10 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_concern_score.
+	/// Purpose: Returns concern score as the geometric mean of score and trend score.
+	/// Calculation Logic: Uses VAR/RETURN with [meas.strat_summary_score] and [meas.strat_summary_trend_score], exponentiation.
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting both score measures.
+	/// Format/Type: Unspecified
 	measure 'meas.strat_summary_concern_score' = ```
 			
 			var val_score = strat_summary[meas.strat_summary_score]
@@ -209,10 +225,9 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_concern_score_display.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Displays concern score as Low/Medium/High based on thresholds.
+	/// Calculation Logic: Uses IF to map [meas.strat_summary_concern_score] to text labels.
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the concern score.
 	/// Format/Type: Unspecified
 	measure 'meas.strat_summary_concern_score_display' =
 			
@@ -220,10 +235,9 @@ table strat_summary
 			return res
 		lineageTag: e8d32342-6ef1-4d93-88c4-986a1f524e93
 
-	/// Measure meas.strat_summary_trend_display.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Displays trend as Improving/Steady/Declining based on trend score.
+	/// Calculation Logic: Uses IF to map [meas.strat_summary_trend_score] to text labels.
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the trend score.
 	/// Format/Type: 0
 	measure 'meas.strat_summary_trend_display' =
 			
@@ -231,15 +245,17 @@ table strat_summary
 			return res
 		lineageTag: 9432771d-5fb2-467d-924b-fa9d6c1041b4
 
-	/// Measure measure.strat_summary_industry_score_display.
+	/// Purpose: Returns a hard-coded industry score display value.
+	/// Calculation Logic: Direct constant value (52).
+	/// Dynamic Behavior: Not filter-dependent.
+	/// Format/Type: 0
 	measure 'measure.strat_summary_industry_score_display' = 52
 		formatString: 0
 		lineageTag: 18b3dd43-84ac-49f4-8cd7-d2283175eed2
 
-	/// Measure meas.strat_summary_key_metric_display_hrs_eop.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns average key metric value over the last 30 days as hours.
+	/// Calculation Logic: Uses VAR/RETURN with FILTER and CALCULATE(AVERAGE).
+	/// Dynamic Behavior: Respects current filter context; CALCULATE applies a rolling 30-day filter on cal_end_dates[Date].
 	/// Format/Type: #,##0.0"hrs"
 	measure 'meas.strat_summary_key_metric_display_hrs_eop' =
 			
@@ -255,10 +271,9 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.strat_summary_key_metric_display_decimal_eop.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns average key metric value over the last 30 days as a decimal.
+	/// Calculation Logic: Uses VAR/RETURN with FILTER and CALCULATE(AVERAGE).
+	/// Dynamic Behavior: Respects current filter context; CALCULATE applies a rolling 30-day filter on cal_end_dates[Date].
 	/// Format/Type: #,##0.0
 	measure 'meas.strat_summary_key_metric_display_decimal_eop' =
 			
@@ -274,10 +289,9 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.strat_summary_display_reference_hrs.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the average key metric reference value as hours.
+	/// Calculation Logic: Uses CALCULATE with AVERAGE over strat_summary[key_metric_reference].
+	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary[key_metric_reference].
 	/// Format/Type: #,##0.0" hrs"
 	measure 'meas.strat_summary_display_reference_hrs' =
 			
@@ -287,10 +301,9 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_display_reference_decimal.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the average key metric reference value as a decimal.
+	/// Calculation Logic: Uses CALCULATE with AVERAGE over strat_summary[key_metric_reference].
+	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary[key_metric_reference].
 	/// Format/Type: #,##0.0
 	measure 'meas.strat_summary_display_reference_decimal' =
 			
@@ -300,7 +313,10 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Measure meas.strat_summary_score_display_eop_existing_cust_exp.
+	/// Purpose: End-of-period score display filtered to Existing Customer Revenue summary category.
+	/// Calculation Logic: Uses CALCULATE to filter [meas.strat_summary_score_display_eop] by strat_summary[summary_cat].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE applies summary_cat filter.
+	/// Format/Type: Unspecified
 	measure 'meas.strat_summary_score_display_eop_existing_cust_exp' = ```
 			
 			CALCULATE(
@@ -313,7 +329,10 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_score_display_eop_for_new_logo_sales.
+	/// Purpose: End-of-period score display filtered to New Logo Sales summary category.
+	/// Calculation Logic: Uses CALCULATE to filter [meas.strat_summary_score_display_eop] by strat_summary[summary_cat].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE applies summary_cat filter.
+	/// Format/Type: Unspecified
 	measure 'meas.strat_summary_score_display_eop_for_new_logo_sales' = ```
 			
 			CALCULATE(
@@ -326,7 +345,10 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_score_display_eop_for_rep_perf.
+	/// Purpose: End-of-period score display filtered to Rep Performance summary category.
+	/// Calculation Logic: Uses CALCULATE to filter [meas.strat_summary_score_display_eop] by strat_summary[summary_cat].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE applies summary_cat filter.
+	/// Format/Type: Unspecified
 	measure 'meas.strat_summary_score_display_eop_for_rep_perf' = ```
 			
 			CALCULATE(
@@ -339,7 +361,10 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_score_display_eop_for_sales_and_market.
+	/// Purpose: End-of-period score display filtered to Sales & Marketing Alignment summary category.
+	/// Calculation Logic: Uses CALCULATE to filter [meas.strat_summary_score_display_eop] by strat_summary[summary_cat].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE applies summary_cat filter.
+	/// Format/Type: Unspecified
 	measure 'meas.strat_summary_score_display_eop_for_sales_and_market' = ```
 			
 			CALCULATE(
@@ -353,7 +378,10 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_score_display_eop_for_target_and_segment.
+	/// Purpose: End-of-period score display filtered to Targeting & Segmenting summary category.
+	/// Calculation Logic: Uses CALCULATE to filter [meas.strat_summary_score_display_eop] by strat_summary[summary_cat].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE applies summary_cat filter.
+	/// Format/Type: Unspecified
 	measure 'meas.strat_summary_score_display_eop_for_target_and_segment' = ```
 			
 			CALCULATE(
@@ -366,7 +394,10 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.strat_summary_all_score.
+	/// Purpose: Returns the average of five category scores and rounds to whole number.
+	/// Calculation Logic: Uses VAR/RETURN with arithmetic average and ROUND.
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the component measures.
+	/// Format/Type: Unspecified
 	measure 'meas.strat_summary_all_score' = ```
 			
 			var score = (strat_summary[meas.strat_summary_score_display_eop_existing_cust_exp] + strat_summary[meas.strat_summary_score_display_eop_for_new_logo_sales] 

@@ -2,30 +2,27 @@
 table ssr
 	lineageTag: cb48d9a8-ea61-48bb-845c-67eb596f90f7
 
-	/// Measure meas.ssr_trueai_conversion_rate.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the conversion rate of ssr_trueai_converted_count to total SSR count.
+	/// Calculation Logic: Uses CALCULATE, COUNT, and division.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr[_sys_doc_id].
 	/// Format/Type: 0.0%;-0.0%;0.0%
 	measure 'meas.ssr_trueai_conversion_rate' = [meas.ssr_trueai_converted_count] / CALCULATE(count(ssr[_sys_doc_id]))
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: __needs_attention
 		lineageTag: a946bddd-5ee9-4adf-a031-0bb4bbb7b204
 
-	/// Measure meas.ssr_trueai_converted_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the distinct count of SSRs converted in the Prospecting step with success.
+	/// Calculation Logic: Uses CALCULATE and DISTINCTCOUNT with filters on step_name and step_success.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr_history[_sys_ssr_id], ssr_history[step_name], and ssr_history[step_success].
 	/// Format/Type: 0
 	measure 'meas.ssr_trueai_converted_count' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="Prospecting" && ssr_history[step_success] =True )
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: f64fb9f1-a6d6-4e35-ade9-42652b127317
 
-	/// Measure meas.ssr_trueai_no_leadsource_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of SSR records with blank or "ND" leadsource.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE, COUNT, OR, ISBLANK, and IF.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr[trueai_leadsource].
 	/// Format/Type: 0
 	measure 'meas.ssr_trueai_no_leadsource_count' = ```
 			
@@ -37,20 +34,18 @@ table ssr
 		displayFolder: __needs_attention
 		lineageTag: 9ff987e5-24d2-453a-8420-d58519669d3c
 
-	/// Measure meas.ssr_trueai_no_leadsource_rate.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the rate of SSR records with blank or "ND" leadsource.
+	/// Calculation Logic: Uses CALCULATE, COUNT, and division.
+	/// Dynamic Behavior: Respects current filter context; responds to filters on ssr[trueai_leadsource] and ssr[_sys_doc_id].
 	/// Format/Type: 0.0%;-0.0%;0.0%
 	measure 'meas.ssr_trueai_no_leadsource_rate' = [meas.ssr_trueai_no_leadsource_count] / CALCULATE(count(ssr[_sys_doc_id]))
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: __needs_attention
 		lineageTag: 688b74be-7bd5-49c2-ac7d-734bc28f3627
 
-	/// Measure measure.ssr_touched_accounts.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the distinct count of SSRs with step_name "Untouched" and step_success true.
+	/// Calculation Logic: Uses CALCULATE and DISTINCTCOUNT with filters on step_name and step_success.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr_history[_sys_ssr_id], ssr_history[step_name], and ssr_history[step_success].
 	/// Format/Type: #,0
 	measure 'measure.ssr_touched_accounts' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="Untouched" && ssr_history[step_success] =True )
 		formatString: #,0
@@ -59,20 +54,18 @@ table ssr
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.ssr_new_logo_won_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the distinct count of SSRs with step_name "New Logo Selling" and step_success true.
+	/// Calculation Logic: Uses CALCULATE and DISTINCTCOUNT with filters on step_name and step_success.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr_history[_sys_ssr_id], ssr_history[step_name], and ssr_history[step_success].
 	/// Format/Type: #,0
 	measure 'meas.ssr_new_logo_won_count' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="New Logo Selling" && ssr_history[step_success] =True )
 		formatString: #,0
 		displayFolder: __needs_attention
 		lineageTag: cd0cea50-3fac-4990-8fc2-b523aa9dc032
 
-	/// Measure meas.ssr_hsitory_accounts_per_prospecting_rep.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the ratio of distinct SSR accounts to distinct prospecting reps.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE, DISTINCTCOUNT, and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr_history[_sys_ssr_id], ssr_history[step_owner_id], and ssr_history[step_name].
 	/// Format/Type: Unspecified
 	measure 'meas.ssr_hsitory_accounts_per_prospecting_rep' = ```
 			
@@ -87,19 +80,17 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ssr_touch_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of ssr[trueai_first_touch] values.
+	/// Calculation Logic: Uses CALCULATE and COUNT.
+	/// Dynamic Behavior: Respects current filter context and responds to filters on ssr[trueai_first_touch].
 	/// Format/Type: 0
 	measure 'meas.ssr_touch_count' = calculate(count(ssr[trueai_first_touch]))
 		formatString: 0
 		lineageTag: b668fd30-f94c-43db-9460-63b5490155f1
 
-	/// Measure meas.ssr_crm_opp_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the sum of ssr[crm_opp_count].
+	/// Calculation Logic: Uses CALCULATE and SUM.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr[crm_opp_count].
 	/// Format/Type: 0
 	measure 'meas.ssr_crm_opp_count' =
 			CALCULATE(
@@ -108,10 +99,9 @@ table ssr
 		formatString: 0
 		lineageTag: fec59036-1e4c-4a53-b0b8-1c0ff6536bf8
 
-	/// Measure meas.leadsource_record_count_sort.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns a leadsource sort key based on record count rank.
+	/// Calculation Logic: Uses VAR/RETURN with RANKX, FILTER, ALL, CALCULATE, COUNT, and MAX.
+	/// Dynamic Behavior: Respects current filter context; uses ALL to rank across lead sources and responds to filters on ssr[crm_leadsource], ssr[trueai_leadsource], and ssr[_sys_doc_id].
 	/// Format/Type: Unspecified
 	measure 'meas.leadsource_record_count_sort' =
 			
@@ -136,10 +126,9 @@ table ssr
 			res
 		lineageTag: d08183c0-78aa-4f8d-9ac4-9313e5df3ff7
 
-	/// Measure meas.record_counts.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of SSR records.
+	/// Calculation Logic: Uses COUNT.
+	/// Dynamic Behavior: Respects current filter context and responds to filters on ssr[_sys_doc_id].
 	/// Format/Type: #,0
 	measure 'meas.record_counts' =
 			
@@ -147,10 +136,9 @@ table ssr
 		formatString: #,0
 		lineageTag: 956cc13c-ee6e-4031-97bd-2dfccee84e0d
 
-	/// Measure meas.ssr_crm_contact_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the sum of ssr[crm_contact_count].
+	/// Calculation Logic: Uses SUM.
+	/// Dynamic Behavior: Respects current filter context and responds to filters on ssr[crm_contact_count].
 	/// Format/Type: 0
 	measure 'meas.ssr_crm_contact_count' =
 			
@@ -160,10 +148,9 @@ table ssr
 		formatString: 0
 		lineageTag: 786b0571-6412-45e9-881f-0e927e48c9e6
 
-	/// Measure meas.ssr_crm_lead_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the sum of ssr[crm_lead_count].
+	/// Calculation Logic: Uses SUM.
+	/// Dynamic Behavior: Respects current filter context and responds to filters on ssr[crm_lead_count].
 	/// Format/Type: 0
 	measure 'meas.ssr_crm_lead_count' =
 			
@@ -173,10 +160,9 @@ table ssr
 		formatString: 0
 		lineageTag: 5187e7df-f760-4af9-8277-9b5e39ff2c76
 
-	/// Measure meas.ssr_crm_account_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the sum of ssr[crm_account_count].
+	/// Calculation Logic: Uses SUM.
+	/// Dynamic Behavior: Respects current filter context and responds to filters on ssr[crm_account_count].
 	/// Format/Type: 0
 	measure 'meas.ssr_crm_account_count' =
 			
@@ -186,10 +172,9 @@ table ssr
 		formatString: 0
 		lineageTag: f70335cc-8680-4df2-8f61-b5b70e973046
 
-	/// Measure meas.ssr_trueai_potential_acv.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the sum of ssr[trueai_potential_acv].
+	/// Calculation Logic: Uses CALCULATE and SUM.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr[trueai_potential_acv].
 	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 	measure 'meas.ssr_trueai_potential_acv' =
 			

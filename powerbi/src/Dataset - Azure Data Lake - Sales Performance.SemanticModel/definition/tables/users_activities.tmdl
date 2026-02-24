@@ -3,6 +3,10 @@ table users_activities
 	lineageTag: fb2d1c4a-d460-4eb9-94bd-25ddedeb3f9c
 
 	/// Measure meas.act_capt_lvl_adj_total_eng_dur_hr.
+	/// Purpose: Returns total adjusted engagement duration in hours.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUMX, and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_adj_eng_dur].
+	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_adj_total_eng_dur_hr' = ```
 			
 			
@@ -27,9 +31,9 @@ table users_activities
 		annotation PBI_FormatHint = {"isDecimal":true}
 
 	/// Measure meas.act_capt_lvl_reps_all_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of users in the current context.
+	/// Calculation Logic: Uses CALCULATE and COUNT.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[_sys_user_id].
 	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_reps_all_count' =
 			CALCULATE(
@@ -42,6 +46,10 @@ table users_activities
 		lineageTag: 3aec840e-5730-46b3-a256-0725ff6e0d42
 
 	/// Measure meas.act_capt_lvl_reps_count.
+	/// Purpose: Returns the count of users with activity capture level above 0.4.
+	/// Calculation Logic: Uses VAR/RETURN and CALCULATE with a filter on users_activities[trueai_owner_act_capt_lvl].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context with users_activities[trueai_owner_act_capt_lvl] > 0.4.
+	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_reps_count' = ```
 			
 			var res = CALCULATE(
@@ -56,9 +64,9 @@ table users_activities
 		lineageTag: b1d73a7c-accc-49b5-bcb8-b555e0f014a1
 
 	/// Measure meas.act_capt_lvl_adj_dur_per_reps.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns adjusted total duration per rep.
+	/// Calculation Logic: Uses VAR/RETURN and DIVIDE over [meas.act_capt_lvl_adj_total_dur_hr] and [meas.act_capt_lvl_reps_count].
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
 	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_adj_dur_per_reps' =
 			
@@ -77,9 +85,9 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_adj_eng_dur_per_reps.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns adjusted engagement duration per rep.
+	/// Calculation Logic: Uses VAR/RETURN and DIVIDE over [meas.act_capt_lvl_adj_total_eng_dur_hr] and [meas.act_capt_lvl_reps_count].
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
 	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_adj_eng_dur_per_reps' =
 			
@@ -98,10 +106,10 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_adj_non_eng_dur_per_reps.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Purpose: Returns adjusted non-engagement duration per rep.
+	/// Calculation Logic: Uses VAR/RETURN, subtraction, and IF over [meas.act_capt_lvl_adj_dur_per_reps] and [meas.act_capt_lvl_adj_eng_dur_per_reps].
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
+	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_adj_non_eng_dur_per_reps' =
 			
 			var _adjtot_dur = [meas.act_capt_lvl_adj_dur_per_reps]
@@ -120,6 +128,10 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_adj_total_non_eng_dur_hr.
+	/// Purpose: Returns total adjusted non-engagement duration.
+	/// Calculation Logic: Uses VAR/RETURN and subtraction of [meas.act_capt_lvl_adj_total_eng_dur_hr] from [meas.act_capt_lvl_adj_total_dur_hr].
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
+	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_adj_total_non_eng_dur_hr' = ```
 			
 			
@@ -136,9 +148,9 @@ table users_activities
 		annotation PBI_FormatHint = {"isDecimal":true}
 
 	/// Measure meas.act_capt_lvl_reps_count_pct.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the percentage of reps with activity capture level above 0.4.
+	/// Calculation Logic: Uses VAR/RETURN and DIVIDE over [meas.act_capt_lvl_reps_count] and [meas.act_capt_lvl_reps_all_count].
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.act_capt_lvl_reps_count_pct' =
 			
@@ -156,6 +168,10 @@ table users_activities
 		lineageTag: fe446259-6784-46e4-bee3-43279a4ee0be
 
 	/// Measure meas.act_capt_lvl_trueai_total_dur_hr.
+	/// Purpose: Returns total TrueAI duration in hours.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUMX, and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_dur].
+	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_trueai_total_dur_hr' = ```
 			
 			
@@ -179,6 +195,10 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_trueai_dur_per_reps.
+	/// Purpose: Returns TrueAI duration per rep.
+	/// Calculation Logic: Uses VAR/RETURN and DIVIDE over [meas.act_capt_lvl_trueai_total_dur_hr] and [meas.act_capt_lvl_reps_count].
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
+	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_trueai_dur_per_reps' = ```
 			
 			var reps_count = [meas.act_capt_lvl_reps_count]     // get the reps/users count act_capt_lvl greater than 0.4
@@ -197,9 +217,9 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_avg_capture_adj_factor.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the average activity capture level adjustment factor.
+	/// Calculation Logic: Uses CALCULATE and AVERAGE on users_activities[trueai_owner_act_capt_lvl].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_owner_act_capt_lvl].
 	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_avg_capture_adj_factor' =
 			
@@ -214,10 +234,10 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_avg_prep_factor.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Purpose: Returns the average prep factor for users.
+	/// Calculation Logic: Uses CALCULATE and AVERAGE on users_activities[trueai_owner_prep_factor].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_owner_prep_factor].
+	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_avg_prep_factor' =
 			
 			CALCULATE(
@@ -231,6 +251,10 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.act_capt_lvl_adj_total_dur_hr.
+	/// Purpose: Returns total adjusted duration in hours.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUMX, and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_adj_dur].
+	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_adj_total_dur_hr' = ```
 			
 			
@@ -255,9 +279,9 @@ table users_activities
 		annotation PBI_FormatHint = {"isDecimal":true}
 
 	/// Measure meas.act_capt_lvl_bar_date_filter.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns 1 when the bar date is within the current context date range, otherwise 0.
+	/// Calculation Logic: Uses VAR/RETURN, MAX, and IF with comparisons to [meas.context_date_min] and [meas.context_date_max].
+	/// Dynamic Behavior: Respects current filter context; responds to filters on users_activities[_sys_filt_end_date] and the context date measures.
 	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_bar_date_filter' =
 			
@@ -278,9 +302,9 @@ table users_activities
 		lineageTag: 76b901f4-e8d2-426f-9790-a30d3e7a2717
 
 	/// Measure meas.act_capt_lvl_reps_all_distinct_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the distinct count of users in the current context.
+	/// Calculation Logic: Uses CALCULATE and DISTINCTCOUNT.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[_sys_user_id].
 	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_reps_all_distinct_count' =
 			CALCULATE(
@@ -293,9 +317,9 @@ table users_activities
 		lineageTag: 6cebb7de-b574-496d-aa40-cc0140e390bd
 
 	/// Measure meas.act_capt_lvl_reps_distinct_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the distinct count of users with activity capture level above 0.4.
+	/// Calculation Logic: Uses CALCULATE and DISTINCTCOUNT with a filter on users_activities[trueai_owner_act_capt_lvl].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context with users_activities[trueai_owner_act_capt_lvl] > 0.4.
 	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_reps_distinct_count' =
 			CALCULATE(
@@ -309,9 +333,9 @@ table users_activities
 		lineageTag: 90d9e0c7-f44d-4bbd-af85-06d9abf127ce
 
 	/// Measure meas.users_activities_trueai_email_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of auto email activities.
+	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_type_auto_email_count].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_auto_email_count].
 	/// Format/Type: 0
 	measure 'meas.users_activities_trueai_email_count' =
 			
@@ -323,9 +347,9 @@ table users_activities
 		lineageTag: 14a0bbf4-0d9b-4108-b92a-8b501be0c185
 
 	/// Measure meas.users_activities_trueai_email_dur.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns total auto email duration in hours.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, and division by 3600.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_auto_email_dur].
 	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_email_dur' =
 			
@@ -344,9 +368,9 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_call_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of call activities.
+	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_type_call_count].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_call_count].
 	/// Format/Type: 0
 	measure 'meas.users_activities_trueai_call_count' =
 			
@@ -358,9 +382,9 @@ table users_activities
 		lineageTag: 583a0940-97a3-43cc-8626-a6a72e3668c0
 
 	/// Measure meas.users_activities_trueai_call_dur.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns total call duration in hours.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, and division by 3600.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_call_dur].
 	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_call_dur' =
 			
@@ -379,9 +403,9 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_social_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of social activities.
+	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_type_social_count].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_social_count].
 	/// Format/Type: 0
 	measure 'meas.users_activities_trueai_social_count' =
 			
@@ -393,9 +417,9 @@ table users_activities
 		lineageTag: ac7f3891-0901-4135-8ecc-e0dade833dfb
 
 	/// Measure meas.users_activities_trueai_social_dur.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns total social activity duration in hours.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, and division by 3600.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_social_dur].
 	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_social_dur' =
 			
@@ -414,6 +438,10 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_history_ci_act_capt_lvl_latest_month.
+	/// Purpose: Returns the average activity capture level for the latest completed month.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, TOPN, MAXX, EOMONTH, and AVERAGEX.
+	/// Dynamic Behavior: Respects current filter context; CALCULATETABLE applies date-range filters on users_history[_sys_filt_end_date].
+	/// Format/Type: Unspecified
 	measure 'meas.users_history_ci_act_capt_lvl_latest_month' = ```
 			
 			var latest_row  = CALCULATETABLE(TOPN(1,users_history, users_history[_sys_filt_end_date], DESC))  // get the latest row
@@ -437,6 +465,10 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_history_ci_act_capt_lvl_most_latest_previous.
+	/// Purpose: Returns the average activity capture level for the month before the latest completed month.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, TOPN, MAXX, EOMONTH, and AVERAGEX.
+	/// Dynamic Behavior: Respects current filter context; CALCULATETABLE applies date-range filters on users_history[_sys_filt_end_date].
+	/// Format/Type: Unspecified
 	measure 'meas.users_history_ci_act_capt_lvl_most_latest_previous' = ```
 			
 			VAR latest_row = CALCULATETABLE(TOPN(1, users_history, users_history[_sys_filt_end_date], DESC))  // Get the latest row
@@ -465,9 +497,9 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_history_avg_ci_act_capt_lvl.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the average activity capture level across users_history.
+	/// Calculation Logic: Uses CALCULATE and AVERAGEX over users_history[ci_act_capt_lvl].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_history rows and responds to filters on users_history[ci_act_capt_lvl].
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_history_avg_ci_act_capt_lvl' =
 			
@@ -481,10 +513,10 @@ table users_activities
 		lineageTag: 09188a3f-50bd-4b1c-bfba-66ef796ac30c
 
 	/// Measure meas.users_history_ci_act_capt_lvl_latest_previous_diff.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #,##0" hrs"
+	/// Purpose: Returns the difference between the latest-month and prior-month capture levels.
+	/// Calculation Logic: Uses VAR/RETURN and subtraction of [meas.users_history_ci_act_capt_lvl_latest_month] and [meas.users_history_ci_act_capt_lvl_most_latest_previous].
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
+	/// Format/Type: Unspecified
 	measure 'meas.users_history_ci_act_capt_lvl_latest_previous_diff' =
 			
 			var latest = [meas.users_history_ci_act_capt_lvl_latest_month]          // get the latest ci_act_capt_lvl
@@ -499,6 +531,10 @@ table users_activities
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.users_activities_trueai_call_dur_weekly.
+	/// Purpose: Returns average weekly call duration in hours for the current context range.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, DATEDIFF, and division by 3600.
+	/// Dynamic Behavior: Respects current filter context; responds to [meas.context_date_min], [meas.context_date_max], and users_activities[trueai_type_call_dur].
+	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_call_dur_weekly' = ```
 			
 			var _min_date = [meas.context_date_min]             // get the context min date
@@ -520,6 +556,10 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_email_dur_weekly.
+	/// Purpose: Returns average weekly auto email duration in hours for the current context range.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, DATEDIFF, and division by 3600.
+	/// Dynamic Behavior: Respects current filter context; responds to [meas.context_date_min], [meas.context_date_max], and users_activities[trueai_type_auto_email_dur].
+	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_email_dur_weekly' = ```
 			
 			
@@ -542,6 +582,10 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_social_dur_weekly.
+	/// Purpose: Returns average weekly social activity duration in hours for the current context range.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, DATEDIFF, and division by 3600.
+	/// Dynamic Behavior: Respects current filter context; responds to [meas.context_date_min], [meas.context_date_max], and users_activities[trueai_type_social_dur].
+	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_social_dur_weekly' = ```
 			
 			
@@ -564,9 +608,9 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_meeting_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of meeting activities.
+	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_type_meeting_count].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_meeting_count].
 	/// Format/Type: 0
 	measure 'meas.users_activities_trueai_meeting_count' =
 			
@@ -578,9 +622,9 @@ table users_activities
 		lineageTag: 95b895ec-9000-41b5-99a1-c6c36f471dc0
 
 	/// Measure meas.users_activities_trueai_meeting_dur.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns total meeting duration in hours.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, and division by 3600.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_meeting_dur].
 	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_meeting_dur' =
 			
@@ -599,6 +643,10 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_trueai_meeting_dur_weekly.
+	/// Purpose: Returns average weekly meeting duration in hours for the current context range.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, DATEDIFF, and division by 3600.
+	/// Dynamic Behavior: Respects current filter context; responds to [meas.context_date_min], [meas.context_date_max], and users_activities[trueai_type_meeting_dur].
+	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_meeting_dur_weekly' = ```
 			
 			
@@ -621,9 +669,9 @@ table users_activities
 		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.users_activities_prospecting_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of prospecting activities.
+	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_purpose_prospecting_count].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_purpose_prospecting_count].
 	/// Format/Type: 0
 	measure 'meas.users_activities_prospecting_count' =
 			
@@ -635,9 +683,9 @@ table users_activities
 		lineageTag: 5e7edb4a-4fde-4263-b9aa-7fd3957cbe38
 
 	/// Measure meas.users_activities_new_logo_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of new-logo activities.
+	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_purpose_new_logo_count].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_purpose_new_logo_count].
 	/// Format/Type: 0
 	measure 'meas.users_activities_new_logo_count' =
 			
@@ -649,9 +697,9 @@ table users_activities
 		lineageTag: 9fb93954-0da2-4918-a58d-a247c88c8085
 
 	/// Measure meas.users_activities_post_sales_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of post-sales activities.
+	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_purpose_post_sales_count].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_purpose_post_sales_count].
 	/// Format/Type: 0
 	measure 'meas.users_activities_post_sales_count' =
 			
@@ -663,9 +711,9 @@ table users_activities
 		lineageTag: c3005fc1-3c14-43c1-8df1-5724c8a97233
 
 	/// Measure meas.users_activities_existing_customer_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of existing-customer activities.
+	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_purpose_exist_cust_selling_count].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_purpose_exist_cust_selling_count].
 	/// Format/Type: 0
 	measure 'meas.users_activities_existing_customer_count' =
 			
@@ -677,9 +725,9 @@ table users_activities
 		lineageTag: f3e51cac-e237-45bd-a998-a7e1b91b94bc
 
 	/// Measure meas.users_activities_internal_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the count of internal activities.
+	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_purpose_internal_count].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_purpose_internal_count].
 	/// Format/Type: 0
 	measure 'meas.users_activities_internal_count' =
 			

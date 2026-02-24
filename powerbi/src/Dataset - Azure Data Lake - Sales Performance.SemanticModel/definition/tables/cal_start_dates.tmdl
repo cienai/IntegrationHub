@@ -3,18 +3,18 @@ table cal_start_dates
 	lineageTag: ae9642a0-a112-45e3-b507-ecb9caa9b8db
 
 	/// Measure meas.last_selected_date.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the last selected date from cal_start_dates[Date].
+	/// Calculation Logic: Uses CALCULATE with MAX and ALLSELECTED.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies context with ALLSELECTED(cal_start_dates[Date]) and responds to filters on cal_start_dates[Date].
 	/// Format/Type: Short Date
 	measure 'meas.last_selected_date' = CALCULATE(MAX(cal_start_dates[Date]), ALLSELECTED(cal_start_dates[Date]))
 		formatString: Short Date
 		lineageTag: 3ad297b1-22f7-40a4-8425-5df3ba7e89dd
 
 	/// Measure meas.sel_date.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
+	/// Purpose: Returns the selected start date as the max of cal_start_dates[Date] in ALLSELECTED.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, ALLSELECTED, and MAXX.
+	/// Dynamic Behavior: Respects current filter context; CALCULATETABLE/ALLSELECTED adjusts context and responds to filters on cal_start_dates[Date].
 	/// Format/Type: General Date
 	measure 'meas.sel_date' = ```
 			
