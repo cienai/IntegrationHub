@@ -2,7 +2,10 @@
 table ssr_history_stakeholders
 	lineageTag: 7d90e819-db99-4cda-845c-11c2533dfe69
 
-	/// Measure meas.stkhlds_first_act.
+	/// Purpose: Returns the max first-activity date for stakeholders in context.
+	/// Calculation Logic: Uses CALCULATE with MAX over ssr_history_stakeholders[trueai_first_act].
+	/// Dynamic Behavior: Respects current filter context and responds to filters on ssr_history_stakeholders[trueai_first_act].
+	/// Format/Type: mm/dd/yyyy
 	measure 'meas.stkhlds_first_act' = CALCULATE(MAX(ssr_history_stakeholders[trueai_first_act]))
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
@@ -10,7 +13,10 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_last_act.
+	/// Purpose: Returns the max last-activity date for stakeholders in context.
+	/// Calculation Logic: Uses CALCULATE with MAX over ssr_history_stakeholders[trueai_last_act].
+	/// Dynamic Behavior: Respects current filter context and responds to filters on ssr_history_stakeholders[trueai_last_act].
+	/// Format/Type: mm/dd/yyyy
 	measure 'meas.stkhlds_last_act' = CALCULATE(MAX(ssr_history_stakeholders[trueai_last_act]))
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
@@ -18,7 +24,10 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_first_eng.
+	/// Purpose: Returns the max first-engagement date for stakeholders in context.
+	/// Calculation Logic: Uses CALCULATE with MAX over ssr_history_stakeholders[trueai_first_eng].
+	/// Dynamic Behavior: Respects current filter context and responds to filters on ssr_history_stakeholders[trueai_first_eng].
+	/// Format/Type: mm/dd/yyyy
 	measure 'meas.stkhlds_first_eng' = CALCULATE(MAX(ssr_history_stakeholders[trueai_first_eng]))
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
@@ -26,7 +35,10 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_last_eng.
+	/// Purpose: Returns the max last-engagement date for stakeholders in context.
+	/// Calculation Logic: Uses CALCULATE with MAX over ssr_history_stakeholders[trueai_last_eng].
+	/// Dynamic Behavior: Respects current filter context and responds to filters on ssr_history_stakeholders[trueai_last_eng].
+	/// Format/Type: mm/dd/yyyy
 	measure 'meas.stkhlds_last_eng' = CALCULATE(MAX(ssr_history_stakeholders[trueai_last_eng]))
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
@@ -34,17 +46,26 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_seniority.
+	/// Purpose: Returns the max stakeholder seniority value in context.
+	/// Calculation Logic: Uses CALCULATE with MAX over ssr_history_stakeholders[trueai_title_seniority].
+	/// Dynamic Behavior: Respects current filter context and responds to filters on ssr_history_stakeholders[trueai_title_seniority].
+	/// Format/Type: Unspecified
 	measure 'meas.stkhlds_seniority' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_seniority]))
 		displayFolder: champion_stkhld
 		lineageTag: 137d542d-667c-4931-b89c-d7a8afbe6a78
 
-	/// Measure meas.stkhlds_title_dept.
+	/// Purpose: Returns the max stakeholder title department value in context.
+	/// Calculation Logic: Uses CALCULATE with MAX over ssr_history_stakeholders[trueai_title_department].
+	/// Dynamic Behavior: Respects current filter context and responds to filters on ssr_history_stakeholders[trueai_title_department].
+	/// Format/Type: Unspecified
 	measure 'meas.stkhlds_title_dept' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]))
 		displayFolder: champion_stkhld
 		lineageTag: 742263c3-150e-4a72-9d14-0bec256467be
 
-	/// Measure meas.stkhlds_name_and_title.
+	/// Purpose: Returns a concatenated stakeholder name and title (truncated if long).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE, MAX, IF, LEN, LEFT to build name and title.
+	/// Dynamic Behavior: Respects current filter context and responds to filters on crm_first_name, crm_last_name, and crm_title.
+	/// Format/Type: Unspecified
 	measure 'meas.stkhlds_name_and_title' = ```
 			
 			// make a concat name title
@@ -56,7 +77,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 8f971e63-ce5a-4267-9229-0e84eadf1781
 
-	/// Measure meas.stkhlds_name_and_title_most_senior.
+	/// Purpose: Returns the name and title for the most senior stakeholder in context.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE and MAX to derive seniority, then filters [meas.stkhlds_name_and_title].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters by ssr_history_stakeholders[trueai_title_seniority].
+	/// Format/Type: Unspecified
 	measure 'meas.stkhlds_name_and_title_most_senior' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -70,7 +94,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: b63f829b-aaa0-40ee-8119-b6334c809800
 
-	/// Measure meas.stkhlds_most_senior_title_dept.
+	/// Purpose: Returns the title department for the most senior stakeholder in context.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE and MAX to derive seniority, then filters [meas.stkhlds_title_dept].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters by ssr_history_stakeholders[trueai_title_seniority].
+	/// Format/Type: Unspecified
 	measure 'meas.stkhlds_most_senior_title_dept' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -82,7 +109,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 4ad56e5e-839b-457c-bf56-f90f07d6b6a2
 
-	/// Measure meas.stkhlds_most_senior_first_act.
+	/// Purpose: Returns the first-activity date for the most senior stakeholder in context.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE and MAX to derive seniority, then filters [meas.stkhlds_first_act].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters by ssr_history_stakeholders[trueai_title_seniority].
+	/// Format/Type: mm/dd/yyyy
 	measure 'meas.stkhlds_most_senior_first_act' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -97,7 +127,10 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_most_senior_last_act.
+	/// Purpose: Returns the last-activity date for the most senior stakeholder in context.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE and MAX to derive seniority, then filters [meas.stkhlds_last_act].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters by ssr_history_stakeholders[trueai_title_seniority].
+	/// Format/Type: mm/dd/yyyy
 	measure 'meas.stkhlds_most_senior_last_act' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -112,7 +145,10 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_most_senior_last_eng.
+	/// Purpose: Returns the last-engagement date for the most senior stakeholder in context.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE and MAX to derive seniority, then filters [meas.stkhlds_last_eng].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters by ssr_history_stakeholders[trueai_title_seniority].
+	/// Format/Type: mm/dd/yyyy
 	measure 'meas.stkhlds_most_senior_last_eng' = ```
 			
 			 
@@ -128,7 +164,10 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.stkhlds_most_senior_seniority.
+	/// Purpose: Returns the seniority value for the most senior stakeholder in context.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE and MAX to derive seniority, then filters [meas.stkhlds_seniority].
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters by ssr_history_stakeholders[trueai_title_seniority].
+	/// Format/Type: Unspecified
 	measure 'meas.stkhlds_most_senior_seniority' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -140,7 +179,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 30eb9278-7c18-4d89-837d-b415ecec64cf
 
-	/// Measure meas.stkhlds_primary_dur_involvement.
+	/// Purpose: Primary stakeholder duration involvement as a share of total duration.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(SUM) and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; responds to filters on ssr_history duration fields.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.stkhlds_primary_dur_involvement' =
 			
 			var PrimDur = CALCULATE(SUM(ssr_history[stkhlds_primary_contact_dur])) // getting the secondary contact act duration
@@ -151,7 +193,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: f3b8a9d2-e05e-485e-8783-3422f1f289e0
 
-	/// Measure meas.stkhlds_secondary_dur_involvement.
+	/// Purpose: Secondary stakeholder duration involvement as a share of total duration.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(SUM) and DIVIDE.
+	/// Dynamic Behavior: Respects current filter context; responds to filters on ssr_history duration fields.
+	/// Format/Type: 0.00%;-0.00%;0.00%
 	measure 'meas.stkhlds_secondary_dur_involvement' =
 			
 			var SecDur = CALCULATE(SUM(ssr_history[stkhlds_secondary_contact_dur])) // getting the secondary contact act duration
@@ -163,7 +208,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 04f85556-5551-4042-b1e9-10981fd157e9
 
-	/// Measure meas.stkhlds_most_senior_dur_involvement.
+	/// Purpose: Duration involvement share for the most senior stakeholder by department.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE, MAX, SUM, DIVIDE, and ALLSELECTED.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters by seniority and department.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.stkhlds_most_senior_dur_involvement' = ```
 			
 			
@@ -187,7 +235,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 7b81a3c1-2f06-40e2-81d0-ea82cf4df10d
 
-	/// Measure meas.other_stkhlds_involv_dur.
+	/// Purpose: Duration involvement share for non-primary/secondary stakeholders.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE, MAX, SUM, DIVIDE, and a NOT IN filter.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE excludes rankings 1 and 2.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.other_stkhlds_involv_dur' =
 			
 			var _dur = CALCULATE(Max(ssr_history_stakeholders[trueai_act_dur]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1, 2}))
@@ -199,7 +250,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 0d1e49d5-8ac4-446e-ac00-84bc0eedcaf3
 
-	/// Measure meas.stkhlds_full_name.
+	/// Purpose: Returns a stakeholder full name for non-primary/secondary stakeholders.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE and MAX over col.full_name.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE excludes rankings 1 and 2.
+	/// Format/Type: Unspecified
 	measure 'meas.stkhlds_full_name' = ```
 			
 			
@@ -213,21 +267,30 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: aace1864-dfc9-414b-ac89-fa076f7b9612
 
-	/// Measure meas.other_stkhlds_title_dept.
+	/// Purpose: Returns title department for non-primary/secondary stakeholders.
+	/// Calculation Logic: Uses CALCULATE with MAX and a NOT IN filter on trueai_stkhld_ranking.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE excludes rankings 1 and 2.
+	/// Format/Type: Unspecified
 	measure 'meas.other_stkhlds_title_dept' =
 			
 			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}) )  // get the  title dept filtering primary and secondary stakeholder
 		displayFolder: champion_stkhld
 		lineageTag: 1f3c8d3c-eced-4f0f-b24b-2fdba44b5453
 
-	/// Measure meas.other_stkhlds_seniority.
+	/// Purpose: Returns seniority for non-primary/secondary stakeholders.
+	/// Calculation Logic: Uses CALCULATE with MAX and a NOT IN filter on trueai_stkhld_ranking.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE excludes rankings 1 and 2.
+	/// Format/Type: Unspecified
 	measure 'meas.other_stkhlds_seniority' =
 			
 			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_seniority]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}))
 		displayFolder: champion_stkhld
 		lineageTag: bc7d75a2-edff-4a7b-a366-b6b65d2fe8c9
 
-	/// Measure meas.other_stkhlds_last_eng.
+	/// Purpose: Returns last-engagement date for non-primary/secondary stakeholders.
+	/// Calculation Logic: Uses CALCULATE with MAX and a NOT IN filter on trueai_stkhld_ranking.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE excludes rankings 1 and 2.
+	/// Format/Type: General Date
 	measure 'meas.other_stkhlds_last_eng' =
 			
 			CALCULATE(MAX(ssr_history_stakeholders[trueai_last_eng]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}))  // filter out the primary and secondary stkhlds
@@ -235,7 +298,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 173cf6a6-5668-4c8c-ab60-3ca3fc4b7d6a
 
-	/// Measure meas.prim_stkhlds_dur_involvement.
+	/// Purpose: Duration involvement share for primary stakeholders (ranking 1).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(SUM), DIVIDE, and a ranking filter.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters trueai_stkhld_ranking in {1}.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.prim_stkhlds_dur_involvement' =
 			
 			var _dur = CALCULATE(sum(ssr_history_stakeholders[trueai_act_dur]), ssr_history_stakeholders[trueai_stkhld_ranking] in {1})
@@ -247,7 +313,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 0cc030f4-fe8f-4343-851b-b7f959145666
 
-	/// Measure meas.sec_stkhlds_dur_involvement.
+	/// Purpose: Duration involvement share for secondary stakeholders (ranking 2).
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(SUM), DIVIDE, and a ranking filter.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE filters trueai_stkhld_ranking in {2}.
+	/// Format/Type: 0%;-0%;0%
 	measure 'meas.sec_stkhlds_dur_involvement' =
 			
 			var _dur = CALCULATE(sum(ssr_history_stakeholders[trueai_act_dur]), ssr_history_stakeholders[trueai_stkhld_ranking] in {2})

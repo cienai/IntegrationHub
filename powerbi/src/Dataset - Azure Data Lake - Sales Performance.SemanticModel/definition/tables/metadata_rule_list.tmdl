@@ -2,7 +2,10 @@
 table metadata_rule_list
 	lineageTag: e7287056-7315-4540-8d9e-1a4360af9287
 
-	/// Measure meas.current_model_rule_count.
+	/// Purpose: Returns the count of records matching the selected rule id for the selected model.
+	/// Calculation Logic: Uses VAR/RETURN, SELECTEDVALUE, IF, SWITCH, CALCULATE, COUNT, FORMAT.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on metadata_rule_list[_sys_doc_id] and metadata_rule_list[model].
+	/// Format/Type: 0
 	measure 'meas.current_model_rule_count' = ```
 			
 			VAR _idText = SELECTEDVALUE(metadata_rule_list[_sys_doc_id])  
@@ -95,7 +98,10 @@ table metadata_rule_list
 		formatString: 0
 		lineageTag: 121f6b47-9e23-4594-8450-f70a37cd2fe2
 
-	/// Measure meas.current_model_rule_count_pct.
+	/// Purpose: Returns the ratio of current_model_rule_count to current_model_rule_total_count.
+	/// Calculation Logic: Uses DIVIDE and VAR/RETURN.
+	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the numerator and denominator.
+	/// Format/Type: 0.00%;-0.00%;0.00%
 	measure 'meas.current_model_rule_count_pct' =
 			
 			var res = DIVIDE(
@@ -109,7 +115,10 @@ table metadata_rule_list
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 69347496-5765-4f61-a05a-68d0410fc6f5
 
-	/// Measure meas.current_model_rule_total_count.
+	/// Purpose: Returns the total count of records with non-blank rule values for the selected model.
+	/// Calculation Logic: Uses VAR/RETURN, SELECTEDVALUE, SWITCH, CALCULATE, COUNTROWS, FILTER, ALL, VALUE.
+	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on metadata_rule_list[model].
+	/// Format/Type: Unspecified
 	measure 'meas.current_model_rule_total_count' = ```
 			
 			VAR _idNum = -999
@@ -356,7 +365,10 @@ table metadata_rule_list
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.total_current_model_rule_count.
+	/// Purpose: Returns the sum of current_model_rule_count across rule ids.
+	/// Calculation Logic: Uses SUMX and VALUES.
+	/// Dynamic Behavior: Respects current filter context; iterates over metadata_rule_list[_sys_doc_id].
+	/// Format/Type: 0
 	measure 'meas.total_current_model_rule_count' =
 			
 			SUMX (
@@ -366,7 +378,10 @@ table metadata_rule_list
 		formatString: 0
 		lineageTag: 929a6388-223e-4c8a-afac-06213b5d11e0
 
-	/// Measure meas.total_current_model_rule_count_pct.
+	/// Purpose: Returns the sum of current_model_rule_count_pct across rule ids.
+	/// Calculation Logic: Uses SUMX and VALUES.
+	/// Dynamic Behavior: Respects current filter context; iterates over metadata_rule_list[_sys_doc_id].
+	/// Format/Type: 0.00%;-0.00%;0.00%
 	measure 'meas.total_current_model_rule_count_pct' =
 			
 			SUMX (
