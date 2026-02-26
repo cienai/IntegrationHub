@@ -1,5 +1,6 @@
 /// Table strat_summary.
 table strat_summary
+	description: "One row per strat_summary record. Source fields include System prefixes. Related to users (_sys_user_id -> _sys_doc_id), cal_end_dates (_sys_filter_end_date -> Date). Supports measures such as meas.strat_summary_delta_prev_period, meas.strat_summary_score."
 	lineageTag: ed1b27bf-eb0f-4e9b-b221-10ffd26ab22c
 
 	/// Purpose: Returns percent change in key metric vs the previous period.
@@ -24,6 +25,7 @@ table strat_summary
 			
 			
 			```
+			description: "Ratio of strat_summary[key_metric_value] to strat_summary[key_metric_value]. Respects the current filter context."
 		formatString: +0%;-0%;0%
 		lineageTag: 82e43cdd-6fc2-467b-bb4c-7674b260c804
 
@@ -49,6 +51,7 @@ table strat_summary
 			
 			
 			```
+			description: "Ratio of cal_end_dates[Date] to strat_summary[key_metric_value]. Respects the current filter context."
 		lineageTag: d24f1d2f-3b43-4850-a366-3df70aa26def
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -69,6 +72,7 @@ table strat_summary
 			
 			
 			```
+			 description: "Average of strat_summary[key_metric_trend_coeff]. Respects the current filter context."
 		lineageTag: 3d5b6690-0192-4c58-9bb5-4bdd921b2202
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -81,6 +85,7 @@ table strat_summary
 			strat_summary[meas.strat_summary_score] * 100
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		formatString: 0
 		lineageTag: 900adbfe-b098-46b6-9e52-d2c67154d556
 
@@ -92,6 +97,7 @@ table strat_summary
 	/// Format/Type: 0.0%;-0.0%;0.0%
 	measure 'meas.strat_summary_display_key_metric_pct' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(AVERAGE(strat_summary[key_metric_value]) )
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: f0422331-3943-4ca3-9d2f-58d99b0c36ac
@@ -119,6 +125,7 @@ table strat_summary
 			
 			
 			```
+			description: "Ratio of cal_end_dates[Date] to strat_summary[key_metric_value]. Respects the current filter context."
 		formatString: 0
 		lineageTag: e2526f51-ac84-4165-94ac-3bafd28f860a
 
@@ -130,6 +137,7 @@ table strat_summary
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.strat_summary_key_metric_display_pct_eop' =
 			
+			description: "TODO: provide business definition for this measure."
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
 			
@@ -146,6 +154,7 @@ table strat_summary
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.strat_summary_display_reference_pct' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: 0%;-0%;0%
 		lineageTag: a77c2788-c85b-428c-8253-13e25284ee52
@@ -174,6 +183,7 @@ table strat_summary
 			
 			
 			```
+			description: "Ratio of strat_summary[key_metric_value] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: +0%;-0%;0%
 		lineageTag: d15bb079-82a5-4e6b-a51b-bf25c3739dc5
 
@@ -185,6 +195,7 @@ table strat_summary
 	/// Format/Type: #.0 ":1"
 	measure 'meas.strat_summary_key_metric_display_ratio_eop' =
 			
+			description: "TODO: provide business definition for this measure."
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
 			
@@ -203,6 +214,7 @@ table strat_summary
 	/// Format/Type: 0":1"
 	measure 'meas.strat_summary_display_reference_ratio' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: 0":1"
 		lineageTag: 1bc2643f-9c54-4121-aa0e-0a47687a4d7e
@@ -221,6 +233,7 @@ table strat_summary
 			var res = (val_score * val_trend_score ) ^ 0.5  
 			return res
 			```
+			description: "TODO: provide business definition for this measure."
 		lineageTag: 4fe7cef8-6834-4cd2-afde-02df60c2998a
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -231,6 +244,7 @@ table strat_summary
 	/// Format/Type: Unspecified
 	measure 'meas.strat_summary_concern_score_display' =
 			
+			description: "TODO: provide business definition for this measure."
 			var res = IF([meas.strat_summary_concern_score] > 0.66, "Low", IF([meas.strat_summary_concern_score] > 0.33, "Medium", "High"))
 			return res
 		lineageTag: e8d32342-6ef1-4d93-88c4-986a1f524e93
@@ -241,6 +255,7 @@ table strat_summary
 	/// Format/Type: 0
 	measure 'meas.strat_summary_trend_display' =
 			
+			description: "TODO: provide business definition for this measure."
 			var res = IF([meas.strat_summary_trend_score] > 0.66, "Improving", IF([meas.strat_summary_trend_score] > 0.33, "Steady", "Declining"))
 			return res
 		lineageTag: 9432771d-5fb2-467d-924b-fa9d6c1041b4
@@ -250,6 +265,7 @@ table strat_summary
 	/// Dynamic Behavior: Not filter-dependent.
 	/// Format/Type: 0
 	measure 'measure.strat_summary_industry_score_display' = 52
+		description: "TODO: provide business definition for this measure."
 		formatString: 0
 		lineageTag: 18b3dd43-84ac-49f4-8cd7-d2283175eed2
 
@@ -259,6 +275,7 @@ table strat_summary
 	/// Format/Type: #,##0.0"hrs"
 	measure 'meas.strat_summary_key_metric_display_hrs_eop' =
 			
+			description: "TODO: provide business definition for this measure."
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
 			
@@ -277,6 +294,7 @@ table strat_summary
 	/// Format/Type: #,##0.0
 	measure 'meas.strat_summary_key_metric_display_decimal_eop' =
 			
+			description: "TODO: provide business definition for this measure."
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
 			
@@ -295,6 +313,7 @@ table strat_summary
 	/// Format/Type: #,##0.0" hrs"
 	measure 'meas.strat_summary_display_reference_hrs' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: #,##0.0" hrs"
 		lineageTag: 288edd56-dc77-461f-a6b8-4e5f3325257b
@@ -307,6 +326,7 @@ table strat_summary
 	/// Format/Type: #,##0.0
 	measure 'meas.strat_summary_display_reference_decimal' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: #,##0.0
 		lineageTag: 0b85899b-d33f-4316-a84f-85b3efc5acb3
@@ -325,6 +345,7 @@ table strat_summary
 			)
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		lineageTag: 33430290-9c5e-405b-84e7-3d2a0a289077
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -341,6 +362,7 @@ table strat_summary
 			)
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		lineageTag: e4fcb2ff-37fa-470d-8456-9a2498a9ffa7
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -357,6 +379,7 @@ table strat_summary
 			)
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		lineageTag: 54bad410-5b58-49e4-b157-b94643407276
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -374,6 +397,7 @@ table strat_summary
 			)
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		lineageTag: b0a32b4e-3082-45c3-89da-dd1861e01461
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -390,6 +414,7 @@ table strat_summary
 			)
 			
 			```
+			description: "TODO: provide business definition for this measure."
 		lineageTag: 9dcc1a6a-d26e-4dee-b408-a3f118fc332b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -410,12 +435,14 @@ table strat_summary
 			return res
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		lineageTag: 7d990357-1036-46de-b650-2b9a15e8103f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Column _sys_docid.
 	column _sys_docid
+		description: "Unclear: System: Value for docid."
 		lineageTag: 776d91c0-dc9d-47f5-9187-626563359320
 		summarizeBy: none
 		isNameInferred
@@ -425,6 +452,7 @@ table strat_summary
 
 	/// Column _sys_user_id.
 	column _sys_user_id
+		description: "System: Identifier for user."
 		lineageTag: b522b9f2-de3d-4fb9-b3dd-b8234b5fab7a
 		summarizeBy: none
 		isNameInferred
@@ -434,6 +462,7 @@ table strat_summary
 
 	/// Column _sys_filter_end_date.
 	column _sys_filter_end_date
+		description: "System: Date/time when filter end date."
 		formatString: General Date
 		lineageTag: efdd6fb6-28fe-4cf9-b214-7da47a01b262
 		summarizeBy: none
@@ -444,6 +473,7 @@ table strat_summary
 
 	/// Column summary_cat.
 	column summary_cat
+		description: "Unclear: Value for summary cat."
 		lineageTag: 37d8d845-231d-44c4-868c-974913754ed7
 		summarizeBy: none
 		isNameInferred
@@ -453,6 +483,7 @@ table strat_summary
 
 	/// Column summary_dimension.
 	column summary_dimension
+		description: "Unclear: Value for summary dimension."
 		lineageTag: 873b3a91-6726-4d34-ac25-43ac132cb79b
 		summarizeBy: none
 		isNameInferred
@@ -462,6 +493,7 @@ table strat_summary
 
 	/// Column key_metric_name.
 	column key_metric_name
+		description: "Unclear: Value for key metric name."
 		lineageTag: 8fd265f4-378e-47d3-81de-603e54118a42
 		summarizeBy: none
 		isNameInferred
@@ -471,6 +503,7 @@ table strat_summary
 
 	/// Column dd.
 	column dd
+		description: "Unclear: Value for dd."
 		formatString: 0
 		lineageTag: fc14fe31-0ea7-4164-bff6-ec07bf9a53a4
 		summarizeBy: sum
@@ -481,6 +514,7 @@ table strat_summary
 
 	/// Column key_metric_value.
 	column key_metric_value
+		description: "Amount for key metric value."
 		lineageTag: d249ae43-2d03-4090-aa4d-49dd78fdc2af
 		summarizeBy: average
 		isNameInferred
@@ -492,6 +526,7 @@ table strat_summary
 
 	/// Column key_metric_reference.
 	column key_metric_reference
+		description: "Unclear: Value for key metric reference."
 		lineageTag: b78e1e91-ff2c-4d8e-a450-74650e87efe9
 		summarizeBy: average
 		isNameInferred
@@ -503,6 +538,7 @@ table strat_summary
 
 	/// Column key_metric_inversed.
 	column key_metric_inversed
+		description: "Unclear: Value for key metric inversed."
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 3e57b584-8803-4854-99c3-e79b17e77b74
 		summarizeBy: none
@@ -513,6 +549,7 @@ table strat_summary
 
 	/// Column key_metric_coeff.
 	column key_metric_coeff
+		description: "Unclear: Value for key metric coeff."
 		lineageTag: fa14b161-28d2-49f5-b2be-678ec68dcb35
 		summarizeBy: sum
 		isNameInferred
@@ -524,6 +561,7 @@ table strat_summary
 
 	/// Column key_metric_trend_coeff.
 	column key_metric_trend_coeff
+		description: "Unclear: Value for key metric trend coeff."
 		lineageTag: 8769dd8d-bb33-4cde-abd4-d3a1eb26b006
 		summarizeBy: sum
 		isNameInferred

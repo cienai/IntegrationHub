@@ -1,5 +1,6 @@
 /// Table dupe_summary.
 table dupe_summary
+	description: "One row per dupe_summary record. Source fields include System prefixes. Related to cal_end_dates (_sys_filter_start_date -> date). Supports measures such as meas.crm_dupe_score, meas.crm_dupe_score_industry_avg_display."
 	lineageTag: f7b99aab-df1a-410a-affa-c6c31f68180a
 
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
@@ -33,6 +34,7 @@ table dupe_summary
 			)
 			
 			```
+			description: "Ratio of dupe_summary[problem] to dupe_summary[_sys_docid]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _dupe_score
 		lineageTag: acf77ee7-4191-4d2b-b5c6-2595509ce4e5
@@ -44,6 +46,7 @@ table dupe_summary
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
 	measure 'meas.crm_dupe_score_industry_avg_display' =
+			description: "TODO: provide business definition for this measure."
 			//0.55 * 100
 			var _score = CALCULATE(
 			    MAX(metadata_reference_values[value]),
@@ -74,6 +77,7 @@ table dupe_summary
 			    res
 			)
 			```
+			description: "Ratio based on dupe_summary[dupe_conf]. Respects the current filter context."
 		displayFolder: _dupe_score
 		lineageTag: 3b35d7b9-f525-4ad5-8374-7ee283d722de
 
@@ -93,6 +97,7 @@ table dupe_summary
 			var res = imp
 			return res
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: +#%;-#%;0%
 		displayFolder: _dupe_score
 		lineageTag: 0b69f420-2ae6-44c0-bf93-9769337276a2
@@ -105,6 +110,7 @@ table dupe_summary
 	/// Format/Type: #,0
 	measure 'meas.crm_dupe_problem_records' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _count = CALCULATE(COUNT(dupe_summary[_sys_docid]), dupe_summary[is_dupe] = true)
 			var res = IF(
 			    _count=BLANK(),
@@ -126,6 +132,7 @@ table dupe_summary
 	/// Format/Type: 0.0%;-0.0%;0.0%
 	measure 'meas.crm_dupe_problem_records_pct' =
 			
+			description: "TODO: provide business definition for this measure."
 			var res = divide ([meas.crm_dupe_problem_records], [meas.crm_records] )
 			
 			RETURN
@@ -144,6 +151,7 @@ table dupe_summary
 	/// Format/Type: #,0
 	measure 'meas.crm_records' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _count = CALCULATE(COUNT(dupe_summary[_sys_docid]))
 			
 			var res = IF(
@@ -166,6 +174,7 @@ table dupe_summary
 	/// Format/Type: #,0
 	measure 'meas.trueai_corrected_records' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _count = CALCULATE(count(dupe_summary[_sys_docid]), dupe_summary[is_master] = true)
 			var res = IF(
 			    _count=BLANK(),
@@ -186,6 +195,7 @@ table dupe_summary
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
 	measure 'meas.crm_dupe_score_display' = [meas.crm_dupe_score] * 100
+		description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _dupe_score
 		lineageTag: 416329b6-8580-4f7c-94e5-3487ae032aaf
@@ -198,6 +208,7 @@ table dupe_summary
 	/// Format/Type: 0
 	measure 'meas.trueai_dupe_score_display' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _crm_score = [meas.crm_dupe_score_display]              // get the crm sciore(before)
 			var _trueai_score = [meas.trueai_dupe_score]*100                // get the after score
 			
@@ -216,6 +227,7 @@ table dupe_summary
 
 	/// Column entity.
 	column entity
+		description: "Unclear: Value for entity."
 		lineageTag: 523e1f04-c261-47b1-8921-ab44d54fcfc8
 		summarizeBy: none
 		isNameInferred
@@ -225,6 +237,7 @@ table dupe_summary
 
 	/// Column _sys_docid.
 	column _sys_docid
+		description: "Unclear: System: Value for docid."
 		lineageTag: 539daabb-d59f-47c8-a425-51b226cb343d
 		summarizeBy: none
 		isNameInferred
@@ -234,6 +247,7 @@ table dupe_summary
 
 	/// Column _sys_filter_start_date.
 	column _sys_filter_start_date
+		description: "System: Date/time when filter start date."
 		formatString: General Date
 		lineageTag: 5d9e1e80-2f66-4ab3-aa77-976b45ff9859
 		summarizeBy: none
@@ -244,6 +258,7 @@ table dupe_summary
 
 	/// Column dupe_id.
 	column dupe_id
+		description: "Identifier for dupe."
 		lineageTag: ce11aa73-204f-4d5a-9e41-208154d77b5e
 		summarizeBy: none
 		isNameInferred
@@ -253,6 +268,7 @@ table dupe_summary
 
 	/// Column is_dupe.
 	column is_dupe
+		description: "Indicates whether is dupe."
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: a7c64657-e43c-41d1-a120-7f7360abd140
 		summarizeBy: none
@@ -263,6 +279,7 @@ table dupe_summary
 
 	/// Column is_master.
 	column is_master
+		description: "Indicates whether is master."
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 062f5d3d-4c9b-42fe-9944-2730b60c473d
 		summarizeBy: none
@@ -273,6 +290,7 @@ table dupe_summary
 
 	/// Column problem.
 	column problem
+		description: "Unclear: Value for problem."
 		lineageTag: d4999f60-8446-4c28-b809-1d9220f53af8
 		summarizeBy: none
 		isNameInferred
@@ -282,6 +300,7 @@ table dupe_summary
 
 	/// Column max_acceptable_pct.
 	column max_acceptable_pct
+		description: "Unclear: Value for max acceptable pct."
 		lineageTag: 9d221c38-3a78-4466-939b-2d863aa76d56
 		summarizeBy: sum
 		isNameInferred
@@ -293,6 +312,7 @@ table dupe_summary
 
 	/// Column dupe_conf.
 	column dupe_conf
+		description: "Unclear: Value for dupe conf."
 		lineageTag: a2ad179f-a3c1-454e-a44c-00c1bf70e71a
 		summarizeBy: sum
 		isNameInferred
@@ -304,6 +324,7 @@ table dupe_summary
 
 	/// Column sort.
 	column sort
+		description: "Unclear: Value for sort."
 		formatString: 0
 		lineageTag: 6c94190f-41f3-4a08-bd7f-c54d80f8ed9d
 		summarizeBy: sum

@@ -1,42 +1,57 @@
+/// Derived entity for the relational mapping of buyer personas involved in each SSR history step.
 table ssr_history_stakeholders
+	description: "One row per ssr_history_stakeholder record. Source fields include CRM, System, TrueAI prefixes. Related to LocalDateTable_1d7cb91c-15c5-4c86-8226-bc81011ae637 (_sys_filt_end_date -> Date), LocalDateTable_289ea6e6-c2ff-4557-bf95-a3d15381bf26 (_sys_filt_start_date -> Date), LocalDateTable_7b9cfb6b-4709-4c4d-8483-918721c83bcc (trueai_first_act -> Date). Supports measures such as meas.stkhlds_first_act, meas.stkhlds_last_act."
 	lineageTag: 7d90e819-db99-4cda-845c-11c2533dfe69
 
+	/// Measure meas.stkhlds_first_act.
 	measure 'meas.stkhlds_first_act' = CALCULATE(MAX(ssr_history_stakeholders[trueai_first_act]))
+		description: "TODO: provide business definition for this measure."
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
 		lineageTag: 52375268-1df9-41d8-8002-d9706502f99e
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.stkhlds_last_act.
 	measure 'meas.stkhlds_last_act' = CALCULATE(MAX(ssr_history_stakeholders[trueai_last_act]))
+		description: "TODO: provide business definition for this measure."
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
 		lineageTag: dea32a2b-9dec-4915-b320-9ad17843053b
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.stkhlds_first_eng.
 	measure 'meas.stkhlds_first_eng' = CALCULATE(MAX(ssr_history_stakeholders[trueai_first_eng]))
+		description: "TODO: provide business definition for this measure."
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
 		lineageTag: c3c2b8f5-d350-453c-a581-9efdfcdef7fd
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.stkhlds_last_eng.
 	measure 'meas.stkhlds_last_eng' = CALCULATE(MAX(ssr_history_stakeholders[trueai_last_eng]))
+		description: "TODO: provide business definition for this measure."
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
 		lineageTag: 0096cee2-f0d7-40ca-9e02-304b984aa30f
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.stkhlds_seniority.
 	measure 'meas.stkhlds_seniority' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_seniority]))
+		description: "TODO: provide business definition for this measure."
 		displayFolder: champion_stkhld
 		lineageTag: 137d542d-667c-4931-b89c-d7a8afbe6a78
 
-	measure 'meas.stkhlds_title_dept' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_dept]))
+	/// Measure meas.stkhlds_title_dept.
+	measure 'meas.stkhlds_title_dept' = CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]))
+		description: "TODO: provide business definition for this measure."
 		displayFolder: champion_stkhld
 		lineageTag: 742263c3-150e-4a72-9d14-0bec256467be
 
+	/// Measure meas.stkhlds_name_and_title.
 	measure 'meas.stkhlds_name_and_title' = ```
 			
 			// make a concat name title
@@ -45,9 +60,11 @@ table ssr_history_stakeholders
 			var res = IF(len(fullname) > 30 , lEFT(fullname, 27) & "...", fullname)  & ", " & title // cut the name if too long
 			return res 
 			```
+			description: "Ratio of ssr_history_stakeholders[crm_first_name] to ssr_history_stakeholders[crm_last_name]. Respects the current filter context."
 		displayFolder: champion_stkhld
 		lineageTag: 8f971e63-ce5a-4267-9229-0e84eadf1781
 
+	/// Measure meas.stkhlds_name_and_title_most_senior.
 	measure 'meas.stkhlds_name_and_title_most_senior' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -58,9 +75,11 @@ table ssr_history_stakeholders
 			
 			
 			```
+			description: "Ratio of ssr_history[stkhlds_all_max_title_seniority] to ssr_history_stakeholders[trueai_title_seniority]. Respects the current filter context."
 		displayFolder: champion_stkhld
 		lineageTag: b63f829b-aaa0-40ee-8119-b6334c809800
 
+	/// Measure meas.stkhlds_most_senior_title_dept.
 	measure 'meas.stkhlds_most_senior_title_dept' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -69,9 +88,11 @@ table ssr_history_stakeholders
 			
 			return res 
 			```
+			description: "Ratio of ssr_history[stkhlds_all_max_title_seniority] to ssr_history_stakeholders[trueai_title_seniority]. Respects the current filter context."
 		displayFolder: champion_stkhld
 		lineageTag: 4ad56e5e-839b-457c-bf56-f90f07d6b6a2
 
+	/// Measure meas.stkhlds_most_senior_first_act.
 	measure 'meas.stkhlds_most_senior_first_act' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -80,12 +101,14 @@ table ssr_history_stakeholders
 			
 			return res 
 			```
+			description: "Ratio of ssr_history[stkhlds_all_max_title_seniority] to ssr_history_stakeholders[trueai_title_seniority]. Respects the current filter context."
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
 		lineageTag: 86c7341e-e7ff-47a7-b418-e86e353faa45
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.stkhlds_most_senior_last_act.
 	measure 'meas.stkhlds_most_senior_last_act' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -94,12 +117,14 @@ table ssr_history_stakeholders
 			
 			return res 
 			```
+			description: "Ratio of ssr_history[stkhlds_all_max_title_seniority] to ssr_history_stakeholders[trueai_title_seniority]. Respects the current filter context."
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
 		lineageTag: 15da1c81-f0ba-479b-b851-93e66ae0db8a
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.stkhlds_most_senior_last_eng.
 	measure 'meas.stkhlds_most_senior_last_eng' = ```
 			
 			 
@@ -109,12 +134,14 @@ table ssr_history_stakeholders
 			
 			return res 
 			```
+			description: "Ratio of ssr_history[stkhlds_all_max_title_seniority] to ssr_history_stakeholders[trueai_title_seniority]. Respects the current filter context."
 		formatString: mm/dd/yyyy
 		displayFolder: champion_stkhld
 		lineageTag: 7f2bd415-c5f1-4fdc-8251-faa716cf9bae
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.stkhlds_most_senior_seniority.
 	measure 'meas.stkhlds_most_senior_seniority' = ```
 			
 			var seniority = CALCULATE(MAX(ssr_history[stkhlds_all_max_title_seniority])) // find the most senior seniority
@@ -123,11 +150,14 @@ table ssr_history_stakeholders
 			
 			return res 
 			```
+			description: "Ratio of ssr_history[stkhlds_all_max_title_seniority] to ssr_history_stakeholders[trueai_title_seniority]. Respects the current filter context."
 		displayFolder: champion_stkhld
 		lineageTag: 30eb9278-7c18-4d89-837d-b415ecec64cf
 
+	/// Measure meas.stkhlds_primary_dur_involvement.
 	measure 'meas.stkhlds_primary_dur_involvement' =
 			
+			description: "TODO: provide business definition for this measure."
 			var PrimDur = CALCULATE(SUM(ssr_history[stkhlds_primary_contact_dur])) // getting the secondary contact act duration
 			var allDur = CALCULATE(SUM(ssr_history[stkhlds_all_dur])) // getting all contact duration
 			var res = DIVIDE(PrimDur, allDur,0)
@@ -136,8 +166,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: f3b8a9d2-e05e-485e-8783-3422f1f289e0
 
+	/// Measure meas.stkhlds_secondary_dur_involvement.
 	measure 'meas.stkhlds_secondary_dur_involvement' =
 			
+			description: "TODO: provide business definition for this measure."
 			var SecDur = CALCULATE(SUM(ssr_history[stkhlds_secondary_contact_dur])) // getting the secondary contact act duration
 			var allDur = CALCULATE(SUM(ssr_history[stkhlds_all_dur])) // getting all contact duration
 			var res = DIVIDE(SecDur, allDur,0)
@@ -147,6 +179,7 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 04f85556-5551-4042-b1e9-10981fd157e9
 
+	/// Measure meas.stkhlds_most_senior_dur_involvement.
 	measure 'meas.stkhlds_most_senior_dur_involvement' = ```
 			
 			
@@ -157,7 +190,7 @@ table ssr_history_stakeholders
 			        ssr_history_stakeholders[trueai_act_dur]
 			    ), 
 			    ssr_history_stakeholders[trueai_title_seniority]=seniority,
-			    ssr_history_stakeholders[trueai_title_dept]= dept
+			    ssr_history_stakeholders[trueai_title_department]= dept
 			) 
 			
 			var total_dur = CALCULATE(SUM(ssr_history_stakeholders[trueai_act_dur]), ALLSELECTED())  // get the total duration
@@ -166,12 +199,15 @@ table ssr_history_stakeholders
 			
 			RETURN res
 			```
+			description: "Ratio of ssr_history[stkhlds_all_max_title_seniority] to ssr_history_stakeholders[trueai_act_dur]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: champion_stkhld
 		lineageTag: 7b81a3c1-2f06-40e2-81d0-ea82cf4df10d
 
+	/// Measure meas.other_stkhlds_involv_dur.
 	measure 'meas.other_stkhlds_involv_dur' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _dur = CALCULATE(Max(ssr_history_stakeholders[trueai_act_dur]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1, 2}))
 			
 			var total_dur = CALCULATE(SUM(ssr_history_stakeholders[trueai_act_dur]), ALLSELECTED())
@@ -181,6 +217,7 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 0d1e49d5-8ac4-446e-ac00-84bc0eedcaf3
 
+	/// Measure meas.stkhlds_full_name.
 	measure 'meas.stkhlds_full_name' = ```
 			
 			
@@ -191,30 +228,39 @@ table ssr_history_stakeholders
 			
 			return full_name
 			```
+			description: "TODO: provide business definition for this measure."
 		displayFolder: champion_stkhld
 		lineageTag: aace1864-dfc9-414b-ac89-fa076f7b9612
 
+	/// Measure meas.other_stkhlds_title_dept.
 	measure 'meas.other_stkhlds_title_dept' =
 			
-			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_dept]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}) )  // get the  title dept filtering primary and secondary stakeholder
+			description: "TODO: provide business definition for this measure."
+			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_department]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}) )  // get the  title dept filtering primary and secondary stakeholder
 		displayFolder: champion_stkhld
 		lineageTag: 1f3c8d3c-eced-4f0f-b24b-2fdba44b5453
 
+	/// Measure meas.other_stkhlds_seniority.
 	measure 'meas.other_stkhlds_seniority' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(MAX(ssr_history_stakeholders[trueai_title_seniority]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}))
 		displayFolder: champion_stkhld
 		lineageTag: bc7d75a2-edff-4a7b-a366-b6b65d2fe8c9
 
+	/// Measure meas.other_stkhlds_last_eng.
 	measure 'meas.other_stkhlds_last_eng' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(MAX(ssr_history_stakeholders[trueai_last_eng]), NOT(ssr_history_stakeholders[trueai_stkhld_ranking] in {1,2}))  // filter out the primary and secondary stkhlds
 		formatString: General Date
 		displayFolder: champion_stkhld
 		lineageTag: 173cf6a6-5668-4c8c-ab60-3ca3fc4b7d6a
 
+	/// Measure meas.prim_stkhlds_dur_involvement.
 	measure 'meas.prim_stkhlds_dur_involvement' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _dur = CALCULATE(sum(ssr_history_stakeholders[trueai_act_dur]), ssr_history_stakeholders[trueai_stkhld_ranking] in {1})
 			
 			var total_dur = CALCULATE(SUM(ssr_history_stakeholders[trueai_act_dur]), ALLSELECTED())
@@ -224,8 +270,10 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: 0cc030f4-fe8f-4343-851b-b7f959145666
 
+	/// Measure meas.sec_stkhlds_dur_involvement.
 	measure 'meas.sec_stkhlds_dur_involvement' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _dur = CALCULATE(sum(ssr_history_stakeholders[trueai_act_dur]), ssr_history_stakeholders[trueai_stkhld_ranking] in {2})
 			
 			var total_dur = CALCULATE(SUM(ssr_history_stakeholders[trueai_act_dur]), ALLSELECTED())
@@ -235,7 +283,9 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: a8feef57-bffd-4dc2-89b1-966bcb2c913e
 
+	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
+		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 8d39f120-d62a-4708-95bf-1fdf91b782b3
 		summarizeBy: none
@@ -243,7 +293,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The end date of the engagement with this stake holder
 	column _sys_filt_end_date
+		description: "System: Date/time when filt end date."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: a5c34138-8cea-49c0-8b7e-42b45e122779
@@ -259,7 +311,9 @@ table ssr_history_stakeholders
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// The start date of the record, stripped of time
 	column _sys_filt_start_date
+		description: "System: Date/time when filt start date."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 0d6583ac-c2f0-4ccc-94a4-cde987462e71
@@ -275,7 +329,9 @@ table ssr_history_stakeholders
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
+		description: "System: Identifier for ssr."
 		dataType: string
 		lineageTag: ad4e0070-f753-4d04-a204-162fe8f3220c
 		summarizeBy: none
@@ -283,7 +339,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The link to a specific ssr history id
 	column _sys_ssr_history_id
+		description: "System: Identifier for ssr history."
 		dataType: string
 		lineageTag: 8c53afb7-2f87-4e43-aa77-269388904504
 		summarizeBy: none
@@ -291,7 +349,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Contact's completeness score based on the CRM data
 	column crm_complt
+		description: "CRM: Numeric value for complt."
 		dataType: double
 		lineageTag: 1794993a-5702-4def-a521-c0ca897a9374
 		summarizeBy: sum
@@ -301,7 +361,9 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Contact's title in the CRM
 	column crm_title
+		description: "CRM: Text label for title."
 		dataType: string
 		lineageTag: 1b167110-fa12-4350-a3cf-7fea3f30b19c
 		summarizeBy: none
@@ -309,7 +371,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Contact's first name in the CRM
 	column crm_first_name
+		description: "CRM: Text label for first name."
 		dataType: string
 		lineageTag: f832e7f5-e0d8-4ad3-a3ea-6b416c34a8ac
 		summarizeBy: none
@@ -317,7 +381,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Contact's last name in the CRM
 	column crm_last_name
+		description: "CRM: Text label for last name."
 		dataType: string
 		lineageTag: c5a2648b-c17c-4e6c-b3dc-02ac25b957fe
 		summarizeBy: none
@@ -325,7 +391,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Completeness score of the contact based on the standardized data
 	column trueai_complt
+		description: "TrueAI: Numeric value for complt."
 		dataType: double
 		lineageTag: 0aedd4ec-bb2e-4406-a0c7-eae1e925780b
 		summarizeBy: sum
@@ -335,7 +403,9 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Contact creator's id
 	column trueai_creator_id
+		description: "TrueAI: Identifier for creator."
 		dataType: string
 		lineageTag: f5adc431-0eed-4127-99a6-b8cf1cdafa03
 		summarizeBy: none
@@ -343,7 +413,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag indicating whether the contact was created by the step owner as part of the sales process
 	column trueai_created_by_step_owner
+		description: "TrueAI: Indicates whether created by step owner."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 749058ff-d804-45cd-8906-ca991216c445
@@ -352,7 +424,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Contact's standardized lead source
 	column trueai_leadsource
+		description: "TrueAI: Text label for leadsource."
 		dataType: string
 		lineageTag: b838a00d-339b-426d-b60d-ccd462e3c1fb
 		summarizeBy: none
@@ -360,7 +434,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Contact's standardized lead source prediction confidence
 	column trueai_leadsource_conf
+		description: "TrueAI: Numeric value for leadsource conf."
 		dataType: double
 		lineageTag: 16960eb2-a057-4517-a8e8-b0e4e662e49b
 		summarizeBy: sum
@@ -370,7 +446,9 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Contact owner's id
 	column trueai_owner_id
+		description: "TrueAI: Identifier for owner."
 		dataType: string
 		lineageTag: 92dc3e3c-45d3-4f7f-8ac5-850927a31549
 		summarizeBy: none
@@ -378,25 +456,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
-	column trueai_title_dept
-		dataType: string
-		lineageTag: 59adad1e-3994-4d75-be15-6b58ee40505e
-		summarizeBy: none
-		sourceColumn: trueai_title_dept
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_title_dept_conf
-		dataType: double
-		lineageTag: aa2feabe-45f6-4376-b825-84f0a96e6e8b
-		summarizeBy: sum
-		sourceColumn: trueai_title_dept_conf
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
+	/// Contact's standardized seniority
 	column trueai_title_seniority
+		description: "TrueAI: Text label for title seniority."
 		dataType: string
 		lineageTag: b06c6e30-774b-43f2-b1ff-cc918ca46e0e
 		summarizeBy: none
@@ -404,7 +466,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Contact's standardized seniority prediction confidence
 	column trueai_title_seniority_conf
+		description: "TrueAI: Numeric value for title seniority conf."
 		dataType: double
 		lineageTag: fe136f8c-8006-4ef6-9d6c-003e12524418
 		summarizeBy: sum
@@ -414,7 +478,9 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of activities performed during the step that were related to the stake holder
 	column trueai_act_count
+		description: "TrueAI: Count of act count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 16b5e058-63b4-41c3-a832-c47a07e21046
@@ -423,7 +489,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of engaged activities performed during the step that were related to the stake holder
 	column trueai_act_eng_count
+		description: "TrueAI: Count of act eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 10817e7b-765b-412e-bfc0-810bad9190dc
@@ -432,7 +500,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Date when the first activity was performed during the step that was related to the stake holder
 	column trueai_first_act
+		description: "TrueAI: Date/time when first act."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 7a0fdc23-a53e-48f1-8a0a-cc738536db7a
@@ -446,7 +516,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Date when the last activity was performed during the step that was related to the stake holder
 	column trueai_last_act
+		description: "TrueAI: Date/time when last act."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: b8e5e518-c692-435e-bc64-5bec371871ff
@@ -460,7 +532,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Id of the contact or lead corresponding to the primary stake holder
 	column trueai_primary_entity_id
+		description: "TrueAI: Identifier for primary entity."
 		dataType: string
 		lineageTag: 08b83651-d2d2-4b83-98cb-6783542e9fab
 		summarizeBy: none
@@ -468,7 +542,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Entity (lead/contact) that the primary stake holder corresponds to
 	column trueai_primary_entity_type
+		description: "TrueAI: Text label for primary entity type."
 		dataType: string
 		lineageTag: a619cece-2b1d-4f1c-b25a-dc0621d75f8c
 		summarizeBy: none
@@ -476,7 +552,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The date of the last data request from the platform
 	column _sys_as_of
+		description: "System: Date/time when as of."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: ab6e23c6-9869-4e53-9ca0-b91fb5ac57cd
@@ -490,7 +568,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The date of the last data modification in the platform
 	column _sys_last_modified_on
+		description: "System: Date/time when last modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 569aaccf-b549-4085-acbd-6168e2a035c3
@@ -504,7 +584,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The primary stake holder will have a value of 1, the secondary 2 etc. Based on the number of engagements with the contact, in decreasing order.
 	column trueai_stkhld_ranking
+		description: "TrueAI: Numeric value for stkhld ranking."
 		dataType: int64
 		formatString: 0
 		lineageTag: 298cc735-43d5-4251-970d-9f209d5dbd34
@@ -513,7 +595,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Contact creation date
 	column trueai_created_on
+		description: "TrueAI: Date/time when created on."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: c6a5b67a-ee02-4f47-a0b3-9b03655cfb37
@@ -529,7 +613,9 @@ table ssr_history_stakeholders
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Adjusted duration of activities performed during the step that were related to the stake holder
 	column trueai_act_adj_dur
+		description: "TrueAI: Numeric value for act adj dur."
 		dataType: double
 		lineageTag: d1c1547c-d720-4d2c-ae9c-90e8c5364afd
 		summarizeBy: sum
@@ -539,7 +625,9 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Rule used to determine the adjusted duration of activities performed during the step
 	column trueai_act_adj_dur_rule
+		description: "TrueAI: Numeric value for act adj dur rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 503da8e7-64ed-410c-8e5b-6f6f33ee31b1
@@ -548,7 +636,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of automated emails performed during the step that were related to the stake holder
 	column trueai_act_type_auto_email_count
+		description: "TrueAI: Count of act type auto email count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 241d616e-4b83-41d1-875e-9f496f939a47
@@ -557,7 +647,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of engaged automated emails performed during the step that were related to the stake holder
 	column trueai_act_type_auto_email_eng_count
+		description: "TrueAI: Count of act type auto email eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 9728baf7-219d-4751-a8f9-3adf46e0d8c4
@@ -566,7 +658,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Duration of activities performed during the step that were related to the stake holder
 	column trueai_act_dur
+		description: "TrueAI: Numeric value for act dur."
 		dataType: double
 		lineageTag: 35b5a4cb-bd23-4d11-98a3-8e1f55891c53
 		summarizeBy: sum
@@ -576,7 +670,9 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Duration of activities performed during the step that were related to the stake holder
 	column trueai_act_dur_eng
+		description: "TrueAI: Numeric value for act dur eng."
 		dataType: double
 		lineageTag: 63396017-f6d9-4d4d-a698-8008146417c4
 		summarizeBy: sum
@@ -586,7 +682,9 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of emails performed during the step that were related to the stake holder
 	column trueai_act_type_email_count
+		description: "TrueAI: Count of act type email count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 4432c86f-9a78-4fd4-8274-cd11145b6e06
@@ -595,7 +693,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of engaged emails performed during the step that were related to the stake holder
 	column trueai_act_type_email_eng_count
+		description: "TrueAI: Count of act type email eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 2819da0f-c4bd-4ec6-a983-cebc16f4cafe
@@ -604,7 +704,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Date when the first engaged activity was performed during the step that was related to the stake holder
 	column trueai_first_eng
+		description: "TrueAI: Date/time when first eng."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 8d386488-4655-4918-8eb2-63c3c50ea365
@@ -618,7 +720,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Date when the last engaged activity was performed during the step that was related to the stake holder
 	column trueai_last_eng
+		description: "TrueAI: Date/time when last eng."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 5c66dc26-572d-4f1c-aead-0e97bb0461db
@@ -632,7 +736,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of meetings performed during the step that were related to the stake holder
 	column trueai_act_type_meeting_count
+		description: "TrueAI: Count of act type meeting count."
 		dataType: int64
 		formatString: 0
 		lineageTag: c6eb5fba-3473-4d15-81d9-43c1dc3ef9c1
@@ -641,7 +747,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of engaged meetings performed during the step that were related to the stake holder
 	column trueai_act_type_meeting_eng_count
+		description: "TrueAI: Count of act type meeting eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: f8e767d8-031a-4814-a1bd-aa833d2a8ce2
@@ -650,7 +758,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of activities with unknown type performed during the step that were related to the stake holder
 	column trueai_act_type_nd_count
+		description: "TrueAI: Count of act type nd count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 87eb1b57-f043-4cc5-b05b-977074c5f710
@@ -659,7 +769,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of engaged activities with unknown type performed during the step that were related to the stake holder
 	column trueai_act_type_nd_eng_count
+		description: "TrueAI: Count of act type nd eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 52aaeedf-b941-4095-9449-72f84aa1292c
@@ -668,7 +780,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of activities with no customer interaction performed during the step that were related to the stake holder
 	column trueai_act_type_no_interaction_count
+		description: "TrueAI: Count of act type no interaction count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 11c6022f-bd5b-4b90-b681-95c02eac5a71
@@ -677,7 +791,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of engaged activities with no customer interaction performed during the step that were related to the stake holder
 	column trueai_act_type_no_interaction_eng_count
+		description: "TrueAI: Count of act type no interaction eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: d45af955-3ce1-450f-86fa-b6458461c45e
@@ -686,7 +802,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of calls performed during the step that were related to the stake holder
 	column trueai_act_type_call_count
+		description: "TrueAI: Count of act type call count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1dcb396b-66ee-4de3-b2aa-5e5ebad7e265
@@ -695,7 +813,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of engaged calls performed during the step that were related to the stake holder
 	column trueai_act_type_call_eng_count
+		description: "TrueAI: Count of act type call eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 722f60b0-cbbd-4139-946e-eb001b7905fa
@@ -704,7 +824,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of social media activities performed during the step that were related to the stake holder
 	column trueai_act_type_social_count
+		description: "TrueAI: Count of act type social count."
 		dataType: int64
 		formatString: 0
 		lineageTag: b4d9543b-0f1a-4e14-8d0a-7c4750183739
@@ -713,7 +835,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of engaged social media activities performed during the step that were related to the stake holder
 	column trueai_act_type_social_eng_count
+		description: "TrueAI: Count of act type social eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 453e1da8-a8d0-4325-a447-89b2c8b86e9b
@@ -722,7 +846,9 @@ table ssr_history_stakeholders
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Prep factor of the owner of the step
 	column trueai_owner_prep_factor
+		description: "TrueAI: Numeric value for owner prep factor."
 		dataType: double
 		lineageTag: 0bafef8b-1a9c-4356-bbe0-035004cf4a66
 		summarizeBy: sum
@@ -732,7 +858,9 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Act_capture_level score of the owner of the step
 	column trueai_owner_act_capt_lvl
+		description: "TrueAI: Numeric value for owner act capt lvl."
 		dataType: double
 		lineageTag: 202bc141-8bd3-44a9-ad40-4555e33a2312
 		summarizeBy: sum
@@ -742,17 +870,43 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column 'col.full_name' = ssr_history_stakeholders[crm_first_name] & " " & ssr_history_stakeholders[crm_last_name].
 	column 'col.full_name' = ssr_history_stakeholders[crm_first_name] & " " & ssr_history_stakeholders[crm_last_name]
+		description: "Unclear: Value for col full name."
 		lineageTag: f9570ba1-8c68-4ee0-a9dc-401538e0a268
 		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Adjusted duration of engaged activities performed during the step that were related to the stake holder
 	column trueai_act_adj_eng_dur
+		description: "TrueAI: Numeric value for act adj eng dur."
 		dataType: double
 		lineageTag: a75a96b3-5337-4550-8839-ec9f6433e6a2
 		summarizeBy: sum
 		sourceColumn: trueai_act_adj_eng_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Contact's standardized department
+	column trueai_title_department
+		description: "TrueAI: Text label for title department."
+		dataType: string
+		lineageTag: 03b57bf8-5ae4-485b-8e4b-cd754a2662f9
+		summarizeBy: none
+		sourceColumn: trueai_title_department
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Contact's standardized department prediction confidence
+	column trueai_title_department_conf
+		description: "TrueAI: Numeric value for title department conf."
+		dataType: double
+		lineageTag: 35591b43-0fea-4400-9a75-164aadb5f692
+		summarizeBy: sum
+		sourceColumn: trueai_title_department_conf
 
 		annotation SummarizationSetBy = Automatic
 
@@ -767,64 +921,64 @@ table ssr_history_stakeholders
 				
 				
 				  dbTableTyped = Table.TransformColumnTypes(dbTable,{
-				{"_sys_as_of", type datetime},
-				{"_sys_doc_id", type text},
-				{"_sys_filt_end_date", type date},
-				{"_sys_filt_start_date", type date},
-				{"_sys_last_modified_on", type datetime},
-				{"_sys_ssr_history_id", type text},
-				{"_sys_ssr_id", type text},
-				{"crm_complt", type number},
-				{"crm_first_name", type text},
-				{"crm_last_name", type text},
-				{"crm_title", type text},
-				{"trueai_act_adj_dur", type number},
-				{"trueai_act_adj_dur_rule", Int64.Type},
-				{"trueai_act_adj_eng_dur", type number},
-				{"trueai_act_count", Int64.Type},
-				{"trueai_act_dur", type number},
-				{"trueai_act_dur_eng", type number},
-				{"trueai_act_eng_count", Int64.Type},
-				{"trueai_act_type_auto_email_count", Int64.Type},
-				{"trueai_act_type_auto_email_eng_count", Int64.Type},
-				{"trueai_act_type_call_count", Int64.Type},
-				{"trueai_act_type_call_eng_count", Int64.Type},
-				{"trueai_act_type_email_count", Int64.Type},
-				{"trueai_act_type_email_eng_count", Int64.Type},
-				{"trueai_act_type_meeting_count", Int64.Type},
-				{"trueai_act_type_meeting_eng_count", Int64.Type},
-				{"trueai_act_type_nd_count", Int64.Type},
-				{"trueai_act_type_nd_eng_count", Int64.Type},
-				{"trueai_act_type_no_interaction_count", Int64.Type},
-				{"trueai_act_type_no_interaction_eng_count", Int64.Type},
-				{"trueai_act_type_social_count", Int64.Type},
-				{"trueai_act_type_social_eng_count", Int64.Type},
-				{"trueai_complt", type number},
-				{"trueai_created_by_step_owner", type logical},
-				{"trueai_created_on", type date},
-				{"trueai_creator_id", type text},
-				{"trueai_first_act", type datetime},
-				{"trueai_first_eng", type datetime},
-				{"trueai_last_act", type datetime},
-				{"trueai_last_eng", type datetime},
-				{"trueai_leadsource", type text},
-				{"trueai_leadsource_conf", type number},
-				{"trueai_owner_act_capt_lvl", type number},
-				{"trueai_owner_id", type text},
-				{"trueai_owner_prep_factor", type number},
-				{"trueai_primary_entity_id", type text},
-				{"trueai_primary_entity_type", type text},
-				{"trueai_stkhld_ranking", Int64.Type},
-				{"trueai_title_dept", type text},
-				{"trueai_title_dept_conf", type number},
-				{"trueai_title_seniority", type text},
-				{"trueai_title_seniority_conf", type number}
+				    {"_sys_as_of", type datetime},
+				    {"_sys_doc_id", type text},
+				    {"_sys_filt_end_date", type date},
+				    {"_sys_filt_start_date", type date},
+				    {"_sys_last_modified_on", type datetime},
+				    {"_sys_ssr_history_id", type text},
+				    {"_sys_ssr_id", type text},
+				    {"crm_complt", type number},
+				    {"crm_first_name", type text},
+				    {"crm_last_name", type text},
+				    {"crm_title", type text},
+				    {"trueai_act_adj_dur", type number},
+				    {"trueai_act_adj_dur_rule", Int64.Type},
+				    {"trueai_act_adj_eng_dur", type number},
+				    {"trueai_act_count", Int64.Type},
+				    {"trueai_act_dur", type number},
+				    {"trueai_act_dur_eng", type number},
+				    {"trueai_act_eng_count", Int64.Type},
+				    {"trueai_act_type_auto_email_count", Int64.Type},
+				    {"trueai_act_type_auto_email_eng_count", Int64.Type},
+				    {"trueai_act_type_call_count", Int64.Type},
+				    {"trueai_act_type_call_eng_count", Int64.Type},
+				    {"trueai_act_type_email_count", Int64.Type},
+				    {"trueai_act_type_email_eng_count", Int64.Type},
+				    {"trueai_act_type_meeting_count", Int64.Type},
+				    {"trueai_act_type_meeting_eng_count", Int64.Type},
+				    {"trueai_act_type_nd_count", Int64.Type},
+				    {"trueai_act_type_nd_eng_count", Int64.Type},
+				    {"trueai_act_type_no_interaction_count", Int64.Type},
+				    {"trueai_act_type_no_interaction_eng_count", Int64.Type},
+				    {"trueai_act_type_social_count", Int64.Type},
+				    {"trueai_act_type_social_eng_count", Int64.Type},
+				    {"trueai_complt", type number},
+				    {"trueai_created_by_step_owner", type logical},
+				    {"trueai_created_on", type date},
+				    {"trueai_creator_id", type text},
+				    {"trueai_first_act", type datetime},
+				    {"trueai_first_eng", type datetime},
+				    {"trueai_last_act", type datetime},
+				    {"trueai_last_eng", type datetime},
+				    {"trueai_leadsource", type text},
+				    {"trueai_leadsource_conf", type number},
+				    {"trueai_owner_act_capt_lvl", type number},
+				    {"trueai_owner_id", type text},
+				    {"trueai_owner_prep_factor", type number},
+				    {"trueai_primary_entity_id", type text},
+				    {"trueai_primary_entity_type", type text},
+				    {"trueai_stkhld_ranking", Int64.Type},
+				    {"trueai_title_department", type text},
+				    {"trueai_title_department_conf", type number},
+				    {"trueai_title_seniority", type text},
+				    {"trueai_title_seniority_conf", type number}
 				})
 				in
 				    dbTableTyped
 				```
 
-	annotation PBI_ResultType = Exception
+	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navigation
 

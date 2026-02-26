@@ -1,8 +1,10 @@
 table ai_conf_skills_summary
+	description: "One row per ai_conf_skills_summary summary record. Related to users (user_id -> _sys_doc_id), cal_end_dates (filter_start_date -> date). Supports measures such as meas.skills_reps, meas.skills_reps_with_scores."
 	lineageTag: 8366b68f-eb81-4009-b4c5-46dae1a9cb66
 
 	measure 'meas.skills_reps' =
 			
+			description: "TODO: provide business definition for this measure."
 			var cnt = CALCULATE(DISTINCTCOUNT(ai_conf_skills_summary[user_id]),ai_conf_skills_summary[is_applicable]= true)
 			var res = cnt
 			return res
@@ -12,6 +14,7 @@ table ai_conf_skills_summary
 
 	measure 'meas.skills_reps_with_scores' =
 			
+			description: "TODO: provide business definition for this measure."
 			var cnt = CALCULATE(DISTINCTCOUNT(ai_conf_skills_summary[user_id]),ai_conf_skills_summary[is_applicable]= true && Isblank(ai_conf_skills_summary[skill_value]) = false)
 			var res = cnt
 			return res
@@ -20,12 +23,14 @@ table ai_conf_skills_summary
 		lineageTag: 64cb0b1e-ff49-4890-b689-a20a5541df2b
 
 	measure 'meas.skills_reps_with_scores_ratio' = divide([meas.skills_reps_with_scores], [meas.skills_reps])
+		description: "Ratio measure. Respects the current filter context."
 		formatString: #,##0 %
 		displayFolder: _skills_analysis
 		lineageTag: 49238757-511c-4344-9f64-e365c4652f62
 
 	measure 'meas.skills_reps_with_scores_ae' =
 			
+			description: "TODO: provide business definition for this measure."
 			var cnt = CALCULATE(DISTINCTCOUNT(ai_conf_skills_summary[user_id]),ai_conf_skills_summary[is_applicable]= true && ai_conf_skills_summary[user_role_function] = "AE" && Isblank(ai_conf_skills_summary[skill_value]) = false)
 			var res = cnt
 			return res
@@ -34,6 +39,7 @@ table ai_conf_skills_summary
 
 	measure 'meas.skills_reps_with_scores_am' =
 			
+			description: "TODO: provide business definition for this measure."
 			var cnt = CALCULATE(DISTINCTCOUNT(ai_conf_skills_summary[user_id]),ai_conf_skills_summary[is_applicable]= true && ai_conf_skills_summary[user_role_function] = "AM" && Isblank(ai_conf_skills_summary[skill_value]) = false)
 			var res = cnt
 			return res
@@ -42,6 +48,7 @@ table ai_conf_skills_summary
 
 	measure 'meas.skills_reps_with_scores_sdr' =
 			
+			description: "TODO: provide business definition for this measure."
 			var cnt = CALCULATE(DISTINCTCOUNT(ai_conf_skills_summary[user_id]),ai_conf_skills_summary[is_applicable]= true && ai_conf_skills_summary[user_role_function] = "SDR" && Isblank(ai_conf_skills_summary[skill_value]) = false)
 			var res = cnt
 			return res
@@ -49,22 +56,26 @@ table ai_conf_skills_summary
 		lineageTag: 6d5fe4b3-0f8a-487f-bcc7-a753e42f0a0a
 
 	measure 'meas.skills_reps_with_scores_ae_ratio' = divide([meas.skills_reps_with_scores_ae], [meas.skills_reps_ae])
+		description: "Ratio measure. Respects the current filter context."
 		formatString: #,##0 %
 		displayFolder: _skills_analysis
 		lineageTag: 668d362a-d7e3-430d-8867-ad31b3b681b4
 
 	measure 'meas.skills_reps_with_scores_am_ratio' = divide([meas.skills_reps_with_scores_am], [meas.skills_reps_am])
+		description: "Ratio measure. Respects the current filter context."
 		formatString: #,##0 %
 		displayFolder: _skills_analysis
 		lineageTag: 5c94f6ed-4983-4678-863e-b985f9b4cb02
 
 	measure 'meas.skills_reps_with_scores_sdr_ratio' = divide([meas.skills_reps_with_scores_sdr], [meas.skills_reps_sdr])
+		description: "Ratio measure. Respects the current filter context."
 		formatString: #,##0 %
 		displayFolder: _skills_analysis
 		lineageTag: 17ed8911-46ec-4ec9-adb1-4d608125f793
 
 	measure 'meas.skills_reps_avg_confidence' =
 			
+			description: "TODO: provide business definition for this measure."
 			var cnt = CALCULATE(AVERAGE(ai_conf_skills_summary[skill_confidence]),ai_conf_skills_summary[is_applicable]= true && ai_conf_skills_summary[skill_confidence] <> 0)
 			var res = cnt
 			return res
@@ -74,6 +85,7 @@ table ai_conf_skills_summary
 
 	measure 'meas.skills_score' =
 			
+			description: "TODO: provide business definition for this measure."
 			var res = ai_conf_skills_summary[meas.skills_reps_avg_confidence] * 100
 			return res
 		formatString: 0
@@ -90,11 +102,13 @@ table ai_conf_skills_summary
 			var res = If (score >= 95, "Excellent", if(score >= 85,  "Great",If(score >= 75, "Good",If(score >= 50, "Fair", "Limited" ))))
 			return  res 
 			```
+			description: "TODO: provide business definition for this measure."
 		displayFolder: _skills_analysis
 		lineageTag: 63c7c775-e60f-4f04-b029-ec93d854a252
 
 	measure 'meas.skills_reps_ae' =
 			
+			description: "TODO: provide business definition for this measure."
 			var cnt = CALCULATE(DISTINCTCOUNT(ai_conf_skills_summary[user_id]),ai_conf_skills_summary[is_applicable]= true && ai_conf_skills_summary[user_role_function] = "AE")
 			var res = cnt
 			return res
@@ -104,6 +118,7 @@ table ai_conf_skills_summary
 
 	measure 'meas.skills_reps_am' =
 			
+			description: "TODO: provide business definition for this measure."
 			var cnt = CALCULATE(DISTINCTCOUNT(ai_conf_skills_summary[user_id]),ai_conf_skills_summary[is_applicable]= true && ai_conf_skills_summary[user_role_function] = "AM")
 			var res = cnt
 			return res
@@ -113,6 +128,7 @@ table ai_conf_skills_summary
 
 	measure 'meas.skills_reps_sdr' =
 			
+			description: "TODO: provide business definition for this measure."
 			var cnt = CALCULATE(DISTINCTCOUNT(ai_conf_skills_summary[user_id]),ai_conf_skills_summary[is_applicable]= true && ai_conf_skills_summary[user_role_function] = "SDR")
 			var res = cnt
 			return res
@@ -121,6 +137,7 @@ table ai_conf_skills_summary
 		lineageTag: 6d5819e0-7f6f-4b87-8462-1bd32318c431
 
 	column sort
+		description: "Unclear: Value for sort."
 		formatString: 0
 		lineageTag: 53f21e8a-aef1-4821-9ddb-08fe9de8a4b9
 		summarizeBy: sum
@@ -130,6 +147,7 @@ table ai_conf_skills_summary
 		annotation SummarizationSetBy = Automatic
 
 	column user_id
+		description: "Identifier for user."
 		lineageTag: 8d4dea27-b90b-47cb-824b-4481343239ea
 		summarizeBy: none
 		isNameInferred
@@ -138,6 +156,7 @@ table ai_conf_skills_summary
 		annotation SummarizationSetBy = Automatic
 
 	column filter_start_date
+		description: "Date/time when filter start date."
 		formatString: Short Date
 		lineageTag: ec675f04-9fba-41d3-8771-cb8d12c7e71f
 		summarizeBy: none
@@ -149,6 +168,7 @@ table ai_conf_skills_summary
 		annotation SummarizationSetBy = Automatic
 
 	column skill
+		description: "Unclear: Value for skill."
 		lineageTag: 0f999199-4312-4ef6-89a3-65ffbb9e9f31
 		summarizeBy: none
 		isNameInferred
@@ -157,6 +177,7 @@ table ai_conf_skills_summary
 		annotation SummarizationSetBy = Automatic
 
 	column user_role_function
+		description: "Unclear: Value for user role function."
 		lineageTag: 55ebf4eb-8f7a-410c-8de4-8d005d351d5f
 		summarizeBy: none
 		isNameInferred
@@ -165,6 +186,7 @@ table ai_conf_skills_summary
 		annotation SummarizationSetBy = Automatic
 
 	column user_full_name
+		description: "Unclear: Value for user full name."
 		lineageTag: 0d8af7fe-7a7f-46e4-b239-401f148f7436
 		summarizeBy: none
 		isNameInferred
@@ -173,6 +195,7 @@ table ai_conf_skills_summary
 		annotation SummarizationSetBy = Automatic
 
 	column skill_value
+		description: "Amount for skill value."
 		lineageTag: 8e4d6911-e2ab-4cae-a13a-3d46b5729b40
 		summarizeBy: none
 		isNameInferred
@@ -181,6 +204,7 @@ table ai_conf_skills_summary
 		annotation SummarizationSetBy = Automatic
 
 	column skill_confidence
+		description: "Unclear: Value for skill confidence."
 		lineageTag: 99ffa2e2-cddd-49c4-ae97-2b34b9f58d18
 		summarizeBy: sum
 		isNameInferred
@@ -191,6 +215,7 @@ table ai_conf_skills_summary
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column is_applicable
+		description: "Indicates whether is applicable."
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 085f18b5-b831-4f81-893e-9a570763e985
 		summarizeBy: none

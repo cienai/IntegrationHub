@@ -1,43 +1,58 @@
+/// Derived entity for the deduplicated and consolidated Single Sales Record (SSR). The source of truth for overall account performance and unified sales process tracking.
 table ssr
+	description: "One row per ssr record. Source fields include CRM, System, TrueAI prefixes. Related to LocalDateTable_74b0c4f1-e144-4fe7-87cd-b6273766fa96 (trueai_first_purchase -> Date), LocalDateTable_6e725079-9265-42a5-b5e7-d7c111fc845a (trueai_last_purchase -> Date), LocalDateTable_cebfbc82-bdaf-4687-b245-affd569762c1 (trueai_churned_on -> Date). Supports measures such as meas.ssr_trueai_conversion_rate, meas.ssr_trueai_converted_count."
 	lineageTag: cb48d9a8-ea61-48bb-845c-67eb596f90f7
 
+	/// Measure meas.ssr_trueai_conversion_rate.
 	measure 'meas.ssr_trueai_conversion_rate' = [meas.ssr_trueai_converted_count] / CALCULATE(count(ssr[_sys_doc_id]))
+		description: "Ratio based on ssr[_sys_doc_id]. Respects the current filter context."
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: __needs_attention
 		lineageTag: a946bddd-5ee9-4adf-a031-0bb4bbb7b204
 
+	/// Measure meas.ssr_trueai_converted_count.
 	measure 'meas.ssr_trueai_converted_count' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="Prospecting" && ssr_history[step_success] =True )
+		description: "Distinct count of ssr_history[_sys_ssr_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: f64fb9f1-a6d6-4e35-ade9-42652b127317
 
+	/// Measure meas.ssr_trueai_no_leadsource_count.
 	measure 'meas.ssr_trueai_no_leadsource_count' = ```
 			
 			var val = CALCULATE(count(ssr[_sys_doc_id]), or(ISBLANK(ssr[trueai_leadsource]) = TRUE(),ssr[trueai_leadsource]= "ND" ))
 			return if(ISBLANK(val), 0, val)
 			
 			```
+			description: "Count of ssr[_sys_doc_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: __needs_attention
 		lineageTag: 9ff987e5-24d2-453a-8420-d58519669d3c
 
+	/// Measure meas.ssr_trueai_no_leadsource_rate.
 	measure 'meas.ssr_trueai_no_leadsource_rate' = [meas.ssr_trueai_no_leadsource_count] / CALCULATE(count(ssr[_sys_doc_id]))
+		description: "Ratio based on ssr[_sys_doc_id]. Respects the current filter context."
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: __needs_attention
 		lineageTag: 688b74be-7bd5-49c2-ac7d-734bc28f3627
 
+	/// Measure measure.ssr_touched_accounts.
 	measure 'measure.ssr_touched_accounts' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="Untouched" && ssr_history[step_success] =True )
+		description: "Distinct count of ssr_history[_sys_ssr_id]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: __needs_attention
 		lineageTag: 9462abf4-4c76-4f8d-8e7f-6b8baac3f495
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
+	/// Measure meas.ssr_new_logo_won_count.
 	measure 'meas.ssr_new_logo_won_count' = Calculate(distinctcount(ssr_history[_sys_ssr_id]),ssr_history[step_name] ="New Logo Selling" && ssr_history[step_success] =True )
+		description: "Distinct count of ssr_history[_sys_ssr_id]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: __needs_attention
 		lineageTag: cd0cea50-3fac-4990-8fc2-b523aa9dc032
 
+	/// Measure meas.ssr_hsitory_accounts_per_prospecting_rep.
 	measure 'meas.ssr_hsitory_accounts_per_prospecting_rep' = ```
 			
 			var accounts = calculate(DISTINCTCOUNT(ssr_history[_sys_ssr_id]))
@@ -46,24 +61,31 @@ table ssr
 			return res
 			
 			```
+			description: "Distinct count of ssr_history[_sys_ssr_id]. Respects the current filter context."
 		displayFolder: __needs_attention
 		lineageTag: 9c9c697b-63fb-4798-b59e-6ba7fc7bef9f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Measure meas.ssr_touch_count.
 	measure 'meas.ssr_touch_count' = calculate(count(ssr[trueai_first_touch]))
+		description: "Count of ssr[trueai_first_touch]. Respects the current filter context."
 		formatString: 0
 		lineageTag: b668fd30-f94c-43db-9460-63b5490155f1
 
+	/// Measure meas.ssr_crm_opp_count.
 	measure 'meas.ssr_crm_opp_count' =
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 			    SUM(ssr[crm_opp_count])
 			)
 		formatString: 0
 		lineageTag: fec59036-1e4c-4a53-b0b8-1c0ff6536bf8
 
+	/// Measure meas.leadsource_record_count_sort.
 	measure 'meas.leadsource_record_count_sort' =
 			
+			description: "TODO: provide business definition for this measure."
 			var rnk = RANKX(
 			    FILTER(
 			        ALL(ssr[crm_leadsource]),
@@ -85,38 +107,48 @@ table ssr
 			res
 		lineageTag: d08183c0-78aa-4f8d-9ac4-9313e5df3ff7
 
+	/// Measure meas.record_counts.
 	measure 'meas.record_counts' =
 			
+			description: "TODO: provide business definition for this measure."
 			COUNT(ssr[_sys_doc_id])
 		formatString: #,0
 		lineageTag: 956cc13c-ee6e-4031-97bd-2dfccee84e0d
 
+	/// Measure meas.ssr_crm_contact_count.
 	measure 'meas.ssr_crm_contact_count' =
 			
+			description: "TODO: provide business definition for this measure."
 			SUM(
 			    ssr[crm_contact_count]
 			)
 		formatString: 0
 		lineageTag: 786b0571-6412-45e9-881f-0e927e48c9e6
 
+	/// Measure meas.ssr_crm_lead_count.
 	measure 'meas.ssr_crm_lead_count' =
 			
+			description: "TODO: provide business definition for this measure."
 			SUM(
 			    ssr[crm_lead_count]     // sum of crm_lead_count
 			)
 		formatString: 0
 		lineageTag: 5187e7df-f760-4af9-8277-9b5e39ff2c76
 
+	/// Measure meas.ssr_crm_account_count.
 	measure 'meas.ssr_crm_account_count' =
 			
+			description: "TODO: provide business definition for this measure."
 			SUM(
 			    ssr[crm_account_count]     // sum of crm_account_count
 			)
 		formatString: 0
 		lineageTag: f70335cc-8680-4df2-8f61-b5b70e973046
 
+	/// Measure meas.ssr_trueai_potential_acv.
 	measure 'meas.ssr_trueai_potential_acv' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 			    SUM(ssr[trueai_potential_acv])          // get the sum of trueai potential acv
 			)
@@ -125,7 +157,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	/// Record's standardized lead source
 	column trueai_leadsource
+		description: "TrueAI: Text label for leadsource."
 		dataType: string
 		lineageTag: 241a0d9b-3aca-4cfd-80fc-029b596f662c
 		summarizeBy: none
@@ -133,7 +167,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's standardized company size
 	column trueai_company_size
+		description: "TrueAI: Text label for company size."
 		dataType: string
 		lineageTag: 01cd87f9-d111-4160-8eb6-85ddb3a676f1
 		summarizeBy: none
@@ -141,7 +177,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Group of the owner of the last step in the sales process
 	column trueai_group
+		description: "TrueAI: Text label for group."
 		dataType: string
 		lineageTag: 01a90e56-5a08-4b9d-93a9-589cbcdda1e6
 		summarizeBy: none
@@ -149,7 +187,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's standardized industry
 	column trueai_industry
+		description: "TrueAI: Text label for industry."
 		dataType: string
 		lineageTag: f402584a-04ee-49ef-84ba-2b5118587537
 		summarizeBy: none
@@ -157,7 +197,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Close date of the first opportunity won
 	column trueai_first_purchase
+		description: "TrueAI: Date/time when first purchase."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 3de5ecb9-c987-4cef-ab5c-3891ff7308c7
@@ -175,7 +217,9 @@ table ssr
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Close date of the last opportunity won
 	column trueai_last_purchase
+		description: "TrueAI: Date/time when last purchase."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 2712115d-c1c6-4ca9-b369-e1fac42e6009
@@ -189,7 +233,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Account's parent id in the CRM
 	column crm_parent_id
+		description: "CRM: Identifier for parent."
 		dataType: string
 		lineageTag: 1f615933-cf28-4b6f-a189-cefe7f03e80f
 		summarizeBy: none
@@ -197,7 +243,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Account's name
 	column crm_name
+		description: "CRM: Text label for name."
 		dataType: string
 		lineageTag: d0935f31-436d-4a8d-83e3-70c116cd9e0b
 		summarizeBy: none
@@ -205,7 +253,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Outcome of the last step in the sales process
 	column trueai_last_outcome
+		description: "TrueAI: Text label for last outcome."
 		dataType: string
 		lineageTag: 59198198-e245-4b25-af00-12777e12fb42
 		summarizeBy: none
@@ -213,7 +263,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the account is the master account in its group of duplicates
 	column trueai_account_is_master
+		description: "TrueAI: Indicates whether account is master."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 6d5a04a7-8a2e-422b-be9c-fc7749e687c1
@@ -222,19 +274,25 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.crm_has_leads' = if(ssr[crm_lead_count] > 0, true, false).
 	column 'col.crm_has_leads' = if(ssr[crm_lead_count] > 0, true, false)
+		description: "Unclear: Value for col crm has leads."
 		lineageTag: db1531e8-482f-42bf-8cac-d2a6505b3bdb
 		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.crm_has_accounts' = if(ssr[crm_account_count] > 0, true, false).
 	column 'col.crm_has_accounts' = if(ssr[crm_account_count] > 0, true, false)
+		description: "Count of col crm has accounts."
 		lineageTag: 2e782cce-e140-459d-8463-31e54cc64e91
 		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_company_size_aprox_val' = ```.
 	column 'col.trueai_company_size_aprox_val' = ```
+			description: "Unclear: Value for col trueai company size aprox val."
 			
 			ssr[trueai_company_size_num]
 			/*
@@ -269,7 +327,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_location_segments' = ```.
 	column 'col.trueai_location_segments' = ```
+			description: "Unclear: Value for col trueai location segments."
 			
 			
 			var country =  ssr[trueai_addr_country]
@@ -291,7 +351,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_qual_bucket_prospecting' = ```.
 	column 'col.trueai_qual_bucket_prospecting' = ```
+			description: "Unclear: Value for col trueai qual bucket prospecting."
 			
 			// var _ssr_id = ssr[_sys_doc_id] 
 			// var res = calculate(MAX(hat_leads[trueai_qual_bucket]), hat_leads[_sys_ssr_id] = _ssr_id)
@@ -303,7 +365,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_leadsource_is_inbound' = ```.
 	column 'col.trueai_leadsource_is_inbound' = ```
+			description: "Unclear: Value for col trueai leadsource is inbound."
 			
 			/*
 			old calc - now depriciated
@@ -330,7 +394,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_time_to_touch_days' = ```.
 	column 'col.trueai_time_to_touch_days' = ```
+			description: "Date/time when col trueai time to touch days."
 			
 			var time_days = IF (isblank([trueai_first_touch]), blank(),   [trueai_first_touch] - [trueai_added_on] )
 			var res = time_days 
@@ -343,7 +409,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_success_prob_new_logo' = calculate(MAX(ssr_history[step_success_prob]), ssr_history[step_name] = "New Logo Selling").
 	column 'col.trueai_success_prob_new_logo' = calculate(MAX(ssr_history[step_success_prob]), ssr_history[step_name] = "New Logo Selling")
+		description: "Unclear: Value for col trueai success prob new logo."
 		lineageTag: a1ee1ad3-f241-474f-9138-624d9301a66e
 		summarizeBy: sum
 
@@ -351,7 +419,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column 'col.trueai_success_prob_untouched' = calculate(MAX(ssr_history[step_success_prob]), ssr_history[step_name] = "Untouched").
 	column 'col.trueai_success_prob_untouched' = calculate(MAX(ssr_history[step_success_prob]), ssr_history[step_name] = "Untouched")
+		description: "Unclear: Value for col trueai success prob untouched."
 		lineageTag: cd7afbc6-7b16-4d70-be1a-f90f7b2d0778
 		summarizeBy: sum
 
@@ -359,7 +429,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column 'col.trueai_vi_lead_gen_value_created' =.
 	column 'col.trueai_vi_lead_gen_value_created' =
+			description: "Amount for col trueai vi lead gen value created."
 			
 			calculate(SUM(ssr_history[vi_value_created]), ssr_history[step_name] = "Lead Gen")
 			//calculate(sum(ssr_history[vi_value_created]), ssr_history[step_name] in {"Lead Gen"})
@@ -369,7 +441,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Account's type in the CRM
 	column crm_type
+		description: "CRM: Text label for type."
 		dataType: string
 		lineageTag: 4aac2a55-9581-40e6-9f19-3571a1d66e1d
 		summarizeBy: none
@@ -377,7 +451,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's standardized company size prediction rule
 	column trueai_company_size_rule
+		description: "TrueAI: Numeric value for company size rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7a12c4ec-50e0-4c14-b586-d515e72113c4
@@ -386,7 +462,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's standardized industry prediction rule
 	column trueai_industry_rule
+		description: "TrueAI: Numeric value for industry rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1ed6b0dc-d852-4c2b-88a8-4fd2dd6df2ed
@@ -395,7 +473,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's standardized lead source prediction rule
 	column trueai_leadsource_rule
+		description: "TrueAI: Numeric value for leadsource rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 4634d771-f8df-4ab2-b441-4222fc86012b
@@ -404,7 +484,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Date when the account churned
 	column trueai_churned_on
+		description: "TrueAI: Date/time when churned on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: a92aacae-b7a3-4691-aae8-80c69efa8214
@@ -418,7 +500,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Last time when the record was touched
 	column trueai_last_touch
+		description: "TrueAI: Date/time when last touch."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 302a0d63-c465-49ed-b6f5-62479974a1b0
@@ -432,7 +516,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the record's standardized lead source is inbound
 	column trueai_leadsource_is_inbound
+		description: "TrueAI: Indicates whether leadsource is inbound."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: ad7765f4-3e89-413c-b269-4f037a5ed36d
@@ -441,7 +527,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// First time when the record was touched
 	column trueai_first_touch
+		description: "TrueAI: Date/time when first touch."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: ed3cc7a1-8deb-496d-8d09-9fbacadeed33
@@ -455,7 +543,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_qual_bucket_prospecting_sortable' = ```.
 	column 'col.trueai_qual_bucket_prospecting_sortable' = ```
+			description: "Unclear: Value for col trueai qual bucket prospecting sortable."
 			
 			
 			// var bucket =  [col.trueai_qual_bucket_prospecting]
@@ -468,7 +558,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
+		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: b6253e8e-bded-4844-b8bf-df63ca107212
 		summarizeBy: none
@@ -476,7 +568,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The end date of the record, stripped of time
 	column _sys_filt_end_date
+		description: "System: Date/time when filt end date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 039a1197-bc70-45b6-8482-0e6c2e380821
@@ -492,7 +586,9 @@ table ssr
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// The start date of the record, stripped of time
 	column _sys_filt_start_date
+		description: "System: Date/time when filt start date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 63f58b80-6542-4662-928e-258d17a47ec2
@@ -508,7 +604,9 @@ table ssr
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Account owner's id in the CRM
 	column crm_owner_id
+		description: "CRM: Identifier for owner."
 		dataType: string
 		lineageTag: 6edcfc7d-c273-495a-bdf9-30ace2688ece
 		summarizeBy: none
@@ -516,7 +614,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Account's duplication confidence
 	column trueai_account_dupe_conf
+		description: "TrueAI: Count of account dupe conf."
 		dataType: string
 		lineageTag: 28071f32-7ec1-4fe2-828f-9adad71357d9
 		summarizeBy: none
@@ -524,7 +624,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Account's duplication id
 	column trueai_account_dupe_id
+		description: "TrueAI: Identifier for account dupe."
 		dataType: string
 		lineageTag: 6c3b1ccf-dc90-4ea6-bc70-c68b087b33d2
 		summarizeBy: none
@@ -532,7 +634,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's city
 	column trueai_addr_city
+		description: "TrueAI: Text label for addr city."
 		dataType: string
 		lineageTag: 33b32cf3-a360-46a3-8e44-af62e348dc26
 		summarizeBy: none
@@ -540,7 +644,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's country
 	column trueai_addr_country
+		description: "TrueAI: Count of addr country."
 		dataType: string
 		lineageTag: 1b6122a3-599f-4817-a0a6-253906579d0a
 		summarizeBy: none
@@ -548,7 +654,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's postal code
 	column trueai_addr_postal_code
+		description: "TrueAI: Text label for addr postal code."
 		dataType: string
 		lineageTag: c564ead9-1a6f-44b3-b3c7-01f7b6c89c40
 		summarizeBy: none
@@ -556,7 +664,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's address prediction rule
 	column trueai_addr_rule
+		description: "TrueAI: Numeric value for addr rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 786d0bef-9a3a-4781-a79e-56d366860683
@@ -565,7 +675,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's state
 	column trueai_addr_state
+		description: "TrueAI: Text label for addr state."
 		dataType: string
 		lineageTag: 8ebc3e2e-9a3e-4e40-a649-cf839fdedc56
 		summarizeBy: none
@@ -573,7 +685,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's street
 	column trueai_addr_street
+		description: "TrueAI: Text label for addr street."
 		dataType: string
 		lineageTag: 2414b219-6176-4e6a-a7af-c596d75922b0
 		summarizeBy: none
@@ -581,7 +695,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Creator id of the first step in the sales process
 	column trueai_creator_id
+		description: "TrueAI: Identifier for creator."
 		dataType: string
 		lineageTag: 484e0944-b61c-4723-9d0c-f29de244493a
 		summarizeBy: none
@@ -589,7 +705,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Booking amount of the first opportunity won
 	column trueai_first_amt
+		description: "TrueAI: Amount for first amt."
 		dataType: double
 		lineageTag: 20f57872-5ea0-47dd-a358-edbb0c2959f7
 		summarizeBy: sum
@@ -599,7 +717,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Record's standardized industry prediction confidence
 	column trueai_industry_conf
+		description: "TrueAI: Numeric value for industry conf."
 		dataType: double
 		lineageTag: cb663c7f-c848-4b1b-8092-d334723ac269
 		summarizeBy: sum
@@ -609,7 +729,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Booking amount of the last opportunity won
 	column trueai_latest_amt
+		description: "TrueAI: Amount for latest amt."
 		dataType: double
 		lineageTag: 544d5b23-ead2-490a-b72e-8e06bee7a986
 		summarizeBy: sum
@@ -619,7 +741,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Record's standardized lead source prediction confidence
 	column trueai_leadsource_conf
+		description: "TrueAI: Numeric value for leadsource conf."
 		dataType: double
 		lineageTag: db5b0dcb-4148-4844-acef-47b10eaec06d
 		summarizeBy: sum
@@ -629,7 +753,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Owner id of the last step in the sales process
 	column trueai_owner_id
+		description: "TrueAI: Identifier for owner."
 		dataType: string
 		lineageTag: b70bff1e-4686-4fac-921c-b096a2754867
 		summarizeBy: none
@@ -637,7 +763,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Sum of the booking amounts of all the opportunities won
 	column trueai_tot_amt
+		description: "TrueAI: Amount for tot amt."
 		dataType: double
 		lineageTag: d9afd2d5-b6fc-4928-ad82-3c0eea10f24b
 		summarizeBy: sum
@@ -647,7 +775,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Sum of the booking amounts of opportunities created
 	column trueai_tot_pipeline_amt
+		description: "TrueAI: Amount for tot pipeline amt."
 		dataType: double
 		lineageTag: 63668268-c0b7-4f28-ae43-08311cdc961d
 		summarizeBy: sum
@@ -657,7 +787,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Number of opportunities won
 	column trueai_tot_purchases
+		description: "TrueAI: Numeric value for tot purchases."
 		dataType: int64
 		formatString: 0
 		lineageTag: 10dbebfc-80c0-4910-a8db-82124b1c308f
@@ -666,7 +798,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of steps in the sales process
 	column trueai_tot_steps
+		description: "TrueAI: Numeric value for tot steps."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7c0a2ecb-88db-4fc3-aa4a-cec93d7ad1fd
@@ -675,7 +809,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Boolean flag that indicates whether the account is the master account in its group of duplicates taking into account whether it has revenue
 	column trueai_ssr_is_master
+		description: "TrueAI: Indicates whether ssr is master."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 75743922-2ce3-4d00-8c0b-f8b3ab1a8838
@@ -684,7 +820,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's latitude
 	column trueai_addr_lat
+		description: "TrueAI: Numeric value for addr lat."
 		dataType: double
 		lineageTag: 86535dd2-5d68-49e4-982c-b42ab34e5e9e
 		summarizeBy: sum
@@ -694,7 +832,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Record's longitude
 	column trueai_addr_long
+		description: "TrueAI: Numeric value for addr long."
 		dataType: double
 		lineageTag: 52f19cf1-71f5-4847-b88c-6149caa54313
 		summarizeBy: sum
@@ -704,7 +844,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Custom categorical variable on the account
 	column crm_account_custom_value_1
+		description: "CRM: Count of account custom value 1."
 		dataType: string
 		lineageTag: 9a28b167-09cc-4a93-aca5-8ac38b52ac24
 		summarizeBy: none
@@ -712,7 +854,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable on the account
 	column crm_account_custom_value_2
+		description: "CRM: Count of account custom value 2."
 		dataType: string
 		lineageTag: 73fa6f23-23ee-4aee-9660-c2cbb062469e
 		summarizeBy: none
@@ -720,7 +864,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable on the account
 	column crm_account_custom_value_3
+		description: "CRM: Count of account custom value 3."
 		dataType: string
 		lineageTag: 61e5c56b-d0fe-45f3-8674-7d7914032e49
 		summarizeBy: none
@@ -728,7 +874,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable
 	column crm_custom_value_1
+		description: "CRM: Amount for custom value 1."
 		dataType: string
 		lineageTag: a717687e-625c-4666-b548-4b9b51e5908f
 		summarizeBy: none
@@ -736,7 +884,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable
 	column crm_custom_value_2
+		description: "CRM: Amount for custom value 2."
 		dataType: string
 		lineageTag: a747ab71-d3b0-48ba-8473-ecde863a72b8
 		summarizeBy: none
@@ -744,7 +894,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Custom categorical variable
 	column crm_custom_value_3
+		description: "CRM: Amount for custom value 3."
 		dataType: string
 		lineageTag: be5bb56e-4ab3-445d-9ac6-dcb8bf442fc6
 		summarizeBy: none
@@ -752,7 +904,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Company size number of the account
 	column trueai_company_size_num
+		description: "TrueAI: Count of company size num."
 		dataType: int64
 		formatString: 0
 		lineageTag: f7391cbd-a008-4cf0-9496-d47d9b718f96
@@ -761,7 +915,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Current ACV of the account
 	column trueai_curr_acv
+		description: "TrueAI: Numeric value for curr acv."
 		dataType: double
 		lineageTag: c9e9c372-1fe7-4cd5-b40d-b42602c950af
 		summarizeBy: sum
@@ -771,7 +927,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Potential ACV of the account
 	column trueai_potential_acv
+		description: "TrueAI: Numeric value for potential acv."
 		dataType: double
 		lineageTag: 032b8ab1-afe6-457c-8e13-8a865eec125f
 		summarizeBy: sum
@@ -781,7 +939,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Potential ACV factor of the account
 	column trueai_potential_acv_factor
+		description: "TrueAI: Numeric value for potential acv factor."
 		dataType: double
 		lineageTag: ae363f6b-e278-4d24-8eef-d901065ab782
 		summarizeBy: sum
@@ -791,7 +951,9 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column 'col.trueai_leadsource_inbound_outbound' = ```.
 	column 'col.trueai_leadsource_inbound_outbound' = ```
+			description: "Unclear: Value for col trueai leadsource inbound outbound."
 			SWITCH(ssr[trueai_leadsource_is_inbound], true, "Inbound", false, "Outbound", "ND")
 			
 			
@@ -801,7 +963,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's standardized type
 	column trueai_type
+		description: "TrueAI: Text label for type."
 		dataType: string
 		lineageTag: 5726945a-3f54-4527-8bac-1da0fac8bd07
 		summarizeBy: none
@@ -809,7 +973,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column trueai_custom_company_size =.
 	column trueai_custom_company_size =
+			description: "Unclear: TrueAI: Value for custom company size."
 			
 			SWITCH (
 			    TRUE (),
@@ -831,7 +997,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// The date of the last data request from the platform
 	column _sys_as_of
+		description: "System: Date/time when as of."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 4795a693-385e-46f7-902e-a26175ac4384
@@ -845,7 +1013,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of accounts related to the sales process
 	column crm_account_count
+		description: "CRM: Count of account count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 4bc9057e-74ca-482f-8911-99e0d9117dc0
@@ -854,7 +1024,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of activities related to the sales process
 	column crm_act_count
+		description: "CRM: Count of act count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 4b8ec2a6-9d91-4c44-a579-c4592e768cd6
@@ -863,7 +1035,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of contacts related to the sales process
 	column crm_contact_count
+		description: "CRM: Count of contact count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 66c1c519-e568-4bff-9880-e8858acce7da
@@ -872,7 +1046,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of leads related to the sales process
 	column crm_lead_count
+		description: "CRM: Count of lead count."
 		dataType: int64
 		formatString: 0
 		lineageTag: cc770444-50ac-41d6-90b5-50f58e8d85c1
@@ -881,7 +1057,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of opportunities related to the sales process
 	column crm_opp_count
+		description: "CRM: Count of opp count."
 		dataType: int64
 		formatString: 0
 		lineageTag: dff74efd-9451-4a82-b954-6e73fabb3655
@@ -890,7 +1068,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Account's URL in the CRM
 	column crm_web_url
+		description: "CRM: Text label for web url."
 		dataType: string
 		lineageTag: efeb106c-f86f-4b37-838e-8d811f1f5928
 		summarizeBy: none
@@ -898,123 +1078,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
-	column sales_proc_account_prospecting
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: bad865cb-b192-4b58-92d2-7f8177d53268
-		summarizeBy: none
-		sourceColumn: sales_proc_account_prospecting
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_ae_did_new_logo
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: fbd2966f-d745-42ee-a7a9-03bad2f4079c
-		summarizeBy: none
-		sourceColumn: sales_proc_ae_did_new_logo
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_am_did_post_sales
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: fc6720fb-0c4b-4e6f-a750-dd51d28ba28a
-		summarizeBy: none
-		sourceColumn: sales_proc_am_did_post_sales
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_mgr_involved
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 832f088e-1f36-40ab-812a-72eff5f77899
-		summarizeBy: none
-		sourceColumn: sales_proc_mgr_involved
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_mkt_did_lead_gen
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: ee9f9f5f-e44a-47a2-9ff2-64e2779e8f1d
-		summarizeBy: none
-		sourceColumn: sales_proc_mkt_did_lead_gen
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_multiple_reps_per_stage
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: d9ddaaee-2852-4f02-8b96-5fac45682c81
-		summarizeBy: none
-		sourceColumn: sales_proc_multiple_reps_per_stage
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_new_logo_more_than_one_rep
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 160ba759-97fa-465e-81c8-45b4fd6cf41e
-		summarizeBy: none
-		sourceColumn: sales_proc_new_logo_more_than_one_rep
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_post_sales_more_than_one_rep
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 3cb0c088-8663-42f9-bed4-609667377cfa
-		summarizeBy: none
-		sourceColumn: sales_proc_post_sales_more_than_one_rep
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_prospecting_end_rule
-		dataType: int64
-		formatString: 0
-		lineageTag: 17ba1372-4c66-4667-9c7f-2c57d28d6b65
-		summarizeBy: sum
-		sourceColumn: sales_proc_prospecting_end_rule
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_prospecting_more_than_one_rep
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: d953167e-0b83-4072-aee1-6a375fb67cad
-		summarizeBy: none
-		sourceColumn: sales_proc_prospecting_more_than_one_rep
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_determinable
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: f8e2c3b5-9d1b-4691-8e47-fdcf7e54f35b
-		summarizeBy: none
-		sourceColumn: sales_proc_determinable
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_handoffs
-		dataType: string
-		lineageTag: 4ef5a3aa-fff8-4021-a6a0-d7e527ec85aa
-		summarizeBy: none
-		sourceColumn: sales_proc_handoffs
-
-		annotation SummarizationSetBy = Automatic
-
-	column sales_proc_sdr_did_prospecting
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 580b0362-2401-4086-a30f-da93ad8b3f08
-		summarizeBy: none
-		sourceColumn: sales_proc_sdr_did_prospecting
-
-		annotation SummarizationSetBy = Automatic
-
+	/// Start date of the first step in the sales process
 	column trueai_added_on
+		description: "TrueAI: Date/time when added on."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 640badb4-9f86-4e4f-9234-df26979e8545
@@ -1028,7 +1094,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Current step id
 	column trueai_curr_step
+		description: "TrueAI: Numeric value for curr step."
 		dataType: int64
 		formatString: 0
 		lineageTag: f1e73a8d-7c6d-489f-a39c-318847f0bf15
@@ -1037,7 +1105,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Current step name
 	column trueai_curr_step_name
+		description: "TrueAI: Text label for curr step name."
 		dataType: string
 		lineageTag: 584ead3b-03ba-4533-8843-40216a923b84
 		summarizeBy: none
@@ -1045,7 +1115,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of days since the start of the first step until the end of the last step in the sales process
 	column trueai_tot_length_in_days
+		description: "TrueAI: Numeric value for tot length in days."
 		dataType: int64
 		formatString: 0
 		lineageTag: 054c6eb1-a0d1-41c1-897c-037cdfa312b0
@@ -1054,7 +1126,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.bucket_num' = ```.
 	column 'col.bucket_num' = ```
+			description: "Count of col bucket num."
 			//SWITCH(ssr[col.trueai_qual_bucket_prospecting], "Lowest", 1, "Low", 2, "Mid", 3, "High", 4, "Highest", 5) 
 			```
 		formatString: 0
@@ -1063,7 +1137,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.crm_leadsource' =.
 	column 'col.crm_leadsource' =
+			description: "Unclear: Value for col crm leadsource."
 			
 			var trueai_leads = [trueai_leadsource]
 			
@@ -1081,7 +1157,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Account's leadsource
 	column crm_leadsource
+		description: "CRM: Text label for leadsource."
 		dataType: string
 		lineageTag: 51f50f9a-2c04-4bb6-a949-3e46a3457262
 		summarizeBy: none
@@ -1089,7 +1167,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Account's industry
 	column crm_industry
+		description: "CRM: Text label for industry."
 		dataType: string
 		lineageTag: 26e40ab6-d09a-49c7-b496-9cc952b2b261
 		summarizeBy: none
@@ -1097,7 +1177,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Account's number of employees
 	column crm_num_employees
+		description: "CRM: Count of num employees."
 		dataType: int64
 		formatString: 0
 		lineageTag: dcab3c9f-bb3c-4da1-a277-3a7221eec020
@@ -1106,7 +1188,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's standardized type rule
 	column trueai_type_rule
+		description: "TrueAI: Numeric value for type rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 91feb751-b15a-4d0a-8fa8-8e98a557bd55
@@ -1115,7 +1199,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.crm_leadsource_concat' =.
 	column 'col.crm_leadsource_concat' =
+			description: "Unclear: Value for col crm leadsource concat."
 			
 			CONCATENATEX(
 			    DISTINCT(
@@ -1136,7 +1222,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.lead_source' =.
 	column 'col.lead_source' =
+			description: "Unclear: Value for col lead source."
 			
 			SWITCH(
 			    ssr[trueai_leadsource_is_inbound],
@@ -1149,7 +1237,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Record's parent account name
 	column trueai_parent_name
+		description: "TrueAI: Text label for parent name."
 		dataType: string
 		lineageTag: 6cf4ee67-8f9f-4ed3-bcdf-06cfb68d0994
 		summarizeBy: none
@@ -1157,7 +1247,9 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_first_touch' = ```.
 	column 'col.trueai_first_touch' = ```
+			description: "Unclear: Value for col trueai first touch."
 			ssr[trueai_first_touch]
 			 
 			 --calculate(MIN(ssr_history[_sys_filter_start_date]), ssr_history[step_name] = "Prospecting")
@@ -1173,79 +1265,116 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Number of days from the start to the first touch
 	column trueai_days_to_first_touch
-		dataType: string
+		description: "TrueAI: Numeric value for days to first touch."
+		dataType: int64
+		formatString: 0
 		lineageTag: 116ac16d-df4e-4134-8777-dfa9fdc43de9
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: trueai_days_to_first_touch
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Average CRM Completeness of Contacts
 	column trueai_crm_complt_contacts
-		dataType: string
+		description: "TrueAI: Numeric value for crm complt contacts."
+		dataType: double
 		lineageTag: 84bd5612-3cde-4c77-9c03-3947da306959
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: trueai_crm_complt_contacts
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Average CRM Completeness of Leads
 	column trueai_crm_complt_leads
-		dataType: string
+		description: "TrueAI: Numeric value for crm complt leads."
+		dataType: double
 		lineageTag: ec72811c-3c8c-4251-97d8-1141eadf7384
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: trueai_crm_complt_leads
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Average CRM Completeness of Opps
 	column trueai_crm_complt_opps
-		dataType: string
+		description: "TrueAI: Numeric value for crm complt opps."
+		dataType: double
 		lineageTag: a74d01b9-67d9-43e4-8146-2ded0b70e2a8
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: trueai_crm_complt_opps
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Average CRM Completeness of Accounts
 	column trueai_crm_complt_accounts
-		dataType: string
+		description: "TrueAI: Count of crm complt accounts."
+		dataType: double
 		lineageTag: 16b0bc7e-313e-4396-b650-847914c23a96
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: trueai_crm_complt_accounts
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Average TrueAI Completeness of Contacts
 	column trueai_complt_contacts
-		dataType: string
+		description: "TrueAI: Numeric value for complt contacts."
+		dataType: double
 		lineageTag: fc795c18-69aa-442c-a5e5-674eee2053fc
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: trueai_complt_contacts
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Average TrueAI Completeness of Leads
 	column trueai_complt_leads
-		dataType: string
+		description: "TrueAI: Numeric value for complt leads."
+		dataType: double
 		lineageTag: e70da5ad-35d1-473b-984b-07785597bb85
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: trueai_complt_leads
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Average TrueAI Completeness of Opps
 	column trueai_complt_opps
-		dataType: string
+		description: "TrueAI: Numeric value for complt opps."
+		dataType: double
 		lineageTag: 6fed659c-fc09-45bc-a958-5df39ac1d865
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: trueai_complt_opps
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Average TrueAI Completeness of Accounts
 	column trueai_complt_accounts
-		dataType: string
+		description: "TrueAI: Count of complt accounts."
+		dataType: double
 		lineageTag: 7c1ea753-705e-4e89-9ee1-8bf38075e122
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: trueai_complt_accounts
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Overall Average CRM Completeness Across Entities
 	column trueai_crm_complt_all
+		description: "TrueAI: Numeric value for crm complt all."
 		dataType: double
 		lineageTag: 2c23906d-0c0f-4f71-aff9-47b03fef6984
 		summarizeBy: sum
@@ -1255,19 +1384,21 @@ table ssr
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Overall Average TrueAI Completeness Across Entities
 	column trueai_complt_all
+		description: "TrueAI: Numeric value for complt all."
 		dataType: double
 		lineageTag: d3246f38-7070-4ac6-9010-824142424a12
 		summarizeBy: sum
 		sourceColumn: trueai_complt_all
 
-		changedProperty = DataType
-
 		annotation SummarizationSetBy = Automatic
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column 'col.trueai_churn_date_no_blanks' =.
 	column 'col.trueai_churn_date_no_blanks' =
+			description: "Date/time when col trueai churn date no blanks."
 			
 			
 			var res = if(isblank(ssr[trueai_churned_on]) = True && isblank(ssr[trueai_first_purchase]) = false  , date(2100,1,1), ssr[trueai_churned_on])
@@ -1292,94 +1423,92 @@ table ssr
 				
 				  dbTableTyped = Table.TransformColumnTypes(dbTable,{
 				    {"_sys_as_of", type datetime},
-				{"_sys_doc_id", type text},
-				{"_sys_filt_end_date", type date},
-				{"_sys_filt_start_date", type date},
-				{"crm_account_count", Int64.Type},
-				{"crm_account_custom_value_1", type text},
-				{"crm_account_custom_value_2", type text},
-				{"crm_account_custom_value_3", type text},
-				{"crm_act_count", Int64.Type},
-				{"crm_contact_count", Int64.Type},
-				{"crm_custom_value_1", type text},
-				{"crm_custom_value_2", type text},
-				{"crm_custom_value_3", type text},
-				{"crm_industry", type text},
-				{"crm_lead_count", Int64.Type},
-				{"crm_leadsource", type text},
-				{"crm_name", type text},
-				{"crm_num_employees", Int64.Type},
-				{"crm_opp_count", Int64.Type},
-				{"crm_owner_id", type text},
-				{"crm_parent_id", type text},
-				{"crm_type", type text},
-				{"crm_web_url", type text},
-				{"sales_proc_account_prospecting", type logical},
-				{"sales_proc_ae_did_new_logo", type logical},
-				{"sales_proc_am_did_post_sales", type logical},
-				{"sales_proc_determinable", type logical},
-				{"sales_proc_handoffs", type text},
-				{"sales_proc_mgr_involved", type logical},
-				{"sales_proc_mkt_did_lead_gen", type logical},
-				{"sales_proc_multiple_reps_per_stage", type logical},
-				{"sales_proc_new_logo_more_than_one_rep", type logical},
-				{"sales_proc_post_sales_more_than_one_rep", type logical},
-				{"sales_proc_prospecting_end_rule", Int64.Type},
-				{"sales_proc_prospecting_more_than_one_rep", type logical},
-				{"sales_proc_sdr_did_prospecting", type logical},
-				{"trueai_account_dupe_conf", type text},
-				{"trueai_account_dupe_id", type text},
-				{"trueai_account_is_master", type logical},
-				{"trueai_added_on", type datetime},
-				{"trueai_addr_city", type text},
-				{"trueai_addr_country", type text},
-				{"trueai_addr_lat", type number},
-				{"trueai_addr_long", type number},
-				{"trueai_addr_postal_code", type text},
-				{"trueai_addr_rule", Int64.Type},
-				{"trueai_addr_state", type text},
-				{"trueai_addr_street", type text},
-				{"trueai_churned_on", type datetime},
-				{"trueai_company_size", type text},
-				{"trueai_company_size_num", Int64.Type},
-				{"trueai_company_size_rule", Int64.Type},
-				{"trueai_creator_id", type text},
-				{"trueai_crm_complt_all", type number},
-				{"trueai_curr_acv", type number},
-				{"trueai_curr_step", Int64.Type},
-				{"trueai_curr_step_name", type text},
-				{"trueai_first_amt", type number},
-				{"trueai_first_purchase", type datetime},
-				{"trueai_first_touch", type datetime},
-				{"trueai_group", type text},
-				{"trueai_industry", type text},
-				{"trueai_industry_conf", type number},
-				{"trueai_industry_rule", Int64.Type},
-				{"trueai_last_outcome", type text},
-				{"trueai_last_purchase", type datetime},
-				{"trueai_last_touch", type datetime},
-				{"trueai_latest_amt", type number},
-				{"trueai_leadsource", type text},
-				{"trueai_leadsource_conf", type number},
-				{"trueai_leadsource_is_inbound", type logical},
-				{"trueai_leadsource_rule", Int64.Type},
-				{"trueai_owner_id", type text},
-				{"trueai_potential_acv", type number},
-				{"trueai_potential_acv_factor", type number},
-				{"trueai_ssr_is_master", type logical},
-				{"trueai_tot_amt", type number},
-				{"trueai_tot_length_in_days", Int64.Type},
-				{"trueai_tot_pipeline_amt", type number},
-				{"trueai_tot_purchases", Int64.Type},
-				{"trueai_tot_steps", Int64.Type},
-				{"trueai_type", type text},
-				{"trueai_type_rule", Int64.Type}
+				    {"_sys_doc_id", type text},
+				    {"_sys_filt_end_date", type date},
+				    {"_sys_filt_start_date", type date},
+				    {"crm_account_count", Int64.Type},
+				    {"crm_account_custom_value_1", type text},
+				    {"crm_account_custom_value_2", type text},
+				    {"crm_account_custom_value_3", type text},
+				    {"crm_act_count", Int64.Type},
+				    {"crm_contact_count", Int64.Type},
+				    {"crm_custom_value_1", type text},
+				    {"crm_custom_value_2", type text},
+				    {"crm_custom_value_3", type text},
+				    {"crm_industry", type text},
+				    {"crm_lead_count", Int64.Type},
+				    {"crm_leadsource", type text},
+				    {"crm_name", type text},
+				    {"crm_num_employees", Int64.Type},
+				    {"crm_opp_count", Int64.Type},
+				    {"crm_owner_id", type text},
+				    {"crm_parent_id", type text},
+				    {"crm_type", type text},
+				    {"crm_web_url", type text},
+				    {"trueai_account_dupe_conf", type text},
+				    {"trueai_account_dupe_id", type text},
+				    {"trueai_account_is_master", type logical},
+				    {"trueai_added_on", type datetime},
+				    {"trueai_addr_city", type text},
+				    {"trueai_addr_country", type text},
+				    {"trueai_addr_lat", type number},
+				    {"trueai_addr_long", type number},
+				    {"trueai_addr_postal_code", type text},
+				    {"trueai_addr_rule", Int64.Type},
+				    {"trueai_addr_state", type text},
+				    {"trueai_addr_street", type text},
+				    {"trueai_churned_on", type datetime},
+				    {"trueai_company_size", type text},
+				    {"trueai_company_size_num", Int64.Type},
+				    {"trueai_company_size_rule", Int64.Type},
+				    {"trueai_complt_accounts", type number},
+				    {"trueai_complt_all", type number},
+				    {"trueai_complt_contacts", type number},
+				    {"trueai_complt_leads", type number},
+				    {"trueai_complt_opps", type number},
+				    {"trueai_creator_id", type text},
+				    {"trueai_crm_complt_accounts", type number},
+				    {"trueai_crm_complt_all", type number},
+				    {"trueai_crm_complt_contacts", type number},
+				    {"trueai_crm_complt_leads", type number},
+				    {"trueai_crm_complt_opps", type number},
+				    {"trueai_curr_acv", type number},
+				    {"trueai_curr_step", Int64.Type},
+				    {"trueai_curr_step_name", type text},
+				    {"trueai_days_to_first_touch", Int64.Type},
+				    {"trueai_first_amt", type number},
+				    {"trueai_first_purchase", type datetime},
+				    {"trueai_first_touch", type datetime},
+				    {"trueai_group", type text},
+				    {"trueai_industry", type text},
+				    {"trueai_industry_conf", type number},
+				    {"trueai_industry_rule", Int64.Type},
+				    {"trueai_last_outcome", type text},
+				    {"trueai_last_purchase", type datetime},
+				    {"trueai_last_touch", type datetime},
+				    {"trueai_latest_amt", type number},
+				    {"trueai_leadsource", type text},
+				    {"trueai_leadsource_conf", type number},
+				    {"trueai_leadsource_is_inbound", type logical},
+				    {"trueai_leadsource_rule", Int64.Type},
+				    {"trueai_owner_id", type text},
+				    {"trueai_parent_name", type text},
+				    {"trueai_potential_acv", type number},
+				    {"trueai_potential_acv_factor", type number},
+				    {"trueai_ssr_is_master", type logical},
+				    {"trueai_tot_amt", type number},
+				    {"trueai_tot_length_in_days", Int64.Type},
+				    {"trueai_tot_pipeline_amt", type number},
+				    {"trueai_tot_purchases", Int64.Type},
+				    {"trueai_tot_steps", Int64.Type},
+				    {"trueai_type", type text},
+				    {"trueai_type_rule", Int64.Type}
 				  })
 				in
 				    dbTableTyped
 				```
 
-	annotation PBI_ResultType = Exception
+	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navigation
 

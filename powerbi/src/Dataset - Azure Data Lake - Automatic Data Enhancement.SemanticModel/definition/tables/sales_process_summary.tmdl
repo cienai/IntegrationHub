@@ -1,5 +1,6 @@
 /// Table sales_process_summary.
 table sales_process_summary
+	description: "One row per sales_process_summary record. Source fields include System, TrueAI prefixes. Related to users (_sys_user_id -> _sys_doc_id), cal_end_dates (_sys_filter_start_date -> date). Supports measures such as meas.crm_sales_process_score_display, meas.crm_sales_process_score_industry_avg."
 	lineageTag: ef2e46a4-dc53-4296-88d6-ed05ebba1fa7
 
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
@@ -8,6 +9,7 @@ table sales_process_summary
 	/// Format/Type: 0
 	measure 'meas.crm_sales_process_score_display' =
 			
+			description: "TODO: provide business definition for this measure."
 			var res = round([meas.crm_sales_process_score]  * 100,0)  // just multiply by 100 and remove decimals
 			return res
 		formatString: 0
@@ -21,6 +23,7 @@ table sales_process_summary
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
 	measure 'meas.crm_sales_process_score_industry_avg' =
+			description: "TODO: provide business definition for this measure."
 			//47
 			var _score = CALCULATE(
 			    MAX(metadata_reference_values[value]),
@@ -39,6 +42,7 @@ table sales_process_summary
 	/// Format/Type: 0
 	measure 'meas.trueai_sales_process_score_display' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _before = [meas.crm_sales_process_score_display]                    // get the before score
 			var _after = round([meas.trueai_sales_process_score] * 100,0)  // just multiply by 100 and remove decimals
 			var res = IF(
@@ -59,6 +63,7 @@ table sales_process_summary
 	/// Format/Type: +#%;-#%;0%
 	measure 'meas.trueai_sales_process_score_improvement' =
 			
+			description: "TODO: provide business definition for this measure."
 			var trueai_score = ROUND([meas.trueai_sales_process_score_display],2)
 			var crm_score = ROUND([meas.crm_sales_process_score_display],2)
 			var imp = divide(trueai_score- crm_score,  crm_score, 0)
@@ -83,6 +88,7 @@ table sales_process_summary
 			return res
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		displayFolder: _all_ade_score
 		lineageTag: 1cfa7cf6-b17d-4810-98ac-00713451dee9
@@ -102,6 +108,7 @@ table sales_process_summary
 			return res
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		displayFolder: _all_ade_score
 		lineageTag: ac155e8c-fcdf-4362-bacd-b0a63f1c66aa
@@ -123,6 +130,7 @@ table sales_process_summary
 			return res
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		displayFolder: _all_ade_score
 		lineageTag: 748ba898-0069-4b13-a51b-a5cf7129cc13
@@ -145,6 +153,7 @@ table sales_process_summary
 			
 			
 			```
+			description: "Ratio measure. Respects the current filter context."
 		formatString: +#%;-#%;0%
 		displayFolder: _all_ade_score
 		lineageTag: 3ac790cd-26eb-4104-a7bb-3b6f71aa4131
@@ -158,6 +167,7 @@ table sales_process_summary
 	measure 'meas.crm_sales_process_score' =
 			
 			
+			description: "TODO: provide business definition for this measure."
 			var total_rules_applied = [meas.crm_sales_process_any_rules_count]
 			var sdt_rules_applied =  [meas.crm_sales_process_any_rules_std_count]
 			var adjusted_ratio= divide (sdt_rules_applied ,  total_rules_applied)
@@ -177,6 +187,7 @@ table sales_process_summary
 			
 			
 			
+			description: "TODO: provide business definition for this measure."
 			var total_rules_applied = [meas.crm_sales_process_any_rules_count]
 			var sdt_rules_applied =  [meas.crm_sales_process_any_rules_std_count]
 			var avg_conf_non_crm = .85  // get the avg non crm conf
@@ -196,6 +207,7 @@ table sales_process_summary
 	measure 'meas.crm_sales_process_any_rules_count' =
 			
 			
+			description: "TODO: provide business definition for this measure."
 			var total_rules_applied = CALCULATE(count(ssr_history[_sys_doc_id]) )
 			var res = total_rules_applied
 			return If(IsBlank(res), 0,res)
@@ -217,6 +229,7 @@ table sales_process_summary
 			var res = std_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
 			```
+			description: "Ratio of ssr_history[step_owner_rule] to ssr_history[_sys_doc_id]. Respects the current filter context."
 		displayFolder: _sales_process_score
 		lineageTag: 0decf15d-bf95-4158-b2d9-7687b44193b8
 
@@ -235,6 +248,7 @@ table sales_process_summary
 			var res = sdt_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
 			```
+			description: "Ratio of ssr_history[step_owner_rule] to ssr_history[_sys_doc_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _sales_process_score
 		lineageTag: 97d25616-7fe7-412d-9397-c0075aa44e42
@@ -252,6 +266,7 @@ table sales_process_summary
 			var res = sdt_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
 			```
+			description: "Ratio of ssr_history[step_end_rule] to ssr_history[_sys_doc_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _sales_process_score
 		lineageTag: 9dfa3fc6-d190-452a-8b64-e8d9a6a0aff5
@@ -269,6 +284,7 @@ table sales_process_summary
 			var res = std_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
 			```
+			description: "Ratio of ssr_history[step_end_rule] to ssr_history[_sys_doc_id]. Respects the current filter context."
 		displayFolder: _sales_process_score
 		lineageTag: f7cd03d7-0290-46f8-95d3-4867b0bc66e4
 
@@ -287,6 +303,7 @@ table sales_process_summary
 			var res = sdt_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
 			```
+			description: "Ratio of ssr_history[step_outcome_rule] to ssr_history[_sys_doc_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _sales_process_score
 		lineageTag: a657c9cb-8377-4d32-81d7-f6ff96382fdc
@@ -304,6 +321,7 @@ table sales_process_summary
 			var res = std_rules_applied // return the res
 			return If(IsBlank(res), 0,res)
 			```
+			description: "Ratio of ssr_history[step_outcome_rule] to ssr_history[_sys_doc_id]. Respects the current filter context."
 		displayFolder: _sales_process_score
 		lineageTag: 705de9ee-9abe-4371-8cc4-6b0bce5ce92a
 
@@ -315,6 +333,7 @@ table sales_process_summary
 	/// Format/Type: 0
 	measure 'meas.crm_sales_process_any_rules_non_std_count' =
 			
+			description: "TODO: provide business definition for this measure."
 			var res = sales_process_summary[meas.crm_sales_process_any_rules_count] - sales_process_summary[meas.crm_sales_process_any_rules_std_count] // just get the diff
 			return If(IsBlank(res), 0,res)
 		formatString: 0
@@ -343,12 +362,14 @@ table sales_process_summary
 			
 			return If(IsBlank(res), 0,res)
 			```
+			description: "Ratio of ssr_history[step_owner_rule] to ssr_history[step_outcome_rule]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _sales_process_score
 		lineageTag: ed668400-4a42-436c-9090-ddde1589f0a7
 
 	/// Column row.
 	column row
+		description: "Unclear: Value for row."
 		formatString: 0
 		lineageTag: 8fbab856-5f4b-4af8-9508-f59c541c8fa2
 		summarizeBy: sum
@@ -359,6 +380,7 @@ table sales_process_summary
 
 	/// Column available_data.
 	column available_data
+		description: "Unclear: Value for available data."
 		lineageTag: b06d31b0-7784-4617-938f-b71b5bf140d5
 		summarizeBy: none
 		isNameInferred
@@ -368,6 +390,7 @@ table sales_process_summary
 
 	/// Column _sys_docid.
 	column _sys_docid
+		description: "Unclear: System: Value for docid."
 		lineageTag: fba69a4f-0936-4e74-9b5b-acb7403b271a
 		summarizeBy: none
 		isNameInferred
@@ -377,6 +400,7 @@ table sales_process_summary
 
 	/// Column _sys_filter_start_date.
 	column _sys_filter_start_date
+		description: "System: Date/time when filter start date."
 		formatString: General Date
 		lineageTag: a390999a-f592-4056-9469-80c68e4a2dcc
 		summarizeBy: none
@@ -387,6 +411,7 @@ table sales_process_summary
 
 	/// Column trueai_completeness_contact_method.
 	column trueai_completeness_contact_method
+		description: "Unclear: TrueAI: Value for completeness contact method."
 		lineageTag: ae957319-63f1-4061-95e2-e6faa0a73728
 		summarizeBy: sum
 		isNameInferred
@@ -398,6 +423,7 @@ table sales_process_summary
 
 	/// Column revenue.
 	column revenue
+		description: "Amount for revenue."
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: 8d6bfd4f-a84e-4578-bd86-5b86c508920e
 		summarizeBy: sum
@@ -410,6 +436,7 @@ table sales_process_summary
 
 	/// Column _sys_user_id.
 	column _sys_user_id
+		description: "System: Identifier for user."
 		lineageTag: 91562e1a-91c4-4534-9dea-5abe0a6aaab1
 		summarizeBy: none
 		isNameInferred

@@ -1,5 +1,6 @@
 /// CRM entity for the reference list for all available products associated with opportunities enriched with TrueAI predictive insights.
 table products
+	description: "One row per product record. Source fields include CRM, System, TrueAI prefixes. Related to LocalDateTable_daac65e6-0114-497c-923e-742489f6006b (_sys_as_of -> Date), LocalDateTable_61b30642-5455-4ae8-a11c-07f96dc2fd68 (_sys_last_modified_on -> Date), LocalDateTable_3b57d89a-6c8b-4e68-afcf-59da8b8da4bb (crm_created_on -> Date). Supports measures such as meas.product_family_unique_accounts, meas.product_family_unique_deals."
 	lineageTag: 40b9c0cb-f2d0-4937-88d6-57242cf9d494
 
 	/// Purpose: Returns the distinct count of opps[_sys_ssr_id].
@@ -8,6 +9,7 @@ table products
 	/// Format/Type: 0
 	measure 'meas.product_family_unique_accounts' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 			    DISTINCTCOUNT(
 			        opps[_sys_ssr_id]        // distinct count of the accounts
@@ -23,6 +25,7 @@ table products
 	/// Format/Type: 0
 	measure 'meas.product_family_unique_deals' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 			    DISTINCTCOUNT(
 			        opps[_sys_doc_id]   // get the disticnt count of _sys_doc_id as unique deals
@@ -44,6 +47,7 @@ table products
 			    )
 			)
 			```
+			description: "Ratio based on opp_line_items[trueai_total_price]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _product_family_screen
 		lineageTag: fa69cd79-aadb-49d4-8bb8-5518cdbb2364
@@ -62,6 +66,7 @@ table products
 			    )
 			)
 			```
+			description: "Ratio based on opp_line_items[trueai_qty]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _product_family_screen
 		lineageTag: 2827e35a-98ac-4e68-8efb-3d73c5ab166f
@@ -72,6 +77,7 @@ table products
 	/// Format/Type: \$#,0;(\$#,0);\$#,0
 	measure 'meas.product_family_avg_list_price' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 			    AVERAGE(
 			        opp_line_items[trueai_list_price]           // get the average  opp line item's trueai_list_price
@@ -87,6 +93,7 @@ table products
 	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 	measure 'meas.product_family_avg_unit_price' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 			    AVERAGE(
 			        opp_line_items[trueai_unit_price]       //get the average of opp line items "trueai_unit_price"
@@ -102,6 +109,7 @@ table products
 	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 	measure 'meas.product_family_total_list_price' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 			    SUMX(
 			        opp_line_items,
@@ -118,6 +126,7 @@ table products
 	/// Format/Type: #,##0" Days"
 	measure 'meas.product_family_avg_sales_cycle' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 			    AVERAGE(
 			        ssr_history[step_length_in_days]            // get the average sales cycle days
@@ -135,6 +144,7 @@ table products
 	/// Format/Type: #,##0.0" hrs"
 	measure 'meas.product_family_avg_time_spent_hrs' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 			    AVERAGE(
 			        ssr_history[stkhlds_all_adj_dur]   // get the average of stkhlds_all_adj_dur
@@ -159,6 +169,7 @@ table products
 			    )
 			)/3600      // convert the duration into hrs 
 			```
+			description: "Ratio based on ssr_history[stkhlds_all_adj_dur]. Respects the current filter context."
 		formatString: #,##0" hrs"
 		displayFolder: _product_family_screen
 		lineageTag: ee99d7e9-07ee-406a-bba8-27a51c0e95c5
@@ -189,6 +200,7 @@ table products
 			RETURN
 			res
 			```
+			description: "Ratio based on opp_line_items[trueai_total_price]. Respects the current filter context."
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: _product_family_screen
 		lineageTag: 28d441be-1f36-40c1-91fb-b4d6a82b39bc
@@ -199,6 +211,7 @@ table products
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.product_family_account_penetration_pct' =
 			
+			description: "TODO: provide business definition for this measure."
 			var _total_acc = CALCULATE(
 			    DISTINCTCOUNT(
 			        opps[_sys_ssr_id]        // distinct count of the accounts removing filters
@@ -245,6 +258,7 @@ table products
 			RETURN
 			res
 			```
+			description: "Ratio based on opps[_sys_doc_id]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _product_family_screen
 		lineageTag: 146208f2-5b08-4bbb-bcca-b7800a76fd98
@@ -255,6 +269,7 @@ table products
 	/// Format/Type: 0
 	measure 'meas.product_family_all_won_deals' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 			    DISTINCTCOUNT(
 			        opps[_sys_doc_id]   // get the disticnt count of _sys_doc_id as unique deals
@@ -271,6 +286,7 @@ table products
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.product_family_win_deals_pct' =
 			
+			description: "TODO: provide business definition for this measure."
 			var total_won = CALCULATE(
 			    DISTINCTCOUNT(
 			        opps[_sys_doc_id]   // get the disticnt count of _sys_doc_id as unique deals
@@ -297,6 +313,7 @@ table products
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.product_family_avg_expected_win_rate_pct' =
 			
+			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 			    AVERAGE(
 			        opps[trueai_prob_of_win]        // get the average of opps prob of win
@@ -308,6 +325,7 @@ table products
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
+		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 0bcf5f8d-813c-4af1-8ff2-1711f569dc21
 		summarizeBy: none
@@ -317,6 +335,7 @@ table products
 
 	/// Product's currency in the CRM
 	column crm_currency
+		description: "CRM: Text label for currency."
 		dataType: string
 		lineageTag: a79158e9-bb2f-4ac6-aa04-d59d9070d725
 		summarizeBy: none
@@ -326,6 +345,7 @@ table products
 
 	/// Product's description in the CRM
 	column crm_description
+		description: "CRM: Text label for description."
 		dataType: string
 		lineageTag: 87fa0f42-a299-4c7c-9c1e-d4d03d743301
 		summarizeBy: none
@@ -335,6 +355,7 @@ table products
 
 	/// Product's family in the CRM
 	column crm_family
+		description: "CRM: Text label for family."
 		dataType: string
 		lineageTag: f07d005b-7aff-468a-b047-ee51d9633e58
 		summarizeBy: none
@@ -344,6 +365,7 @@ table products
 
 	/// Product name in the CRM
 	column crm_name
+		description: "CRM: Text label for name."
 		dataType: string
 		lineageTag: c459f7a9-f02b-4d4f-9d61-4a1c6c4f0d02
 		summarizeBy: none
@@ -353,6 +375,7 @@ table products
 
 	/// Product code in the CRM
 	column crm_product_code
+		description: "CRM: Text label for product code."
 		dataType: string
 		lineageTag: 12a4fe8b-05e6-452e-95e6-59756c1a0e9f
 		summarizeBy: none
@@ -362,6 +385,7 @@ table products
 
 	/// The date of the last data request from the platform
 	column _sys_as_of
+		description: "System: Date/time when as of."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 6d6d2a88-e0fd-4a53-a783-b1c394ed9399
@@ -377,6 +401,7 @@ table products
 
 	/// Boolean flag that indicates whether the record was set to inactive in the remote system
 	column _sys_is_active
+		description: "System: Indicates whether is active."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 6049249d-4611-49a2-b7a0-94c4441d9366
@@ -387,6 +412,7 @@ table products
 
 	/// Boolean flag that indicates whether the record was set to deleted in the remote system
 	column _sys_is_deleted
+		description: "System: Indicates whether is deleted."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: c5a89cb9-af6f-47bf-bf0d-0b6d8bbe3ae9
@@ -397,6 +423,7 @@ table products
 
 	/// The date of the last data modification in the platform
 	column _sys_last_modified_on
+		description: "System: Date/time when last modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: df5e128e-88e9-4fea-9517-1fc313135472
@@ -412,6 +439,7 @@ table products
 
 	/// Product's creation date in the CRM
 	column crm_created_on
+		description: "CRM: Date/time when created on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 2a1ba898-6562-4954-b2e3-2acee0a1085d
@@ -427,6 +455,7 @@ table products
 
 	/// Product's modified on date in the CRM
 	column crm_modified_on
+		description: "CRM: Date/time when modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: c7cd9c4b-9bcf-420a-ab35-ce95a53ffd61
@@ -442,6 +471,7 @@ table products
 
 	/// Product name
 	column trueai_name
+		description: "TrueAI: Text label for name."
 		dataType: string
 		lineageTag: 0ff92be8-6302-4a3d-8878-a435d2db6140
 		summarizeBy: none
@@ -451,6 +481,7 @@ table products
 
 	/// Product's family
 	column trueai_family
+		description: "TrueAI: Text label for family."
 		dataType: string
 		lineageTag: ccbb5fac-6eb2-4657-a77d-3b4c341b0e08
 		summarizeBy: none
@@ -460,6 +491,7 @@ table products
 
 	/// Column 'col.product_name' =.
 	column 'col.product_name' =
+			description: "Unclear: Value for col product name."
 			
 			CONCATENATEX(
 			    FILTER(
