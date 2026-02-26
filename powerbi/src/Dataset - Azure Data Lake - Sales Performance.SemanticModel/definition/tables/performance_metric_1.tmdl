@@ -1567,68 +1567,6 @@ table performance_metric_1
 	measure 'meas.slicer_placeholder' = SELECTEDVALUE( metadata_performance_metrics_slicer[sys_doc_id] )
 		lineageTag: dc634891-d706-4118-b640-36637669037f
 
-	measure 'meas.performance_metric_value_secondary' =
-			
-			VAR _id =
-			    SELECTEDVALUE( metadata_performance_metrics_secondary[sys_doc_id] )
-			
-			VAR _measureToReturn =
-			    SWITCH(
-			        TRUE(),
-			
-			        /* ============================
-			           :pushpin: Revenue Type Metrics
-			           ============================ */
-			        _id = "rev01", [meas.opp_nnb_amt],
-			        _id = "rev02", [meas.opp_cross_sale_amt],
-			        _id = "rev03", [meas.opp_downgrade_amt],
-			        _id = "rev04", [meas.opp_renewal_amt],
-			        _id = "rev05", [meas.opp_arr_amt],
-			        _id = "rev06", [meas.opp_nd_amt],
-			        _id = "rev07", [meas.opp_one_time_amt],
-			        _id = "rev08", [meas.opp_expansion_amt],
-			        _id = "rev09", [meas.opp_mrr_amt],
-			
-			        /* ============================
-			           :pushpin: Existing Sales Metrics
-			           ============================ */
-			        _id = "sal01", [meas.ssr_history_won_amt],
-			        _id = "sal02", [meas.total_opps_count],
-			        _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
-			        _id = "sal04", [meas.ssr_history_win_rate],
-			        _id = "sal05", [meas.total_opps_count],
-			
-			        /* ============================
-			           :pushpin: Pipeline Metrics
-			           ============================ */
-			        _id = "pip01", [meas.pipeline_amt_sum],
-			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
-			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
-			
-			        /* ============================
-			           :pushpin: Activity Metrics
-			           ============================ */
-			        _id = "act01", [meas.stkhlds_all_act_count],
-			        _id = "act02", [meas.stkhlds_all_act_email_count],
-			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
-			        _id = "act04", [meas.ssr_history_duration_hrs],
-			
-			        /* ============================
-			           :octagonal_sign: Default
-			           ============================ */
-			        BLANK()
-			    )
-			
-			RETURN
-			IF(
-			    ISBLANK(_measureToReturn),
-			    BLANK(),
-			    _measureToReturn   -- :brain: NO CALCULATE HERE (keeps row context intact)
-			)
-		lineageTag: c453710f-4a24-41a3-a56a-5af756a2cf7d
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	measure 'meas.restricted_line_chart_only_performance_metric_value_secondary' =
 			
 			VAR _id =
@@ -1693,17 +1631,12 @@ table performance_metric_1
 
 	measure 'meas.performance_metric_value_avg' = ```
 			
-			  
 			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
 						users[trueai_full_name],
 						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
-						
 			)
 			var perf_metric_average_per_rep = AVERAGEX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
-			
 			RETURN perf_metric_average_per_rep
-			
-			
 			```
 		lineageTag: 2779f423-d006-4068-b1fc-5089fcf728d4
 
@@ -1872,6 +1805,199 @@ table performance_metric_1
 			)
 			```
 		lineageTag: 30796767-70f0-4434-b4da-c6ad03a2e178
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_secondary' =
+			
+			VAR _id =
+			    SELECTEDVALUE( metadata_performance_metrics_secondary[sys_doc_id] )
+			
+			VAR _measureToReturn =
+			    SWITCH(
+			        TRUE(),
+			
+			        /* ============================
+			           :pushpin: Revenue Type Metrics
+			           ============================ */
+			        _id = "rev01", [meas.opp_nnb_amt],
+			        _id = "rev02", [meas.opp_cross_sale_amt],
+			        _id = "rev03", [meas.opp_downgrade_amt],
+			        _id = "rev04", [meas.opp_renewal_amt],
+			        _id = "rev05", [meas.opp_arr_amt],
+			        _id = "rev06", [meas.opp_nd_amt],
+			        _id = "rev07", [meas.opp_one_time_amt],
+			        _id = "rev08", [meas.opp_expansion_amt],
+			        _id = "rev09", [meas.opp_mrr_amt],
+			
+			        /* ============================
+			           :pushpin: Existing Sales Metrics
+			           ============================ */
+			        _id = "sal01", [meas.ssr_history_won_amt],
+			        _id = "sal02", [meas.total_opps_count],
+			        _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			        _id = "sal04", [meas.ssr_history_win_rate],
+			        _id = "sal05", [meas.total_opps_count],
+			
+			        /* ============================
+			           :pushpin: Pipeline Metrics
+			           ============================ */
+			        _id = "pip01", [meas.pipeline_amt_sum],
+			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			
+			        /* ============================
+			           :pushpin: Activity Metrics
+			           ============================ */
+			        _id = "act01", [meas.stkhlds_all_act_count],
+			        _id = "act02", [meas.stkhlds_all_act_email_count],
+			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			        _id = "act04", [meas.ssr_history_duration_hrs],
+			
+			        /* ============================
+			           :octagonal_sign: Default
+			           ============================ */
+			        BLANK()
+			    )
+			
+			RETURN
+			IF(
+			    ISBLANK(_measureToReturn),
+			    BLANK(),
+			    _measureToReturn   -- :brain: NO CALCULATE HERE (keeps row context intact)
+			)
+		lineageTag: c453710f-4a24-41a3-a56a-5af756a2cf7d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_avg_peer' = ```
+			
+			// CALCULATE(
+			//     VAR tbl = SUMMARIZECOLUMNS(
+			//         ssr_history[col.step_owner_group],
+			//         ssr_history[trueai_user_role_alias],
+			//         "Measure_Pre_AGG", [meas.performance_metric_value]
+			//     )
+			//     RETURN AVERAGEX( tbl, [Measure_Pre_AGG] )
+			//     ,
+			//     -- This removes any filter specifically on the Rep's name
+			//     REMOVEFILTERS(users[trueai_full_name]) 
+			// )
+			
+			    CALCULATE(
+			        -- We summarize the USERS table to get a list of people
+			    VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN AVERAGEX( tbl, [Measure_Pre_AGG] )
+			        ,
+			        REMOVEFILTERS(users[trueai_full_name])
+			
+			    )
+			
+			
+			```
+		lineageTag: 5160e701-f84f-4f9c-bf98-a9d289d0c26f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_count_peer' = ```
+			
+			IF(
+			    NOT ISFILTERED(users[trueai_group]) && NOT ISFILTERED(users[trueai_user_role_alias]),
+			    BLANK(), 
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN COUNTROWS(tbl), 
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			)
+			
+			```
+		formatString: 0
+		lineageTag: eae44156-0021-4e10-9e2a-1b63a3d84fad
+
+	measure 'meas.performance_metric_value_max_peer' = ```
+			
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN MAXX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			
+			
+			
+			```
+		lineageTag: d3806bb9-112d-4660-8a82-d3ffce27082b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_min_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN MINX(tbl, [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: d352ee87-3732-49c6-afb3-f4dc027068e4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_median_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN MEDIANX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			
+			```
+		lineageTag: 40b78582-969b-4a96-9566-1193bee9f26f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_std_deviation_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN STDEVX.P( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: 2465309d-38ce-49c1-82d1-08c029932ff7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value_sum_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG", [meas.performance_metric_value]
+			        )
+			        RETURN SUMX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: 66f44f39-7246-4b8c-baa9-ed16c350de1e
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
