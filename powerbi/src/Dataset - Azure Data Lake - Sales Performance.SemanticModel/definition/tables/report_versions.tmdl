@@ -1,19 +1,13 @@
 /// Table report_versions.
 table report_versions
-	description: "TODO: provide business definition for this table. Related to LocalDateTable_ac99c4be-fabc-485e-853f-0d39068680d7 (release_date -> Date). Supports measures such as meas.report_versions_current_ver."
 	lineageTag: feead5d3-417c-4a86-b923-ee3151b279d1
 
-	/// Purpose: Returns the latest version based on the most recent release_date.
-	/// Calculation Logic: Uses TOPN and MAXX.
-	/// Dynamic Behavior: Respects current filter context; responds to filters on report_versions[release_date].
-	/// Format/Type: Unspecified
+	/// Measure meas.report_versions_current_ver.
 	measure 'meas.report_versions_current_ver' = maxx(topn(1, report_versions, report_versions[release_date] ,DESC), [version])
-		description: "TODO: provide business definition for this measure."
 		lineageTag: a7f6e283-43c0-4471-a500-586962b4bf1e
 
 	/// Column version.
 	column version
-		description: "Text label for version."
 		dataType: string
 		lineageTag: fb950d55-2a2c-448a-847a-217f615a6387
 		summarizeBy: none
@@ -23,7 +17,6 @@ table report_versions
 
 	/// Column release_date.
 	column release_date
-		description: "Date/time when release date."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 9ece4326-1102-458f-ad68-dfa6acee04ba
@@ -45,8 +38,8 @@ table report_versions
 				let
 				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMtEz0DM2VtJRMjTSN9U3MjAyVoqNBQA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [version = _t, release_date = _t]),
 				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"version", type text}, {"release_date", type date}}),
-				    #"Replaced Value" = Table.ReplaceValue(#"Changed Type","4.0.33","4.3.4",Replacer.ReplaceText,{"version"}),
-				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value",#date(2023, 12, 5),#date(2025, 02, 25),Replacer.ReplaceValue,{"release_date"})
+				    #"Replaced Value" = Table.ReplaceValue(#"Changed Type","4.0.33","4.3.3",Replacer.ReplaceText,{"version"}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value",#date(2023, 12, 5),#date(2025, 02, 18),Replacer.ReplaceValue,{"release_date"})
 				in
 				    #"Replaced Value1"
 
