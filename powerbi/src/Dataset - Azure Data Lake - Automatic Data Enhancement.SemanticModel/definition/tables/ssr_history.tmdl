@@ -1,11 +1,6 @@
-/// Derived entity for the chronological log of transitions through the Single Sales Record (SSR) lifecycle. Sequence: Lead Gen -> Untouched -> Prospecting -> New Logo -> Post-Sales Support -> Existing Customer Selling.
 table ssr_history
 	lineageTag: c2ee1095-155a-44f5-a5af-efb2bc2dc2c5
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[_sys_doc_id], ssr_history[step_success].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
 	measure 'meas.ssr_history_success_count' = ```
 			CALCULATE(count(ssr_history[_sys_doc_id]),ssr_history[step_success] = true)  
 			```
@@ -13,19 +8,11 @@ table ssr_history
 		displayFolder: _ssr_history_analyis
 		lineageTag: fbf78099-2fdd-4373-9016-2af11cc5f240
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[_sys_doc_id] | Measures: [meas.ssr_history_success_count].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0.00%;-0.00%;0.00%
 	measure 'meas.ssr_history_success_rate' = DIVIDE([meas.ssr_history_success_count], count(ssr_history[_sys_doc_id]))
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _ssr_history_analyis
 		lineageTag: cda20e0e-69cf-402d-9516-347d9e518aa3
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[step_owner_user_role].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: Not specified.
 	measure 'meas.ssr_history_step_summary' = ```
 			// get the step owner user role
 			CALCULATE(MAX(ssr_history[step_owner_user_role])) 
@@ -33,19 +20,11 @@ table ssr_history
 		displayFolder: _ssr_history_analyis
 		lineageTag: 6abc5488-273b-4e5d-b362-1ba28618566c
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_name].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
 	measure 'meas.ssr_history_touched_accounts' = CALCULATE(DISTINCTCOUNT(ssr_history[_sys_ssr_id]), ssr_history[step_name] ="Prospecting")
 		formatString: 0
 		displayFolder: _ssr_history_analyis
 		lineageTag: 3ed7eb07-019d-4902-b108-7fddffd138fd
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0.00
 	measure 'meas.ssr_history_adj_dur_conf' =
 			// this comment is for check the github  version check
 			
@@ -65,16 +44,6 @@ table ssr_history
 		displayFolder: _tl_analysis
 		lineageTag: 153eea7e-74f4-4e9a-822f-21fc0d3cf9c0
 
-	/// Purpose: Returns a sum derived from ssr_history[opp_pipeline_amt].
-	/// Calculation Logic: Direct expression without VAR/RETURN.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: $#,0;($#,0);$#,0
-	measure 'meas.ssr_history_pipeline_amt' = CALCULATE(SUM(ssr_history[opp_pipeline_amt]))
-		formatString: \$#,0;(\$#,0);\$#,0
-		displayFolder: _ssr_history_analyis
-		lineageTag: 91a3faca-99d9-4358-ba4b-a76c86d9b63a
-
-	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
 		dataType: string
 		lineageTag: 5dab0112-202e-4780-9aad-25b2f42a82d8
@@ -83,7 +52,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity id on selling steps, first opportunity id on steps prior to that, last opportunity id on post-sales support steps
 	column entity_opp_id
 		dataType: string
 		lineageTag: b951ec4a-2cb6-4841-8e1d-4af168b4dbc3
@@ -92,16 +60,14 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Quality bucket based on the probability of success
-	column entity_propensity
+	column entity_qual_bucket
 		dataType: string
 		lineageTag: 579230fa-0af4-417b-8716-1fe876b243f7
 		summarizeBy: none
-		sourceColumn: entity_propensity
+		sourceColumn: entity_qual_bucket
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's current normalized stage, present in selling steps
 	column opp_final_stage
 		dataType: string
 		lineageTag: 24f7cb62-2901-4a1a-9ebf-b4819c07a601
@@ -110,7 +76,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the opportunity entered the late stage, present in selling steps
 	column opp_late_date
 		dataType: dateTime
 		formatString: General Date
@@ -125,7 +90,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the opportunity entered the middle stage, present in selling steps
 	column opp_mid_date
 		dataType: dateTime
 		formatString: General Date
@@ -140,7 +104,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// End date of the step
 	column step_end_date
 		dataType: dateTime
 		formatString: General Date
@@ -155,7 +118,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Rule used to determine the end date of the step
 	column step_end_rule
 		dataType: int64
 		formatString: 0
@@ -165,7 +127,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Id of the step, specific to every step name
 	column step_id
 		dataType: string
 		lineageTag: ee7f53b4-2284-45c0-ab85-a00c96e0e966
@@ -174,7 +135,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of days from the step start date to end date
 	column step_length_in_days
 		dataType: int64
 		formatString: 0
@@ -184,7 +144,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Name of the step
 	column step_name
 		dataType: string
 		lineageTag: 40c49999-5de7-4f44-8aa7-dc1baddec394
@@ -193,7 +152,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Outcome of the step, if end date present
 	column step_outcome
 		dataType: string
 		lineageTag: 27b46a21-ec44-44a3-bab7-da6b81d3866b
@@ -202,7 +160,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Rule used to determine the outcome of the step, if end date present
 	column step_outcome_rule
 		dataType: int64
 		formatString: 0
@@ -212,7 +169,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Prep factor of the owner of the step
 	column step_owner_prep_factor
 		dataType: double
 		lineageTag: 70517a6e-8e13-4364-9085-23194faa46d2
@@ -223,7 +179,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Rule used to determine the owner of the step
 	column step_owner_rule
 		dataType: int64
 		formatString: 0
@@ -233,7 +188,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// User role of the owner of the step
 	column step_owner_user_role
 		dataType: string
 		lineageTag: b2930202-3eb6-4436-8753-05be01b7abd1
@@ -242,7 +196,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Ordinal number based on the position of the step in the sequence
 	column step_sequence
 		dataType: int64
 		formatString: 0
@@ -252,7 +205,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Start date of the step
 	column step_start_date
 		dataType: dateTime
 		formatString: General Date
@@ -267,7 +219,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Probability of successful outcome of the step
 	column step_success_prob
 		dataType: double
 		formatString: 0%;-0%;0%
@@ -277,7 +228,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the outcome of the step was successful
 	column step_success
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -287,9 +237,8 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Value created during the step
 	column vi_value_created
-		dataType: double
+		dataType: decimal
 		lineageTag: 30322891-c9f1-4b88-b781-315e5687ad84
 		summarizeBy: sum
 		sourceColumn: vi_value_created
@@ -298,9 +247,8 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Value delivered at the end of the step
 	column vi_value_delivered
-		dataType: double
+		dataType: decimal
 		lineageTag: 7debbe86-1dbe-4d14-bffb-dc0aacd2e2b3
 		summarizeBy: sum
 		sourceColumn: vi_value_delivered
@@ -309,7 +257,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Column 'col.simplified_outcome' =.
 	column 'col.simplified_outcome' =
 			if(ssr_history[step_success],
 			
@@ -322,7 +269,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.step_name_outcome' = ```.
 	column 'col.step_name_outcome' = ```
 			
 			var concat_str = (ssr_history[step_name] & "_" &  if(or(ISBLANK(ssr_history[step_outcome]),ssr_history[step_outcome] = "" ) , "ongoing", ssr_history[step_outcome]))
@@ -335,7 +281,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.time_line_summary' = ```.
 	column 'col.time_line_summary' = ```
 			
 			var space_char = "_" //" " // uses special space char " " instead of reg space
@@ -381,7 +326,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's close date in the first opportunity history entry, present in selling steps
 	column opp_initial_close_date
 		dataType: dateTime
 		formatString: General Date
@@ -396,7 +340,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's sale type, present in selling steps
 	column opp_sale_type
 		dataType: string
 		lineageTag: 5d5f0842-add2-4c1d-8663-3e097b3f93e1
@@ -405,7 +348,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's current CRM stage name, present in selling steps
 	column opp_crm_stage
 		dataType: string
 		lineageTag: 1259d0d4-9d4e-4dce-be0b-73586a253504
@@ -414,7 +356,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Entity of the primary object related to the step
 	column entity_primary
 		dataType: string
 		lineageTag: 1a34793c-6549-4cf5-a521-2d600811b983
@@ -423,7 +364,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Account id, if account already exists
 	column entity_account_id
 		dataType: string
 		lineageTag: 569cdd75-7a8c-4381-9284-ad2f4abad3f7
@@ -432,7 +372,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Lead id, if the prospecting object is a lead
 	column entity_lead_id
 		dataType: string
 		lineageTag: 9eff1ee5-775b-4c76-9999-c7d94e76ae4c
@@ -441,7 +380,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Custom categorical variable
 	column entity_crm_custom_value_1
 		dataType: string
 		lineageTag: 07a5f813-78db-47f8-9792-43fd553e2bb5
@@ -450,7 +388,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Custom categorical variable
 	column entity_crm_custom_value_2
 		dataType: string
 		lineageTag: d075f504-804f-473a-b75f-edb9d7b78e38
@@ -459,7 +396,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Custom categorical variable
 	column entity_crm_custom_value_3
 		dataType: string
 		lineageTag: 283e37f4-4f46-498f-a876-b433532c3088
@@ -468,7 +404,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's last normalized stage, before it was lost
 	column opp_lost_stage
 		dataType: string
 		lineageTag: 7db7d08d-50d1-47f0-84c5-3cc69919a8d1
@@ -477,7 +412,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's CRM type, present in selling steps
 	column opp_crm_type
 		dataType: string
 		lineageTag: 322fa32e-00ae-43b1-82e9-c253df6a3257
@@ -486,7 +420,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Probability of successful outcome of the step
 	column step_next_success_prob
 		dataType: double
 		lineageTag: c0536ef9-11f7-4630-838f-a8a2e2eed88a
@@ -497,7 +430,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Id of the owner of the step
 	column step_owner_id
 		dataType: string
 		lineageTag: 2b87f9a1-d041-42d5-84e5-f10769aaeae3
@@ -506,7 +438,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of activities performed by the owner of the step
 	column step_owner_act
 		dataType: double
 		lineageTag: cd8ca7b2-0015-4d08-8ecb-90ed24996507
@@ -517,7 +448,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 018ce634-26b5-4f20-8a34-713a7c2f3205
@@ -526,7 +456,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// The end date of the record, stripped of time
 	column _sys_filt_end_date
 		dataType: dateTime
 		formatString: Short Date
@@ -545,7 +474,6 @@ table ssr_history
 
 		annotation UnderlyingDateTimeDataType = Date
 
-	/// The start date of the record, stripped of time
 	column _sys_filt_start_date
 		dataType: dateTime
 		formatString: Short Date
@@ -559,7 +487,6 @@ table ssr_history
 
 		annotation UnderlyingDateTimeDataType = Date
 
-	/// Completeness score of the account based on the CRM data
 	column entity_primary_crm_complt
 		dataType: double
 		lineageTag: f0b557b7-37f1-4af3-b4e4-3a5ca2d53ca8
@@ -570,7 +497,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Unique record identifier of the primary object related to the step, based on the ID of the document in the remote system (such as Salesforce ID)
 	column entity_primary_doc_id
 		dataType: string
 		lineageTag: 0d0089cd-8162-4af0-befa-1c2d3ce10da0
@@ -579,7 +505,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Completeness score of the account based on the standardized data
 	column entity_primary_trueai_complt
 		dataType: double
 		lineageTag: ad2129d7-0236-4602-a862-af62cb2a9c53
@@ -590,9 +515,8 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity's booking amount
 	column opp_booking_amt
-		dataType: double
+		dataType: decimal
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: 3dd48081-1cf7-458d-93a2-cf461dc58120
 		summarizeBy: sum
@@ -602,9 +526,8 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's booking amount in the first opportunity history entry, present in selling steps
 	column opp_initial_amt
-		dataType: double
+		dataType: decimal
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: df730a7a-f07b-4b2c-b334-7474cb5989f7
 		summarizeBy: sum
@@ -614,9 +537,8 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Pipeline amount created in step
 	column opp_pipeline_amt
-		dataType: double
+		dataType: decimal
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: b9cae793-2a9d-40d6-937d-a2f211da06d8
 		summarizeBy: sum
@@ -626,9 +548,19 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's value when closed, present in closed selling steps
+	column opp_pred_booking_amt
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: a2679efe-4081-4dbd-a2a5-b05e003e4154
+		summarizeBy: sum
+		sourceColumn: opp_pred_booking_amt
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = Automatic
+
 	column opp_won_amt
-		dataType: double
+		dataType: decimal
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: 99521d04-d411-492d-911b-fca3dbc75502
 		summarizeBy: sum
@@ -638,7 +570,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Act_capture_level score of the owner of the step
 	column step_owner_act_capt_lvl
 		dataType: double
 		lineageTag: 9614c784-7091-4c3a-9242-09c40fcfcf3a
@@ -649,7 +580,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Duration of activities performed by the owner of the step
 	column step_owner_dur
 		dataType: double
 		lineageTag: 05268cea-c546-4cae-851a-0212317f8e34
@@ -660,7 +590,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Number of users involved in the step, based on activities and ownership
 	column step_users_tot
 		dataType: int64
 		formatString: 0
@@ -670,7 +599,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of activities performed during the step
 	column stkhlds_all_act_count
 		dataType: int64
 		formatString: 0
@@ -680,7 +608,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of engaged activities performed during the step
 	column stkhlds_all_act_eng_count
 		dataType: int64
 		formatString: 0
@@ -690,7 +617,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Adjusted duration of activities performed during the step
 	column stkhlds_all_adj_dur
 		dataType: double
 		lineageTag: 28adabf3-b34e-4df2-a9b1-a69d28d75868
@@ -701,7 +627,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Number of contacts involved in the step
 	column stkhlds_all_contacts_count
 		dataType: int64
 		formatString: 0
@@ -711,7 +636,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Duration of activities performed during the step
 	column stkhlds_all_dur
 		dataType: double
 		lineageTag: 3ff4076a-2c04-4e9c-95b7-21ed12c223fd
@@ -722,7 +646,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Duration of activities performed during the step
 	column stkhlds_all_dur_eng
 		dataType: double
 		lineageTag: 65aa4895-3235-43f9-8fd0-8304bf6c8257
@@ -733,7 +656,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Date when the first activity was performed during the step
 	column stkhlds_all_first_act
 		dataType: dateTime
 		formatString: General Date
@@ -748,7 +670,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the last activity was performed during the step
 	column stkhlds_all_last_act
 		dataType: dateTime
 		formatString: General Date
@@ -763,7 +684,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Highest seniority amongst all contacts of the step
 	column stkhlds_all_max_title_seniority
 		dataType: string
 		lineageTag: e7f92078-7399-4542-bd83-6dc26d447015
@@ -772,7 +692,14 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Most common seniority amongst all contacts of the step
+	column stkhlds_all_most_common_title_dept
+		dataType: string
+		lineageTag: 5b641176-c48c-497d-a316-df346d964def
+		summarizeBy: none
+		sourceColumn: stkhlds_all_most_common_title_dept
+
+		annotation SummarizationSetBy = Automatic
+
 	column stkhlds_all_most_common_title_seniority
 		dataType: string
 		lineageTag: 12945aed-c7e6-48b9-847c-7c6e71bfa788
@@ -781,7 +708,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Unique departments amongst all contacts of the step
 	column stkhlds_all_unique_title_depts
 		dataType: int64
 		formatString: 0
@@ -791,7 +717,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Unique seniority in all contacts of the step
 	column stkhlds_all_unique_title_seniorities
 		dataType: int64
 		formatString: 0
@@ -801,7 +726,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of activities performed by the primary stakeholder during the step
 	column stkhlds_primary_contact_act_count
 		dataType: int64
 		formatString: 0
@@ -811,7 +735,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of engaged activities performed by the primary stakeholder during the step
 	column stkhlds_primary_contact_act_eng_count
 		dataType: int64
 		formatString: 0
@@ -821,7 +744,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Duration of activities performed by the primary contact of the step during the step
 	column stkhlds_primary_contact_dur
 		dataType: double
 		lineageTag: 80274285-40ba-4a38-836b-a98e716ae548
@@ -832,7 +754,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Duration of activities performed by the primary contact of the step during the step
 	column stkhlds_primary_contact_eng_dur
 		dataType: double
 		lineageTag: 2310887f-e11d-4201-ae02-a7b864e8e8db
@@ -843,7 +764,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Date when the first activity by the primary contact was performed during the step
 	column stkhlds_primary_contact_first_act
 		dataType: dateTime
 		formatString: General Date
@@ -858,7 +778,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the last activity by the primary contact was performed during the step
 	column stkhlds_primary_contact_last_act
 		dataType: dateTime
 		formatString: General Date
@@ -873,7 +792,14 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Seniority of the primary contact of the step
+	column stkhlds_primary_contact_title_dept
+		dataType: string
+		lineageTag: 59d2a1c7-1221-42cd-a955-f45e88735e7d
+		summarizeBy: none
+		sourceColumn: stkhlds_primary_contact_title_dept
+
+		annotation SummarizationSetBy = Automatic
+
 	column stkhlds_primary_contact_title_seniority
 		dataType: string
 		lineageTag: 0de8069b-6adb-4215-82ad-8f577d0858d4
@@ -882,7 +808,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Id of the primary contact of the step
 	column stkhlds_primary_entity_id
 		dataType: string
 		lineageTag: e4a8eee2-6394-4f9d-83e9-5d8968fcf80b
@@ -891,7 +816,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of activities performed by the secondary stakeholder during the step
 	column stkhlds_secondary_contact_act_count
 		dataType: int64
 		formatString: 0
@@ -901,7 +825,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of engaged activities performed by the secondary stakeholder during the step
 	column stkhlds_secondary_contact_act_eng_count
 		dataType: int64
 		formatString: 0
@@ -911,7 +834,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Duration of activities performed by the secondary contact of the step during the step
 	column stkhlds_secondary_contact_dur
 		dataType: double
 		lineageTag: 00233e00-4f96-4ecf-bda9-1912be8d7614
@@ -922,7 +844,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Duration of activities performed by the secondary contact of the step during the step
 	column stkhlds_secondary_contact_eng_dur
 		dataType: double
 		lineageTag: 9f6552bc-68b2-4f13-ade1-ca3f2fbc88c2
@@ -933,7 +854,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Date when the first activity by the secondary contact was performed during the step
 	column stkhlds_secondary_contact_first_act
 		dataType: dateTime
 		formatString: General Date
@@ -948,7 +868,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the last activity by the secondary contact was performed during the step
 	column stkhlds_secondary_contact_last_act
 		dataType: dateTime
 		formatString: General Date
@@ -963,7 +882,14 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Seniority of the secondary contact of the step
+	column stkhlds_secondary_contact_title_dept
+		dataType: string
+		lineageTag: ad6f778d-1caf-44d8-b5e2-6ab05cf70931
+		summarizeBy: none
+		sourceColumn: stkhlds_secondary_contact_title_dept
+
+		annotation SummarizationSetBy = Automatic
+
 	column stkhlds_secondary_contact_title_seniority
 		dataType: string
 		lineageTag: 71c2cef7-737a-40b0-9fed-27d28c71e4e2
@@ -972,7 +898,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Id of the secondary contact of the step
 	column stkhlds_secondary_entity_id
 		dataType: string
 		lineageTag: b5e6b2a1-f84b-4412-83ae-6d9839ea940d
@@ -981,7 +906,15 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Custom categorical variable on the account
+	column entity_hat_lead_recycled
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 5e78c841-cb45-40d9-94a7-c2221d9f6fe3
+		summarizeBy: none
+		sourceColumn: entity_hat_lead_recycled
+
+		annotation SummarizationSetBy = Automatic
+
 	column account_crm_custom_value_1
 		dataType: string
 		lineageTag: 3a8f92c0-681c-493f-9165-9aa4f7192b1f
@@ -990,7 +923,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Custom categorical variable on the account
 	column account_crm_custom_value_2
 		dataType: string
 		lineageTag: eea5afa9-4519-4a0c-91f7-f1472a86811b
@@ -999,7 +931,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Custom categorical variable on the account
 	column account_crm_custom_value_3
 		dataType: string
 		lineageTag: e1fc1091-d4ed-43eb-bfa4-2d575ade9ca2
@@ -1008,29 +939,33 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Rule used to determine the adjusted duration of activities performed during the step
 	column stkhlds_all_adj_dur_rule
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: 33b5ab94-7969-4bfe-b5a2-1b70f747abde
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: stkhlds_all_adj_dur_rule
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Quality bucket expressed as an integer from 1 to 5 based on the probability of success
-	column entity_propensity_num
+	column entity_qual_bucket_num
 		dataType: int64
 		formatString: 0
 		lineageTag: 8626ffcc-0d1c-4378-a127-f5a2c4a95bd4
 		summarizeBy: sum
-		sourceColumn: entity_propensity_num
+		sourceColumn: entity_qual_bucket_num
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Repeat value of the step
+	column step_success_prob_factors
+		dataType: string
+		lineageTag: 2aad99a7-bb0e-42dd-a4f9-161460f5c4ad
+		summarizeBy: none
+		sourceColumn: step_success_prob_factors
+
+		annotation SummarizationSetBy = Automatic
+
 	column vi_value_repeat
-		dataType: double
+		dataType: decimal
 		lineageTag: f16cec7e-11f1-4dc7-836c-eb0ad3fd0b4c
 		summarizeBy: sum
 		sourceColumn: vi_value_repeat
@@ -1039,7 +974,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// ID of the user the step was received from
 	column step_received_from_id
 		dataType: string
 		lineageTag: 282ce57e-072a-4023-889c-fd7b55042439
@@ -1048,7 +982,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// ID of the users the step was handed off to
 	column step_handed_off_to_id
 		dataType: string
 		lineageTag: 54553a3f-296e-4e39-930c-2516653abdb4
@@ -1057,7 +990,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Entity of the primary contact of the step: lead or contact
 	column stkhlds_primary_entity_type
 		dataType: string
 		lineageTag: 40fd26a0-77f9-4761-93aa-922bac32872a
@@ -1066,7 +998,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// The date of the last data request from the platform
 	column _sys_as_of
 		dataType: dateTime
 		formatString: General Date
@@ -1081,7 +1012,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of activities performed during the step by a manager
 	column step_mgr_act
 		dataType: int64
 		formatString: 0
@@ -1091,7 +1021,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Expected duration of activities performed by the owner of the step
 	column step_owner_expected_dur
 		dataType: double
 		lineageTag: 1e039b32-21ed-468e-8f19-a36b6a418cc1
@@ -1102,7 +1031,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Number of automated emails performed during the step
 	column stkhlds_all_act_type_auto_email_count
 		dataType: int64
 		formatString: 0
@@ -1112,7 +1040,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of engaged automated emails performed during the step
 	column stkhlds_all_act_type_auto_email_eng_count
 		dataType: int64
 		formatString: 0
@@ -1122,7 +1049,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of emails performed during the step
 	column stkhlds_all_act_type_email_count
 		dataType: int64
 		formatString: 0
@@ -1132,7 +1058,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of engaged emails performed during the step
 	column stkhlds_all_act_type_email_eng_count
 		dataType: int64
 		formatString: 0
@@ -1142,7 +1067,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the first engaged activity was performed during the step
 	column stkhlds_all_first_eng
 		dataType: dateTime
 		formatString: General Date
@@ -1157,7 +1081,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the last engaged activity was performed during the step
 	column stkhlds_all_last_eng
 		dataType: dateTime
 		formatString: General Date
@@ -1172,7 +1095,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of meetings performed during the step
 	column stkhlds_all_act_type_meeting_count
 		dataType: int64
 		formatString: 0
@@ -1182,7 +1104,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of engaged meetings performed during the step
 	column stkhlds_all_act_type_meeting_eng_count
 		dataType: int64
 		formatString: 0
@@ -1192,7 +1113,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of activities with unknown type performed during the step
 	column stkhlds_all_act_type_nd_count
 		dataType: int64
 		formatString: 0
@@ -1202,7 +1122,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of engaged activities with unknown type performed during the step
 	column stkhlds_all_act_type_nd_eng_count
 		dataType: int64
 		formatString: 0
@@ -1212,7 +1131,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of activities with no customer interaction performed during the step
 	column stkhlds_all_act_type_no_interaction_count
 		dataType: int64
 		formatString: 0
@@ -1222,7 +1140,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of engaged activities with no customer interaction performed during the step
 	column stkhlds_all_act_type_no_interaction_eng_count
 		dataType: int64
 		formatString: 0
@@ -1232,7 +1149,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of calls performed during the step
 	column stkhlds_all_act_type_call_count
 		dataType: int64
 		formatString: 0
@@ -1242,7 +1158,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of engaged calls performed during the step
 	column stkhlds_all_act_type_call_eng_count
 		dataType: int64
 		formatString: 0
@@ -1252,7 +1167,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of social media activities performed during the step
 	column stkhlds_all_act_type_social_count
 		dataType: int64
 		formatString: 0
@@ -1262,7 +1176,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Number of engaged social media activities performed during the step
 	column stkhlds_all_act_type_social_eng_count
 		dataType: int64
 		formatString: 0
@@ -1272,7 +1185,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the first engaged activity by the primary contact was performed during the step
 	column stkhlds_primary_contact_first_eng
 		dataType: dateTime
 		formatString: General Date
@@ -1287,7 +1199,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the last engaged activity by the primary contact was performed during the step
 	column stkhlds_primary_contact_last_eng
 		dataType: dateTime
 		formatString: General Date
@@ -1302,7 +1213,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the first engaged activity by the secondary contact was performed during the step
 	column stkhlds_secondary_contact_first_eng
 		dataType: dateTime
 		formatString: General Date
@@ -1317,7 +1227,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the last engaged activity by the secondary contact was performed during the step
 	column stkhlds_secondary_contact_last_eng
 		dataType: dateTime
 		formatString: General Date
@@ -1332,7 +1241,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Entity of the secondary contact of the step: lead or contact
 	column stkhlds_secondary_entity_type
 		dataType: string
 		lineageTag: aa566fa5-a547-4f3c-aea5-4c4453d54c05
@@ -1341,7 +1249,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Sub type of the step
 	column step_sub_type
 		dataType: string
 		lineageTag: ca816189-0b3f-4294-a06e-e77e84d933e8
@@ -1350,7 +1257,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Adjusted duration of engaged activities performed during the step
 	column stkhlds_all_adj_eng_dur
 		dataType: double
 		lineageTag: 709f1924-b0dd-4549-8a4a-2fd760792c00
@@ -1361,7 +1267,6 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Confidence in the adjusted duration of activities performed during the step
 	column stkhlds_all_adj_dur_conf
 		dataType: double
 		lineageTag: 79550477-a40d-4d07-861e-9dba80dadfd8
@@ -1372,67 +1277,130 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Boolean flag that indicates whether the current step is expansion
-	column opp_existing_customer_selling_expansion
+	column entity_hat_lead_restarted
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 13e20f99-d64e-4a05-9c5b-68fff76ab40e
+		summarizeBy: none
+		sourceColumn: entity_hat_lead_restarted
+
+		annotation SummarizationSetBy = Automatic
+
+	column entity_hat_lead_winback
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 49c52db3-82e8-4e04-9161-49e968fd5fab
+		summarizeBy: none
+		sourceColumn: entity_hat_lead_winback
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_upsell_expansion
+		dataType: string
+		lineageTag: 6aa60b00-bcde-49c7-9512-354d5c6f51f4
+		summarizeBy: none
+		sourceColumn: opp_upsell_expansion
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_upsell_downgrade
+		dataType: string
+		lineageTag: ac1018e7-881e-47c4-b3ec-9577da281228
+		summarizeBy: none
+		sourceColumn: opp_upsell_downgrade
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_upsell_cross_sale
+		dataType: string
+		lineageTag: 6a22067c-d0b7-48e5-a108-df6fab6f5e2b
+		summarizeBy: none
+		sourceColumn: opp_upsell_cross_sale
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_upsell_renewal
+		dataType: string
+		lineageTag: 018ae489-3ab4-4f0a-b0e8-10733f96efdf
+		summarizeBy: none
+		sourceColumn: opp_upsell_renewal
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_upsell_combination
+		dataType: string
+		lineageTag: b0322b67-9b5a-462a-9a58-a638a8a27834
+		summarizeBy: none
+		sourceColumn: opp_upsell_combination
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_existing_customer_selling_expansion
+		dataType: string
 		lineageTag: 2888f796-24fc-43fd-92ba-7f34e3cefd2c
 		summarizeBy: none
 		sourceColumn: opp_existing_customer_selling_expansion
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the current step is downgrade
 	column opp_existing_customer_selling_downgrade
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
+		dataType: string
 		lineageTag: 8de8eb2e-eab3-4131-b2e8-a6c372a5e227
 		summarizeBy: none
 		sourceColumn: opp_existing_customer_selling_downgrade
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the current step is cross-sale
 	column opp_existing_customer_selling_cross_sale
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
+		dataType: string
 		lineageTag: d3ae902c-0a52-45ce-8bc6-68b699f6b80b
 		summarizeBy: none
 		sourceColumn: opp_existing_customer_selling_cross_sale
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the current step is renewal
 	column opp_existing_customer_selling_renewal
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
+		dataType: string
 		lineageTag: 385c7834-d8e8-4f0b-8010-40ff245fb601
 		summarizeBy: none
 		sourceColumn: opp_existing_customer_selling_renewal
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the current step is combination
 	column opp_existing_customer_selling_combination
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
+		dataType: string
 		lineageTag: b40f41c4-ea1f-4c48-b01b-aa07ba20b7d6
 		summarizeBy: none
 		sourceColumn: opp_existing_customer_selling_combination
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the current step is based on an ERP order
 	column opp_erp
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
+		dataType: string
 		lineageTag: 40a1fcd8-d396-4fd5-979e-a48987d41a96
 		summarizeBy: none
 		sourceColumn: opp_erp
 
 		annotation SummarizationSetBy = Automatic
 
-	/// CRM pipeline name
+	column step_mgr_involved
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 97289f07-942e-49bd-9807-ee85be4819ec
+		summarizeBy: none
+		sourceColumn: step_mgr_involved
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_sales_engineer_involved
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: debb985b-f51d-4cf2-9ff7-55ff2eb90421
+		summarizeBy: none
+		sourceColumn: step_sales_engineer_involved
+
+		annotation SummarizationSetBy = Automatic
+
 	column opp_crm_pipeline_name
 		dataType: string
 		lineageTag: 38775ec1-43a6-405f-bc1f-ba4f77f51048
@@ -1441,7 +1409,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's stage name
 	column opp_stage
 		dataType: string
 		lineageTag: d8dce5d2-187b-4ced-a612-c518a6b6904d
@@ -1450,7 +1417,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Pipeline name of the opportunity
 	column opp_pipeline_name
 		dataType: string
 		lineageTag: f94818b2-7847-4b10-98ab-426f3d2250d3
@@ -1459,7 +1425,6 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's last crm stage, before it was lost
 	column opp_lost_crm_stage
 		dataType: string
 		lineageTag: 2bcb6912-c563-4bbb-a421-3c5295e2e702
@@ -1468,322 +1433,155 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Expected number of days from the step start date to end date
 	column step_expected_length_in_days
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: 24ce0e29-0bf2-4eeb-8c52-233f962c580e
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: step_expected_length_in_days
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Difference in days between the step length and expected step length
 	column step_days_pushed_pulled
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: 9285a308-3b54-4d4f-b464-11c31b3ba4b6
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: step_days_pushed_pulled
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Quality bucket of the next step based on the probability of success
-	column step_next_propensity
-		dataType: string
-		lineageTag: 2e92057e-6c79-4ee3-bdff-ef287c8bd150
-		summarizeBy: none
-		sourceColumn: step_next_propensity
-
-		annotation SummarizationSetBy = Automatic
-
-	/// Quality bucket of the next step expressed as an integer from 1 to 5 based on the probability of success
-	column step_next_propensity_num
-		dataType: int64
-		formatString: 0
-		lineageTag: ce97e64b-420a-4bb8-9c8e-4a6bf252a822
-		summarizeBy: sum
-		sourceColumn: step_next_propensity_num
-
-		annotation SummarizationSetBy = Automatic
-
-	/// Adjusted duration of activities performed during the prior step
-	column stkhlds_all_adj_dur_prior_step
-		dataType: double
-		lineageTag: ab1338aa-8d63-43bf-99fd-a4fc587a912e
-		summarizeBy: sum
-		sourceColumn: stkhlds_all_adj_dur_prior_step
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's NNB amount
-	column opp_nnb_amt
-		dataType: double
-		lineageTag: a49dccfb-583f-4fbe-9b4b-762aa2fba06c
-		summarizeBy: sum
-		sourceColumn: opp_nnb_amt
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's downgrade amount
-	column opp_downgrade_amt
-		dataType: double
-		lineageTag: 35a389fb-2973-4238-953e-a2028e0f1d6e
-		summarizeBy: sum
-		sourceColumn: opp_downgrade_amt
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's cross-sale amount
-	column opp_cross_sale_amt
-		dataType: double
-		lineageTag: 7496080a-d1f0-4b37-a248-dadf54c570b8
-		summarizeBy: sum
-		sourceColumn: opp_cross_sale_amt
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's renewal amount
-	column opp_renewal_amt
-		dataType: double
-		lineageTag: f797c296-d4f0-4ea6-b384-3edd8c5a4a1c
-		summarizeBy: sum
-		sourceColumn: opp_renewal_amt
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's expansion amount
-	column opp_expansion_amt
-		dataType: double
-		lineageTag: 5b95f7d2-e75b-4dd7-ad9d-47dcd8ccc274
-		summarizeBy: sum
-		sourceColumn: opp_expansion_amt
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's one time amount
-	column opp_one_time_amt
-		dataType: double
-		lineageTag: a2660d1a-4879-45e6-b4e5-00f6dc295c79
-		summarizeBy: sum
-		sourceColumn: opp_one_time_amt
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's ND amount
-	column opp_nd_amt
-		dataType: double
-		lineageTag: 5e868727-29d6-4b1b-a36e-72403ef1e555
-		summarizeBy: sum
-		sourceColumn: opp_nd_amt
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's ARR amount
-	column opp_arr_amt
-		dataType: double
-		lineageTag: a2557989-d833-4ed8-9c6d-5cd01f8b5006
-		summarizeBy: sum
-		sourceColumn: opp_arr_amt
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Column entity_prospecting_recycled.
-	column entity_prospecting_recycled
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 8a71f1ee-da88-4608-8d0a-0083218e1a6d
-		summarizeBy: none
-		sourceColumn: entity_prospecting_recycled
-
-		annotation SummarizationSetBy = Automatic
-
-	/// Column entity_prospecting_winback.
-	column entity_prospecting_winback
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 59ecfd4f-1aa6-4ed5-b181-5edd5adad173
-		summarizeBy: none
-		sourceColumn: entity_prospecting_winback
-
-		annotation SummarizationSetBy = Automatic
-
-	/// Column opp_initial_subscription_amt.
-	column opp_initial_subscription_amt
-		dataType: double
-		lineageTag: 41822a70-c608-4663-aaef-bd48dc4eff9d
-		summarizeBy: sum
-		sourceColumn: opp_initial_subscription_amt
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Column opp_existing_customer_selling_one_time.
-	column opp_existing_customer_selling_one_time
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 9f783165-3f33-4df9-b1b3-ce26030ac68e
-		summarizeBy: none
-		sourceColumn: opp_existing_customer_selling_one_time
-
-		annotation SummarizationSetBy = Automatic
-
-	/// Most common department amongst all contacts of the step
-	column stkhlds_all_most_common_title_department
-		dataType: string
-		lineageTag: 169b8c4d-bbb7-4886-8bee-4c01274760d9
-		summarizeBy: none
-		sourceColumn: stkhlds_all_most_common_title_department
-
-		annotation SummarizationSetBy = Automatic
-
-	/// Department of the primary contact of the step
-	column stkhlds_primary_contact_title_department
-		dataType: string
-		lineageTag: ac0c3d67-76ed-4145-8b4f-d35e40b014de
-		summarizeBy: none
-		sourceColumn: stkhlds_primary_contact_title_department
-
-		annotation SummarizationSetBy = Automatic
-
-	/// Department of the secondary contact of the step
-	column stkhlds_secondary_contact_title_department
-		dataType: string
-		lineageTag: ae427279-3dcd-4168-b17b-45c40d454c60
-		summarizeBy: none
-		sourceColumn: stkhlds_secondary_contact_title_department
-
-		annotation SummarizationSetBy = Automatic
-
-	/// Column entity_prospecting_restarted.
-	column entity_prospecting_restarted
-		dataType: string
-		lineageTag: 4573b2a8-20fd-4a69-b465-ef02678c754d
-		summarizeBy: none
-		sourceColumn: entity_prospecting_restarted
-
-		annotation SummarizationSetBy = Automatic
-
-	/// Boolean flag indicating whether a manager was involved in the step, either as the owner of the step or as the owner of activities related to the step.
-	column step_mgr_involved
-		dataType: string
-		lineageTag: 8233a89d-48d9-4dad-aac0-4670fc8557e9
-		summarizeBy: none
-		sourceColumn: step_mgr_involved
-
-		annotation SummarizationSetBy = Automatic
-
-	/// Boolean flag indicating whether a sales engineer was involved in the step, either as the owner of the step or as the owner of activities related to the step.
-	column step_sales_engineer_involved
-		dataType: string
-		lineageTag: 766a6142-5395-4034-bb63-67f661868179
-		summarizeBy: none
-		sourceColumn: step_sales_engineer_involved
-
-		annotation SummarizationSetBy = Automatic
-
-	/// Count of sales development representatives (SDRs) involved in the step as the owner of activities related to the step.
 	column step_sdr_count_involved
 		dataType: string
-		lineageTag: 52e3ebf3-08ef-4d12-b92f-774ce8e21e82
+		lineageTag: 871fa916-22a5-4820-b7a0-a52ffd2ffa65
 		summarizeBy: none
 		sourceColumn: step_sdr_count_involved
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Count of account executives (AEs) involved in the step as the owner of activities related to the step.
 	column step_ae_count_involved
 		dataType: string
-		lineageTag: 012802a0-8e95-424f-b929-7b0d535d90ca
+		lineageTag: 2cec2f0a-3650-46ba-bade-23d6b05c1ed3
 		summarizeBy: none
 		sourceColumn: step_ae_count_involved
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Count of account managers (AMs) involved in the step as the owner of activities related to the step.
 	column step_am_count_involved
 		dataType: string
-		lineageTag: f7571070-31bf-42c9-9947-83b8a4dfa5e8
+		lineageTag: 79a66a92-5438-496f-9f76-eccc7e246411
 		summarizeBy: none
 		sourceColumn: step_am_count_involved
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Count of marketing (MKT) users involved in the step as the owner of activities related to the step.
 	column step_mkt_count_involved
 		dataType: string
-		lineageTag: 0266dec2-519d-42fd-bd9e-bd87a2ea0318
+		lineageTag: ea04c5a6-9018-457a-8a19-3ecf5fe68bef
 		summarizeBy: none
 		sourceColumn: step_mkt_count_involved
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Count of other users involved in the step as the owner of activities related to the step.
 	column step_other_count_involved
 		dataType: string
-		lineageTag: caef4c42-a393-4904-b45a-85ee354c7ac6
+		lineageTag: ccef398b-c6cd-4d1f-8b88-13c55b071ae1
 		summarizeBy: none
 		sourceColumn: step_other_count_involved
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Count of management (MGMT) users involved in the step as the owner of activities related to the step.
 	column step_mgmt_count_involved
 		dataType: string
-		lineageTag: 06c48c83-7bfb-431b-8ce3-93926b5c993f
+		lineageTag: ecd01fd2-e6a1-4458-89c8-d2177a815a98
 		summarizeBy: none
 		sourceColumn: step_mgmt_count_involved
 
 		annotation SummarizationSetBy = Automatic
 
-	column step_pred_booking_amt
+	column step_next_qual_bucket
 		dataType: string
-		lineageTag: 46f02f41-d0e0-470d-9728-cda2d02ae10c
+		lineageTag: 2e92057e-6c79-4ee3-bdff-ef287c8bd150
 		summarizeBy: none
-		sourceColumn: step_pred_booking_amt
+		sourceColumn: step_next_qual_bucket
 
 		annotation SummarizationSetBy = Automatic
 
-	column step_pred_close_date
+	column step_next_qual_bucket_num
 		dataType: string
-		lineageTag: 339cf4a7-895c-45e1-ae16-45e1f78ee01c
+		lineageTag: ce97e64b-420a-4bb8-9c8e-4a6bf252a822
 		summarizeBy: none
-		sourceColumn: step_pred_close_date
+		sourceColumn: step_next_qual_bucket_num
 
 		annotation SummarizationSetBy = Automatic
 
-	column step_pred_close_date_if_won
+	column stkhlds_all_adj_dur_prior_step
 		dataType: string
-		lineageTag: 9d49be0a-29a6-4332-a7e1-0db7af257707
+		lineageTag: ab1338aa-8d63-43bf-99fd-a4fc587a912e
 		summarizeBy: none
-		sourceColumn: step_pred_close_date_if_won
+		sourceColumn: stkhlds_all_adj_dur_prior_step
 
 		annotation SummarizationSetBy = Automatic
 
-	column step_pred_close_date_if_lost
+	column opp_nnb_amt
 		dataType: string
-		lineageTag: e9f10be5-073a-4cfa-8903-b889467ef04a
+		lineageTag: a49dccfb-583f-4fbe-9b4b-762aa2fba06c
 		summarizeBy: none
-		sourceColumn: step_pred_close_date_if_lost
+		sourceColumn: opp_nnb_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_downgrade_amt
+		dataType: string
+		lineageTag: 35a389fb-2973-4238-953e-a2028e0f1d6e
+		summarizeBy: none
+		sourceColumn: opp_downgrade_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_cross_sale_amt
+		dataType: string
+		lineageTag: 7496080a-d1f0-4b37-a248-dadf54c570b8
+		summarizeBy: none
+		sourceColumn: opp_cross_sale_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_renewal_amt
+		dataType: string
+		lineageTag: f797c296-d4f0-4ea6-b384-3edd8c5a4a1c
+		summarizeBy: none
+		sourceColumn: opp_renewal_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_expansion_amt
+		dataType: string
+		lineageTag: 5b95f7d2-e75b-4dd7-ad9d-47dcd8ccc274
+		summarizeBy: none
+		sourceColumn: opp_expansion_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_one_time_amt
+		dataType: string
+		lineageTag: a2660d1a-4879-45e6-b4e5-00f6dc295c79
+		summarizeBy: none
+		sourceColumn: opp_one_time_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_nd_amt
+		dataType: string
+		lineageTag: 5e868727-29d6-4b1b-a36e-72403ef1e555
+		summarizeBy: none
+		sourceColumn: opp_nd_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_arr_amt
+		dataType: string
+		lineageTag: a2557989-d833-4ed8-9c6d-5cd01f8b5006
+		summarizeBy: none
+		sourceColumn: opp_arr_amt
 
 		annotation SummarizationSetBy = Automatic
 
@@ -1795,148 +1593,138 @@ table ssr_history
 				
 				dbTableTyped = Table.TransformColumnTypes(dbTable,{ // change types to what we're expecting
 				      {"_sys_as_of", type datetime},
-				{"_sys_doc_id", type text},
-				{"_sys_filt_end_date", type date},
-				{"_sys_filt_start_date", type date},
-				{"_sys_ssr_id", type text},
-				{"account_crm_custom_value_1", type text},
-				{"account_crm_custom_value_2", type text},
-				{"account_crm_custom_value_3", type text},
-				{"entity_account_id", type text},
-				{"entity_crm_custom_value_1", type text},
-				{"entity_crm_custom_value_2", type text},
-				{"entity_crm_custom_value_3", type text},
-				{"entity_lead_id", type text},
-				{"entity_opp_id", type text},
-				{"entity_primary", type text},
-				{"entity_primary_crm_complt", type number},
-				{"entity_primary_doc_id", type text},
-				{"entity_primary_trueai_complt", type number},
-				{"entity_prospecting_recycled", type logical},
-				{"entity_prospecting_winback", type logical},
-				{"entity_propensity", type text},
-				{"entity_propensity_num", Int64.Type},
-				{"opp_arr_amt", type number},
-				{"opp_booking_amt", type number},
-				{"opp_crm_pipeline_name", type text},
-				{"opp_crm_stage", type text},
-				{"opp_crm_type", type text},
-				{"opp_cross_sale_amt", type number},
-				{"opp_downgrade_amt", type number},
-				{"opp_erp", type logical},
-				{"opp_existing_customer_selling_combination", type logical},
-				{"opp_existing_customer_selling_cross_sale", type logical},
-				{"opp_existing_customer_selling_downgrade", type logical},
-				{"opp_existing_customer_selling_expansion", type logical},
-				{"opp_existing_customer_selling_one_time", type logical},
-				{"opp_existing_customer_selling_renewal", type logical},
-				{"opp_expansion_amt", type number},
-				{"opp_final_stage", type text},
-				{"opp_initial_amt", type number},
-				{"opp_initial_close_date", type datetime},
-				{"opp_initial_subscription_amt", type number},
-				{"opp_late_date", type datetime},
-				{"opp_lost_crm_stage", type text},
-				{"opp_lost_stage", type text},
-				{"opp_mid_date", type datetime},
-				{"opp_nd_amt", type number},
-				{"opp_nnb_amt", type number},
-				{"opp_one_time_amt", type number},
-				{"opp_pipeline_amt", type number},
-				{"opp_pipeline_name", type text},
-				{"opp_renewal_amt", type number},
-				{"opp_sale_type", type text},
-				{"opp_stage", type text},
-				{"opp_won_amt", type number},
-				{"step_days_pushed_pulled", Int64.Type},
-				{"step_end_date", type datetime},
-				{"step_end_rule", Int64.Type},
-				{"step_expected_length_in_days", Int64.Type},
-				{"step_handed_off_to_id", type text},
-				{"step_id", type text},
-				{"step_length_in_days", Int64.Type},
-				{"step_mgr_act", Int64.Type},
-				{"step_name", type text},
-				{"step_next_propensity", type text},
-				{"step_next_propensity_num", Int64.Type},
-				{"step_next_success_prob", type number},
-				{"step_outcome", type text},
-				{"step_outcome_rule", Int64.Type},
-				{"step_owner_act", type number},
-				{"step_owner_act_capt_lvl", type number},
-				{"step_owner_dur", type number},
-				{"step_owner_expected_dur", type number},
-				{"step_owner_id", type text},
-				{"step_owner_prep_factor", type number},
-				{"step_owner_rule", Int64.Type},
-				{"step_owner_user_role", type text},
-				{"step_received_from_id", type text},
-				{"step_sequence", Int64.Type},
-				{"step_start_date", type datetime},
-				{"step_sub_type", type text},
-				{"step_success", type logical},
-				{"step_success_prob", type number},
-				{"step_users_tot", Int64.Type},
-				{"stkhlds_all_act_count", Int64.Type},
-				{"stkhlds_all_act_eng_count", Int64.Type},
-				{"stkhlds_all_act_type_auto_email_count", Int64.Type},
-				{"stkhlds_all_act_type_auto_email_eng_count", Int64.Type},
-				{"stkhlds_all_act_type_call_count", Int64.Type},
-				{"stkhlds_all_act_type_call_eng_count", Int64.Type},
-				{"stkhlds_all_act_type_email_count", Int64.Type},
-				{"stkhlds_all_act_type_email_eng_count", Int64.Type},
-				{"stkhlds_all_act_type_meeting_count", Int64.Type},
-				{"stkhlds_all_act_type_meeting_eng_count", Int64.Type},
-				{"stkhlds_all_act_type_nd_count", Int64.Type},
-				{"stkhlds_all_act_type_nd_eng_count", Int64.Type},
-				{"stkhlds_all_act_type_no_interaction_count", Int64.Type},
-				{"stkhlds_all_act_type_no_interaction_eng_count", Int64.Type},
-				{"stkhlds_all_act_type_social_count", Int64.Type},
-				{"stkhlds_all_act_type_social_eng_count", Int64.Type},
-				{"stkhlds_all_adj_dur", type number},
-				{"stkhlds_all_adj_dur_conf", type number},
-				{"stkhlds_all_adj_dur_prior_step", type number},
-				{"stkhlds_all_adj_dur_rule", Int64.Type},
-				{"stkhlds_all_adj_eng_dur", type number},
-				{"stkhlds_all_contacts_count", Int64.Type},
-				{"stkhlds_all_dur", type number},
-				{"stkhlds_all_dur_eng", type number},
-				{"stkhlds_all_first_act", type datetime},
-				{"stkhlds_all_first_eng", type datetime},
-				{"stkhlds_all_last_act", type datetime},
-				{"stkhlds_all_last_eng", type datetime},
-				{"stkhlds_all_max_title_seniority", type text},
-				{"stkhlds_all_most_common_title_department", type text},
-				{"stkhlds_all_most_common_title_seniority", type text},
-				{"stkhlds_all_unique_title_depts", Int64.Type},
-				{"stkhlds_all_unique_title_seniorities", Int64.Type},
-				{"stkhlds_primary_contact_act_count", Int64.Type},
-				{"stkhlds_primary_contact_act_eng_count", Int64.Type},
-				{"stkhlds_primary_contact_dur", type number},
-				{"stkhlds_primary_contact_eng_dur", type number},
-				{"stkhlds_primary_contact_first_act", type datetime},
-				{"stkhlds_primary_contact_first_eng", type datetime},
-				{"stkhlds_primary_contact_last_act", type datetime},
-				{"stkhlds_primary_contact_last_eng", type datetime},
-				{"stkhlds_primary_contact_title_department", type text},
-				{"stkhlds_primary_contact_title_seniority", type text},
-				{"stkhlds_primary_entity_id", type text},
-				{"stkhlds_primary_entity_type", type text},
-				{"stkhlds_secondary_contact_act_count", Int64.Type},
-				{"stkhlds_secondary_contact_act_eng_count", Int64.Type},
-				{"stkhlds_secondary_contact_dur", type number},
-				{"stkhlds_secondary_contact_eng_dur", type number},
-				{"stkhlds_secondary_contact_first_act", type datetime},
-				{"stkhlds_secondary_contact_first_eng", type datetime},
-				{"stkhlds_secondary_contact_last_act", type datetime},
-				{"stkhlds_secondary_contact_last_eng", type datetime},
-				{"stkhlds_secondary_contact_title_department", type text},
-				{"stkhlds_secondary_contact_title_seniority", type text},
-				{"stkhlds_secondary_entity_id", type text},
-				{"stkhlds_secondary_entity_type", type text},
-				{"vi_value_created", type number},
-				{"vi_value_delivered", type number},
-				{"vi_value_repeat", type number}
+				      {"_sys_doc_id", type text},
+				      {"_sys_filt_end_date", type date},
+				      {"_sys_filt_start_date", type date},
+				      {"_sys_ssr_id", type text},
+				      {"account_crm_custom_value_1", type text},
+				      {"account_crm_custom_value_2", type text},
+				      {"account_crm_custom_value_3", type text},
+				      {"entity_account_id", type text},
+				      {"entity_crm_custom_value_1", type text},
+				      {"entity_crm_custom_value_2", type text},
+				      {"entity_crm_custom_value_3", type text},
+				      {"entity_hat_lead_recycled", type logical},
+				      {"entity_hat_lead_restarted", type logical},
+				      {"entity_hat_lead_winback", type logical},
+				      {"entity_lead_id", type text},
+				      {"entity_opp_id", type text},
+				      {"entity_primary", type text},
+				      {"entity_primary_crm_complt",  type number},
+				      {"entity_primary_doc_id", type text},
+				      {"entity_primary_trueai_complt",  type number},
+				      {"entity_qual_bucket", type text},
+				      {"entity_qual_bucket_num", Int64.Type},
+				      {"opp_booking_amt",   Currency.Type},
+				      {"opp_crm_stage", type text},
+				      {"opp_crm_type", type text},
+				      {"opp_existing_customer_selling_combination", type text},
+				      {"opp_existing_customer_selling_cross_sale", type text},
+				      {"opp_existing_customer_selling_downgrade", type text},
+				      {"opp_existing_customer_selling_expansion", type text},
+				      {"opp_existing_customer_selling_renewal", type text},
+				      {"opp_final_stage", type text},
+				      {"opp_initial_amt",   Currency.Type},
+				      {"opp_initial_close_date", type datetime},
+				      {"opp_late_date", type datetime},
+				      {"opp_lost_stage", type text},
+				      {"opp_mid_date", type datetime},
+				      {"opp_pipeline_amt",   Currency.Type},
+				      {"opp_pred_booking_amt",   Currency.Type},
+				      {"opp_sale_type", type text},
+				      {"opp_upsell_combination", type text},
+				      {"opp_upsell_cross_sale", type text},
+				      {"opp_upsell_downgrade", type text},
+				      {"opp_upsell_expansion", type text},
+				      {"opp_upsell_renewal", type text},
+				      {"opp_won_amt",   Currency.Type},
+				      {"step_end_date", type datetime},
+				      {"step_end_rule", Int64.Type},
+				      {"step_handed_off_to_id", type text},
+				      {"step_id", type text},
+				      {"step_length_in_days", Int64.Type},
+				      {"step_mgr_act", Int64.Type},
+				      {"step_mgr_involved", type logical},
+				      {"step_sales_engineer_involved",type logical},
+				      {"step_name", type text},
+				      {"step_next_success_prob",  type number},
+				      {"step_outcome", type text},
+				      {"step_outcome_rule", Int64.Type},
+				      {"step_owner_act",  type number},
+				      {"step_owner_act_capt_lvl",  type number},
+				      {"step_owner_dur",  type number},
+				      {"step_owner_expected_dur",  type number},
+				      {"step_owner_id", type text},
+				      {"step_owner_prep_factor",  type number},
+				      {"step_owner_rule", Int64.Type},
+				      {"step_owner_user_role", type text},
+				      {"step_received_from_id", type text},
+				      {"step_sequence", Int64.Type},
+				      {"step_start_date", type datetime},
+				      {"step_sub_type", type text},
+				      {"step_success", type logical},
+				      {"step_success_prob",  type number},
+				      {"step_success_prob_factors", type text},
+				      {"step_users_tot", Int64.Type},
+				      {"stkhlds_all_act_count", Int64.Type},
+				      {"stkhlds_all_act_eng_count", Int64.Type},
+				      {"stkhlds_all_act_type_auto_email_count", Int64.Type},
+				      {"stkhlds_all_act_type_auto_email_eng_count", Int64.Type},
+				      {"stkhlds_all_act_type_call_count", Int64.Type},
+				      {"stkhlds_all_act_type_call_eng_count", Int64.Type},
+				      {"stkhlds_all_act_type_email_count", Int64.Type},
+				      {"stkhlds_all_act_type_email_eng_count", Int64.Type},
+				      {"stkhlds_all_act_type_meeting_count", Int64.Type},
+				      {"stkhlds_all_act_type_meeting_eng_count", Int64.Type},
+				      {"stkhlds_all_act_type_nd_count", Int64.Type},
+				      {"stkhlds_all_act_type_nd_eng_count", Int64.Type},
+				      {"stkhlds_all_act_type_no_interaction_count", Int64.Type},
+				      {"stkhlds_all_act_type_no_interaction_eng_count", Int64.Type},
+				      {"stkhlds_all_act_type_social_count", Int64.Type},
+				      {"stkhlds_all_act_type_social_eng_count", Int64.Type},
+				      {"stkhlds_all_adj_dur",  type number},
+				      {"stkhlds_all_adj_dur_conf",  type number},
+				      {"stkhlds_all_adj_dur_rule", type text},
+				      {"stkhlds_all_adj_eng_dur",  type number},
+				      {"stkhlds_all_contacts_count", Int64.Type},
+				      {"stkhlds_all_dur",  type number},
+				      {"stkhlds_all_dur_eng",  type number},
+				      {"stkhlds_all_first_act", type datetime},
+				      {"stkhlds_all_first_eng", type datetime},
+				      {"stkhlds_all_last_act", type datetime},
+				      {"stkhlds_all_last_eng", type datetime},
+				      {"stkhlds_all_max_title_seniority", type text},
+				      {"stkhlds_all_most_common_title_dept", type text},
+				      {"stkhlds_all_most_common_title_seniority", type text},
+				      {"stkhlds_all_unique_title_depts", Int64.Type},
+				      {"stkhlds_all_unique_title_seniorities", Int64.Type},
+				      {"stkhlds_primary_contact_act_count", Int64.Type},
+				      {"stkhlds_primary_contact_act_eng_count", Int64.Type},
+				      {"stkhlds_primary_contact_dur",  type number},
+				      {"stkhlds_primary_contact_eng_dur",  type number},
+				      {"stkhlds_primary_contact_first_act", type datetime},
+				      {"stkhlds_primary_contact_first_eng", type datetime},
+				      {"stkhlds_primary_contact_last_act", type datetime},
+				      {"stkhlds_primary_contact_last_eng", type datetime},
+				      {"stkhlds_primary_contact_title_dept", type text},
+				      {"stkhlds_primary_contact_title_seniority", type text},
+				      {"stkhlds_primary_entity_id", type text},
+				      {"stkhlds_primary_entity_type", type text},
+				      {"stkhlds_secondary_contact_act_count", Int64.Type},
+				      {"stkhlds_secondary_contact_act_eng_count", Int64.Type},
+				      {"stkhlds_secondary_contact_dur",  type number},
+				      {"stkhlds_secondary_contact_eng_dur",  type number},
+				      {"stkhlds_secondary_contact_first_act", type datetime},
+				      {"stkhlds_secondary_contact_first_eng", type datetime},
+				      {"stkhlds_secondary_contact_last_act", type datetime},
+				      {"stkhlds_secondary_contact_last_eng", type datetime},
+				      {"stkhlds_secondary_contact_title_dept", type text},
+				      {"stkhlds_secondary_contact_title_seniority", type text},
+				      {"stkhlds_secondary_entity_id", type text},
+				      {"stkhlds_secondary_entity_type", type text},
+				      {"vi_value_created",   Currency.Type},
+				      {"vi_value_delivered",   Currency.Type},
+				      {"vi_value_repeat",   Currency.Type}
 				
 				
 				    })

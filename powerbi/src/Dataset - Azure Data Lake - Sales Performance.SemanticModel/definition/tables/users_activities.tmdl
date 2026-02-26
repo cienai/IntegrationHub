@@ -1,12 +1,6 @@
-/// Derived entity for daily aggregates of user activity. One row per user per day. Provides high-level activity volume and type summaries. Historical depth: 6 years retroactive.
 table users_activities
 	lineageTag: fb2d1c4a-d460-4eb9-94bd-25ddedeb3f9c
 
-	/// Measure meas.act_capt_lvl_adj_total_eng_dur_hr.
-	/// Purpose: Returns total adjusted engagement duration in hours.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUMX, and DIVIDE.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_adj_eng_dur].
-	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_adj_total_eng_dur_hr' = ```
 			
 			
@@ -30,11 +24,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.act_capt_lvl_reps_all_count.
-	/// Purpose: Returns the count of users in the current context.
-	/// Calculation Logic: Uses CALCULATE and COUNT.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[_sys_user_id].
-	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_reps_all_count' =
 			CALCULATE(
 			    COUNT(
@@ -45,11 +34,6 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 3aec840e-5730-46b3-a256-0725ff6e0d42
 
-	/// Measure meas.act_capt_lvl_reps_count.
-	/// Purpose: Returns the count of users with activity capture level above 0.4.
-	/// Calculation Logic: Uses VAR/RETURN and CALCULATE with a filter on users_activities[trueai_owner_act_capt_lvl].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context with users_activities[trueai_owner_act_capt_lvl] > 0.4.
-	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_reps_count' = ```
 			
 			var res = CALCULATE(
@@ -63,11 +47,6 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: b1d73a7c-accc-49b5-bcb8-b555e0f014a1
 
-	/// Measure meas.act_capt_lvl_adj_dur_per_reps.
-	/// Purpose: Returns adjusted total duration per rep.
-	/// Calculation Logic: Uses VAR/RETURN and DIVIDE over [meas.act_capt_lvl_adj_total_dur_hr] and [meas.act_capt_lvl_reps_count].
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
-	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_adj_dur_per_reps' =
 			
 			var reps_count = [meas.act_capt_lvl_reps_count]
@@ -84,11 +63,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_eng_dur_per_reps.
-	/// Purpose: Returns adjusted engagement duration per rep.
-	/// Calculation Logic: Uses VAR/RETURN and DIVIDE over [meas.act_capt_lvl_adj_total_eng_dur_hr] and [meas.act_capt_lvl_reps_count].
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
-	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_adj_eng_dur_per_reps' =
 			
 			var reps_count = [meas.act_capt_lvl_reps_count]
@@ -105,11 +79,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_non_eng_dur_per_reps.
-	/// Purpose: Returns adjusted non-engagement duration per rep.
-	/// Calculation Logic: Uses VAR/RETURN, subtraction, and IF over [meas.act_capt_lvl_adj_dur_per_reps] and [meas.act_capt_lvl_adj_eng_dur_per_reps].
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
-	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_adj_non_eng_dur_per_reps' =
 			
 			var _adjtot_dur = [meas.act_capt_lvl_adj_dur_per_reps]
@@ -127,11 +96,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_total_non_eng_dur_hr.
-	/// Purpose: Returns total adjusted non-engagement duration.
-	/// Calculation Logic: Uses VAR/RETURN and subtraction of [meas.act_capt_lvl_adj_total_eng_dur_hr] from [meas.act_capt_lvl_adj_total_dur_hr].
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
-	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_adj_total_non_eng_dur_hr' = ```
 			
 			
@@ -147,11 +111,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.act_capt_lvl_reps_count_pct.
-	/// Purpose: Returns the percentage of reps with activity capture level above 0.4.
-	/// Calculation Logic: Uses VAR/RETURN and DIVIDE over [meas.act_capt_lvl_reps_count] and [meas.act_capt_lvl_reps_all_count].
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
-	/// Format/Type: 0%;-0%;0%
 	measure 'meas.act_capt_lvl_reps_count_pct' =
 			
 			var _tot_reps_count = [meas.act_capt_lvl_reps_all_count]        // get the all reps/users count
@@ -167,11 +126,6 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: fe446259-6784-46e4-bee3-43279a4ee0be
 
-	/// Measure meas.act_capt_lvl_trueai_total_dur_hr.
-	/// Purpose: Returns total TrueAI duration in hours.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUMX, and DIVIDE.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_dur].
-	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_trueai_total_dur_hr' = ```
 			
 			
@@ -194,11 +148,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_trueai_dur_per_reps.
-	/// Purpose: Returns TrueAI duration per rep.
-	/// Calculation Logic: Uses VAR/RETURN and DIVIDE over [meas.act_capt_lvl_trueai_total_dur_hr] and [meas.act_capt_lvl_reps_count].
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
-	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_trueai_dur_per_reps' = ```
 			
 			var reps_count = [meas.act_capt_lvl_reps_count]     // get the reps/users count act_capt_lvl greater than 0.4
@@ -216,11 +165,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_avg_capture_adj_factor.
-	/// Purpose: Returns the average activity capture level adjustment factor.
-	/// Calculation Logic: Uses CALCULATE and AVERAGE on users_activities[trueai_owner_act_capt_lvl].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_owner_act_capt_lvl].
-	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_avg_capture_adj_factor' =
 			
 			CALCULATE(
@@ -233,11 +177,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_avg_prep_factor.
-	/// Purpose: Returns the average prep factor for users.
-	/// Calculation Logic: Uses CALCULATE and AVERAGE on users_activities[trueai_owner_prep_factor].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_owner_prep_factor].
-	/// Format/Type: Unspecified
 	measure 'meas.act_capt_lvl_avg_prep_factor' =
 			
 			CALCULATE(
@@ -250,11 +189,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_total_dur_hr.
-	/// Purpose: Returns total adjusted duration in hours.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUMX, and DIVIDE.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_adj_dur].
-	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_adj_total_dur_hr' = ```
 			
 			
@@ -278,11 +212,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.act_capt_lvl_bar_date_filter.
-	/// Purpose: Returns 1 when the bar date is within the current context date range, otherwise 0.
-	/// Calculation Logic: Uses VAR/RETURN, MAX, and IF with comparisons to [meas.context_date_min] and [meas.context_date_max].
-	/// Dynamic Behavior: Respects current filter context; responds to filters on users_activities[_sys_filt_end_date] and the context date measures.
-	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_bar_date_filter' =
 			
 			var _min_date = [meas.context_date_min]         // get the screen min date from slicer
@@ -301,11 +230,6 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 76b901f4-e8d2-426f-9790-a30d3e7a2717
 
-	/// Measure meas.act_capt_lvl_reps_all_distinct_count.
-	/// Purpose: Returns the distinct count of users in the current context.
-	/// Calculation Logic: Uses CALCULATE and DISTINCTCOUNT.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[_sys_user_id].
-	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_reps_all_distinct_count' =
 			CALCULATE(
 			    DISTINCTCOUNT(
@@ -316,11 +240,6 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 6cebb7de-b574-496d-aa40-cc0140e390bd
 
-	/// Measure meas.act_capt_lvl_reps_distinct_count.
-	/// Purpose: Returns the distinct count of users with activity capture level above 0.4.
-	/// Calculation Logic: Uses CALCULATE and DISTINCTCOUNT with a filter on users_activities[trueai_owner_act_capt_lvl].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context with users_activities[trueai_owner_act_capt_lvl] > 0.4.
-	/// Format/Type: 0
 	measure 'meas.act_capt_lvl_reps_distinct_count' =
 			CALCULATE(
 			    DISTINCTCOUNT(
@@ -332,11 +251,6 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 90d9e0c7-f44d-4bbd-af85-06d9abf127ce
 
-	/// Measure meas.users_activities_trueai_email_count.
-	/// Purpose: Returns the count of auto email activities.
-	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_type_auto_email_count].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_auto_email_count].
-	/// Format/Type: 0
 	measure 'meas.users_activities_trueai_email_count' =
 			
 			CALCULATE(
@@ -346,11 +260,6 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 14a0bbf4-0d9b-4108-b92a-8b501be0c185
 
-	/// Measure meas.users_activities_trueai_email_dur.
-	/// Purpose: Returns total auto email duration in hours.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, and division by 3600.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_auto_email_dur].
-	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_email_dur' =
 			
 			
@@ -367,11 +276,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_call_count.
-	/// Purpose: Returns the count of call activities.
-	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_type_call_count].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_call_count].
-	/// Format/Type: 0
 	measure 'meas.users_activities_trueai_call_count' =
 			
 			CALCULATE(
@@ -381,11 +285,6 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 583a0940-97a3-43cc-8626-a6a72e3668c0
 
-	/// Measure meas.users_activities_trueai_call_dur.
-	/// Purpose: Returns total call duration in hours.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, and division by 3600.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_call_dur].
-	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_call_dur' =
 			
 			
@@ -402,11 +301,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_social_count.
-	/// Purpose: Returns the count of social activities.
-	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_type_social_count].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_social_count].
-	/// Format/Type: 0
 	measure 'meas.users_activities_trueai_social_count' =
 			
 			CALCULATE(
@@ -416,11 +310,6 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: ac7f3891-0901-4135-8ecc-e0dade833dfb
 
-	/// Measure meas.users_activities_trueai_social_dur.
-	/// Purpose: Returns total social activity duration in hours.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, and division by 3600.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_social_dur].
-	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_social_dur' =
 			
 			
@@ -437,11 +326,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_history_ci_act_capt_lvl_latest_month.
-	/// Purpose: Returns the average activity capture level for the latest completed month.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, TOPN, MAXX, EOMONTH, and AVERAGEX.
-	/// Dynamic Behavior: Respects current filter context; CALCULATETABLE applies date-range filters on users_history[_sys_filt_end_date].
-	/// Format/Type: Unspecified
 	measure 'meas.users_history_ci_act_capt_lvl_latest_month' = ```
 			
 			var latest_row  = CALCULATETABLE(TOPN(1,users_history, users_history[_sys_filt_end_date], DESC))  // get the latest row
@@ -464,11 +348,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_act_capt_lvl_most_latest_previous.
-	/// Purpose: Returns the average activity capture level for the month before the latest completed month.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, TOPN, MAXX, EOMONTH, and AVERAGEX.
-	/// Dynamic Behavior: Respects current filter context; CALCULATETABLE applies date-range filters on users_history[_sys_filt_end_date].
-	/// Format/Type: Unspecified
 	measure 'meas.users_history_ci_act_capt_lvl_most_latest_previous' = ```
 			
 			VAR latest_row = CALCULATETABLE(TOPN(1, users_history, users_history[_sys_filt_end_date], DESC))  // Get the latest row
@@ -496,11 +375,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_avg_ci_act_capt_lvl.
-	/// Purpose: Returns the average activity capture level across users_history.
-	/// Calculation Logic: Uses CALCULATE and AVERAGEX over users_history[ci_act_capt_lvl].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_history rows and responds to filters on users_history[ci_act_capt_lvl].
-	/// Format/Type: 0%;-0%;0%
 	measure 'meas.users_history_avg_ci_act_capt_lvl' =
 			
 			var res = CALCULATE(
@@ -512,11 +386,6 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 09188a3f-50bd-4b1c-bfba-66ef796ac30c
 
-	/// Measure meas.users_history_ci_act_capt_lvl_latest_previous_diff.
-	/// Purpose: Returns the difference between the latest-month and prior-month capture levels.
-	/// Calculation Logic: Uses VAR/RETURN and subtraction of [meas.users_history_ci_act_capt_lvl_latest_month] and [meas.users_history_ci_act_capt_lvl_most_latest_previous].
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the referenced measures.
-	/// Format/Type: Unspecified
 	measure 'meas.users_history_ci_act_capt_lvl_latest_previous_diff' =
 			
 			var latest = [meas.users_history_ci_act_capt_lvl_latest_month]          // get the latest ci_act_capt_lvl
@@ -530,11 +399,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_activities_trueai_call_dur_weekly.
-	/// Purpose: Returns average weekly call duration in hours for the current context range.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, DATEDIFF, and division by 3600.
-	/// Dynamic Behavior: Respects current filter context; responds to [meas.context_date_min], [meas.context_date_max], and users_activities[trueai_type_call_dur].
-	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_call_dur_weekly' = ```
 			
 			var _min_date = [meas.context_date_min]             // get the context min date
@@ -555,11 +419,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_email_dur_weekly.
-	/// Purpose: Returns average weekly auto email duration in hours for the current context range.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, DATEDIFF, and division by 3600.
-	/// Dynamic Behavior: Respects current filter context; responds to [meas.context_date_min], [meas.context_date_max], and users_activities[trueai_type_auto_email_dur].
-	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_email_dur_weekly' = ```
 			
 			
@@ -581,11 +440,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_social_dur_weekly.
-	/// Purpose: Returns average weekly social activity duration in hours for the current context range.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, DATEDIFF, and division by 3600.
-	/// Dynamic Behavior: Respects current filter context; responds to [meas.context_date_min], [meas.context_date_max], and users_activities[trueai_type_social_dur].
-	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_social_dur_weekly' = ```
 			
 			
@@ -607,11 +461,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_meeting_count.
-	/// Purpose: Returns the count of meeting activities.
-	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_type_meeting_count].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_meeting_count].
-	/// Format/Type: 0
 	measure 'meas.users_activities_trueai_meeting_count' =
 			
 			CALCULATE(
@@ -621,11 +470,6 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 95b895ec-9000-41b5-99a1-c6c36f471dc0
 
-	/// Measure meas.users_activities_trueai_meeting_dur.
-	/// Purpose: Returns total meeting duration in hours.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, and division by 3600.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_type_meeting_dur].
-	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_meeting_dur' =
 			
 			
@@ -642,11 +486,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_meeting_dur_weekly.
-	/// Purpose: Returns average weekly meeting duration in hours for the current context range.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SUM, DATEDIFF, and division by 3600.
-	/// Dynamic Behavior: Respects current filter context; responds to [meas.context_date_min], [meas.context_date_max], and users_activities[trueai_type_meeting_dur].
-	/// Format/Type: #,##0" hrs"
 	measure 'meas.users_activities_trueai_meeting_dur_weekly' = ```
 			
 			
@@ -668,11 +507,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_prospecting_count.
-	/// Purpose: Returns the count of prospecting activities.
-	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_purpose_prospecting_count].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_purpose_prospecting_count].
-	/// Format/Type: 0
 	measure 'meas.users_activities_prospecting_count' =
 			
 			CALCULATE(
@@ -682,11 +516,6 @@ table users_activities
 		displayFolder: _step_activities
 		lineageTag: 5e7edb4a-4fde-4263-b9aa-7fd3957cbe38
 
-	/// Measure meas.users_activities_new_logo_count.
-	/// Purpose: Returns the count of new-logo activities.
-	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_purpose_new_logo_count].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_purpose_new_logo_count].
-	/// Format/Type: 0
 	measure 'meas.users_activities_new_logo_count' =
 			
 			CALCULATE(
@@ -696,11 +525,6 @@ table users_activities
 		displayFolder: _step_activities
 		lineageTag: 9fb93954-0da2-4918-a58d-a247c88c8085
 
-	/// Measure meas.users_activities_post_sales_count.
-	/// Purpose: Returns the count of post-sales activities.
-	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_purpose_post_sales_count].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_purpose_post_sales_count].
-	/// Format/Type: 0
 	measure 'meas.users_activities_post_sales_count' =
 			
 			CALCULATE(
@@ -710,11 +534,6 @@ table users_activities
 		displayFolder: _step_activities
 		lineageTag: c3005fc1-3c14-43c1-8df1-5724c8a97233
 
-	/// Measure meas.users_activities_existing_customer_count.
-	/// Purpose: Returns the count of existing-customer activities.
-	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_purpose_exist_cust_selling_count].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_purpose_exist_cust_selling_count].
-	/// Format/Type: 0
 	measure 'meas.users_activities_existing_customer_count' =
 			
 			CALCULATE(
@@ -724,11 +543,6 @@ table users_activities
 		displayFolder: _step_activities
 		lineageTag: f3e51cac-e237-45bd-a998-a7e1b91b94bc
 
-	/// Measure meas.users_activities_internal_count.
-	/// Purpose: Returns the count of internal activities.
-	/// Calculation Logic: Uses CALCULATE and SUM on users_activities[trueai_purpose_internal_count].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE evaluates filtered users_activities rows and responds to filters on users_activities[trueai_purpose_internal_count].
-	/// Format/Type: 0
 	measure 'meas.users_activities_internal_count' =
 			
 			CALCULATE(
@@ -738,7 +552,6 @@ table users_activities
 		displayFolder: _step_activities
 		lineageTag: 511529c4-a270-4137-a221-a9bd209ad403
 
-	/// The ID of the document in the remote system (such as Salesforce ID)
 	column _sys_user_id
 		dataType: string
 		lineageTag: 3cd7e0d5-077d-43a7-a02a-714059e71dbc
@@ -747,7 +560,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// The date of the last data request from the platform in UTC
 	column trueai_end_date
 		dataType: dateTime
 		formatString: Long Date
@@ -764,7 +576,6 @@ table users_activities
 
 		annotation UnderlyingDateTimeDataType = Date
 
-	/// User's standardized and combined role
 	column trueai_user_role
 		dataType: string
 		lineageTag: 519977bd-63e8-4b03-8c5e-d06639c29d8b
@@ -773,7 +584,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// User's function derived from the standardized and combined role
 	column trueai_user_role_function
 		dataType: string
 		lineageTag: c5edfbe6-3ab1-433f-893a-08745a7c5c9d
@@ -782,7 +592,14 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Total Count
+	column trueai_user_role_dept
+		dataType: string
+		lineageTag: 56cebb61-f618-41f8-9ae3-f97767dd9eed
+		summarizeBy: none
+		sourceColumn: trueai_user_role_dept
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_count
 		dataType: int64
 		formatString: 0
@@ -792,7 +609,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Total Duration
 	column trueai_dur
 		dataType: int64
 		lineageTag: 97d319d6-7ab3-4ad1-be9b-e6c6485b6a9d
@@ -803,7 +619,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Engaged Count
 	column trueai_eng_count
 		dataType: int64
 		formatString: 0
@@ -813,7 +628,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Engaged Duration
 	column trueai_eng_dur
 		dataType: double
 		lineageTag: 06cb50bc-bdef-4e6f-a3be-10e25e2109c4
@@ -824,7 +638,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Total Unique Ids
 	column trueai_unique_ssr_ids
 		dataType: int64
 		formatString: 0
@@ -834,7 +647,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Engaged Unique Ids
 	column trueai_eng_unique_ssr_ids
 		dataType: int64
 		formatString: 0
@@ -844,7 +656,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Total Adj Duration
 	column trueai_adj_dur
 		dataType: double
 		formatString: 0.00
@@ -854,7 +665,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Total Adj Duration Rule
 	column trueai_adj_dur_rule
 		dataType: double
 		lineageTag: e516c07d-6f73-46cf-9332-bf7a6ed6603d
@@ -865,7 +675,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Call Count
 	column trueai_type_call_count
 		dataType: int64
 		formatString: 0
@@ -875,7 +684,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Engaged Count
 	column trueai_type_call_eng_count
 		dataType: int64
 		formatString: 0
@@ -885,7 +693,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Duration
 	column trueai_type_call_dur
 		dataType: double
 		lineageTag: 5dcd55de-58c5-4216-afcd-37153168e897
@@ -896,7 +703,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Call Engaged Duration
 	column trueai_type_call_eng_dur
 		dataType: double
 		lineageTag: 94efcdc9-06c5-4618-bb1f-a10c19a90893
@@ -907,7 +713,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Call Unique Ids
 	column trueai_type_call_unique_ids
 		dataType: int64
 		formatString: 0
@@ -917,7 +722,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Engaged Unique Ids
 	column trueai_type_call_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -927,7 +731,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email Count
 	column trueai_type_email_count
 		dataType: int64
 		formatString: 0
@@ -937,7 +740,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email Engaged Count
 	column trueai_type_email_eng_count
 		dataType: int64
 		formatString: 0
@@ -947,7 +749,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email Duration
 	column trueai_type_email_dur
 		dataType: double
 		lineageTag: 0a4b30fa-7485-453e-b043-d72f1a485d89
@@ -958,7 +759,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Email Engaged Duration
 	column trueai_type_email_eng_dur
 		dataType: double
 		lineageTag: 6f0f2642-421b-4b62-9379-a172842b5c07
@@ -969,7 +769,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Email Unique Ids
 	column trueai_type_email_unique_ids
 		dataType: int64
 		formatString: 0
@@ -979,7 +778,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email Engaged Unique Ids
 	column trueai_type_email_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -989,7 +787,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Count
 	column trueai_type_meeting_count
 		dataType: int64
 		formatString: 0
@@ -999,7 +796,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Engaged Count
 	column trueai_type_meeting_eng_count
 		dataType: int64
 		formatString: 0
@@ -1009,7 +805,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Duration
 	column trueai_type_meeting_dur
 		dataType: double
 		lineageTag: 1a488ee7-e3de-45d9-a4a9-873bbe3bd6c4
@@ -1020,7 +815,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Meeting Engaged Duration
 	column trueai_type_meeting_eng_dur
 		dataType: double
 		lineageTag: be46b861-11d3-4def-8927-7002dbc6adb6
@@ -1031,7 +825,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Meeting Unique Ids
 	column trueai_type_meeting_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1041,7 +834,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Engaged Unique Ids
 	column trueai_type_meeting_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1051,7 +843,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Count
 	column trueai_type_social_count
 		dataType: int64
 		formatString: 0
@@ -1061,7 +852,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Engaged Count
 	column trueai_type_social_eng_count
 		dataType: int64
 		formatString: 0
@@ -1071,7 +861,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Duration
 	column trueai_type_social_dur
 		dataType: double
 		lineageTag: d6683630-bba9-44e4-91fd-358360deed33
@@ -1082,7 +871,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Social Engaged Duration
 	column trueai_type_social_eng_dur
 		dataType: double
 		lineageTag: 212a3704-4a07-457c-b143-e2393ad85df0
@@ -1093,7 +881,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Social Unique Ids
 	column trueai_type_social_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1103,7 +890,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Engaged Unique Ids
 	column trueai_type_social_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1113,7 +899,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Count
 	column trueai_type_auto_email_count
 		dataType: int64
 		formatString: 0
@@ -1123,7 +908,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Engaged Count
 	column trueai_type_auto_email_eng_count
 		dataType: int64
 		formatString: 0
@@ -1133,7 +917,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Duration
 	column trueai_type_auto_email_dur
 		dataType: double
 		lineageTag: 89b577fb-5a59-442b-8684-3c94298ee7a6
@@ -1144,7 +927,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Automated Email Engaged Duration
 	column trueai_type_auto_email_eng_dur
 		dataType: double
 		lineageTag: ca0421b4-9190-4837-a3e9-71f95d7d227e
@@ -1155,7 +937,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Automated Email Unique Ids
 	column trueai_type_auto_email_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1165,7 +946,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Engaged Unique Ids
 	column trueai_type_auto_email_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1175,7 +955,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Count
 	column trueai_type_no_interaction_count
 		dataType: int64
 		formatString: 0
@@ -1185,7 +964,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Engaged Count
 	column trueai_type_no_interaction_eng_count
 		dataType: int64
 		formatString: 0
@@ -1195,7 +973,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Duration
 	column trueai_type_no_interaction_dur
 		dataType: double
 		lineageTag: 2a59e221-7640-467c-916b-bf7a41bc5436
@@ -1206,7 +983,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities No Interaction Engaged Duration
 	column trueai_type_no_interaction_eng_dur
 		dataType: double
 		lineageTag: e2994dd8-1b2e-4795-9a1f-777a1b60a8a9
@@ -1217,7 +993,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities No Interaction Unique Ids
 	column trueai_type_no_interaction_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1227,7 +1002,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Engaged Unique Ids
 	column trueai_type_no_interaction_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1237,7 +1011,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Count
 	column trueai_type_nd_count
 		dataType: int64
 		formatString: 0
@@ -1247,7 +1020,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Engaged Count
 	column trueai_type_nd_eng_count
 		dataType: int64
 		formatString: 0
@@ -1257,7 +1029,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Duration
 	column trueai_type_nd_dur
 		dataType: double
 		lineageTag: a33bb4e7-2088-4056-8e50-f7a94fa60e7f
@@ -1268,7 +1039,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Non Determinable Engaged Duration
 	column trueai_type_nd_eng_dur
 		dataType: double
 		lineageTag: 6489f0fb-d5ac-406d-8ede-fa410225164b
@@ -1279,7 +1049,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Non Determinable Unique Ids
 	column trueai_type_nd_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1289,7 +1058,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Engaged Unique Ids
 	column trueai_type_nd_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1299,7 +1067,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 4d493adc-826f-4c98-be0c-3d9f0e3d3ac9
@@ -1308,7 +1075,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// The Cien company ID
 	column _sys_co_id
 		dataType: string
 		lineageTag: a7d0dda1-41c8-44ed-8edd-c7bf088e60c7
@@ -1317,7 +1083,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// The date of the last data request from the platform
 	column _sys_as_of
 		dataType: dateTime
 		formatString: Long Date
@@ -1332,7 +1097,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the record was set to inactive in the remote system
 	column _sys_is_active
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1342,7 +1106,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the record was set to deleted in the remote system
 	column _sys_is_deleted
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -1352,7 +1115,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// The last date of the month that the record applies to (for past months) or the last date of aggregated data (for the present month), stripped of time
 	column _sys_filt_end_date
 		dataType: dateTime
 		formatString: Long Date
@@ -1364,7 +1126,6 @@ table users_activities
 
 		annotation UnderlyingDateTimeDataType = Date
 
-	/// The first date of the month that the records applies to, stripped of time
 	column _sys_filt_start_date
 		dataType: dateTime
 		formatString: Long Date
@@ -1381,7 +1142,6 @@ table users_activities
 
 		annotation UnderlyingDateTimeDataType = Date
 
-	/// Activities Capture Level
 	column trueai_owner_act_capt_lvl
 		dataType: double
 		lineageTag: 7e38ee1e-2a36-4662-a4b4-6a154299b2e9
@@ -1392,7 +1152,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Prep factor
 	column trueai_owner_prep_factor
 		dataType: double
 		lineageTag: a3537cdc-2b10-4a07-968d-abfba23c9fa7
@@ -1403,7 +1162,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Capture Level Confidence
 	column trueai_owner_act_capt_lvl_conf
 		dataType: double
 		lineageTag: 63f2b50c-cdd2-47ff-afa5-51f957674793
@@ -1414,7 +1172,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Prospecting Count
 	column trueai_purpose_prospecting_count
 		dataType: int64
 		formatString: 0
@@ -1424,7 +1181,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Prospecting Engaged Count
 	column trueai_purpose_prospecting_eng_count
 		dataType: int64
 		formatString: 0
@@ -1434,7 +1190,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Prospecting Duration
 	column trueai_purpose_prospecting_dur
 		dataType: double
 		lineageTag: 9cf65e1e-dcd1-48ca-97a6-1b9fe0182304
@@ -1445,7 +1200,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Prospecting Engaged Duration
 	column trueai_purpose_prospecting_eng_dur
 		dataType: double
 		lineageTag: 105d283b-3383-4659-8f8d-4b783e615be8
@@ -1456,7 +1210,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Prospecting Unique Ids
 	column trueai_purpose_prospecting_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1466,7 +1219,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Prospecting Engaged Unique Ids
 	column trueai_purpose_prospecting_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1476,7 +1228,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities New Logo Count
 	column trueai_purpose_new_logo_count
 		dataType: int64
 		formatString: 0
@@ -1486,7 +1237,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities New Logo Engaged Count
 	column trueai_purpose_new_logo_eng_count
 		dataType: int64
 		formatString: 0
@@ -1496,7 +1246,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities New Logo Duration
 	column trueai_purpose_new_logo_dur
 		dataType: double
 		lineageTag: b58880aa-44f4-45f3-a79d-d4a2b56d1c9f
@@ -1507,7 +1256,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities New Logo Engaged Duration
 	column trueai_purpose_new_logo_eng_dur
 		dataType: double
 		lineageTag: 68e99b17-1901-4eac-84c0-a098b2894d9f
@@ -1518,7 +1266,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities New Logo Unique Ids
 	column trueai_purpose_new_logo_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1528,7 +1275,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities New Logo Engaged Unique Ids
 	column trueai_purpose_new_logo_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1538,7 +1284,62 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Post Selling Count
+	column trueai_purpose_upselling_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 244b38cc-521e-4bf8-8d90-1b0cfdf26d96
+		summarizeBy: sum
+		sourceColumn: trueai_purpose_upselling_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_purpose_upselling_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: f12983b6-a403-44ee-9efe-9023687397e1
+		summarizeBy: sum
+		sourceColumn: trueai_purpose_upselling_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_purpose_upselling_dur
+		dataType: double
+		lineageTag: a1b908f3-14a6-4621-a7a5-ce8686891b0f
+		summarizeBy: sum
+		sourceColumn: trueai_purpose_upselling_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_purpose_upselling_eng_dur
+		dataType: double
+		lineageTag: d5566b32-e4e6-44d3-91f4-3fd30c12848c
+		summarizeBy: sum
+		sourceColumn: trueai_purpose_upselling_eng_dur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_purpose_upselling_unique_ids
+		dataType: int64
+		formatString: 0
+		lineageTag: b38b2c84-e118-4109-8923-43a6c85a4cf6
+		summarizeBy: sum
+		sourceColumn: trueai_purpose_upselling_unique_ids
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_purpose_upselling_eng_unique_ids
+		dataType: int64
+		formatString: 0
+		lineageTag: e91d10a9-b097-46ab-afe9-c7b91644825f
+		summarizeBy: sum
+		sourceColumn: trueai_purpose_upselling_eng_unique_ids
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_purpose_post_sales_count
 		dataType: int64
 		formatString: 0
@@ -1548,7 +1349,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Post Selling Engaged Count
 	column trueai_purpose_post_sales_eng_count
 		dataType: int64
 		formatString: 0
@@ -1558,7 +1358,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Post Selling Duration
 	column trueai_purpose_post_sales_dur
 		dataType: double
 		lineageTag: e805a723-e154-4f5c-8d9e-43d7509fe334
@@ -1569,7 +1368,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Post Selling Engaged Duration
 	column trueai_purpose_post_sales_eng_dur
 		dataType: double
 		lineageTag: 99f22cab-cf55-4c97-af95-b476e7de6c8a
@@ -1580,7 +1378,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Post Selling Unique Ids
 	column trueai_purpose_post_sales_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1590,7 +1387,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Post Selling Engaged Unique Ids
 	column trueai_purpose_post_sales_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1600,7 +1396,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Internal Count
 	column trueai_purpose_internal_count
 		dataType: int64
 		formatString: 0
@@ -1610,7 +1405,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Internal Engaged Count
 	column trueai_purpose_internal_eng_count
 		dataType: int64
 		formatString: 0
@@ -1620,7 +1414,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Internal Duration
 	column trueai_purpose_internal_dur
 		dataType: double
 		lineageTag: e822ff61-a9d0-404d-af0a-2bbbf0cef73a
@@ -1631,7 +1424,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Internal Engaged Duration
 	column trueai_purpose_internal_eng_dur
 		dataType: double
 		lineageTag: c0268d28-8e2d-4155-96ba-974d5a6094d1
@@ -1642,7 +1434,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Internal Unique Ids
 	column trueai_purpose_internal_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1652,7 +1443,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Internal Engaged Unique Ids
 	column trueai_purpose_internal_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -1662,7 +1452,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call ProspectingCount
 	column trueai_type_call_purpose_prospecting_count
 		dataType: int64
 		formatString: 0
@@ -1672,7 +1461,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Prospecting Engaged Count
 	column trueai_type_call_purpose_prospecting_eng_count
 		dataType: int64
 		formatString: 0
@@ -1682,7 +1470,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call New Logo Count
 	column trueai_type_call_purpose_new_logo_count
 		dataType: int64
 		formatString: 0
@@ -1692,7 +1479,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call New Logo Engaged Count
 	column trueai_type_call_purpose_new_logo_eng_count
 		dataType: int64
 		formatString: 0
@@ -1702,7 +1488,24 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Post Selling Count
+	column trueai_type_call_purpose_upselling_count
+		dataType: int64
+		formatString: 0
+		lineageTag: cb54c130-feba-43a6-a6a9-be07dc47cf7a
+		summarizeBy: sum
+		sourceColumn: trueai_type_call_purpose_upselling_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_type_call_purpose_upselling_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: a832d21e-0841-4949-b17c-92b8fc0b87bb
+		summarizeBy: sum
+		sourceColumn: trueai_type_call_purpose_upselling_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_type_call_purpose_post_sales_count
 		dataType: int64
 		formatString: 0
@@ -1712,7 +1515,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Post Selling Engaged Count
 	column trueai_type_call_purpose_post_sales_eng_count
 		dataType: int64
 		formatString: 0
@@ -1722,7 +1524,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Internal Count
 	column trueai_type_call_purpose_internal_count
 		dataType: int64
 		formatString: 0
@@ -1732,7 +1533,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Internal Engaged Count
 	column trueai_type_call_purpose_internal_eng_count
 		dataType: int64
 		formatString: 0
@@ -1742,7 +1542,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Prospecting Count
 	column trueai_type_email_purpose_prospecting_count
 		dataType: int64
 		formatString: 0
@@ -1752,7 +1551,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Prospecting Engaged Count
 	column trueai_type_email_purpose_prospecting_eng_count
 		dataType: int64
 		formatString: 0
@@ -1762,7 +1560,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email New Logo Count
 	column trueai_type_email_purpose_new_logo_count
 		dataType: int64
 		formatString: 0
@@ -1772,7 +1569,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email New Logo Engaged Count
 	column trueai_type_email_purpose_new_logo_eng_count
 		dataType: int64
 		formatString: 0
@@ -1782,7 +1578,24 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email Post Selling Count
+	column trueai_type_email_purpose_upselling_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 0680b056-871a-4ed9-afcc-884aaa0d81b1
+		summarizeBy: sum
+		sourceColumn: trueai_type_email_purpose_upselling_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_type_email_purpose_upselling_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 1801ad8d-2b9f-468e-ab20-8de30e408875
+		summarizeBy: sum
+		sourceColumn: trueai_type_email_purpose_upselling_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_type_email_purpose_post_sales_count
 		dataType: int64
 		formatString: 0
@@ -1792,7 +1605,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email Post Selling Engaged Count
 	column trueai_type_email_purpose_post_sales_eng_count
 		dataType: int64
 		formatString: 0
@@ -1802,7 +1614,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email Internal Count
 	column trueai_type_email_purpose_internal_count
 		dataType: int64
 		formatString: 0
@@ -1812,7 +1623,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email Internal Engaged Count
 	column trueai_type_email_purpose_internal_eng_count
 		dataType: int64
 		formatString: 0
@@ -1822,7 +1632,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Prospecting Count
 	column trueai_type_meeting_purpose_prospecting_count
 		dataType: int64
 		formatString: 0
@@ -1832,7 +1641,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Prospecting Engaged Count
 	column trueai_type_meeting_purpose_prospecting_eng_count
 		dataType: int64
 		formatString: 0
@@ -1842,7 +1650,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting New Logo Count
 	column trueai_type_meeting_purpose_new_logo_count
 		dataType: int64
 		formatString: 0
@@ -1852,7 +1659,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting New Logo Engaged Count
 	column trueai_type_meeting_purpose_new_logo_eng_count
 		dataType: int64
 		formatString: 0
@@ -1862,7 +1668,24 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Post Selling Count
+	column trueai_type_meeting_purpose_upselling_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 3dfe5aa9-8450-4fab-be5b-58a57058123d
+		summarizeBy: sum
+		sourceColumn: trueai_type_meeting_purpose_upselling_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_type_meeting_purpose_upselling_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 387da29a-80c6-4d2c-8aa5-d12ebc583ddf
+		summarizeBy: sum
+		sourceColumn: trueai_type_meeting_purpose_upselling_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_type_meeting_purpose_post_sales_count
 		dataType: int64
 		formatString: 0
@@ -1872,7 +1695,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Post Selling Engaged Count
 	column trueai_type_meeting_purpose_post_sales_eng_count
 		dataType: int64
 		formatString: 0
@@ -1882,7 +1704,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Internal Count
 	column trueai_type_meeting_purpose_internal_count
 		dataType: int64
 		formatString: 0
@@ -1892,7 +1713,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Internal Engaged Count
 	column trueai_type_meeting_purpose_internal_eng_count
 		dataType: int64
 		formatString: 0
@@ -1902,7 +1722,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Prospecting Count
 	column trueai_type_social_purpose_prospecting_count
 		dataType: int64
 		formatString: 0
@@ -1912,7 +1731,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Prospecting Engaged Count
 	column trueai_type_social_purpose_prospecting_eng_count
 		dataType: int64
 		formatString: 0
@@ -1922,7 +1740,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social New Logo Count
 	column trueai_type_social_purpose_new_logo_count
 		dataType: int64
 		formatString: 0
@@ -1932,7 +1749,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social New Logo Engaged Count
 	column trueai_type_social_purpose_new_logo_eng_count
 		dataType: int64
 		formatString: 0
@@ -1942,7 +1758,24 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Post Selling Count
+	column trueai_type_social_purpose_upselling_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 35cdcba4-b576-4054-93ce-e868cfbc7372
+		summarizeBy: sum
+		sourceColumn: trueai_type_social_purpose_upselling_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_type_social_purpose_upselling_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 154e2ed2-46d7-4335-8224-a201a063d691
+		summarizeBy: sum
+		sourceColumn: trueai_type_social_purpose_upselling_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_type_social_purpose_post_sales_count
 		dataType: int64
 		formatString: 0
@@ -1952,7 +1785,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Post Selling Engaged Count
 	column trueai_type_social_purpose_post_sales_eng_count
 		dataType: int64
 		formatString: 0
@@ -1962,7 +1794,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Internal Count
 	column trueai_type_social_purpose_internal_count
 		dataType: int64
 		formatString: 0
@@ -1972,7 +1803,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Internal Engaged Count
 	column trueai_type_social_purpose_internal_eng_count
 		dataType: int64
 		formatString: 0
@@ -1982,7 +1812,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Prospecting Count
 	column trueai_type_auto_email_purpose_prospecting_count
 		dataType: int64
 		formatString: 0
@@ -1992,7 +1821,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Prospecting Engaged Count
 	column trueai_type_auto_email_purpose_prospecting_eng_count
 		dataType: int64
 		formatString: 0
@@ -2002,7 +1830,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email New Logo Count
 	column trueai_type_auto_email_purpose_new_logo_count
 		dataType: int64
 		formatString: 0
@@ -2012,7 +1839,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email New Logo Engaged Count
 	column trueai_type_auto_email_purpose_new_logo_eng_count
 		dataType: int64
 		formatString: 0
@@ -2022,7 +1848,24 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Post Selling Count
+	column trueai_type_auto_email_purpose_upselling_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 6229b807-ad05-4493-bd5d-0ea8a7b921b6
+		summarizeBy: sum
+		sourceColumn: trueai_type_auto_email_purpose_upselling_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_type_auto_email_purpose_upselling_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: cd56056d-26e8-4d10-8b0b-fab3bd498bbb
+		summarizeBy: sum
+		sourceColumn: trueai_type_auto_email_purpose_upselling_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_type_auto_email_purpose_post_sales_count
 		dataType: int64
 		formatString: 0
@@ -2032,7 +1875,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Post Selling Engaged Count
 	column trueai_type_auto_email_purpose_post_sales_eng_count
 		dataType: int64
 		formatString: 0
@@ -2042,7 +1884,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Internal Count
 	column trueai_type_auto_email_purpose_internal_count
 		dataType: int64
 		formatString: 0
@@ -2052,7 +1893,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Internal Engaged Count
 	column trueai_type_auto_email_purpose_internal_eng_count
 		dataType: int64
 		formatString: 0
@@ -2062,7 +1902,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Prospecting Count
 	column trueai_type_no_interaction_purpose_prospecting_count
 		dataType: int64
 		formatString: 0
@@ -2072,7 +1911,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Prospecting Engaged Count
 	column trueai_type_no_interaction_purpose_prospecting_eng_count
 		dataType: int64
 		formatString: 0
@@ -2082,7 +1920,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction New Logo Count
 	column trueai_type_no_interaction_purpose_new_logo_count
 		dataType: int64
 		formatString: 0
@@ -2092,7 +1929,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction New Logo Engaged Count
 	column trueai_type_no_interaction_purpose_new_logo_eng_count
 		dataType: int64
 		formatString: 0
@@ -2102,7 +1938,24 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Post Selling Count
+	column trueai_type_no_interaction_purpose_upselling_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 9815e436-5be0-497e-8f04-4daa5408ae18
+		summarizeBy: sum
+		sourceColumn: trueai_type_no_interaction_purpose_upselling_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_type_no_interaction_purpose_upselling_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 4627e504-7e08-461f-9196-70bb078e4c37
+		summarizeBy: sum
+		sourceColumn: trueai_type_no_interaction_purpose_upselling_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_type_no_interaction_purpose_post_sales_count
 		dataType: int64
 		formatString: 0
@@ -2112,7 +1965,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Post Selling Engaged Count
 	column trueai_type_no_interaction_purpose_post_sales_eng_count
 		dataType: int64
 		formatString: 0
@@ -2122,7 +1974,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Internal Count
 	column trueai_type_no_interaction_purpose_internal_count
 		dataType: int64
 		formatString: 0
@@ -2132,7 +1983,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Internal Engaged Count
 	column trueai_type_no_interaction_purpose_internal_eng_count
 		dataType: int64
 		formatString: 0
@@ -2142,7 +1992,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Prospecting Count
 	column trueai_type_nd_purpose_prospecting_count
 		dataType: int64
 		formatString: 0
@@ -2152,7 +2001,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Prospecting Engaged Count
 	column trueai_type_nd_purpose_prospecting_eng_count
 		dataType: int64
 		formatString: 0
@@ -2162,7 +2010,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable New Logo Count
 	column trueai_type_nd_purpose_new_logo_count
 		dataType: int64
 		formatString: 0
@@ -2172,7 +2019,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable New Logo Engaged Count
 	column trueai_type_nd_purpose_new_logo_eng_count
 		dataType: int64
 		formatString: 0
@@ -2182,7 +2028,24 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Post Selling Count
+	column trueai_type_nd_purpose_upselling_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 83b43423-6125-4d63-9d03-fbfb8982faf3
+		summarizeBy: sum
+		sourceColumn: trueai_type_nd_purpose_upselling_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_type_nd_purpose_upselling_eng_count
+		dataType: int64
+		formatString: 0
+		lineageTag: e729dbb9-452f-4672-b9b5-2ec8fbc0faa5
+		summarizeBy: sum
+		sourceColumn: trueai_type_nd_purpose_upselling_eng_count
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_type_nd_purpose_post_sales_count
 		dataType: int64
 		formatString: 0
@@ -2192,7 +2055,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Post Selling Engaged Count
 	column trueai_type_nd_purpose_post_sales_eng_count
 		dataType: int64
 		formatString: 0
@@ -2202,7 +2064,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Internal Count
 	column trueai_type_nd_purpose_internal_count
 		dataType: int64
 		formatString: 0
@@ -2212,7 +2073,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Internal Engaged Count
 	column trueai_type_nd_purpose_internal_eng_count
 		dataType: int64
 		formatString: 0
@@ -2222,7 +2082,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Engaged Adj Duration
 	column trueai_adj_eng_dur
 		dataType: double
 		lineageTag: 568c494f-236e-4d04-8349-9313de4753f4
@@ -2233,7 +2092,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Existing Customer Selling Count
 	column trueai_purpose_exist_cust_selling_count
 		dataType: int64
 		formatString: 0
@@ -2243,7 +2101,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Existing Customer Selling Engaged Count
 	column trueai_purpose_exist_cust_selling_eng_count
 		dataType: int64
 		formatString: 0
@@ -2253,7 +2110,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Existing Customer Selling Duration
 	column trueai_purpose_exist_cust_selling_dur
 		dataType: double
 		lineageTag: 799b6b3d-576f-48aa-9bae-c3058d18e99d
@@ -2264,7 +2120,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Existing Customer Selling Engaged Duration
 	column trueai_purpose_exist_cust_selling_eng_dur
 		dataType: double
 		lineageTag: 31c3a1da-ef83-42fb-96a0-4b8488adcf6f
@@ -2275,7 +2130,6 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Activities Existing Customer Selling Unique Ids
 	column trueai_purpose_exist_cust_selling_unique_ids
 		dataType: int64
 		formatString: 0
@@ -2285,7 +2139,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Existing Customer Selling Engaged Unique Ids
 	column trueai_purpose_exist_cust_selling_eng_unique_ids
 		dataType: int64
 		formatString: 0
@@ -2295,7 +2148,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Existing Customer Selling Count
 	column trueai_type_call_purpose_exist_cust_selling_count
 		dataType: int64
 		formatString: 0
@@ -2305,7 +2157,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Call Existing Customer Selling Engaged Count
 	column trueai_type_call_purpose_exist_cust_selling_eng_count
 		dataType: int64
 		formatString: 0
@@ -2315,7 +2166,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email Existing Customer Selling Count
 	column trueai_type_email_purpose_exist_cust_selling_count
 		dataType: int64
 		formatString: 0
@@ -2325,7 +2175,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Email Existing Customer Selling Engaged Count
 	column trueai_type_email_purpose_exist_cust_selling_eng_count
 		dataType: int64
 		formatString: 0
@@ -2335,7 +2184,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Existing Customer Selling Count
 	column trueai_type_meeting_purpose_exist_cust_selling_count
 		dataType: int64
 		formatString: 0
@@ -2345,7 +2193,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Meeting Existing Customer Selling Engaged Count
 	column trueai_type_meeting_purpose_exist_cust_selling_eng_count
 		dataType: int64
 		formatString: 0
@@ -2355,7 +2202,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Existing Customer Selling Count
 	column trueai_type_social_purpose_exist_cust_selling_count
 		dataType: int64
 		formatString: 0
@@ -2365,7 +2211,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Social Existing Customer Selling Engaged Count
 	column trueai_type_social_purpose_exist_cust_selling_eng_count
 		dataType: int64
 		formatString: 0
@@ -2375,7 +2220,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Existing Customer Selling Count
 	column trueai_type_auto_email_purpose_exist_cust_selling_count
 		dataType: int64
 		formatString: 0
@@ -2385,7 +2229,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Automated Email Existing Customer Selling Engaged Count
 	column trueai_type_auto_email_purpose_exist_cust_selling_eng_count
 		dataType: int64
 		formatString: 0
@@ -2395,7 +2238,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Existing Customer Selling Count
 	column trueai_type_no_interaction_purpose_exist_cust_selling_count
 		dataType: int64
 		formatString: 0
@@ -2405,7 +2247,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities No Interaction Existing Customer Selling Engaged Count
 	column trueai_type_no_interaction_purpose_exist_cust_selling_eng_count
 		dataType: int64
 		formatString: 0
@@ -2415,7 +2256,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Existing Customer Selling Count
 	column trueai_type_nd_purpose_exist_cust_selling_count
 		dataType: int64
 		formatString: 0
@@ -2425,7 +2265,6 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Activities Non Determinable Existing Customer Selling Engaged Count
 	column trueai_type_nd_purpose_exist_cust_selling_eng_count
 		dataType: int64
 		formatString: 0
@@ -2435,21 +2274,11 @@ table users_activities
 
 		annotation SummarizationSetBy = Automatic
 
-	/// User's standardized and combined role aliased
 	column trueai_user_role_alias
 		dataType: string
 		lineageTag: 434950dd-872f-41e1-bdd9-c2d5ca480c6c
 		summarizeBy: none
 		sourceColumn: trueai_user_role_alias
-
-		annotation SummarizationSetBy = Automatic
-
-	/// User's department derived from the standardized and combined role
-	column trueai_user_role_department
-		dataType: string
-		lineageTag: 5b2e2612-3a3a-4850-b792-f30010d4196a
-		summarizeBy: none
-		sourceColumn: trueai_user_role_department
 
 		annotation SummarizationSetBy = Automatic
 
@@ -2460,173 +2289,194 @@ table users_activities
 				  
 				  dbTable = getDBTable("users_activities"), // get the right table
 				  dbTableTyped = Table.TransformColumnTypes(dbTable,{ // change types to what we're expecting
-				       {"_sys_as_of", type datetime},
-				        {"_sys_co_id", type text},
-				        {"_sys_doc_id", type text},
-				        {"_sys_filt_end_date", type date},
-				        {"_sys_filt_start_date", type date},
-				        {"_sys_is_active", type logical},
-				        {"_sys_is_deleted", type logical},
-				        {"_sys_user_id", type text},
-				        {"trueai_adj_dur", type number},
-				        {"trueai_adj_dur_rule", type number},
-				        {"trueai_adj_eng_dur", type number},
-				        {"trueai_count", Int64.Type},
-				        {"trueai_dur", Int64.Type},
-				        {"trueai_end_date", type date},
-				        {"trueai_eng_count", Int64.Type},
-				        {"trueai_eng_dur", type number},
-				        {"trueai_eng_unique_ssr_ids", Int64.Type},
-				        {"trueai_owner_act_capt_lvl", type number},
-				        {"trueai_owner_act_capt_lvl_conf", type number},
-				        {"trueai_owner_prep_factor", type number},
-				        {"trueai_purpose_exist_cust_selling_count", Int64.Type},
-				        {"trueai_purpose_exist_cust_selling_dur", type number},
-				        {"trueai_purpose_exist_cust_selling_eng_count", Int64.Type},
-				        {"trueai_purpose_exist_cust_selling_eng_dur", type number},
-				        {"trueai_purpose_exist_cust_selling_eng_unique_ids", Int64.Type},
-				        {"trueai_purpose_exist_cust_selling_unique_ids", Int64.Type},
-				        {"trueai_purpose_internal_count", Int64.Type},
-				        {"trueai_purpose_internal_dur", type number},
-				        {"trueai_purpose_internal_eng_count", Int64.Type},
-				        {"trueai_purpose_internal_eng_dur", type number},
-				        {"trueai_purpose_internal_eng_unique_ids", Int64.Type},
-				        {"trueai_purpose_internal_unique_ids", Int64.Type},
-				        {"trueai_purpose_new_logo_count", Int64.Type},
-				        {"trueai_purpose_new_logo_dur", type number},
-				        {"trueai_purpose_new_logo_eng_count", Int64.Type},
-				        {"trueai_purpose_new_logo_eng_dur", type number},
-				        {"trueai_purpose_new_logo_eng_unique_ids", Int64.Type},
-				        {"trueai_purpose_new_logo_unique_ids", Int64.Type},
-				        {"trueai_purpose_post_sales_count", Int64.Type},
-				        {"trueai_purpose_post_sales_dur", type number},
-				        {"trueai_purpose_post_sales_eng_count", Int64.Type},
-				        {"trueai_purpose_post_sales_eng_dur", type number},
-				        {"trueai_purpose_post_sales_eng_unique_ids", Int64.Type},
-				        {"trueai_purpose_post_sales_unique_ids", Int64.Type},
-				        {"trueai_purpose_prospecting_count", Int64.Type},
-				        {"trueai_purpose_prospecting_dur", type number},
-				        {"trueai_purpose_prospecting_eng_count", Int64.Type},
-				        {"trueai_purpose_prospecting_eng_dur", type number},
-				        {"trueai_purpose_prospecting_eng_unique_ids", Int64.Type},
-				        {"trueai_purpose_prospecting_unique_ids", Int64.Type},
-				        {"trueai_type_auto_email_count", Int64.Type},
-				        {"trueai_type_auto_email_dur", type number},
-				        {"trueai_type_auto_email_eng_count", Int64.Type},
-				        {"trueai_type_auto_email_eng_dur", type number},
-				        {"trueai_type_auto_email_eng_unique_ids", Int64.Type},
-				        {"trueai_type_auto_email_purpose_exist_cust_selling_count", Int64.Type},
-				        {"trueai_type_auto_email_purpose_exist_cust_selling_eng_count", Int64.Type},
-				        {"trueai_type_auto_email_purpose_internal_count", Int64.Type},
-				        {"trueai_type_auto_email_purpose_internal_eng_count", Int64.Type},
-				        {"trueai_type_auto_email_purpose_new_logo_count", Int64.Type},
-				        {"trueai_type_auto_email_purpose_new_logo_eng_count", Int64.Type},
-				        {"trueai_type_auto_email_purpose_post_sales_count", Int64.Type},
-				        {"trueai_type_auto_email_purpose_post_sales_eng_count", Int64.Type},
-				        {"trueai_type_auto_email_purpose_prospecting_count", Int64.Type},
-				        {"trueai_type_auto_email_purpose_prospecting_eng_count", Int64.Type},
-				        {"trueai_type_auto_email_unique_ids", Int64.Type},
-				        {"trueai_type_call_count", Int64.Type},
-				        {"trueai_type_call_dur", type number},
-				        {"trueai_type_call_eng_count", Int64.Type},
-				        {"trueai_type_call_eng_dur", type number},
-				        {"trueai_type_call_eng_unique_ids", Int64.Type},
-				        {"trueai_type_call_purpose_exist_cust_selling_count", Int64.Type},
-				        {"trueai_type_call_purpose_exist_cust_selling_eng_count", Int64.Type},
-				        {"trueai_type_call_purpose_internal_count", Int64.Type},
-				        {"trueai_type_call_purpose_internal_eng_count", Int64.Type},
-				        {"trueai_type_call_purpose_new_logo_count", Int64.Type},
-				        {"trueai_type_call_purpose_new_logo_eng_count", Int64.Type},
-				        {"trueai_type_call_purpose_post_sales_count", Int64.Type},
-				        {"trueai_type_call_purpose_post_sales_eng_count", Int64.Type},
-				        {"trueai_type_call_purpose_prospecting_count", Int64.Type},
-				        {"trueai_type_call_purpose_prospecting_eng_count", Int64.Type},
-				        {"trueai_type_call_unique_ids", Int64.Type},
-				        {"trueai_type_email_count", Int64.Type},
-				        {"trueai_type_email_dur", type number},
-				        {"trueai_type_email_eng_count", Int64.Type},
-				        {"trueai_type_email_eng_dur", type number},
-				        {"trueai_type_email_eng_unique_ids", Int64.Type},
-				        {"trueai_type_email_purpose_exist_cust_selling_count", Int64.Type},
-				        {"trueai_type_email_purpose_exist_cust_selling_eng_count", Int64.Type},
-				        {"trueai_type_email_purpose_internal_count", Int64.Type},
-				        {"trueai_type_email_purpose_internal_eng_count", Int64.Type},
-				        {"trueai_type_email_purpose_new_logo_count", Int64.Type},
-				        {"trueai_type_email_purpose_new_logo_eng_count", Int64.Type},
-				        {"trueai_type_email_purpose_post_sales_count", Int64.Type},
-				        {"trueai_type_email_purpose_post_sales_eng_count", Int64.Type},
-				        {"trueai_type_email_purpose_prospecting_count", Int64.Type},
-				        {"trueai_type_email_purpose_prospecting_eng_count", Int64.Type},
-				        {"trueai_type_email_unique_ids", Int64.Type},
-				        {"trueai_type_meeting_count", Int64.Type},
-				        {"trueai_type_meeting_dur", type number},
-				        {"trueai_type_meeting_eng_count", Int64.Type},
-				        {"trueai_type_meeting_eng_dur", type number},
-				        {"trueai_type_meeting_eng_unique_ids", Int64.Type},
-				        {"trueai_type_meeting_purpose_exist_cust_selling_count", Int64.Type},
-				        {"trueai_type_meeting_purpose_exist_cust_selling_eng_count", Int64.Type},
-				        {"trueai_type_meeting_purpose_internal_count", Int64.Type},
-				        {"trueai_type_meeting_purpose_internal_eng_count", Int64.Type},
-				        {"trueai_type_meeting_purpose_new_logo_count", Int64.Type},
-				        {"trueai_type_meeting_purpose_new_logo_eng_count", Int64.Type},
-				        {"trueai_type_meeting_purpose_post_sales_count", Int64.Type},
-				        {"trueai_type_meeting_purpose_post_sales_eng_count", Int64.Type},
-				        {"trueai_type_meeting_purpose_prospecting_count", Int64.Type},
-				        {"trueai_type_meeting_purpose_prospecting_eng_count", Int64.Type},
-				        {"trueai_type_meeting_unique_ids", Int64.Type},
-				        {"trueai_type_nd_count", Int64.Type},
-				        {"trueai_type_nd_dur", type number},
-				        {"trueai_type_nd_eng_count", Int64.Type},
-				        {"trueai_type_nd_eng_dur", type number},
-				        {"trueai_type_nd_eng_unique_ids", Int64.Type},
-				        {"trueai_type_nd_purpose_exist_cust_selling_count", Int64.Type},
-				        {"trueai_type_nd_purpose_exist_cust_selling_eng_count", Int64.Type},
-				        {"trueai_type_nd_purpose_internal_count", Int64.Type},
-				        {"trueai_type_nd_purpose_internal_eng_count", Int64.Type},
-				        {"trueai_type_nd_purpose_new_logo_count", Int64.Type},
-				        {"trueai_type_nd_purpose_new_logo_eng_count", Int64.Type},
-				        {"trueai_type_nd_purpose_post_sales_count", Int64.Type},
-				        {"trueai_type_nd_purpose_post_sales_eng_count", Int64.Type},
-				        {"trueai_type_nd_purpose_prospecting_count", Int64.Type},
-				        {"trueai_type_nd_purpose_prospecting_eng_count", Int64.Type},
-				        {"trueai_type_nd_unique_ids", Int64.Type},
-				        {"trueai_type_no_interaction_count", Int64.Type},
-				        {"trueai_type_no_interaction_dur", type number},
-				        {"trueai_type_no_interaction_eng_count", Int64.Type},
-				        {"trueai_type_no_interaction_eng_dur", type number},
-				        {"trueai_type_no_interaction_eng_unique_ids", Int64.Type},
-				        {"trueai_type_no_interaction_purpose_exist_cust_selling_count", Int64.Type},
-				        {"trueai_type_no_interaction_purpose_exist_cust_selling_eng_count", Int64.Type},
-				        {"trueai_type_no_interaction_purpose_internal_count", Int64.Type},
-				        {"trueai_type_no_interaction_purpose_internal_eng_count", Int64.Type},
-				        {"trueai_type_no_interaction_purpose_new_logo_count", Int64.Type},
-				        {"trueai_type_no_interaction_purpose_new_logo_eng_count", Int64.Type},
-				        {"trueai_type_no_interaction_purpose_post_sales_count", Int64.Type},
-				        {"trueai_type_no_interaction_purpose_post_sales_eng_count", Int64.Type},
-				        {"trueai_type_no_interaction_purpose_prospecting_count", Int64.Type},
-				        {"trueai_type_no_interaction_purpose_prospecting_eng_count", Int64.Type},
-				        {"trueai_type_no_interaction_unique_ids", Int64.Type},
-				        {"trueai_type_social_count", Int64.Type},
-				        {"trueai_type_social_dur", type number},
-				        {"trueai_type_social_eng_count", Int64.Type},
-				        {"trueai_type_social_eng_dur", type number},
-				        {"trueai_type_social_eng_unique_ids", Int64.Type},
-				        {"trueai_type_social_purpose_exist_cust_selling_count", Int64.Type},
-				        {"trueai_type_social_purpose_exist_cust_selling_eng_count", Int64.Type},
-				        {"trueai_type_social_purpose_internal_count", Int64.Type},
-				        {"trueai_type_social_purpose_internal_eng_count", Int64.Type},
-				        {"trueai_type_social_purpose_new_logo_count", Int64.Type},
-				        {"trueai_type_social_purpose_new_logo_eng_count", Int64.Type},
-				        {"trueai_type_social_purpose_post_sales_count", Int64.Type},
-				        {"trueai_type_social_purpose_post_sales_eng_count", Int64.Type},
-				        {"trueai_type_social_purpose_prospecting_count", Int64.Type},
-				        {"trueai_type_social_purpose_prospecting_eng_count", Int64.Type},
-				        {"trueai_type_social_unique_ids", Int64.Type},
-				        {"trueai_unique_ssr_ids", Int64.Type},
-				        {"trueai_user_role", type text},
-				        {"trueai_user_role_alias", type text},
-				        {"trueai_user_role_department", type text},
-				        {"trueai_user_role_function", type text}
+				      {"_sys_as_of", type datetime},
+				{"_sys_co_id", type text},
+				{"_sys_doc_id", type text},
+				{"_sys_filt_end_date", type date},
+				{"_sys_filt_start_date", type date},
+				{"_sys_is_active", type logical},
+				{"_sys_is_deleted", type logical},
+				{"_sys_user_id", type text},
+				{"trueai_adj_dur", type number},
+				{"trueai_adj_dur_rule", type number},
+				{"trueai_adj_eng_dur", type number},
+				{"trueai_count", Int64.Type},
+				{"trueai_dur", Int64.Type},
+				{"trueai_end_date", type date},
+				{"trueai_eng_count", Int64.Type},
+				{"trueai_eng_dur", type number},
+				{"trueai_eng_unique_ssr_ids", Int64.Type},
+				{"trueai_owner_act_capt_lvl", type number},
+				{"trueai_owner_act_capt_lvl_conf", type number},
+				{"trueai_owner_prep_factor", type number},
+				{"trueai_purpose_exist_cust_selling_count", Int64.Type},
+				{"trueai_purpose_exist_cust_selling_dur", type number},
+				{"trueai_purpose_exist_cust_selling_eng_count", Int64.Type},
+				{"trueai_purpose_exist_cust_selling_eng_dur", type number},
+				{"trueai_purpose_exist_cust_selling_eng_unique_ids", Int64.Type},
+				{"trueai_purpose_exist_cust_selling_unique_ids", Int64.Type},
+				{"trueai_purpose_internal_count", Int64.Type},
+				{"trueai_purpose_internal_dur", type number},
+				{"trueai_purpose_internal_eng_count", Int64.Type},
+				{"trueai_purpose_internal_eng_dur", type number},
+				{"trueai_purpose_internal_eng_unique_ids", Int64.Type},
+				{"trueai_purpose_internal_unique_ids", Int64.Type},
+				{"trueai_purpose_new_logo_count", Int64.Type},
+				{"trueai_purpose_new_logo_dur", type number},
+				{"trueai_purpose_new_logo_eng_count", Int64.Type},
+				{"trueai_purpose_new_logo_eng_dur", type number},
+				{"trueai_purpose_new_logo_eng_unique_ids", Int64.Type},
+				{"trueai_purpose_new_logo_unique_ids", Int64.Type},
+				{"trueai_purpose_post_sales_count", Int64.Type},
+				{"trueai_purpose_post_sales_dur", type number},
+				{"trueai_purpose_post_sales_eng_count", Int64.Type},
+				{"trueai_purpose_post_sales_eng_dur", type number},
+				{"trueai_purpose_post_sales_eng_unique_ids", Int64.Type},
+				{"trueai_purpose_post_sales_unique_ids", Int64.Type},
+				{"trueai_purpose_prospecting_count", Int64.Type},
+				{"trueai_purpose_prospecting_dur", type number},
+				{"trueai_purpose_prospecting_eng_count", Int64.Type},
+				{"trueai_purpose_prospecting_eng_dur", type number},
+				{"trueai_purpose_prospecting_eng_unique_ids", Int64.Type},
+				{"trueai_purpose_prospecting_unique_ids", Int64.Type},
+				{"trueai_purpose_upselling_count", Int64.Type},
+				{"trueai_purpose_upselling_dur", type number},
+				{"trueai_purpose_upselling_eng_count", Int64.Type},
+				{"trueai_purpose_upselling_eng_dur", type number},
+				{"trueai_purpose_upselling_eng_unique_ids", Int64.Type},
+				{"trueai_purpose_upselling_unique_ids", Int64.Type},
+				{"trueai_type_auto_email_count", Int64.Type},
+				{"trueai_type_auto_email_dur", type number},
+				{"trueai_type_auto_email_eng_count", Int64.Type},
+				{"trueai_type_auto_email_eng_dur", type number},
+				{"trueai_type_auto_email_eng_unique_ids", Int64.Type},
+				{"trueai_type_auto_email_purpose_exist_cust_selling_count", Int64.Type},
+				{"trueai_type_auto_email_purpose_exist_cust_selling_eng_count", Int64.Type},
+				{"trueai_type_auto_email_purpose_internal_count", Int64.Type},
+				{"trueai_type_auto_email_purpose_internal_eng_count", Int64.Type},
+				{"trueai_type_auto_email_purpose_new_logo_count", Int64.Type},
+				{"trueai_type_auto_email_purpose_new_logo_eng_count", Int64.Type},
+				{"trueai_type_auto_email_purpose_post_sales_count", Int64.Type},
+				{"trueai_type_auto_email_purpose_post_sales_eng_count", Int64.Type},
+				{"trueai_type_auto_email_purpose_prospecting_count", Int64.Type},
+				{"trueai_type_auto_email_purpose_prospecting_eng_count", Int64.Type},
+				{"trueai_type_auto_email_purpose_upselling_count", Int64.Type},
+				{"trueai_type_auto_email_purpose_upselling_eng_count", Int64.Type},
+				{"trueai_type_auto_email_unique_ids", Int64.Type},
+				{"trueai_type_call_count", Int64.Type},
+				{"trueai_type_call_dur", type number},
+				{"trueai_type_call_eng_count", Int64.Type},
+				{"trueai_type_call_eng_dur", type number},
+				{"trueai_type_call_eng_unique_ids", Int64.Type},
+				{"trueai_type_call_purpose_exist_cust_selling_count", Int64.Type},
+				{"trueai_type_call_purpose_exist_cust_selling_eng_count", Int64.Type},
+				{"trueai_type_call_purpose_internal_count", Int64.Type},
+				{"trueai_type_call_purpose_internal_eng_count", Int64.Type},
+				{"trueai_type_call_purpose_new_logo_count", Int64.Type},
+				{"trueai_type_call_purpose_new_logo_eng_count", Int64.Type},
+				{"trueai_type_call_purpose_post_sales_count", Int64.Type},
+				{"trueai_type_call_purpose_post_sales_eng_count", Int64.Type},
+				{"trueai_type_call_purpose_prospecting_count", Int64.Type},
+				{"trueai_type_call_purpose_prospecting_eng_count", Int64.Type},
+				{"trueai_type_call_purpose_upselling_count", Int64.Type},
+				{"trueai_type_call_purpose_upselling_eng_count", Int64.Type},
+				{"trueai_type_call_unique_ids", Int64.Type},
+				{"trueai_type_email_count", Int64.Type},
+				{"trueai_type_email_dur", type number},
+				{"trueai_type_email_eng_count", Int64.Type},
+				{"trueai_type_email_eng_dur", type number},
+				{"trueai_type_email_eng_unique_ids", Int64.Type},
+				{"trueai_type_email_purpose_exist_cust_selling_count", Int64.Type},
+				{"trueai_type_email_purpose_exist_cust_selling_eng_count", Int64.Type},
+				{"trueai_type_email_purpose_internal_count", Int64.Type},
+				{"trueai_type_email_purpose_internal_eng_count", Int64.Type},
+				{"trueai_type_email_purpose_new_logo_count", Int64.Type},
+				{"trueai_type_email_purpose_new_logo_eng_count", Int64.Type},
+				{"trueai_type_email_purpose_post_sales_count", Int64.Type},
+				{"trueai_type_email_purpose_post_sales_eng_count", Int64.Type},
+				{"trueai_type_email_purpose_prospecting_count", Int64.Type},
+				{"trueai_type_email_purpose_prospecting_eng_count", Int64.Type},
+				{"trueai_type_email_purpose_upselling_count", Int64.Type},
+				{"trueai_type_email_purpose_upselling_eng_count", Int64.Type},
+				{"trueai_type_email_unique_ids", Int64.Type},
+				{"trueai_type_meeting_count", Int64.Type},
+				{"trueai_type_meeting_dur", type number},
+				{"trueai_type_meeting_eng_count", Int64.Type},
+				{"trueai_type_meeting_eng_dur", type number},
+				{"trueai_type_meeting_eng_unique_ids", Int64.Type},
+				{"trueai_type_meeting_purpose_exist_cust_selling_count", Int64.Type},
+				{"trueai_type_meeting_purpose_exist_cust_selling_eng_count", Int64.Type},
+				{"trueai_type_meeting_purpose_internal_count", Int64.Type},
+				{"trueai_type_meeting_purpose_internal_eng_count", Int64.Type},
+				{"trueai_type_meeting_purpose_new_logo_count", Int64.Type},
+				{"trueai_type_meeting_purpose_new_logo_eng_count", Int64.Type},
+				{"trueai_type_meeting_purpose_post_sales_count", Int64.Type},
+				{"trueai_type_meeting_purpose_post_sales_eng_count", Int64.Type},
+				{"trueai_type_meeting_purpose_prospecting_count", Int64.Type},
+				{"trueai_type_meeting_purpose_prospecting_eng_count", Int64.Type},
+				{"trueai_type_meeting_purpose_upselling_count", Int64.Type},
+				{"trueai_type_meeting_purpose_upselling_eng_count", Int64.Type},
+				{"trueai_type_meeting_unique_ids", Int64.Type},
+				{"trueai_type_nd_count", Int64.Type},
+				{"trueai_type_nd_dur", type number},
+				{"trueai_type_nd_eng_count", Int64.Type},
+				{"trueai_type_nd_eng_dur", type number},
+				{"trueai_type_nd_eng_unique_ids", Int64.Type},
+				{"trueai_type_nd_purpose_exist_cust_selling_count", Int64.Type},
+				{"trueai_type_nd_purpose_exist_cust_selling_eng_count", Int64.Type},
+				{"trueai_type_nd_purpose_internal_count", Int64.Type},
+				{"trueai_type_nd_purpose_internal_eng_count", Int64.Type},
+				{"trueai_type_nd_purpose_new_logo_count", Int64.Type},
+				{"trueai_type_nd_purpose_new_logo_eng_count", Int64.Type},
+				{"trueai_type_nd_purpose_post_sales_count", Int64.Type},
+				{"trueai_type_nd_purpose_post_sales_eng_count", Int64.Type},
+				{"trueai_type_nd_purpose_prospecting_count", Int64.Type},
+				{"trueai_type_nd_purpose_prospecting_eng_count", Int64.Type},
+				{"trueai_type_nd_purpose_upselling_count", Int64.Type},
+				{"trueai_type_nd_purpose_upselling_eng_count", Int64.Type},
+				{"trueai_type_nd_unique_ids", Int64.Type},
+				{"trueai_type_no_interaction_count", Int64.Type},
+				{"trueai_type_no_interaction_dur", type number},
+				{"trueai_type_no_interaction_eng_count", Int64.Type},
+				{"trueai_type_no_interaction_eng_dur", type number},
+				{"trueai_type_no_interaction_eng_unique_ids", Int64.Type},
+				{"trueai_type_no_interaction_purpose_exist_cust_selling_count", Int64.Type},
+				{"trueai_type_no_interaction_purpose_exist_cust_selling_eng_count", Int64.Type},
+				{"trueai_type_no_interaction_purpose_internal_count", Int64.Type},
+				{"trueai_type_no_interaction_purpose_internal_eng_count", Int64.Type},
+				{"trueai_type_no_interaction_purpose_new_logo_count", Int64.Type},
+				{"trueai_type_no_interaction_purpose_new_logo_eng_count", Int64.Type},
+				{"trueai_type_no_interaction_purpose_post_sales_count", Int64.Type},
+				{"trueai_type_no_interaction_purpose_post_sales_eng_count", Int64.Type},
+				{"trueai_type_no_interaction_purpose_prospecting_count", Int64.Type},
+				{"trueai_type_no_interaction_purpose_prospecting_eng_count", Int64.Type},
+				{"trueai_type_no_interaction_purpose_upselling_count", Int64.Type},
+				{"trueai_type_no_interaction_purpose_upselling_eng_count", Int64.Type},
+				{"trueai_type_no_interaction_unique_ids", Int64.Type},
+				{"trueai_type_social_count", Int64.Type},
+				{"trueai_type_social_dur", type number},
+				{"trueai_type_social_eng_count", Int64.Type},
+				{"trueai_type_social_eng_dur", type number},
+				{"trueai_type_social_eng_unique_ids", Int64.Type},
+				{"trueai_type_social_purpose_exist_cust_selling_count", Int64.Type},
+				{"trueai_type_social_purpose_exist_cust_selling_eng_count", Int64.Type},
+				{"trueai_type_social_purpose_internal_count", Int64.Type},
+				{"trueai_type_social_purpose_internal_eng_count", Int64.Type},
+				{"trueai_type_social_purpose_new_logo_count", Int64.Type},
+				{"trueai_type_social_purpose_new_logo_eng_count", Int64.Type},
+				{"trueai_type_social_purpose_post_sales_count", Int64.Type},
+				{"trueai_type_social_purpose_post_sales_eng_count", Int64.Type},
+				{"trueai_type_social_purpose_prospecting_count", Int64.Type},
+				{"trueai_type_social_purpose_prospecting_eng_count", Int64.Type},
+				{"trueai_type_social_purpose_upselling_count", Int64.Type},
+				{"trueai_type_social_purpose_upselling_eng_count", Int64.Type},
+				{"trueai_type_social_unique_ids", Int64.Type},
+				{"trueai_unique_ssr_ids", Int64.Type},
+				{"trueai_user_role", type text},
+				{"trueai_user_role_alias", type text},
+				{"trueai_user_role_dept", type text},
+				{"trueai_user_role_function", type text}
+				 
 				    })
 				in
 				    dbTableTyped

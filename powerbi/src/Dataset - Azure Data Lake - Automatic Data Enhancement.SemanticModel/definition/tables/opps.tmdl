@@ -1,11 +1,6 @@
-/// CRM entity for opportunity records enriched with TrueAI predictive insights.
 table opps
 	lineageTag: 4277295b-2fd7-47a1-b82b-5de4b447fb12
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_complt], [trueai_complt].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0 %
 	measure 'meas.opp_trueai_completeness_improvement' = ```
 			
 			var crmval = CALCULATE(AVERAGE([crm_complt]))
@@ -18,7 +13,6 @@ table opps
 		formatString: 0 %
 		lineageTag: 7282e887-bcaf-41aa-b41c-9e863ab86f59
 
-	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
 		dataType: string
 		lineageTag: 068c6a2d-be04-474a-a201-5f2bba17dbb3
@@ -27,7 +21,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Name of the opportunity
 	column crm_name
 		dataType: string
 		lineageTag: c2656224-81d4-4a43-8fa3-102dd26f2af1
@@ -36,7 +29,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Link to the opportunity in the remote system (such as Salesforce)
 	column crm_deep_link
 		dataType: string
 		lineageTag: 278fbcf3-b41a-44b4-b4b6-bf2c71b75301
@@ -45,9 +37,8 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's booking amount in the CRM
 	column crm_booking_amt
-		dataType: double
+		dataType: decimal
 		lineageTag: a1803061-2073-4961-b70a-eaf839c0b5b8
 		summarizeBy: sum
 		sourceColumn: crm_booking_amt
@@ -56,7 +47,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity's close date in the CRM
 	column crm_close_date
 		dataType: dateTime
 		formatString: General Date
@@ -71,7 +61,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's currency in the CRM
 	column crm_currency
 		dataType: string
 		lineageTag: 1f4f6bac-98e9-4d9a-97b4-f6bfa484ac44
@@ -80,7 +69,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's lead source in the CRM
 	column crm_leadsource
 		dataType: string
 		lineageTag: 4f726618-6bc3-429c-9c16-a793fcf15ff5
@@ -89,7 +77,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's stage name in the CRM
 	column crm_stage_name
 		dataType: string
 		lineageTag: 9513b2ce-c3bf-460b-ba1c-4266fd204493
@@ -98,7 +85,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's stage number in the CRM
 	column crm_stage_num
 		dataType: int64
 		formatString: 0
@@ -108,7 +94,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's type in the CRM
 	column crm_type
 		dataType: string
 		lineageTag: a0467423-b728-42d4-a0fc-4483577a7442
@@ -117,9 +102,8 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's booking amount
 	column trueai_booking_amt
-		dataType: double
+		dataType: decimal
 		lineageTag: 93945286-f8de-4b88-82cb-620bb5a23717
 		summarizeBy: sum
 		sourceColumn: trueai_booking_amt
@@ -128,7 +112,16 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity's close date
+	column trueai_pred_booking_amt
+		dataType: decimal
+		lineageTag: e4ce187a-225d-4b44-87bb-df2bb5d7d05e
+		summarizeBy: sum
+		sourceColumn: trueai_pred_booking_amt
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column trueai_close_date
 		dataType: dateTime
 		formatString: General Date
@@ -138,12 +131,11 @@ table opps
 
 		variation Variation
 			isDefault
-			relationship: d8fe22e8-5b68-47f9-b823-cfb78e8f57cc
-			defaultHierarchy: LocalDateTable_3e9628b4-fa22-4c3c-b272-3a06a0a0081b.'Date Hierarchy'
+			relationship: e39668f7-aa9e-4a33-bf31-3f12965785b4
+			defaultHierarchy: LocalDateTable_29323c1d-ac48-43e6-b585-07bebbf9c8ce.'Date Hierarchy'
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's standardized lead source
 	column trueai_leadsource
 		dataType: string
 		lineageTag: 842625c6-762b-4147-85b3-b0c9c99e47db
@@ -152,7 +144,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's standardized industry
 	column trueai_industry
 		dataType: string
 		lineageTag: 696bf1ab-e6ed-4e10-8d8d-272e3ce0f730
@@ -161,7 +152,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's standardized company size
 	column trueai_company_size
 		dataType: string
 		lineageTag: c2557585-eaa5-406b-bc54-ec9d57b9900a
@@ -170,7 +160,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the opportunity is a new logo
 	column trueai_is_new_logo
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -180,7 +169,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's sale type
 	column trueai_sale_type
 		dataType: string
 		lineageTag: 9b7d2e0e-4419-4aa0-9856-10dec214d42b
@@ -189,7 +177,46 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the opportunity entered the middle stage
+	column trueai_vi_repeat_value
+		dataType: decimal
+		lineageTag: 353f015c-8b9b-4263-8845-12c391a7be7e
+		summarizeBy: sum
+		sourceColumn: trueai_vi_repeat_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_vi_post_sales_value
+		dataType: decimal
+		lineageTag: 99b33eda-53ff-49e1-85ff-dbbf6b838844
+		summarizeBy: sum
+		sourceColumn: trueai_vi_post_sales_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_vi_prospecting_value
+		dataType: decimal
+		lineageTag: a3b7bdcd-a978-4d7e-9b30-6aee3ff88bd3
+		summarizeBy: sum
+		sourceColumn: trueai_vi_prospecting_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_vi_opp_value
+		dataType: decimal
+		lineageTag: 1d00ad62-9169-425b-b4e6-1057cfa271dd
+		summarizeBy: sum
+		sourceColumn: trueai_vi_opp_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column trueai_opp_stage_mid_date
 		dataType: dateTime
 		formatString: General Date
@@ -199,12 +226,11 @@ table opps
 
 		variation Variation
 			isDefault
-			relationship: fe1a26b3-49e7-4f88-8efb-e929f5358543
-			defaultHierarchy: LocalDateTable_3cf76079-fb90-447d-bedf-f1e0abb80cc4.'Date Hierarchy'
+			relationship: 0f20103f-04d7-45fa-be03-42ff31a10622
+			defaultHierarchy: LocalDateTable_ac18bf8a-f848-4d1a-9994-87cb3c102203.'Date Hierarchy'
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Date when the opportunity entered the late stage
 	column trueai_opp_stage_late_date
 		dataType: dateTime
 		formatString: General Date
@@ -214,21 +240,29 @@ table opps
 
 		variation Variation
 			isDefault
-			relationship: b38b9523-7969-44ed-afc0-f99da6e567f4
-			defaultHierarchy: LocalDateTable_76391fd4-8e95-484d-920c-152d60748974.'Date Hierarchy'
+			relationship: aff3dfab-6438-42e7-864e-ec42bd73db4a
+			defaultHierarchy: LocalDateTable_72c98827-7095-4224-8a98-7ff8a40d066f.'Date Hierarchy'
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Quality bucket based on the probability of win
-	column trueai_propensity
+	column trueai_discount
+		dataType: decimal
+		lineageTag: 0da79087-e97b-40ee-a06d-caa9ea3ca715
+		summarizeBy: sum
+		sourceColumn: trueai_discount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_qual_bucket
 		dataType: string
 		lineageTag: 33dacbdb-aa27-4569-842d-a68d5df4b162
 		summarizeBy: none
-		sourceColumn: trueai_propensity
+		sourceColumn: trueai_qual_bucket
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's standardized company size prediction rule
 	column trueai_company_size_rule
 		dataType: int64
 		formatString: 0
@@ -238,7 +272,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's standardized industry prediction rule
 	column trueai_industry_rule
 		dataType: int64
 		formatString: 0
@@ -248,7 +281,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's standardized lead source prediction rule
 	column trueai_leadsource_rule
 		dataType: int64
 		formatString: 0
@@ -258,7 +290,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column _sys_docid.
 	column _sys_docid
 		dataType: string
 		lineageTag: 4c4c765b-b094-4e78-9d2c-98e352479ee8
@@ -267,7 +298,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// The end date of the record, stripped of time
 	column _sys_filt_end_date
 		dataType: dateTime
 		formatString: Long Date
@@ -284,7 +314,6 @@ table opps
 
 		annotation UnderlyingDateTimeDataType = Date
 
-	/// The start date of the record, stripped of time
 	column _sys_filt_start_date
 		dataType: dateTime
 		formatString: Long Date
@@ -296,7 +325,6 @@ table opps
 
 		annotation UnderlyingDateTimeDataType = Date
 
-	/// CRM account id of the opportunity
 	column crm_account_id
 		dataType: string
 		lineageTag: 8bfebe69-9b96-48b8-9b35-5c835a6fd81a
@@ -305,7 +333,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's completeness score based on the CRM data
 	column crm_complt
 		dataType: double
 		lineageTag: 27d9c40c-eb3d-42bd-8255-2f953d6fdda7
@@ -316,7 +343,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity's contact information completeness score based on the CRM data
 	column crm_complt_contact
 		dataType: double
 		lineageTag: 6182e8bb-f0e3-42e0-adc4-22ac2a3db69e
@@ -327,7 +353,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity's marketing completeness score based on the CRM data
 	column crm_complt_marketing
 		dataType: double
 		lineageTag: 1f82c4a7-7ee5-472e-b608-eda124921bdd
@@ -338,7 +363,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity creator's id in the CRM
 	column crm_creator_id
 		dataType: string
 		lineageTag: 1a496b42-c56d-4d92-a34a-5b05eb365f85
@@ -347,7 +371,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's last activity time in the CRM
 	column crm_last_act_time
 		dataType: dateTime
 		formatString: General Date
@@ -362,7 +385,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity owner's id in the CRM
 	column crm_owner_id
 		dataType: string
 		lineageTag: e79a1f42-a883-449c-921d-875121187958
@@ -371,7 +393,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's city
 	column trueai_addr_city
 		dataType: string
 		lineageTag: acef1ff0-68ed-4269-bef1-6dd78cc44e6c
@@ -380,7 +401,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's country
 	column trueai_addr_country
 		dataType: string
 		lineageTag: 33e4cb1d-8d14-4178-b2d9-be3a5c89dfdc
@@ -389,7 +409,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's postal code
 	column trueai_addr_postal_code
 		dataType: string
 		lineageTag: fb94a4e9-78e3-4849-93a6-0efc6bfa537f
@@ -398,7 +417,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's address prediction rule
 	column trueai_addr_rule
 		dataType: int64
 		formatString: 0
@@ -408,7 +426,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's state
 	column trueai_addr_state
 		dataType: string
 		lineageTag: c9a15770-da6c-4994-af38-906b6300864a
@@ -417,7 +434,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's street
 	column trueai_addr_street
 		dataType: string
 		lineageTag: 8646f0d2-03e8-4294-a19d-7c283f323a6f
@@ -426,7 +442,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Completeness score of the opportunity based on the standardized data
 	column trueai_complt
 		dataType: double
 		lineageTag: 86ab3cd5-4fe4-4f00-95c1-0767e56552c0
@@ -437,7 +452,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Contact information completeness score of the opportunity based on the standardized data
 	column trueai_complt_contact
 		dataType: double
 		lineageTag: ef08d4c3-eb87-4137-8b93-782a2b6d0eda
@@ -448,7 +462,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Marketing completeness score of the opportunity based on the standardized data
 	column trueai_complt_marketing
 		dataType: double
 		lineageTag: 7a1114c8-a824-4fd0-8bc7-d572fbeef21d
@@ -459,7 +472,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity creator's id
 	column trueai_creator_id
 		dataType: string
 		lineageTag: b67881e7-dd9d-4671-9169-a5bb51140c9d
@@ -468,17 +480,16 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Total duration of activities performed on the opportunity
 	column trueai_dur
 		dataType: int64
-		formatString: 0
 		lineageTag: fc30936e-9c80-418e-83bc-20dadaf45689
 		summarizeBy: sum
 		sourceColumn: trueai_dur
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's standardized industry prediction confidence
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column trueai_industry_conf
 		dataType: double
 		lineageTag: 65d477e3-23c9-4122-a7c1-5d7943da50c3
@@ -489,7 +500,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity's standardized lead source prediction confidence
 	column trueai_leadsource_conf
 		dataType: double
 		lineageTag: 0cace160-468e-45dc-819b-bc4b273589f3
@@ -500,7 +510,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity owner's id
 	column trueai_owner_id
 		dataType: string
 		lineageTag: d273f151-efd6-47b2-aabd-6bcf806b5fe2
@@ -509,7 +518,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's sale type prediction confidence
 	column trueai_sale_type_conf
 		dataType: double
 		lineageTag: a02bebd0-7814-4f36-b65c-a18d636ea34f
@@ -520,7 +528,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Custom categorical variable on the account
 	column crm_account_custom_value_1
 		dataType: string
 		isHidden
@@ -532,7 +539,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Custom categorical variable on the account
 	column crm_account_custom_value_2
 		dataType: string
 		lineageTag: af53eced-5aef-4585-bc13-a68a24452119
@@ -541,7 +547,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Custom categorical variable on the account
 	column crm_account_custom_value_3
 		dataType: string
 		lineageTag: c502b962-6875-442b-80d1-763563eee54a
@@ -550,7 +555,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Custom categorical variable
 	column crm_custom_value_1
 		dataType: string
 		lineageTag: 5cc9d428-8116-4b40-8ce5-014af57251c4
@@ -559,7 +563,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Custom categorical variable
 	column crm_custom_value_2
 		dataType: string
 		lineageTag: fd5e8882-a8d2-4311-af5a-c4b0cb0501f5
@@ -568,7 +571,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Custom categorical variable
 	column crm_custom_value_3
 		dataType: string
 		lineageTag: 1ad95fc2-dfac-47f4-a259-4d45f7c47147
@@ -577,7 +579,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's latitude
 	column trueai_addr_lat
 		dataType: double
 		lineageTag: 80713b91-8088-414c-b9f0-dc248e498a21
@@ -588,7 +589,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity's longitude
 	column trueai_addr_long
 		dataType: double
 		lineageTag: 1b6b9893-a061-40bf-95d0-12493c49fc5a
@@ -599,7 +599,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity's booking amount rule related to the presence or absence of opp line items and custom mappings
 	column trueai_booking_amt_rule
 		dataType: int64
 		formatString: 0
@@ -609,17 +608,15 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Quality bucket expressed as an integer from 1 to 5 based on the probability of win
-	column trueai_propensity_num
+	column trueai_qual_bucket_num
 		dataType: int64
 		formatString: 0
 		lineageTag: 0bafe83f-36cb-485e-a258-c4c53cb803a6
 		summarizeBy: sum
-		sourceColumn: trueai_propensity_num
+		sourceColumn: trueai_qual_bucket_num
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's custom completeness score based on the CRM data
 	column crm_complt_custom
 		dataType: double
 		lineageTag: c27d3ff1-0185-417e-ac64-792ba0006253
@@ -630,7 +627,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// The date of the last data request from the platform
 	column _sys_as_of
 		dataType: dateTime
 		formatString: General Date
@@ -645,7 +641,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the opportunity is active
 	column _sys_is_active
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -655,7 +650,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// The date of the last data modification in the platform
 	column _sys_last_modified_on
 		dataType: dateTime
 		formatString: General Date
@@ -670,7 +664,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity creation date in the CRM
 	column crm_created_on
 		dataType: dateTime
 		formatString: General Date
@@ -685,7 +678,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the opportunity is closed in the CRM
 	column crm_is_closed
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -695,7 +687,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the opportunity is won in the CRM
 	column crm_is_won
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -705,7 +696,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity modified on date in the CRM
 	column crm_modified_on
 		dataType: dateTime
 		formatString: General Date
@@ -720,7 +710,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's prospecting entity
 	column trueai_created_from_entity
 		dataType: string
 		lineageTag: af89d79f-a7bf-40cb-90f2-1ba80a19c81d
@@ -729,7 +718,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's prospecting object's id
 	column trueai_created_from_id
 		dataType: string
 		lineageTag: 89effb20-308b-4349-9417-3a0390fa5c9c
@@ -738,7 +726,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity creation date
 	column trueai_created_on
 		dataType: dateTime
 		formatString: General Date
@@ -748,12 +735,11 @@ table opps
 
 		variation Variation
 			isDefault
-			relationship: a172bfa4-1870-4bc8-b257-b82b92cfed41
-			defaultHierarchy: LocalDateTable_dac1b4ea-2ca8-4599-bc50-bab7ddce298f.'Date Hierarchy'
+			relationship: 76a33ae6-4d13-47a1-9146-b187efeae260
+			defaultHierarchy: LocalDateTable_8d9c2ad2-afbe-49ff-aed4-db4a012c6a94.'Date Hierarchy'
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the opportunity is won
 	column trueai_is_won
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -763,7 +749,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's normalized stage
 	column trueai_stage
 		dataType: string
 		lineageTag: 31aeb6d1-40a2-4e47-8a25-935f89a8573e
@@ -772,7 +757,24 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Probability of win
+	column trueai_prob_of_next_opp
+		dataType: double
+		lineageTag: 9f7f7dd5-6464-4d87-9714-a55d949009db
+		summarizeBy: sum
+		sourceColumn: trueai_prob_of_next_opp
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_prob_of_next_opp_explained
+		dataType: string
+		lineageTag: b78637ba-d959-415f-af1d-5c48af558faa
+		summarizeBy: none
+		sourceColumn: trueai_prob_of_next_opp_explained
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_prob_of_win
 		dataType: double
 		lineageTag: a1d0c01d-8d25-4303-9f12-945e43fecd3a
@@ -783,9 +785,16 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity discount amount
+	column trueai_prob_of_win_explained
+		dataType: string
+		lineageTag: fe83202d-d69e-418b-97e7-8d96dbf515d7
+		summarizeBy: none
+		sourceColumn: trueai_prob_of_win_explained
+
+		annotation SummarizationSetBy = Automatic
+
 	column trueai_discount_amt
-		dataType: double
+		dataType: decimal
 		lineageTag: 4c4d1b13-ca33-47eb-8c2d-4221e15509b8
 		summarizeBy: sum
 		sourceColumn: trueai_discount_amt
@@ -794,7 +803,6 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Opportunity discount percentage
 	column trueai_discount_pct
 		dataType: double
 		lineageTag: 9277eec1-452b-49cc-83ca-ef7907d5829f
@@ -805,27 +813,22 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Boolean flag indicating whether the opportunity should be treated as an order instead.
 	column trueai_is_erp
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
+		dataType: string
 		lineageTag: 017de80e-c49a-4333-a1f7-0f4f72d37bea
 		summarizeBy: none
 		sourceColumn: trueai_is_erp
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's booking amount currency conversion rule
 	column trueai_booking_amt_currency_rule
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: cad47743-e6a8-4028-ad99-91ea44a8111f
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_booking_amt_currency_rule
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's account id
 	column trueai_account_id
 		dataType: string
 		lineageTag: b361074d-2e04-434e-865b-785b04a1b5ce
@@ -834,28 +837,22 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's account id rule
 	column trueai_account_id_rule
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: 40cb1717-d850-47f1-a44d-6ed84ed4d0a7
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_account_id_rule
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's account id confidence
 	column trueai_account_id_conf
-		dataType: double
+		dataType: string
 		lineageTag: 441bc720-2a6c-416a-937f-a0364f63c616
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_account_id_conf
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Test model
 	column trueai_test
 		dataType: string
 		lineageTag: ae610465-1d85-4e27-be3e-157a0333b680
@@ -864,18 +861,14 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Test model confidence
 	column trueai_test_conf
-		dataType: double
+		dataType: string
 		lineageTag: 32c3aff2-227c-4caa-9777-92b446ce770e
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_test_conf
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Test model rule
 	column trueai_test_rule
 		dataType: string
 		lineageTag: ea3b8c35-8502-4b7b-bd57-fd215806bb87
@@ -884,7 +877,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Test model debug information
 	column trueai_test_debug
 		dataType: string
 		lineageTag: fdd82951-47f4-4190-b879-3a2a8e31224e
@@ -893,57 +885,46 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's close date rule
 	column trueai_close_date_rule
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: bb1bf736-b666-4d32-82a1-e97cb34f280a
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_close_date_rule
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's start date rule
 	column trueai_start_date_rule
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: 3951c187-168a-4a53-aab8-07547820d3a4
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_start_date_rule
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity creation date rule
 	column trueai_created_on_rule
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: 1cf4303b-6e94-4caf-82c1-0050d10a604d
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_created_on_rule
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity creator's id rule
 	column trueai_creator_id_rule
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: 0ba1454d-e37c-4671-bc0b-bd906554582b
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_creator_id_rule
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity owner's id rule
 	column trueai_owner_id_rule
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: e11373ab-6696-4f4b-88b9-cf1237cec1dc
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_owner_id_rule
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_text1
 	column cust_text1
 		dataType: string
 		lineageTag: fe3cff9b-ca90-4d37-8657-b856c56ec451
@@ -952,7 +933,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_text2
 	column cust_text2
 		dataType: string
 		lineageTag: f119aa48-2a30-4565-935b-3242c39339ec
@@ -961,7 +941,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_text3
 	column cust_text3
 		dataType: string
 		lineageTag: 421a042d-5a6c-4151-a4c5-75fb48cc4d13
@@ -970,7 +949,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_text4
 	column cust_text4
 		dataType: string
 		lineageTag: fe1ee96e-8099-4a00-b32c-869e5a3d379e
@@ -979,7 +957,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_text5
 	column cust_text5
 		dataType: string
 		lineageTag: c96f83f9-bdd2-47ad-8465-f87a05307223
@@ -988,104 +965,78 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_num1
 	column cust_num1
-		dataType: double
+		dataType: string
 		lineageTag: 5a348056-2bca-4012-a5fb-9c91cc8e14a9
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: cust_num1
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// cust_num2
 	column cust_num2
-		dataType: double
+		dataType: string
 		lineageTag: b4e15cbb-9ea9-4fb5-aadb-caf347767268
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: cust_num2
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// cust_num3
 	column cust_num3
-		dataType: double
+		dataType: string
 		lineageTag: f43311cd-4a78-44bf-a75f-924dcc8a3e01
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: cust_num3
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// cust_num4
 	column cust_num4
-		dataType: double
+		dataType: string
 		lineageTag: 9a2127b8-fe5a-4345-8f43-e018c34f43b4
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: cust_num4
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// cust_num5
 	column cust_num5
-		dataType: double
+		dataType: string
 		lineageTag: 0e9e1ac1-3b76-4494-8efd-952b50238774
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: cust_num5
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// cust_num6
 	column cust_num6
-		dataType: double
+		dataType: string
 		lineageTag: 725861e0-4756-475e-b6db-5e0e528b4f5f
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: cust_num6
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// cust_num7
 	column cust_num7
-		dataType: double
+		dataType: string
 		lineageTag: 9d2be5a9-2774-4697-9a0f-5ce54ac1d13c
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: cust_num7
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// cust_bool1
 	column cust_bool1
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
+		dataType: string
 		lineageTag: 8f50bed2-78a0-48cd-9ffa-33a47ecc1fc5
 		summarizeBy: none
 		sourceColumn: cust_bool1
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_bool2
 	column cust_bool2
-		dataType: boolean
-		formatString: """TRUE"";""TRUE"";""FALSE"""
+		dataType: string
 		lineageTag: 9530aa93-5b86-4a46-83ea-a2302c85fa73
 		summarizeBy: none
 		sourceColumn: cust_bool2
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's loss reason in the CRM
 	column crm_loss_reason
 		dataType: string
 		lineageTag: c89e6b1f-5e75-40a4-adba-8c19d411ecb8
@@ -1094,7 +1045,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// CRM pipeline id of the opportunity
 	column crm_pipeline_id
 		dataType: string
 		lineageTag: c621778b-965e-4b68-9cf4-d1f8ccb8ec6d
@@ -1103,7 +1053,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// CRM pipeline name of the opportunity
 	column crm_pipeline_name
 		dataType: string
 		lineageTag: cff75ad7-9162-4c31-8ca8-aae99f72eae1
@@ -1112,7 +1061,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's stage ID in the CRM
 	column crm_stage_id
 		dataType: string
 		lineageTag: 686075b0-4f2c-453b-8d86-b59a631e5b25
@@ -1121,17 +1069,14 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity Age
 	column trueai_age
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: 6e9f9c2a-e416-4167-9042-9e430717223f
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_age
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's stage ID
 	column trueai_stage_id
 		dataType: string
 		lineageTag: e4741ea0-94e0-4560-af27-48625f8f3f58
@@ -1140,7 +1085,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's stage name
 	column trueai_stage_name
 		dataType: string
 		lineageTag: cdb9c7a1-d855-4eba-9c11-f65755027c33
@@ -1149,7 +1093,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Pipeline name of the opportunity
 	column trueai_pipeline_name
 		dataType: string
 		lineageTag: 5a0eaa5b-af49-4d22-80a5-8afdf9a8a48c
@@ -1158,7 +1101,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's loss reason
 	column trueai_loss_reason
 		dataType: string
 		lineageTag: eb7e6e63-6e07-4999-a081-ae9516a7b504
@@ -1167,7 +1109,6 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity discount percentage tier
 	column trueai_discount_pct_tier
 		dataType: string
 		lineageTag: adbe027b-d27f-489b-8856-3d9280eaf4ad
@@ -1176,95 +1117,70 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's NNB amount
 	column trueai_nnb_amt
-		dataType: double
+		dataType: string
 		lineageTag: 15012e60-ba2f-461c-a7e3-1171df54a078
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_nnb_amt
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's downgrade amount
 	column trueai_downgrade_amt
-		dataType: double
+		dataType: string
 		lineageTag: 2be34387-58f1-437c-a6d0-069b614aa0b0
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_downgrade_amt
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's Cross-Sale amount
 	column trueai_cross_sale_amt
-		dataType: double
+		dataType: string
 		lineageTag: 408cc3c2-8405-4c2c-aacd-c4768e1b7786
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_cross_sale_amt
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's renewal amount
 	column trueai_renewal_amt
-		dataType: double
+		dataType: string
 		lineageTag: 19c8bd2d-2f54-445a-950d-ad49962d2e49
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_renewal_amt
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's expansion amount
 	column trueai_expansion_amt
-		dataType: double
+		dataType: string
 		lineageTag: ff8b6020-587d-4364-9205-30fdd2caed80
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_expansion_amt
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's one time amount
 	column trueai_one_time_amt
-		dataType: double
+		dataType: string
 		lineageTag: 7eed184c-b9f8-4277-a6e5-2c4f3b17fcac
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_one_time_amt
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's non determinable amount
 	column trueai_nd_amt
-		dataType: double
+		dataType: string
 		lineageTag: ddc826d6-c947-4a12-bfcd-9c9ee4da67d0
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_nd_amt
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's ARR amount
 	column trueai_arr_amt
-		dataType: double
+		dataType: string
 		lineageTag: 7715a470-91ba-4b02-9f44-fbcf563ca5a8
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_arr_amt
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Opportunity's last crm stage, before it was lost
 	column trueai_lost_crm_stage
 		dataType: string
 		lineageTag: 12bc86dc-384d-4c28-990e-4943ea62dc8e
@@ -1273,46 +1189,11 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Opportunity's Initial Subscription amount
 	column trueai_initial_subscription_amt
-		dataType: double
+		dataType: string
 		lineageTag: 34a3b594-8d4f-450a-9e6e-cb3b48b1332b
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_initial_subscription_amt
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	column trueai_pred_booking_amt
-		dataType: string
-		lineageTag: 920701c0-7325-4740-b280-051655d156ab
-		summarizeBy: none
-		sourceColumn: trueai_pred_booking_amt
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_pred_close_date
-		dataType: string
-		lineageTag: afcb6d90-5b15-49d2-af7a-b49ac0a45f7a
-		summarizeBy: none
-		sourceColumn: trueai_pred_close_date
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_pred_close_date_if_won
-		dataType: string
-		lineageTag: 7e22ff4c-c435-452d-ac5c-362ca80c1a6e
-		summarizeBy: none
-		sourceColumn: trueai_pred_close_date_if_won
-
-		annotation SummarizationSetBy = Automatic
-
-	column trueai_pred_close_date_if_lost
-		dataType: string
-		lineageTag: 31f6769a-9306-48a8-8136-b8c07353bfde
-		summarizeBy: none
-		sourceColumn: trueai_pred_close_date_if_lost
 
 		annotation SummarizationSetBy = Automatic
 
@@ -1322,96 +1203,7 @@ table opps
 				let
 				  dbTable = getDBTable("opps"), // get the right table
 				  dbTableTyped = Table.TransformColumnTypes(dbTable,{ // change types to what we're expecting
-				    {"crm_pipeline_name", type text},
-				{"crm_stage_id", type text},
-				{"crm_stage_name", type text},
-				{"crm_stage_num", Int64.Type},
-				{"crm_type", type text},
-				{"cust_bool1", type logical},
-				{"cust_bool2", type logical},
-				{"cust_num1", type number},
-				{"cust_num2", type number},
-				{"cust_num3", type number},
-				{"cust_num4", type number},
-				{"cust_num5", type number},
-				{"cust_num6", type number},
-				{"cust_num7", type number},
-				{"cust_text1", type text},
-				{"cust_text2", type text},
-				{"cust_text3", type text},
-				{"cust_text4", type text},
-				{"cust_text5", type text},
-				{"trueai_account_id", type text},
-				{"trueai_account_id_conf", type number},
-				{"trueai_account_id_rule", Int64.Type},
-				{"trueai_addr_city", type text},
-				{"trueai_addr_country", type text},
-				{"trueai_addr_lat", type number},
-				{"trueai_addr_long", type number},
-				{"trueai_addr_postal_code", type text},
-				{"trueai_addr_rule", Int64.Type},
-				{"trueai_addr_state", type text},
-				{"trueai_addr_street", type text},
-				{"trueai_age", Int64.Type},
-				{"trueai_arr_amt", type number},
-				{"trueai_booking_amt", type number},
-				{"trueai_booking_amt_currency_rule", Int64.Type},
-				{"trueai_booking_amt_rule", Int64.Type},
-				{"trueai_close_date", type datetime},
-				{"trueai_close_date_rule", Int64.Type},
-				{"trueai_company_size", type text},
-				{"trueai_company_size_rule", Int64.Type},
-				{"trueai_complt", type number},
-				{"trueai_complt_contact", type number},
-				{"trueai_complt_marketing", type number},
-				{"trueai_created_from_entity", type text},
-				{"trueai_created_from_id", type text},
-				{"trueai_created_on", type datetime},
-				{"trueai_created_on_rule", Int64.Type},
-				{"trueai_creator_id", type text},
-				{"trueai_creator_id_rule", Int64.Type},
-				{"trueai_cross_sale_amt", type number},
-				{"trueai_discount_amt", type number},
-				{"trueai_discount_pct", type number},
-				{"trueai_discount_pct_tier", type text},
-				{"trueai_downgrade_amt", type number},
-				{"trueai_dur", Int64.Type},
-				{"trueai_expansion_amt", type number},
-				{"trueai_industry", type text},
-				{"trueai_industry_conf", type number},
-				{"trueai_industry_rule", Int64.Type},
-				{"trueai_initial_subscription_amt", type number},
-				{"trueai_is_erp", type logical},
-				{"trueai_is_new_logo", type logical},
-				{"trueai_is_won", type logical},
-				{"trueai_leadsource", type text},
-				{"trueai_leadsource_conf", type number},
-				{"trueai_leadsource_rule", Int64.Type},
-				{"trueai_loss_reason", type text},
-				{"trueai_lost_crm_stage", type text},
-				{"trueai_nd_amt", type number},
-				{"trueai_nnb_amt", type number},
-				{"trueai_one_time_amt", type number},
-				{"trueai_opp_stage_late_date", type datetime},
-				{"trueai_opp_stage_mid_date", type datetime},
-				{"trueai_owner_id", type text},
-				{"trueai_owner_id_rule", Int64.Type},
-				{"trueai_pipeline_name", type text},
-				{"trueai_prob_of_win", type number},
-				{"trueai_propensity", type text},
-				{"trueai_propensity_num", Int64.Type},
-				{"trueai_renewal_amt", type number},
-				{"trueai_sale_type", type text},
-				{"trueai_sale_type_conf", type number},
-				{"trueai_stage", type text},
-				{"trueai_stage_id", type text},
-				{"trueai_stage_name", type text},
-				{"trueai_start_date_rule", Int64.Type},
-				{"trueai_test", type text},
-				{"trueai_test_conf", type number},
-				{"trueai_test_debug", type text},
-				{"trueai_test_rule", type text},
-				{"_sys_as_of", type datetime},
+				    {"_sys_as_of", type datetime},
 				{"_sys_doc_id", type text},
 				{"_sys_filt_end_date", type date},
 				{"_sys_filt_start_date", type date},
@@ -1422,12 +1214,12 @@ table opps
 				{"crm_account_custom_value_2", type text},
 				{"crm_account_custom_value_3", type text},
 				{"crm_account_id", type text},
-				{"crm_booking_amt", type number},
+				{"crm_booking_amt",   Currency.Type},
 				{"crm_close_date", type datetime},
-				{"crm_complt", type number},
-				{"crm_complt_contact", type number},
-				{"crm_complt_custom", type number},
-				{"crm_complt_marketing", type number},
+				{"crm_complt",  type number},
+				{"crm_complt_contact",  type number},
+				{"crm_complt_custom",  type number},
+				{"crm_complt_marketing",  type number},
 				{"crm_created_on", type datetime},
 				{"crm_creator_id", type text},
 				{"crm_currency", type text},
@@ -1439,11 +1231,61 @@ table opps
 				{"crm_is_won", type logical},
 				{"crm_last_act_time", type datetime},
 				{"crm_leadsource", type text},
-				{"crm_loss_reason", type text},
 				{"crm_modified_on", type datetime},
 				{"crm_name", type text},
 				{"crm_owner_id", type text},
-				{"crm_pipeline_id", type text}
+				{"crm_stage_name", type text},
+				{"crm_stage_num", Int64.Type},
+				{"crm_type", type text},
+				{"trueai_addr_city", type text},
+				{"trueai_addr_country", type text},
+				{"trueai_addr_lat",  type number},
+				{"trueai_addr_long",  type number},
+				{"trueai_addr_postal_code", type text},
+				{"trueai_addr_rule", Int64.Type},
+				{"trueai_addr_state", type text},
+				{"trueai_addr_street", type text},
+				{"trueai_booking_amt",   Currency.Type},
+				{"trueai_booking_amt_rule", Int64.Type},
+				{"trueai_close_date", type datetime},
+				{"trueai_company_size", type text},
+				{"trueai_company_size_rule", Int64.Type},
+				{"trueai_complt",  type number},
+				{"trueai_complt_contact",  type number},
+				{"trueai_complt_marketing",  type number},
+				{"trueai_created_from_entity", type text},
+				{"trueai_created_from_id", type text},
+				{"trueai_created_on", type datetime},
+				{"trueai_creator_id", type text},
+				{"trueai_discount",   Currency.Type},
+				{"trueai_discount_amt",   Currency.Type},
+				{"trueai_discount_pct",  type number},
+				{"trueai_dur", Int64.Type},
+				{"trueai_industry", type text},
+				{"trueai_industry_conf",  type number},
+				{"trueai_industry_rule", Int64.Type},
+				{"trueai_is_new_logo", type logical},
+				{"trueai_is_won", type logical},
+				{"trueai_leadsource", type text},
+				{"trueai_leadsource_conf",  type number},
+				{"trueai_leadsource_rule", Int64.Type},
+				{"trueai_opp_stage_late_date", type datetime},
+				{"trueai_opp_stage_mid_date", type datetime},
+				{"trueai_owner_id", type text},
+				{"trueai_pred_booking_amt",   Currency.Type},
+				{"trueai_prob_of_next_opp",  type number},
+				{"trueai_prob_of_next_opp_explained", type text},
+				{"trueai_prob_of_win",  type number},
+				{"trueai_prob_of_win_explained", type text},
+				{"trueai_qual_bucket", type text},
+				{"trueai_qual_bucket_num", Int64.Type},
+				{"trueai_sale_type", type text},
+				{"trueai_sale_type_conf",  type number},
+				{"trueai_stage", type text},
+				{"trueai_vi_opp_value",   Currency.Type},
+				{"trueai_vi_post_sales_value",   Currency.Type},
+				{"trueai_vi_prospecting_value",   Currency.Type},
+				{"trueai_vi_repeat_value",   Currency.Type}
 				
 				
 				  }),

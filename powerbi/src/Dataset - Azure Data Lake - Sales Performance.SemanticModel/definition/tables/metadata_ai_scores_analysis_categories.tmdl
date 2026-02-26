@@ -1,12 +1,6 @@
-/// Reference list for high-level AI score groupings (e.g., Momentum, Risk) used in reporting dashboards.
 table metadata_ai_scores_analysis_categories
 	lineageTag: 2a9487c6-d810-48ea-ac55-50ee75f3d4b8
 
-	/// Measure meas.analysis_cat_weighted_avg.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, SUMX, DIVIDE.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: 0
 	measure 'meas.analysis_cat_weighted_avg' = ```
 			
 			var sum_prod = SUMX(
@@ -28,7 +22,6 @@ table metadata_ai_scores_analysis_categories
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Unique AI score identifier
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 5742a150-e24a-4953-909b-bc950f37c3a2
@@ -37,16 +30,15 @@ table metadata_ai_scores_analysis_categories
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Is Active
 	column _sys_is_active
-		dataType: string
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: e2eaa130-5b11-481d-b866-fbdd3c13d589
 		summarizeBy: none
 		sourceColumn: _sys_is_active
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Modified On Date
 	column _sys_modified_on
 		dataType: dateTime
 		formatString: General Date
@@ -61,7 +53,6 @@ table metadata_ai_scores_analysis_categories
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Category Name
 	column category_name
 		dataType: string
 		lineageTag: 9ec99825-cecd-48e6-a9e7-1a2b29bd08f1
@@ -70,7 +61,6 @@ table metadata_ai_scores_analysis_categories
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Description
 	column description
 		dataType: string
 		lineageTag: 7b6718be-dd28-460a-b722-e5c0fe4461ea
@@ -79,7 +69,6 @@ table metadata_ai_scores_analysis_categories
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Sort Order
 	column sort_order
 		dataType: int64
 		formatString: 0
@@ -94,13 +83,7 @@ table metadata_ai_scores_analysis_categories
 		source =
 				let
 				    metadata_ai_scores_analysis_categories = getDBTable("metadata_ai_scores_analysis_categories"),
-				    #"Changed Type" = Table.TransformColumnTypes(metadata_ai_scores_analysis_categories,{
-				        {"_sys_doc_id", type text},
-				        {"_sys_is_active", type text},
-				        {"_sys_modified_on", type datetime},
-				        {"category_name", type text},
-				        {"description", type text},
-				        {"sort_order", Int64.Type}})
+				    #"Changed Type" = Table.TransformColumnTypes(metadata_ai_scores_analysis_categories,{{"_sys_doc_id", type text}, {"_sys_is_active", type logical}, {"_sys_modified_on", type datetime}, {"category_name", type text}, {"description", type text}, {"sort_order", Int64.Type}})
 				in
 				    #"Changed Type"
 

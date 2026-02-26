@@ -1,11 +1,6 @@
-/// CRM entity for individual product or service entries linked to an Opportunity enriched with TrueAI predictive insights.
 table opp_line_items
 	lineageTag: 686ea3a9-2296-4d86-bcfd-80415925b6e8
 
-	/// Purpose: Returns the measure value derived from the DAX expression.
-	/// Calculation Logic: Uses VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: -$#,##0;-$#,##0;$0
 	measure 'meas.opp_line_item_discount_amt' = ```
 			
 			var res = ([meas.opp_line_item_total_price_before_discount]-[meas.opp_line_item_total_price_after_discount])*-1  // use the existing measures and multiply by -1  
@@ -18,10 +13,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Returns a ratio derived from the DAX expression.
-	/// Calculation Logic: Uses DIVIDE, RETURN.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: 0%;-0%;0%
 	measure 'meas.opp_line_item_discount_pct' =
 			
 			
@@ -33,10 +24,6 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: dd1dba57-2410-444e-b287-68ada1efc23c
 
-	/// Purpose: Returns the measure value derived from the DAX expression.
-	/// Calculation Logic: Uses IF, VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: 0
 	measure 'meas.discount_line_opps' =
 			
 			IF([meas.opp_line_item_discount_pct] = 0, 0,BLANK())
@@ -44,10 +31,6 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: 55bd8ea0-eb11-461f-b799-99a4f1e6e0ac
 
-	/// Purpose: Returns a sum derived from the DAX expression.
-	/// Calculation Logic: Uses SUMX, DIVIDE, VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: 0%;-0%;0%
 	measure 'meas.opp_line_item_dis_pct' =
 			
 			var orig_cost = SUMX(opp_line_items, [trueai_list_price]*[trueai_qty])              // get the original cost
@@ -58,10 +41,6 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: b5f83928-e12e-4884-aa64-e29f8c0e2b70
 
-	/// Purpose: Returns a sum derived from the DAX expression.
-	/// Calculation Logic: Uses CALCULATETABLE, SUMX, VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments.
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
 	measure 'meas.opp_line_item_total_price_after_discount' =
 			
 			
@@ -73,10 +52,6 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: 982b866e-1a68-4089-9f0b-fff63419a571
 
-	/// Purpose: Returns a sum derived from the DAX expression.
-	/// Calculation Logic: Uses CALCULATETABLE, SUMX, DIVIDE, VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments.
-	/// Format/Type: 0%;-0%;0%
 	measure 'meas.opp_lines_item_discount_pct' = ```
 			
 			
@@ -90,10 +65,6 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: 92f502aa-be60-41d1-a075-d98ed0682e74
 
-	/// Purpose: Returns the measure value derived from the DAX expression.
-	/// Calculation Logic: Uses RETURN.
-	/// Dynamic Behavior: Respects current filter context and responds to filters on opps[trueai_discount_pct].
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
 	measure 'meas.delta_expected_booking_amt' = ```
 			
 			var wonAmt = [meas.ssr_history_won_amt]     // get the won amt 
@@ -108,10 +79,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Purpose: Returns the measure value derived from the DAX expression.
-	/// Calculation Logic: Uses CALCULATE, AVERAGE, VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on opps[trueai_discount_pct].
-	/// Format/Type: Unspecified
 	measure 'meas.opps_average_discount_pct' =
 			
 			ABS(CALCULATE(AVERAGE(opps[trueai_discount_pct])))     // get the abs of avg discount pct
@@ -120,10 +87,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Returns a ratio derived from the DAX expression.
-	/// Calculation Logic: Uses DIVIDE, VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 	measure 'meas.opps_avg_deals_amt' =
 			
 			var Amt = [meas.ssr_history_won_amt] - [meas.opps_deal_discount_amt]        // get the difference amt
@@ -136,10 +99,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Purpose: Returns the measure value derived from the DAX expression.
-	/// Calculation Logic: Uses VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context and responds to filters on opps[_sys_doc_id].
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
 	measure 'meas.opps_deal_discount_amt' = ```
 			
 			// var pct = ABS([meas.opps_average_discount_pct])
@@ -157,10 +116,6 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: a7e40876-f224-4016-b137-855d4e4bb99c
 
-	/// Purpose: Returns a ratio derived from the DAX expression.
-	/// Calculation Logic: Uses CALCULATE, COUNT, DIVIDE, VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on opps[_sys_doc_id].
-	/// Format/Type: 0%;-0%;0%
 	measure 'meas.opps_deals_pct' =
 			
 			var stepCount = [meas.ssr_history_step_count]       // calculating the step count
@@ -173,10 +128,6 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: c7df8b8f-3864-41d9-94e5-b44b2836158f
 
-	/// Purpose: Returns the measure value derived from the DAX expression.
-	/// Calculation Logic: Uses CALCULATE, VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on opps[_sys_doc_id].
-	/// Format/Type: 0%;-0%;0%
 	measure 'meas.opps_delta_expected_pct' =
 			
 			VAR SuccessRate =
@@ -195,10 +146,6 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: 9d875de2-fc0a-47b4-86e6-f717b75bf26f
 
-	/// Purpose: Returns the measure value derived from the DAX expression.
-	/// Calculation Logic: Uses CALCULATE, COUNT.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on opps[_sys_doc_id].
-	/// Format/Type: 0
 	measure 'meas.opps_tot_deals' =
 			
 			CALCULATE(COUNT(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK()) // get the total deals count
@@ -206,10 +153,6 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: ba127637-f77b-4fbe-8646-8ee9fea3c6a3
 
-	/// Purpose: Returns the measure value derived from the DAX expression.
-	/// Calculation Logic: Uses CALCULATE, AVERAGE, VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on opps[trueai_discount_pct].
-	/// Format/Type: Unspecified
 	measure 'meas.opp_line_items_avg_discount_pct' =
 			CALCULATE(
 			    AVERAGE(
@@ -221,10 +164,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Returns a sum derived from opp_line_items[trueai_list_price].
-	/// Calculation Logic: Uses CALCULATETABLE, SUMX, RETURN.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on opp_line_items[trueai_list_price].
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
 	measure 'meas.opp_line_item_total_price_before_discount' =
 			
 			var tbl = CALCULATETABLE(opp_line_items)        // get the calculatd table
@@ -236,10 +175,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Purpose: Returns a maximum value derived from opp_line_items[trueai_list_price].
-	/// Calculation Logic: Uses CALCULATE, MAX, VAR, RETURN.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on opp_line_items[trueai_list_price].
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
 	measure 'meas.opp_line_items_trueai_list_price' =
 			
 			CALCULATE(
@@ -251,10 +186,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Purpose: Returns the change in average discount percent between the first and last visible dates.
-	/// Calculation Logic: Uses VAR/RETURN with CALCULATE, MIN, MAX, ALLSELECTED, and KEEPFILTERS.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on cal_end_dates[Date].
-	/// Format/Type: Unspecified
 	measure 'meas.avg_discount_pct_change' =
 			
 			VAR MinVisibleDate =
@@ -286,10 +217,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Returns a sum derived from opp_line_items[trueai_total_price].
-	/// Calculation Logic: Uses CALCULATE and SUM.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on opp_line_items[trueai_total_price].
-	/// Format/Type: Unspecified
 	measure 'meas.opp_line_items_trueai_total_price' =
 			
 			CALCULATE(
@@ -299,7 +226,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
 		dataType: string
 		lineageTag: 2343c249-79f2-4cdb-bda4-9d09f792ce18
@@ -308,7 +234,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
 		dataType: string
 		lineageTag: 45b4092f-a962-4ca4-870c-80008d021727
@@ -317,7 +242,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's currency in the CRM
 	column crm_currency
 		dataType: string
 		lineageTag: 30d46d4f-10aa-4bb0-87f5-51e87dca5509
@@ -326,7 +250,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's description in the CRM
 	column crm_description
 		dataType: string
 		lineageTag: 5c24954f-db51-48c4-bb6e-3311b911d0c4
@@ -335,7 +258,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's list_price in the CRM
 	column crm_list_price
 		dataType: double
 		formatString: \$#,0;(\$#,0);\$#,0
@@ -347,7 +269,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Product name in the CRM
 	column crm_name
 		dataType: string
 		lineageTag: b2ba0f34-770d-42be-84e8-951ff7e57ce0
@@ -356,7 +277,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product oppid in the CRM
 	column crm_opp_id
 		dataType: string
 		lineageTag: 7e7b3852-a801-4db2-a7ca-01c57f936c0b
@@ -365,7 +285,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product code in the CRM
 	column crm_product_code
 		dataType: string
 		lineageTag: 7f9f9b23-3c64-49aa-86d7-c1340079f055
@@ -374,7 +293,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product product_id in the CRM
 	column crm_product_id
 		dataType: string
 		lineageTag: 8726f1fb-0dd7-4b21-891e-a0286af6840e
@@ -383,7 +301,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's qty in the CRM
 	column crm_qty
 		dataType: int64
 		formatString: 0
@@ -393,7 +310,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's total_price in the CRM
 	column crm_total_price
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -403,7 +319,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's unit_price in the CRM
 	column crm_unit_price
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -413,7 +328,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's total price
 	column trueai_total_price
 		dataType: double
 		formatString: \$#,0;(\$#,0);\$#,0
@@ -423,7 +337,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's total price rule
 	column trueai_total_price_rule
 		dataType: int64
 		formatString: 0
@@ -433,7 +346,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.trueai_list_price' = [crm_list_price].
 	column 'col.trueai_list_price' = [crm_list_price]
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: b1ca80d0-9500-44bd-a852-8abf5dbdfd6f
@@ -441,7 +353,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.trueai_unit_price' = [crm_unit_price].
 	column 'col.trueai_unit_price' = [crm_unit_price]
 		lineageTag: b7387413-52ef-4af2-a4fd-d43d72c14f84
 		summarizeBy: sum
@@ -450,14 +361,12 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Column 'col.trueai_prod_category' = "Other".
 	column 'col.trueai_prod_category' = "Other"
 		lineageTag: ef2adbd1-8667-47a4-956e-6ef1fa55f1c5
 		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.trueai_unit_cogs' = 0.5 * opp_line_items[col.trueai_list_price].
 	column 'col.trueai_unit_cogs' = 0.5 * opp_line_items[col.trueai_list_price]
 		lineageTag: 27d05765-419c-4300-9dbb-a0563138c373
 		summarizeBy: sum
@@ -466,7 +375,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// The date of the last data request from the platform
 	column _sys_as_of
 		dataType: dateTime
 		formatString: Long Date
@@ -481,7 +389,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Boolean flag that indicates whether the stage was set to deleted in the remote system
 	column _sys_is_deleted
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -491,7 +398,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// The date of the last data modification in the platform
 	column _sys_last_modified_on
 		dataType: dateTime
 		formatString: General Date
@@ -506,7 +412,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's creation date in the CRM
 	column crm_created_on
 		dataType: dateTime
 		formatString: Short Date
@@ -521,7 +426,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's modified on date in the CRM
 	column crm_modified_on
 		dataType: dateTime
 		formatString: General Date
@@ -536,7 +440,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's list price
 	column trueai_list_price
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -546,7 +449,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product's list price rule
 	column trueai_list_price_rule
 		dataType: int64
 		formatString: 0
@@ -556,7 +458,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Products quantity
 	column trueai_qty
 		dataType: double
 		formatString: 0
@@ -568,7 +469,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Product's discount amount
 	column trueai_discount_amt
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -580,7 +480,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Product's discount percentage
 	column trueai_discount_pct
 		dataType: double
 		lineageTag: c2794a63-c525-4c11-99a1-ebe3144c5463
@@ -591,7 +490,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Product's unit price
 	column trueai_unit_price
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -603,7 +501,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Product's unit price rule
 	column trueai_unit_price_rule
 		dataType: int64
 		formatString: 0
@@ -613,7 +510,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.line_items_trueai_list_price' = CALCULATE(MAXX(opp_line_items, opp_line_items[trueai_list_price])).
 	column 'col.line_items_trueai_list_price' = CALCULATE(MAXX(opp_line_items, opp_line_items[trueai_list_price]))
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -626,7 +522,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// cust_text1
 	column cust_text1
 		dataType: string
 		lineageTag: b39b9cba-b1cf-41e3-84b2-58d07416bdc6
@@ -635,7 +530,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_text2
 	column cust_text2
 		dataType: string
 		lineageTag: 21abdf8a-4c2b-4c1b-8875-2beb1d104e7e
@@ -644,7 +538,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_text3
 	column cust_text3
 		dataType: string
 		lineageTag: 6d5a8016-c913-4ff4-813f-0b9a33b7e180
@@ -653,7 +546,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_text4
 	column cust_text4
 		dataType: string
 		lineageTag: 4faa4045-e7f5-4d01-97d7-a13f48c87ec0
@@ -662,7 +554,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_text5
 	column cust_text5
 		dataType: string
 		lineageTag: 99f759f1-a19a-4728-99c4-9cb6245f1ea2
@@ -671,7 +562,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_num1
 	column cust_num1
 		dataType: double
 		lineageTag: b36f438d-0c39-4d52-97c5-e1444b691c86
@@ -682,7 +572,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// cust_num2
 	column cust_num2
 		dataType: double
 		lineageTag: 8f87418e-d529-4d8f-9f83-cc7f1ae21d00
@@ -693,7 +582,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// cust_num3
 	column cust_num3
 		dataType: double
 		lineageTag: 46d48d39-0750-4cd7-a6a3-53e1e05220d3
@@ -704,7 +592,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// cust_num4
 	column cust_num4
 		dataType: double
 		lineageTag: 9f01b746-3170-4bcb-b404-9021531c5bca
@@ -715,7 +602,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// cust_num5
 	column cust_num5
 		dataType: double
 		lineageTag: 8be602d6-8751-4757-9c5d-ba0f2448287c
@@ -726,7 +612,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// cust_num6
 	column cust_num6
 		dataType: double
 		lineageTag: 879fb808-e9e6-4386-9122-aee59165c598
@@ -737,7 +622,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// cust_num7
 	column cust_num7
 		dataType: double
 		lineageTag: ce7b7fdf-9880-4781-ab86-682487292f37
@@ -748,7 +632,6 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// cust_bool1
 	column cust_bool1
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -758,7 +641,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// cust_bool2
 	column cust_bool2
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
@@ -768,7 +650,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Prompt Used To Classify Product Type
 	column trueai_revenue_type_context
 		dataType: string
 		lineageTag: e4cdd869-5199-4fe7-848b-a5de41a8f86f
@@ -777,7 +658,6 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Revenue Type
 	column trueai_revenue_type
 		dataType: string
 		lineageTag: 3e6c36eb-2060-4657-a0ac-093356801632
@@ -786,17 +666,14 @@ table opp_line_items
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Revenue Type Rule
 	column trueai_revenue_type_rule
-		dataType: int64
-		formatString: 0
+		dataType: string
 		lineageTag: 8131a728-b9cb-469c-b11c-9177707bc153
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: trueai_revenue_type_rule
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Product Type
 	column trueai_product_type
 		dataType: string
 		lineageTag: 182d0d5f-d7b1-415a-8220-27fb312999a5
@@ -815,55 +692,53 @@ table opp_line_items
 				    dbTable = getDBTable("opp_line_items"), // get the right table
 				
 				     dbTableTyped = Table.TransformColumnTypes(dbTable,{
-				        {"_sys_as_of", type datetime},
-				        {"_sys_doc_id", type text},
-				        {"_sys_is_deleted", type logical},
-				        {"_sys_last_modified_on", type datetime},
-				        {"_sys_ssr_id", type text},
-				        {"crm_created_on", type datetime},
-				        {"crm_currency", type text},
-				        {"crm_description", type text},
-				        {"crm_list_price", type number},
-				        {"crm_modified_on", type datetime},
-				        {"crm_name", type text},
-				        {"crm_opp_id", type text},
-				        {"crm_product_code", type text},
-				        {"crm_product_id", type text},
-				        {"crm_qty", Int64.Type},
-				        {"crm_total_price", type number},
-				        {"crm_unit_price", type number},
-				        {"cust_bool1", type logical},
-				        {"cust_bool2", type logical},
-				        {"cust_num1", type number},
-				        {"cust_num2", type number},
-				        {"cust_num3", type number},
-				        {"cust_num4", type number},
-				        {"cust_num5", type number},
-				        {"cust_num6", type number},
-				        {"cust_num7", type number},
-				        {"cust_text1", type text},
-				        {"cust_text2", type text},
-				        {"cust_text3", type text},
-				        {"cust_text4", type text},
-				        {"cust_text5", type text},
-				        {"trueai_discount_amt", type number},
-				        {"trueai_discount_pct", type number},
-				        {"trueai_list_price", type number},
-				        {"trueai_list_price_rule", Int64.Type},
-				        {"trueai_product_type", type text},
-				        {"trueai_qty", type number},
-				        {"trueai_revenue_type", type text},
-				        {"trueai_revenue_type_context", type text},
-				        {"trueai_revenue_type_rule", Int64.Type},
-				        {"trueai_total_price", type number},
-				        {"trueai_total_price_rule", Int64.Type},
-				        {"trueai_unit_price", type number},
-				        {"trueai_unit_price_rule", Int64.Type}
+				         {"cust_text5", type text},
+				{"_sys_as_of", type datetime},
+				{"_sys_doc_id", type text},
+				{"_sys_is_deleted", type logical},
+				{"_sys_last_modified_on", type datetime},
+				{"_sys_ssr_id", type text},
+				{"crm_created_on", type datetime},
+				{"crm_currency", type text},
+				{"crm_description", type text},
+				{"crm_list_price", type number},
+				{"crm_modified_on", type datetime},
+				{"crm_name", type text},
+				{"crm_opp_id", type text},
+				{"crm_product_code", type text},
+				{"crm_product_id", type text},
+				{"crm_qty", Int64.Type},
+				{"crm_total_price", type number},
+				{"crm_unit_price", type number},
+				{"cust_bool1", type logical},
+				{"cust_bool2", type logical},
+				{"cust_num1", type number},
+				{"cust_num2", type number},
+				{"cust_num3", type number},
+				{"cust_num4", type number},
+				{"cust_num5", type number},
+				{"cust_num6", type number},
+				{"cust_num7", type number},
+				{"cust_text1", type text},
+				{"cust_text2", type text},
+				{"cust_text3", type text},
+				{"cust_text4", type text},
+				{"trueai_discount_amt", type number},
+				{"trueai_discount_pct", type number},
+				{"trueai_list_price", type number},
+				{"trueai_list_price_rule", Int64.Type},
+				{"trueai_revenue_type_context", type text},
+				{"trueai_revenue_type", type text},
+				{"trueai_qty", type number},
+				{"trueai_total_price", type number},
+				{"trueai_total_price_rule", Int64.Type},
+				{"trueai_unit_price", type number},
+				{"trueai_unit_price_rule", Int64.Type}
 				})
 				in
 				    dbTableTyped
 
-	annotation PBI_ResultType = Table
+	annotation PBI_ResultType = Exception
 
 	annotation PBI_NavigationStepName = Navigation
 
