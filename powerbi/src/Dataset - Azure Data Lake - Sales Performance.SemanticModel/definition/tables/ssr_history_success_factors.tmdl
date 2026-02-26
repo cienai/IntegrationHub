@@ -1,17 +1,16 @@
 /// Derived entity for key drivers impacting the success probability of a specific SSR history step.
 table ssr_history_success_factors
-	description: "One row per ssr_history_success_factor record. Source fields include System, TrueAI prefixes. Related to ssr_history (_sys_ssr_history_id -> _sys_doc_id). Supports measures such as meas.ssr_history_success_prob_impact, meas.ssr_history_success_prob_impact_positive."
 	lineageTag: 6d0d1645-2b04-4700-87d8-13fed799fb4d
 
-	/// Measure meas.ssr_history_success_prob_impact.
+	/// Purpose: Ssr History Success Prob Impact.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.ssr_history_success_prob_impact' =
 			
-			description: "TODO: provide business definition for this measure."
 			var _prob = CALCULATE(
-			    AVERAGE(
-			        ssr_history_success_factors[trueai_value_impact]        // get the average prob
-			    )
-			)
+			AVERAGE(			ssr_history_success_factors[trueai_value_impact]        // get the average prob			)			)
 			
 			var res = ROUND(_prob, 2)
 			
@@ -23,10 +22,13 @@ table ssr_history_success_factors
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.ssr_history_success_prob_impact_positive.
+	/// Purpose: Ssr History Success Prob Impact Positive.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.ssr_history_success_prob_impact_positive' =
 			
-			description: "TODO: provide business definition for this measure."
 			var positiveVal = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
 			RETURN
 			IF(positiveVal > 0, positiveVal,BLANK())
@@ -34,10 +36,13 @@ table ssr_history_success_factors
 		displayFolder: success_prob_factors
 		lineageTag: 565e0f38-f6ce-4548-a88e-9b6de987e2fa
 
-	/// Measure meas.ssr_history_success_prob_impact_negative.
+	/// Purpose: Ssr History Success Prob Impact Negative.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.ssr_history_success_prob_impact_negative' =
 			
-			description: "TODO: provide business definition for this measure."
 			var Val = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
 			RETURN
 			IF(Val < 0, Val,BLANK())
@@ -45,10 +50,13 @@ table ssr_history_success_factors
 		displayFolder: success_prob_factors
 		lineageTag: 9148a5ce-e1ea-4877-a07c-e9990c3e02af
 
-	/// Measure meas.ssr_history_success_prob_impact_neutral.
+	/// Purpose: Ssr History Success Prob Impact Neutral.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.ssr_history_success_prob_impact_neutral' =
 			
-			description: "TODO: provide business definition for this measure."
 			var positiveVal = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
 			RETURN
 			IF(positiveVal = 0, positiveVal,BLANK())
@@ -56,46 +64,56 @@ table ssr_history_success_factors
 		displayFolder: success_prob_factors
 		lineageTag: be309515-4d9a-4856-ad6a-8d0c3dad396e
 
-	/// Measure meas.ssr_history_success_prob_factors_count.
-	measure 'meas.ssr_history_success_prob_factors_count' = ```
+	/// Purpose: Ssr History Success Prob Factors Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_history_success_prob_factors_count' = 
 			
 			var res = CALCULATE(count(ssr_history_success_factors[_sys_doc_id]))
 			RETURN res
 			
-			```
-			description: "Count of ssr_history_success_factors[_sys_doc_id]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: success_prob_factors
 		lineageTag: ffbf4531-12c0-4a82-889e-ed353a5a1a5e
 
-	/// Measure meas.ssr_history_success_prob_factors_all_count.
-	measure 'meas.ssr_history_success_prob_factors_all_count' = ```
+	/// Purpose: Ssr History Success Prob Factors All Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_history_success_prob_factors_all_count' = 
 			
 			var res = CALCULATE(count(ssr_history_success_factors[_sys_ssr_history_id]), ssr_history_success_factors[trueai_factor_name] <> "aaa" &&  ssr_history_success_factors[trueai_value] <> "aaa" ) // get the count of all outside the filter
 			RETURN res
 			
-			```
-			description: "Ratio of ssr_history_success_factors[_sys_ssr_history_id] to ssr_history_success_factors[trueai_factor_name]. Respects the current filter context."
 		formatString: 0
 		displayFolder: success_prob_factors
 		lineageTag: bb952828-5ff6-4ce1-8186-7124fb7627ac
 
-	/// Measure meas.ssr_history_success_prob_factors_pct.
-	measure 'meas.ssr_history_success_prob_factors_pct' = ```
+	/// Purpose: Ssr History Success Prob Factors Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.ssr_history_success_prob_factors_pct' = 
 			
 			
 			// this is our old measure
 			var res = DIVIDE([meas.ssr_history_success_prob_factors_count], [meas.ssr_history_success_prob_factors_all_count])  // ratio of the factors count
 			RETURN res
 			
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: #%
 		displayFolder: success_prob_factors
 		lineageTag: fbebdf1c-4075-4d59-9b9d-7cae7d96dee0
 
-	/// Measure meas.success_prob_factors_most_impact_str.
-	measure 'meas.success_prob_factors_most_impact_str' = ```
+	/// Purpose: Success Prob Factors Most Impact Str.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.success_prob_factors_most_impact_str' = 
 			
 			
 			// changes for git check
@@ -128,32 +146,31 @@ table ssr_history_success_factors
 			//         [Rank],
 			//         ASC
 			//     )
-			```
-			description: "Ratio of ssr_history_success_prob_factors[name] to ssr_history_success_prob_factors[value]. Respects the current filter context."
 		formatString: 0
 		displayFolder: success_prob_factors
 		lineageTag: d3d03bb1-d585-4650-afcf-21178f54a977
 
-	/// Measure meas.ssr_history_success_prob_feature_impact.
-	measure 'meas.ssr_history_success_prob_feature_impact' = ```
+	/// Purpose: Ssr History Success Prob Feature Impact.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.ssr_history_success_prob_feature_impact' = 
 			
 			CALCULATE(
-			    AVERAGEX(
-			        ssr_history_success_factors, 
-			        ssr_history_success_factors[trueai_factor_impact]        // get the average feature impact
-			    )
-			)
-			```
-			description: "Ratio based on ssr_history_success_factors[trueai_factor_impact]. Respects the current filter context."
+			AVERAGEX(			ssr_history_success_factors, 			ssr_history_success_factors[trueai_factor_impact]        // get the average feature impact			)			)
 		formatString: 0%;-0%;0%
 		displayFolder: success_prob_factors
 		lineageTag: ca2857e0-3196-408f-8103-8b2b7f7460ba
 
-	/// Measure meas.ssr_history_success_prob_factors_pct_how_many.
+	/// Purpose: Ssr History Success Prob Factors Pct How Many.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.ssr_history_success_prob_factors_pct_how_many' =
 			
 			
-			description: "TODO: provide business definition for this measure."
 			var step_count = [meas.ssr_history_step_count]           // get the converted leads count from ssr_history table
 			
 			var _success_prob_count = [meas.ssr_history_success_prob_factors_count]         // get the success prob count from ssr_history success prob table
@@ -166,29 +183,24 @@ table ssr_history_success_factors
 		displayFolder: success_prob_factors
 		lineageTag: 0162ca58-4bf0-4d0b-8b9b-11e1cccf55ea
 
-	/// Measure meas.top_factor_name_by_impact.
-	measure 'meas.top_factor_name_by_impact' = ```
+	/// Purpose: Top Factor Name By Impact.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.top_factor_name_by_impact' = 
 			
 			VAR MaxImpact = 
-			    MAXX(
-			        'ssr_history_success_factors', 
-			        'ssr_history_success_factors'[trueai_value_impact]
-			    )
-			-- Now find the corresponding name with that max impact
+			MAXX(			'ssr_history_success_factors', 			'ssr_history_success_factors'[trueai_value_impact]			)			-- Now find the corresponding name with that max impact
 			RETURN
 			CALCULATE(
-			    MAX('ssr_history_success_factors'[trueai_factor_name]),
-			    'ssr_history_success_factors'[trueai_value_impact] = MaxImpact
-			)
+			MAX('ssr_history_success_factors'[trueai_factor_name]),			'ssr_history_success_factors'[trueai_value_impact] = MaxImpact			)
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		displayFolder: success_prob_factors
 		lineageTag: f24a5b64-818e-42df-920a-3a818a663c56
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 9cb59373-1b86-4c62-88de-26ae0e1a56f7
 		summarizeBy: none
@@ -198,7 +210,6 @@ table ssr_history_success_factors
 
 	/// The link to a specific ssr history id
 	column _sys_ssr_history_id
-		description: "System: Identifier for ssr history."
 		dataType: string
 		lineageTag: c60453b3-97d7-45b1-ade6-aaacedf30c77
 		summarizeBy: none
@@ -208,7 +219,6 @@ table ssr_history_success_factors
 
 	/// Name of the ssr history step
 	column trueai_ssr_history_name
-		description: "TrueAI: Text label for ssr history name."
 		dataType: string
 		lineageTag: 0a5aa9a4-f9e9-4e91-b840-87ef01567824
 		summarizeBy: none
@@ -218,7 +228,6 @@ table ssr_history_success_factors
 
 	/// The model used to generate the success factor
 	column trueai_model_name
-		description: "TrueAI: Text label for model name."
 		dataType: string
 		lineageTag: 79f09f95-7f97-4047-a5ac-b15a8f77e0bf
 		summarizeBy: none
@@ -228,7 +237,6 @@ table ssr_history_success_factors
 
 	/// The value of the success factor
 	column trueai_value
-		description: "TrueAI: Amount for value."
 		dataType: string
 		lineageTag: 54056493-5086-4eed-8225-4c96c25cdfda
 		summarizeBy: none
@@ -238,7 +246,6 @@ table ssr_history_success_factors
 
 	/// The sign (direction) of the success factor: positive, negative or neutral
 	column trueai_value_impact_sign
-		description: "TrueAI: Amount for value impact sign."
 		dataType: string
 		lineageTag: 70f041a1-2749-4523-866e-3393830dd2ed
 		summarizeBy: none
@@ -248,7 +255,6 @@ table ssr_history_success_factors
 
 	/// The name of the success factor
 	column trueai_factor_name
-		description: "TrueAI: Text label for factor name."
 		dataType: string
 		lineageTag: b1957e1b-78c4-4fc3-a1bf-d5bf4fa364b8
 		summarizeBy: none
@@ -258,7 +264,6 @@ table ssr_history_success_factors
 
 	/// The impact of the value of the success factor
 	column trueai_value_impact
-		description: "TrueAI: Amount for value impact."
 		dataType: double
 		lineageTag: 7eb9e59b-0ac2-4acd-87b2-e2dde8374099
 		summarizeBy: sum
@@ -270,7 +275,6 @@ table ssr_history_success_factors
 
 	/// The sort order of the value within its success factor
 	column trueai_sort
-		description: "TrueAI: Numeric value for sort."
 		dataType: double
 		lineageTag: 6c8fbedc-c97c-480d-9c39-a7d2864e6aa6
 		summarizeBy: sum
@@ -282,7 +286,6 @@ table ssr_history_success_factors
 
 	/// The impact of the success factor
 	column trueai_factor_impact
-		description: "TrueAI: Numeric value for factor impact."
 		dataType: double
 		lineageTag: 8a7fb210-55ef-4152-9627-767e12a7e82c
 		summarizeBy: sum
@@ -294,7 +297,6 @@ table ssr_history_success_factors
 
 	/// The ordering factor of the value within its success factor
 	column trueai_ordering_factor
-		description: "TrueAI: Numeric value for ordering factor."
 		dataType: double
 		lineageTag: ac867424-720b-4775-802f-be1578d81508
 		summarizeBy: sum
@@ -306,7 +308,6 @@ table ssr_history_success_factors
 
 	/// Boolean flag indicating if the value is significant
 	column trueai_is_significant
-		description: "TrueAI: Indicates whether is significant."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 37b1f614-1a72-45e8-aa6b-fa0a617884fb

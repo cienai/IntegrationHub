@@ -1,31 +1,47 @@
+/// Table quality_buckets.
 table quality_buckets
-	description: "One row per quality_bucket record. Source fields include System prefixes. Supports measures such as meas.quality_bucket_prob_lower_pct, meas.quality_bucket_prob_upper_pct."
 	lineageTag: 3bca5c50-5b78-4939-8abb-0daae7d2d5cb
 
+	/// Purpose: Quality Bucket Prob Lower Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.quality_bucket_prob_lower_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(MAX(quality_buckets[prob_lower_bound]))   // get the lower bound of probability
 		formatString: 0%;-0%;0%
 		displayFolder: _quality_measures
 		lineageTag: 51f547a1-e575-4c80-b95a-e1444bf7b404
 
+	/// Purpose: Quality Bucket Prob Upper Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.quality_bucket_prob_upper_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(MAX(quality_buckets[prob_upper_bound]))       // get the upper bound of probability
 		formatString: 0%;-0%;0%
 		displayFolder: _quality_measures
 		lineageTag: 804c34d9-baa9-4dec-9223-5c86c07029e6
 
-	measure 'meas.quality_buckets_step_name' = CALCULATE(MAX(quality_buckets[step_name]))     // get the quality bucket step name
-		description: "Ratio based on quality_buckets[step_name]. Respects the current filter context."
+	/// Purpose: Quality Buckets Step Name.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.quality_buckets_step_name' = CALCULATE(MAX(quality_buckets[step_name]))     // get the propensity step name
 		displayFolder: _quality_measures
 		lineageTag: 46d3abd7-9013-430f-8f05-1db9082e79d7
 
+	/// Purpose: Quality Bucket New Logo R2.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.quality_bucket__new_logo_r2' =
 			
-			description: "TODO: provide business definition for this measure."
 			var latestDate = CALCULATE(MAX(companies_history[_sys_filt_end_date])) // getting the maximum date
 			var res =  CALCULATE(AVERAGE(companies_history[di_pred_new_logo_r2]), companies_history[_sys_filt_end_date]=latestDate) // get the  r2 filtered with latest date
 			RETURN res
@@ -34,9 +50,13 @@ table quality_buckets
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Purpose: Quality Bucket Existing Customer Selling R2.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.quality_bucket_existing_customer_selling_r2' =
 			
-			description: "TODO: provide business definition for this measure."
 			var latestDate = CALCULATE(MAX(companies_history[_sys_filt_end_date])) // getting the maximum date
 			var res =  CALCULATE(AVERAGE(companies_history[di_pred_existing_customer_selling_r2]), companies_history[_sys_filt_end_date]=latestDate) // get the r2 filtered with latest date
 			RETURN res
@@ -45,9 +65,13 @@ table quality_buckets
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Purpose: Quality Bucket Prospecting R2.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.quality_bucket__prospecting_r2' =
 			
-			description: "TODO: provide business definition for this measure."
 			var latestDate = CALCULATE(MAX(companies_history[_sys_filt_end_date])) // getting the maximum date
 			var res =  CALCULATE(AVERAGE(companies_history[di_pred_prospecting_r2]), companies_history[_sys_filt_end_date]=latestDate) // get the prospecting r2 filtered with latest date
 			RETURN res
@@ -56,9 +80,13 @@ table quality_buckets
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Purpose: Quality Bucket Post Sales R2.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.quality_bucket_post_sales_r2' =
 			
-			description: "TODO: provide business definition for this measure."
 			var latestDate = CALCULATE(MAX(companies_history[_sys_filt_end_date])) // getting the maximum date
 			var res =  CALCULATE(AVERAGE(companies_history[di_pred_post_sales_r2]), companies_history[_sys_filt_end_date]=latestDate) // get the r2 filtered with latest date
 			RETURN res
@@ -67,45 +95,58 @@ table quality_buckets
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.quality_bucket_new_logo_auc' = ```
+	/// Purpose: Quality Bucket New Logo Auc.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.quality_bucket_new_logo_auc' = 
 			
 			var latestDate = CALCULATE(MAX(companies_history[_sys_filt_end_date])) // getting the maximum date
 			var res =  CALCULATE(MAX(companies_history[di_pred_new_logo_auc]), companies_history[_sys_filt_end_date]=latestDate) // get the prospecting auc filtered with latest date
 			RETURN res 
-			```
-			description: "Ratio of companies_history[_sys_filt_end_date] to companies_history[di_pred_new_logo_auc]. Respects the current filter context."
 		displayFolder: _quality_measures
 		lineageTag: 2a48bb26-6bc9-43a8-bb65-e6c548ee2d91
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.quality_bucket_existing_customer_selling_auc' = ```
+	/// Purpose: Quality Bucket Existing Customer Selling Auc.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.quality_bucket_existing_customer_selling_auc' = 
 			
 			var latestDate = CALCULATE(MAX(companies_history[_sys_filt_end_date])) // getting the maximum date
 			var res =  CALCULATE(MAX(companies_history[di_pred_existing_customer_selling_auc]), companies_history[_sys_filt_end_date]=latestDate) // get the existing customer selling  auc filtered with latest date
 			RETURN res 
-			```
-			description: "Ratio of companies_history[_sys_filt_end_date] to companies_history[di_pred_existing_customer_selling_auc]. Respects the current filter context."
 		displayFolder: _quality_measures
 		lineageTag: 1fe4abde-0a9b-47a2-bcbe-c9dfdf21e7bc
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.quality_bucket_prospecting_auc' = ```
+	/// Purpose: Quality Bucket Prospecting Auc.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.quality_bucket_prospecting_auc' = 
 			
 			var latestDate = CALCULATE(MAX(companies_history[_sys_filt_end_date])) // getting the maximum date
 			var res =  CALCULATE(MAX(companies_history[di_pred_prospecting_auc]), companies_history[_sys_filt_end_date]=latestDate) // get the prospecting auc filtered with latest date
 			RETURN res 
-			```
-			description: "Ratio of companies_history[_sys_filt_end_date] to companies_history[di_pred_prospecting_auc]. Respects the current filter context."
 		displayFolder: _quality_measures
 		lineageTag: 032ad037-65a1-4cd9-9aa2-99f6d07577bc
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Purpose: Quality Bucket Post Sales Auc.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.quality_bucket_post_sales_auc' =
 			
-			description: "TODO: provide business definition for this measure."
 			var latestDate = CALCULATE(MAX(companies_history[_sys_filt_end_date])) // getting the maximum date
 			var res =  CALCULATE(MAX(companies_history[di_pred_post_sales_auc]), companies_history[_sys_filt_end_date]=latestDate) // get the prospecting auc filtered with latest date
 			RETURN res
@@ -114,64 +155,70 @@ table quality_buckets
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Purpose: Quality Buckets Bucket Name.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.quality_buckets_bucket_name' =
 			
-			description: "TODO: provide business definition for this measure."
-			CALCULATE(MAX(quality_buckets[bucket]))   // get the quality bucket
+			CALCULATE(MAX(quality_buckets[bucket]))   // get the propensity
 		displayFolder: _quality_measures
 		lineageTag: 7bc22605-1491-40ef-ad18-3d7d51fb3b73
 
-	measure 'meas.quality_bucket_min_max' = ```
+	/// Purpose: Quality Bucket Min Max.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.quality_bucket_min_max' = 
 			
 			var bucket = CALCULATE(
-			    MAX(quality_buckets[bucket])		// get the bucket name
-			)
+			MAX(quality_buckets[bucket])		// get the bucket name			)
 			var res =bucket & " " & "(" & FORMAT(quality_buckets[meas.quality_bucket_prob_lower_pct], "0%") & "-" & FORMAT(quality_buckets[meas.quality_bucket_prob_upper_pct],"#%") & ")"  // adding min and max tier pct values with bucket name. for min and max tier, used format to get the % values ol.quality_bucket_min_max 
 			RETURN
 			IF(
-			    HASONEVALUE(quality_buckets[bucket]),
-			    res,
-			    "Total"
-			)
-			```
-			description: "Ratio of quality_buckets[bucket] to quality_buckets[bucket]. Respects the current filter context."
+			HASONEVALUE(quality_buckets[bucket]),			res,			"Total"			)
 		displayFolder: _quality_measures
 		lineageTag: a7e3d12f-8c5b-478f-91f3-ecdf3ab6735d
 
+	/// Purpose: Lead Gen Success Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.lead_gen_success_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			var cnt = CALCULATE(
-			    [meas.ssr_history_success_count_lead_gen],
-			    ssr_history[entity_qual_bucket_num] in {1,2,3,4,5}      // count of lead gen filtering with entity_qual-bucket-num
-			)
+			[meas.ssr_history_success_count_lead_gen],			ssr_history[entity_propensity_num] in {1,2,3,4,5}      // count of lead gen filtering with entity_qual-bucket-num			)
 			RETURN
 			cnt
 		formatString: 0
 		displayFolder: _quality_measures
 		lineageTag: ca5647bf-a3de-4e1a-a9e1-2efa0309bb2e
 
-	measure 'meas.quality_bucket_conditional_background_color' = ```
+	/// Purpose: Quality Bucket Conditional Background Color.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.quality_bucket_conditional_background_color' = 
 			
-			 var bucket_val = CALCULATE(MAX(quality_buckets[bucket]))
-			
+			var bucket_val = CALCULATE(MAX(quality_buckets[bucket]))			
 			RETURN
 			SWITCH(
-			    True(),
-			    CONTAINSSTRING(bucket_val, "Lowest"),1,
-			    CONTAINSSTRING(bucket_val, "Low"),2,
-			    CONTAINSSTRING(bucket_val, "Mid"),3,        // get a condition for creating a background color in the table visual
-			    CONTAINSSTRING(bucket_val, "High"),4,
-			    CONTAINSSTRING(bucket_val, "Highest"),5
-			)
+			True(),			CONTAINSSTRING(bucket_val, "Lowest"),1,			CONTAINSSTRING(bucket_val, "Low"),2,			CONTAINSSTRING(bucket_val, "Mid"),3,        // get a condition for creating a background color in the table visual			CONTAINSSTRING(bucket_val, "High"),4,			CONTAINSSTRING(bucket_val, "Highest"),5			)
 			
-			```
-			 description: "Ratio based on quality_buckets[bucket]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _quality_measures
 		lineageTag: c65fc392-be42-4abe-ae4b-fa852cad8d1b
 
-	measure 'meas.quality_bucket_combined_r2' = ```
+	/// Purpose: Quality Bucket Combined R2.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.quality_bucket_combined_r2' = 
 			
 			VAR _step_name = CALCULATE(MAX(ssr_history[step_name]))
 			var latestDate = CALCULATE(MAX(companies_history[_sys_filt_end_date])) // getting the maximum date
@@ -181,20 +228,18 @@ table quality_buckets
 			var existing_customer_r2 =  CALCULATE(AVERAGE(companies_history[di_pred_existing_customer_selling_r2]), companies_history[_sys_filt_end_date]=latestDate) // get the existing customer r2
 			RETURN 
 			SWITCH(
-			    TRUE(),
-			    _step_name = "Prospecting", pros_r2,
-			    _step_name = "New Logo Selling", new_logo_r2,
-			    _step_name = "Post-Sales Support", post_sales_r2,
-			    _step_name = "Existing Customer Selling", existing_customer_r2
-			)
-			```
-			description: "Ratio of ssr_history[step_name] to companies_history[_sys_filt_end_date]. Respects the current filter context."
+			TRUE(),			_step_name = "Prospecting", pros_r2,			_step_name = "New Logo Selling", new_logo_r2,			_step_name = "Post-Sales Support", post_sales_r2,			_step_name = "Existing Customer Selling", existing_customer_r2			)
 		displayFolder: _quality_measures
 		lineageTag: e85e9ade-6570-405a-87b5-e90f60242da8
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.quality_bucket_combined_auc' = ```
+	/// Purpose: Quality Bucket Combined Auc.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.quality_bucket_combined_auc' = 
 			
 			VAR _step_name = CALCULATE(MAX(ssr_history[step_name]))
 			var latestDate = CALCULATE(MAX(companies_history[_sys_filt_end_date])) // getting the maximum date
@@ -204,20 +249,18 @@ table quality_buckets
 			var existing_customer_auc =  CALCULATE(AVERAGE(companies_history[di_pred_existing_customer_selling_auc]), companies_history[_sys_filt_end_date]=latestDate) // get the existing customer selling auc
 			RETURN 
 			SWITCH(
-			    TRUE(),
-			    _step_name = "Prospecting", pros_auc,
-			    _step_name = "New Logo Selling", new_logo_auc,
-			    _step_name = "Post-Sales Support", post_sales_auc,         
-			    _step_name = "Existing Customer Selling", existing_customer_auc
-			)
-			```
-			description: "Ratio of ssr_history[step_name] to companies_history[_sys_filt_end_date]. Respects the current filter context."
+			TRUE(),			_step_name = "Prospecting", pros_auc,			_step_name = "New Logo Selling", new_logo_auc,			_step_name = "Post-Sales Support", post_sales_auc,         			_step_name = "Existing Customer Selling", existing_customer_auc			)
 		displayFolder: _quality_measures
 		lineageTag: f42014d2-b4fb-43f7-840f-921245d4bf16
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.quality_bucket_conditional_r2' = ```
+	/// Purpose: Quality Bucket Conditional R2.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.quality_bucket_conditional_r2' = 
 			
 			var pros_r2 = [meas.quality_bucket__prospecting_r2]
 			var new_r2 = [meas.quality_bucket__new_logo_r2]
@@ -227,43 +270,27 @@ table quality_buckets
 			var step_name = CALCULATE(MAX(ssr_history[step_name]))
 			
 			var r2_score = SWITCH(
-			    TRUE(),
-			    step_name = "Prospecting" || step_name = "Untouched" ,pros_r2,
-			    step_name = "New Logo Selling", new_r2,
-			    step_name = "Post-Sales Support", post_r2,
-			    step_name = "Existing Customer Selling", exist_r2
-			)
+			TRUE(),			step_name = "Prospecting" || step_name = "Untouched" ,pros_r2,			step_name = "New Logo Selling", new_r2,			step_name = "Post-Sales Support", post_r2,			step_name = "Existing Customer Selling", exist_r2			)
 			
 			var _conf = ROUND(r2_score*100, 0)
 			
 			var _status_ = 
-			    IF(
-			    _conf >= 0 && _conf <= 49, "Limited",
-			        IF(
-			            _conf >=50 && _conf <= 74, "Fair",
-			            IF(
-			                _conf >=75 && _conf <= 84, "Good",
-			                IF(
-			                    _conf >=85 && _conf <= 94, "Great",
-			                    "Excellent"
-			                )
-			            )
-			        )
-			)
+			IF(			_conf >= 0 && _conf <= 49, "Limited",			IF(			_conf >=50 && _conf <= 74, "Fair",			IF(			_conf >=75 && _conf <= 84, "Good",			IF(			_conf >=85 && _conf <= 94, "Great",			"Excellent"			)			)			)			)
 			
 			
 			
 			RETURN 
 			IF(
-			    _conf <>0,
-			    _status_ & " (" & _conf & ")"  // Convert _conf to integer text format
-			)
-			```
-			description: "Ratio based on ssr_history[step_name]. Respects the current filter context."
+			_conf <>0,			_status_ & " (" & _conf & ")"  // Convert _conf to integer text format			)
 		displayFolder: _quality_measures
 		lineageTag: 25e9c210-f17e-479a-9f65-8acce3eeb3c7
 
-	measure 'meas.quality_bucket_conditional_auc' = ```
+	/// Purpose: Quality Bucket Conditional Auc.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.quality_bucket_conditional_auc' = 
 			
 			var pros_auc = [meas.quality_bucket_prospecting_auc]            // get the each step auc
 			var new_auc= [meas.quality_bucket_new_logo_auc]
@@ -273,44 +300,23 @@ table quality_buckets
 			var step_name = CALCULATE(MAX(ssr_history[step_name]))
 			
 			var auc_score = SWITCH(
-			    TRUE(),
-			    step_name = "Prospecting" || step_name = "Untouched" ,pros_auc,
-			    step_name = "New Logo Selling", new_auc,                        // condition 
-			    step_name = "Post-Sales Support", post_auc,
-			    step_name = "Existing Customer Selling", exist_auc
-			)
+			TRUE(),			step_name = "Prospecting" || step_name = "Untouched" ,pros_auc,			step_name = "New Logo Selling", new_auc,                        // condition 			step_name = "Post-Sales Support", post_auc,			step_name = "Existing Customer Selling", exist_auc			)
 			
 			var _conf = ROUND(auc_score*100, 0)
 			
 			var _status_ = 
-			    IF(
-			    _conf >= 0 && _conf <= 49, "Limited",
-			        IF(
-			            _conf >=50 && _conf <= 74, "Fair",
-			            IF(
-			                _conf >=75 && _conf <= 84, "Good",
-			                IF(
-			                    _conf >=85 && _conf <= 94, "Great",
-			                    "Excellent"
-			                )
-			            )
-			        )
-			)
+			IF(			_conf >= 0 && _conf <= 49, "Limited",			IF(			_conf >=50 && _conf <= 74, "Fair",			IF(			_conf >=75 && _conf <= 84, "Good",			IF(			_conf >=85 && _conf <= 94, "Great",			"Excellent"			)			)			)			)
 			
 			
 			
 			RETURN 
 			IF(
-			    _conf <>0,
-			    _status_ & " (" & _conf & ")"  // Convert _conf to integer text format
-			)
-			```
-			description: "Ratio based on ssr_history[step_name]. Respects the current filter context."
+			_conf <>0,			_status_ & " (" & _conf & ")"  // Convert _conf to integer text format			)
 		displayFolder: _quality_measures
 		lineageTag: f907a2f8-5dd2-43ed-863b-29f52804383c
 
+	/// Column _sys_doc_id.
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 2f315d1c-946f-443c-83d4-9c4dd7536b0e
 		summarizeBy: none
@@ -318,8 +324,8 @@ table quality_buckets
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column step_name.
 	column step_name
-		description: "Text label for step name."
 		dataType: string
 		lineageTag: efcb5ddf-b15d-4d34-b13e-f0d16d07fd5f
 		summarizeBy: none
@@ -327,8 +333,8 @@ table quality_buckets
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column prob_lower_bound.
 	column prob_lower_bound
-		description: "Numeric value for prob lower bound."
 		dataType: double
 		lineageTag: 4b71e0f3-4ee3-497f-b291-d22996df7096
 		summarizeBy: none
@@ -338,8 +344,8 @@ table quality_buckets
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column prob_upper_bound.
 	column prob_upper_bound
-		description: "Numeric value for prob upper bound."
 		dataType: double
 		lineageTag: 93ec3add-ecdc-43a3-a929-725e08f3f985
 		summarizeBy: none
@@ -349,8 +355,8 @@ table quality_buckets
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column bucket.
 	column bucket
-		description: "Text label for bucket."
 		dataType: string
 		lineageTag: c4d16a3f-7805-4b53-9c3a-b915859f659b
 		summarizeBy: none
@@ -361,8 +367,8 @@ table quality_buckets
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column bucket_num.
 	column bucket_num
-		description: "Count of bucket num."
 		dataType: int64
 		formatString: 0
 		lineageTag: 50b0465e-d300-4710-9d88-cbce3515570c
@@ -373,8 +379,8 @@ table quality_buckets
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column step_name_bucket_num.
 	column step_name_bucket_num
-		description: "Count of step name bucket num."
 		dataType: string
 		lineageTag: a9d91316-bba5-4243-be8c-9ad92705a216
 		summarizeBy: none
@@ -382,12 +388,12 @@ table quality_buckets
 
 		annotation SummarizationSetBy = Automatic
 
-	column 'col.qual_bucket_min_max_tier' = ```
-			description: "Unclear: Value for col qual bucket min max tier."
+	/// Column 'col.propensity_min_max_tier' = ```.
+	column 'col.propensity_min_max_tier' = ```
 			
 			var bucket = CALCULATE(
 			    MAX(
-			        quality_buckets[bucket]  // get the quality bucket
+			        quality_buckets[bucket]  // get the propensity
 			    )
 			)
 			
@@ -422,26 +428,26 @@ table quality_buckets
 				    Source = companies_history,
 				    #"Sorted Rows" = Table.Sort(Source,{{"_sys_processed_as_of", Order.Descending}}),
 				    #"Kept First Rows" = Table.FirstN(#"Sorted Rows",1),
-				    newTable = Table.SelectColumns(#"Kept First Rows", {"_sys_doc_id", "di_pred_post_sales_qual_bucket_tiers", "di_pred_prospecting_qual_bucket_tiers", "di_pred_selling_new_logo_qual_bucket_tiers", "di_pred_selling_existing_customer_qual_bucket_tiers"}),
-				    dbTableNoNull = Table.SelectRows(newTable, each [di_pred_post_sales_qual_bucket_tiers] <> null),
-				    Parsed_JSON = Table.TransformColumns(dbTableNoNull,{{"di_pred_post_sales_qual_bucket_tiers", Json.Document}, {"di_pred_prospecting_qual_bucket_tiers", Json.Document}, {"di_pred_selling_new_logo_qual_bucket_tiers", Json.Document}, {"di_pred_selling_existing_customer_qual_bucket_tiers", Json.Document}}),
+				    newTable = Table.SelectColumns(#"Kept First Rows", {"_sys_doc_id", "di_pred_post_sales_propensity_tiers", "di_pred_prospecting_propensity_tiers", "di_pred_new_logo_propensity_tiers", "di_pred_existing_customer_propensity_tiers"}),
+				    dbTableNoNull = Table.SelectRows(newTable, each [di_pred_post_sales_propensity_tiers] <> null),
+				    Parsed_JSON = Table.TransformColumns(dbTableNoNull,{{"di_pred_post_sales_propensity_tiers", Json.Document}, {"di_pred_prospecting_propensity_tiers", Json.Document}, {"di_pred_new_logo_propensity_tiers", Json.Document}, {"di_pred_existing_customer_propensity_tiers", Json.Document}}),
 				
 				
-				    postsalesTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_post_sales_qual_bucket_tiers"}),
+				    postsalesTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_post_sales_propensity_tiers"}),
 				    postSalesAddCol = Table.AddColumn(postsalesTable, "direction", each "Post-Sales Support"),
-				    postSalesExpanded = Table.ExpandRecordColumn(postSalesAddCol, "di_pred_post_sales_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    postSalesExpanded = Table.ExpandRecordColumn(postSalesAddCol, "di_pred_post_sales_propensity_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
-				    ProsTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_prospecting_qual_bucket_tiers"}),
+				    ProsTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_prospecting_propensity_tiers"}),
 				    ProsAddCol = Table.AddColumn(ProsTable, "direction", each "Prospecting"),
-				    ProsExpanded = Table.ExpandRecordColumn(ProsAddCol, "di_pred_prospecting_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    ProsExpanded = Table.ExpandRecordColumn(ProsAddCol, "di_pred_prospecting_propensity_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
-				    NewLogoTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_selling_new_logo_qual_bucket_tiers"}),
+				    NewLogoTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_new_logo_propensity_tiers"}),
 				    NewLogoAddCol = Table.AddColumn(NewLogoTable, "direction", each "New Logo Selling"),
-				    NewLogoExpanded = Table.ExpandRecordColumn(NewLogoAddCol, "di_pred_selling_new_logo_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    NewLogoExpanded = Table.ExpandRecordColumn(NewLogoAddCol, "di_pred_new_logo_propensity_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
-				    UpsellingTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_selling_existing_customer_qual_bucket_tiers"}),
+				    UpsellingTable = Table.SelectColumns(Parsed_JSON, {"_sys_doc_id", "di_pred_existing_customer_propensity_tiers"}),
 				    UpsellingAddCol = Table.AddColumn(UpsellingTable, "direction", each "Existing Customer Selling"),
-				    UpsellingExpanded = Table.ExpandRecordColumn(UpsellingAddCol, "di_pred_selling_existing_customer_qual_bucket_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
+				    UpsellingExpanded = Table.ExpandRecordColumn(UpsellingAddCol, "di_pred_existing_customer_propensity_tiers", {"Lowest", "Low", "Mid", "High", "Highest"}, {"Lowest", "Low", "Mid", "High", "Highest"}),
 				
 				    combinedTable = Table.Combine({postSalesExpanded, ProsExpanded, NewLogoExpanded, UpsellingExpanded}),
 				

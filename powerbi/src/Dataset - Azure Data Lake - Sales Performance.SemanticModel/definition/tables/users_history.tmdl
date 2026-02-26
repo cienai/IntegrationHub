@@ -1,10 +1,13 @@
 /// Derived entity for monthly snapshots of user-level performance. One row per user per month. Includes User metadata, Deal Intelligence (DI), Coaching Intelligence (CI), and Automatic Data Enhancement (ADE) metrics. Historical depth: 6 years retroactive.
 table users_history
-	description: "One row per users_history record. Source fields include CI, CRM, System, TrueAI prefixes. Related to LocalDateTable_cd48709e-408c-49fa-ba94-c04ec6cce76e (_sys_filt_start_date -> Date), LocalDateTable_11197bed-ded4-4a7a-9aad-f88f5ce688a7 ('col.perf_date_first_reached' -> Date), managers_direct (_sys_user_id -> _sys_doc_id). Supports measures such as meas.data_logs_user_mgr_count_eop, meas.data_logs_user_new_hires_reached_performer_within_12_months."
 	lineageTag: d904fbb9-5121-4eb7-966a-bb236f245cbb
 
-	/// Measure meas.data_logs_user_mgr_count_eop.
-	measure 'meas.data_logs_user_mgr_count_eop' = ```
+	/// Purpose: Data Logs User Mgr Count Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_mgr_count_eop' = 
 			
 			
 			var fromDate =[meas.context_date_min] 
@@ -17,14 +20,16 @@ table users_history
 			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
 			
 			return res // return the res :)
-			```
-			description: "Ratio of users_history[_sys_filt_start_date] to users_history[_sys_filt_start_date]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: b37dd8bf-3abb-4c71-b2b1-02d86db3fea8
 
-	/// Measure meas.data_logs_user_new_hires_reached_performer_within_12_months.
-	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months' = ```
+	/// Purpose: Data Logs User New Hires Reached Performer Within 12 Months.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months' = 
 			
 			
 			
@@ -33,18 +38,18 @@ table users_history
 			var toDate = [meas.context_date_max] 
 			
 			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate, 
-			           If(isblank(users_history[col.perf_date_first_reached]) = true, date(2100,1,1), users_history[col.perf_date_first_reached]) <  (users_history[trueai_hire_date] + 365) 
-			)
+			users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate, 			If(isblank(users_history[col.perf_date_first_reached]) = true, date(2100,1,1), users_history[col.perf_date_first_reached]) <  (users_history[trueai_hire_date] + 365) 			)
 			return If(isblank( res), 0, res)
-			```
-			description: "Distinct count of users_history[_sys_user_id]. Respects the current filter context."
 		formatString: +0
 		displayFolder: _perf_analysis
 		lineageTag: a2dee853-9dbc-44fa-8056-38f45ee80945
 
-	/// Measure meas.data_logs_user_new_terminations.
-	measure 'meas.data_logs_user_new_terminations' = ```
+	/// Purpose: Data Logs User New Terminations.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_new_terminations' = 
 			
 			
 			
@@ -52,45 +57,40 @@ table users_history
 			var toDate = [meas.context_date_max] 
 			
 			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_termination_date] >= fromDate &&     users_history[trueai_termination_date]  <= toDate 
-			)
+			users_history[trueai_termination_date] >= fromDate &&     users_history[trueai_termination_date]  <= toDate 			)
 			return 
 			IF(
-			    res = BLANK(), 
-			    0,                  // putting the condition to show 0 instead of blank
-			    res * -1
-			)
-			```
-			description: "Ratio of users_history[_sys_user_id] to users_history[trueai_termination_date]. Respects the current filter context."
+			res = BLANK(), 			0,                  // putting the condition to show 0 instead of blank			res * -1			)
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: bde20ead-06ce-47fd-a172-f24a25d9b9c4
 
-	/// Measure meas.data_logs_user_individual_contrib_count_eop.
-	measure 'meas.data_logs_user_individual_contrib_count_eop' = ```
+	/// Purpose: Data Logs User Individual Contrib Count Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_individual_contrib_count_eop' = 
 			
 			[meas.data_logs_user_count_eop_for_all_sales_roles]  - [meas.data_logs_user_count_eop_for_mgr] 
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 190042ed-5ba8-4940-b3a0-4223f7d6d03b
 
-	/// Measure meas.data_logs_user_rep_mgr_ratio.
+	/// Purpose: Data Logs User Rep Mgr Ratio.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.data_logs_user_rep_mgr_ratio' =
-			description: "TODO: provide business definition for this measure."
 			//divide(users_history[meas.data_logs_user_individual_contrib_count_eop] ,users_history[meas.data_logs_user_count_eop_for_mgr])
 			
 			VAR _total_role = CALCULATE(
-			    [meas.data_logs_user_count_eop], // get the necessary count filtering role dept
-			    users_history[trueai_user_role_function] in {"AE","AM", "SDR"}
-			)
+			[meas.data_logs_user_count_eop], // get the necessary count filtering role dept			users_history[trueai_user_role_function] in {"AE","AM", "SDR"}			)
 			VAR _mgr_count = [meas.data_logs_user_count_eop_for_mgr]   // get the manager count
 			var res  = DIVIDE(
-			    _total_role,
-			    _mgr_count
-			)
+			_total_role,			_mgr_count			)
 			
 			RETURN
 			res
@@ -102,8 +102,12 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_user_count_eop.
-	measure 'meas.data_logs_user_count_eop' = ```
+	/// Purpose: Data Logs User Count Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_count_eop' = 
 			
 			
 			var fromDate =[meas.context_date_min] 
@@ -116,14 +120,16 @@ table users_history
 			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
 			
 			return res // return the res :)
-			```
-			description: "Ratio of users_history[_sys_filt_start_date] to users_history[_sys_filt_start_date]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 0d53230b-70a9-4c33-923e-97f01c07267f
 
-	/// Measure meas.data_logs_user_new_terminations_within_12_months.
-	measure 'meas.data_logs_user_new_terminations_within_12_months' = ```
+	/// Purpose: Data Logs User New Terminations Within 12 Months.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_new_terminations_within_12_months' = 
 			
 			
 			
@@ -132,16 +138,17 @@ table users_history
 			
 			
 			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_termination_date] >= fromDate &&  users_history[trueai_termination_date]  <= toDate  && users_history[trueai_tenure] < 13)
-			return res * -1
-			```
-			description: "Distinct count of users_history[_sys_user_id]. Respects the current filter context."
+			users_history[trueai_termination_date] >= fromDate &&  users_history[trueai_termination_date]  <= toDate  && users_history[trueai_tenure] < 13)			return res * -1
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: 1b315d56-3418-4f57-83da-95dd0f39299c
 
-	/// Measure meas.data_logs_ci_perf_tier_count.
-	measure 'meas.data_logs_ci_perf_tier_count' = ```
+	/// Purpose: Data Logs Ci Perf Tier Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_ci_perf_tier_count' = 
 			
 			var month_instances = CALCULATE(COUNT(users_history[col.ci.perf_qtly_performance_tier]))  // how many months in this perf cat
 			Var total_months = CALCULATE(count(users_history[col.ci.perf_qtly_performance_tier]), users_history[col.ci.perf_qtly_performance_tier] <> "XX") // how many months in total? (per cate not equal anything
@@ -149,39 +156,45 @@ table users_history
 			var users_in_perf_tier_dec = total_users * (month_instances) / total_months
 			var res = Round(users_in_perf_tier_dec ,0) 
 			return res
-			```
-			description: "Ratio based on users_history[_sys_user_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _perf_analysis
 		lineageTag: c8771d48-9a93-446a-b576-b1cae3318ddc
 
-	/// Measure meas.data_logs_user_net_new_users.
-	measure 'meas.data_logs_user_net_new_users' = ```
+	/// Purpose: Data Logs User Net New Users.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_net_new_users' = 
 			[meas.data_logs_user_new_hires] + [meas.data_logs_user_new_terminations] 
-			```
-			description: "TODO: provide business definition for this measure."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 1103f6b8-a2c1-47f7-82b8-8f911720ebe9
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_bookings.
-	measure 'meas.data_logs_ci_perf_annual_avg_bookings' = ```
+	/// Purpose: Data Logs Ci Perf Annual Avg Bookings.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_ci_perf_annual_avg_bookings' = 
 			
 			var end_date =   [meas.companies_history_reference_date]
 			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
 			var res =  CALCULATE(AVERAGE(users_history[ci_perf_qtly_avg_bookings_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date) // qtly number
 			return res * 4 // annual number
 			
-			```
-			description: "Ratio of users_history[ci_perf_qtly_avg_bookings_peers] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _perf_analysis
 		lineageTag: e8d0ba55-4ac1-4b2d-9735-21fbf43528cc
 
 		annotation PBI_FormatHint = {"currencyCulture":""}
 
-	/// Measure meas.data_logs_user_count_bop.
-	measure 'meas.data_logs_user_count_bop' = ```
+	/// Purpose: Data Logs User Count Bop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_count_bop' = 
 			
 			
 			var fromDate =[meas.context_date_min] 
@@ -194,41 +207,47 @@ table users_history
 			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
 			
 			return res // return the res :)
-			```
-			description: "Ratio of users_history[_sys_filt_start_date] to users_history[_sys_filt_start_date]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 23c2187f-b803-4f66-a9bb-b218861c778f
 
-	/// Measure meas.data_logs_user_count_change.
+	/// Purpose: Data Logs User Count Change.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.data_logs_user_count_change' = divide([meas.data_logs_user_new_hires] , [meas.data_logs_user_count_bop], BLANK())
-		description: "Ratio measure. Respects the current filter context."
 		formatString: +#,##0%;-#,##0%
 		displayFolder: _rep_count_analysis
 		lineageTag: c2d4b16c-eba9-4e44-a36b-88f0439a492c
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_user_new_hires.
-	measure 'meas.data_logs_user_new_hires' = ```
+	/// Purpose: Data Logs User New Hires.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_new_hires' = 
 			
 			
 			var fromDate =[meas.context_date_min] 
 			var toDate = [meas.context_date_max] 
 			
 			var res = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate)
-			
+			users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate)			
 			           
 			return if(isblank(res), 0, res)
-			```
-			description: "Distinct count of users_history[_sys_user_id]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 71c8d155-d6fc-42de-b47d-f7c9060e54a1
 
-	/// Measure meas.data_logs_user_new_terminations_within_12_months_avg_tenure.
-	measure 'meas.data_logs_user_new_terminations_within_12_months_avg_tenure' = ```
+	/// Purpose: Data Logs User New Terminations Within 12 Months Avg Tenure.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.data_logs_user_new_terminations_within_12_months_avg_tenure' = 
 			
 			
 			
@@ -237,69 +256,57 @@ table users_history
 			
 			
 			var res = CALCULATE(AVERAGEX(users_history, (users_history[trueai_termination_date]  - users_history[trueai_hire_date]) /30  ), 
-			           users_history[trueai_termination_date] >= fromDate &&  users_history[trueai_termination_date]  <= toDate  && users_history[trueai_tenure] < 13)
-			
+			users_history[trueai_termination_date] >= fromDate &&  users_history[trueai_termination_date]  <= toDate  && users_history[trueai_tenure] < 13)			
 			return res
-			```
-			description: "Ratio of users_history[trueai_termination_date] to users_history[trueai_hire_date]. Respects the current filter context."
 		formatString: 0.0
 		displayFolder: _ramp_analysis
 		lineageTag: 75d0f25d-3377-4efe-b39e-2e5fcc6393ab
 
-	/// Measure meas.data_logs_user_new_hires_reached_performer_success_rate.
-	measure 'meas.data_logs_user_new_hires_reached_performer_success_rate' = ```
+	/// Purpose: Data Logs User New Hires Reached Performer Success Rate.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.data_logs_user_new_hires_reached_performer_success_rate' = 
 			
 			var tot_new_hires  = [meas.data_logs_user_new_hires]
 			
 			var _reached_reps = [meas.user_history_user_new_hires_reached_perf_in_12_month]
 			
 			var res = DIVIDE(
-			    _reached_reps,
-			    tot_new_hires,
-			    0
-			)
+			_reached_reps,			tot_new_hires,			0			)
 			RETURN
 			IF(
-			    res=BLANK(),
-			    0,                      // putting the condition to 0% instead of blank if there is blank 
-			    res
-			)
-			```
-			description: "Ratio measure. Respects the current filter context."
+			res=BLANK(),			0,                      // putting the condition to 0% instead of blank if there is blank 			res			)
 		formatString: 0%;-0%;0%
 		displayFolder: _perf_analysis
 		lineageTag: c9422a55-f07e-46d0-8b7d-e7073208b629
 
-	/// Measure meas.data_logs_user_new_terminations_within_12_months_failure_rate.
+	/// Purpose: Data Logs User New Terminations Within 12 Months Failure Rate.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.data_logs_user_new_terminations_within_12_months_failure_rate' = divide( -1 * [meas.data_logs_user_new_terminations_within_12_months],  [meas.data_logs_user_new_hires] , BLANK())
-		description: "Ratio measure. Respects the current filter context."
 		formatString: #,0%;-#,0%;#,0%
 		displayFolder: _ramp_analysis
 		lineageTag: 29a4c52e-0ac6-4eb5-8258-ac1cac98ccae
 
-	/// Measure meas.data_logs_user_new_hires_reached_performer_within_12_months_avg_tenure.
-	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months_avg_tenure' = ```
+	/// Purpose: Data Logs User New Hires Reached Performer Within 12 Months Avg Tenure.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months_avg_tenure' = 
 			
 			VAR fromDate = [meas.context_date_min]
 			VAR toDate = [meas.context_date_max]
 			
 			VAR res =
-			    CALCULATE(
-			        AVERAGEX(
-			            users_history,
-			            MAX(0, DATEDIFF(users_history[trueai_hire_date], users_history[col.perf_date_first_reached], DAY))
-			        ),
-			        users_history[trueai_hire_date] >= fromDate &&
-			        users_history[trueai_hire_date] <= toDate &&
-			
-			        NOT(ISBLANK(users_history[col.perf_date_first_reached])) &&
-			        users_history[col.perf_date_first_reached] <= users_history[trueai_hire_date] + 365
-			    ) / 30 
-			
+			CALCULATE(			AVERAGEX(			users_history,			MAX(0, DATEDIFF(users_history[trueai_hire_date], users_history[col.perf_date_first_reached], DAY))			),			users_history[trueai_hire_date] >= fromDate &&			users_history[trueai_hire_date] <= toDate &&			
+			NOT(ISBLANK(users_history[col.perf_date_first_reached])) &&			users_history[col.perf_date_first_reached] <= users_history[trueai_hire_date] + 365			) / 30 			
 			RETURN
 			IF(res = BLANK(), "-", res)
-			```
-			description: "Ratio of users_history[trueai_hire_date] to users_history[trueai_hire_date]. Respects the current filter context."
 		formatString: #,##0.0" Mos."
 		displayFolder: _perf_analysis
 		lineageTag: 13df22da-2a25-4c0d-beca-5c550610123e
@@ -308,8 +315,12 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_pipeline_created.
-	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created' = ```
+	/// Purpose: Data Logs Ci Perf Annual Avg Pipeline Created.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created' = 
 			
 			var end_date =   [meas.companies_history_reference_date]
 			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
@@ -318,16 +329,18 @@ table users_history
 			
 			
 			
-			```
-			description: "Ratio based on cal_end_dates[Date]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _perf_analysis
 		lineageTag: a71bba55-020c-4658-b8f1-53fffc283958
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.users_history_ramping_reps_count_eop.
-	measure 'meas.users_history_ramping_reps_count_eop' = ```
+	/// Purpose: Users History Ramping Reps Count Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.users_history_ramping_reps_count_eop' = 
 			
 			
 			
@@ -341,23 +354,27 @@ table users_history
 			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, users_history[_sys_user_id]))) // get a disctinct count of users from that filter context 
 			
 			return res // return the res :)
-			```
-			description: "Ratio of users_history[_sys_filt_start_date] to users_history[_sys_filt_start_date]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _skills_analysis
 		lineageTag: 443a145f-8199-4a8d-bba8-a3b1556b6100
 
-	/// Measure meas.user_history_period_count.
+	/// Purpose: User History Period Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.user_history_period_count' = CALCULATE(DISTINCTCOUNT(users_history[_sys_filt_start_date]))
-		description: "Distinct count of users_history[_sys_filt_start_date]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _helper
 		lineageTag: a95dbb11-f9e5-4d93-950a-5d9a776941b0
 
-	/// Measure meas.users_history_vi_value_received_all_prior_time.
+	/// Purpose: Users History Vi Value Received All Prior Time.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_history_vi_value_received_all_prior_time' =
 			
-			description: "TODO: provide business definition for this measure."
 			var max_date = CALCULATE(max(cal_end_dates[Date]))
 			var val_all_time = CALCULATE(Sum(users_history[vi_value_received_tot]),cal_end_dates[Date] > Date(1900,1,1) && cal_end_dates[Date] <= max_date) // override all prior time until max date
 			var res = val_all_time
@@ -370,69 +387,68 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.user_history_user_new_hires_reached_perf_in_12_month.
-	measure 'meas.user_history_user_new_hires_reached_perf_in_12_month' = ```
+	/// Purpose: User History User New Hires Reached Perf In 12 Month.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.user_history_user_new_hires_reached_perf_in_12_month' = 
 			
 			
 			var fromDate =[meas.context_date_min] 
 			var toDate = [meas.context_date_max] 
 			var perf_reps = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&    users_history[trueai_hire_date]  <= toDate -- hired this year
-			           && users_history[col.perf_date_first_reached]  <  users_history[trueai_hire_date] +365  -- did reach perf within a year 
-			           && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) > users_history[trueai_hire_date] +365 -- did not get terminated within a year
-			           )
-			
+			users_history[trueai_hire_date] >= fromDate &&    users_history[trueai_hire_date]  <= toDate -- hired this year			&& users_history[col.perf_date_first_reached]  <  users_history[trueai_hire_date] +365  -- did reach perf within a year 			&& if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) > users_history[trueai_hire_date] +365 -- did not get terminated within a year			)			
 			var res = if(ISBLANK(perf_reps), 0, perf_reps)
 			return res
-			```
-			description: "Distinct count of users_history[_sys_user_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: d7c2bfef-6936-47f3-b6c3-3453a31b2971
 
-	/// Measure meas.user_history_user_new_hires_didnt_reach_perf_in_12_month.
-	measure 'meas.user_history_user_new_hires_didnt_reach_perf_in_12_month' = ```
+	/// Purpose: User History User New Hires Didnt Reach Perf In 12 Month.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.user_history_user_new_hires_didnt_reach_perf_in_12_month' = 
 			
 			
 			var fromDate =[meas.context_date_min] 
 			var toDate = [meas.context_date_max] 
 			var perf_reps = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year
-			           && users_history[col.perf_date_first_reached]   > users_history[trueai_hire_date] +365 -- did not reach perf level in a year
-			           && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) > users_history[trueai_hire_date] +365 -- was not terminated
-			           )
-			
+			users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year			&& users_history[col.perf_date_first_reached]   > users_history[trueai_hire_date] +365 -- did not reach perf level in a year			&& if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) > users_history[trueai_hire_date] +365 -- was not terminated			)			
 			var res = if(ISBLANK(perf_reps), 0, perf_reps)
 			return res
-			```
-			description: "Distinct count of users_history[_sys_user_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: cbad2d08-9be8-4635-a80e-1fb33bbc5488
 
-	/// Measure meas.user_history_user_new_hires_terminated_in_12_month.
-	measure 'meas.user_history_user_new_hires_terminated_in_12_month' = ```
+	/// Purpose: User History User New Hires Terminated In 12 Month.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.user_history_user_new_hires_terminated_in_12_month' = 
 			
 			
 			var fromDate =[meas.context_date_min] 
 			var toDate = [meas.context_date_max] 
 			var termed_within12 = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year
-			           && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) < users_history[trueai_hire_date] +365) -- terminated within a year
-			
+			users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year			&& if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) < users_history[trueai_hire_date] +365) -- terminated within a year			
 			var res = if(isblank(termed_within12),0,termed_within12 )
 			return res * -1
-			```
-			description: "Distinct count of users_history[_sys_user_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: 1aea2f21-f4e1-4f4d-bc08-8849f865a4c8
 
-	/// Measure meas.users_history_ci_perf_avg_attainment.
+	/// Purpose: Users History Ci Perf Avg Attainment.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.users_history_ci_perf_avg_attainment' =
 			
 			
-			description: "TODO: provide business definition for this measure."
 			var tbl_reps = SUMMARIZE(CALCULATETABLE(users_history,users_history[ci_perf_qtly_avg_bookings_peers] > 1 ), users_history[_sys_user_id],  "rep_sum",  sum(users_history[col.ci.perf_qtly_bookings_user]), "peer_sum",  sum(users_history[ci_perf_qtly_avg_bookings_peers]))
 			var avg_rep_attain = AVERAGEX(tbl_reps, DIVIDE([rep_sum],[peer_sum]))
 			var res  = avg_rep_attain
@@ -443,15 +459,15 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_ae.
-	measure 'meas.data_logs_user_count_eop_for_ae' = ```
+	/// Purpose: Data Logs User Count Eop For Ae.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_count_eop_for_ae' = 
 			
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "AE" 
-			)
-			```
-			description: "TODO: provide business definition for this measure."
+			[meas.data_logs_user_count_eop]+0,			users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "AE" 			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 0f5821e3-d7cc-4ce4-ae7f-9f760cba5013
@@ -464,15 +480,15 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_am.
-	measure 'meas.data_logs_user_count_eop_for_am' = ```
+	/// Purpose: Data Logs User Count Eop For Am.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_count_eop_for_am' = 
 			
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "AM" 
-			)
-			```
-			description: "TODO: provide business definition for this measure."
+			[meas.data_logs_user_count_eop]+0,			users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "AM" 			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 851eef1a-e954-4e31-91a7-0aaf4d2959b1
@@ -485,15 +501,15 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_sdr.
-	measure 'meas.data_logs_user_count_eop_for_sdr' = ```
+	/// Purpose: Data Logs User Count Eop For Sdr.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_count_eop_for_sdr' = 
 			
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "SDR" 
-			)
-			```
-			description: "TODO: provide business definition for this measure."
+			[meas.data_logs_user_count_eop]+0,			users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "SDR" 			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: bc734f70-1e1a-414c-8344-0db6935738ea
@@ -506,15 +522,15 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_all_sales_roles.
-	measure 'meas.data_logs_user_count_eop_for_all_sales_roles' = ```
+	/// Purpose: Data Logs User Count Eop For All Sales Roles.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_count_eop_for_all_sales_roles' = 
 			
 			CALCULATE(
-			    [meas.data_logs_user_count_eop],
-			    users_history[trueai_user_role_department] = "SALES" 
-			)
-			```
-			description: "TODO: provide business definition for this measure."
+			[meas.data_logs_user_count_eop],			users_history[trueai_user_role_department] = "SALES" 			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 5e4e7b8f-4fec-4aef-aad0-58359508545c
@@ -527,39 +543,40 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_mgr.
-	measure 'meas.data_logs_user_count_eop_for_mgr' = ```
+	/// Purpose: Data Logs User Count Eop For Mgr.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_count_eop_for_mgr' = 
 			
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "MGMT" 
-			        )
-			```
-			description: "TODO: provide business definition for this measure."
-		formatString: #,0
+			[meas.data_logs_user_count_eop]+0,			users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "MGMT" 			)		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 85f4c5b8-e1fe-4183-b591-4ef4151f7ee6
 
-	/// Measure meas.data_logs_user_count_eop_for_other.
+	/// Purpose: Data Logs User Count Eop For Other.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.data_logs_user_count_eop_for_other' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "OTHER ROLES"
-			)
+			[meas.data_logs_user_count_eop]+0,			users_history[trueai_user_role_department] = "SALES" &&  users_history[trueai_user_role_function] = "OTHER ROLES"			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 264b9cb9-f0ce-4764-8abe-39c27f7e8175
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_mkt.
+	/// Purpose: Data Logs User Count Eop For Dept Mkt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.data_logs_user_count_eop_for_dept_mkt' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.data_logs_user_count_eop],
-			    users_history[trueai_user_role_department] IN { "MKT" }
-			)
+			[meas.data_logs_user_count_eop],			users_history[trueai_user_role_department] IN { "MKT" }			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 7e8c4b48-a945-4fc5-a092-43358df3fa62
@@ -572,14 +589,15 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_sales.
+	/// Purpose: Data Logs User Count Eop For Dept Sales.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.data_logs_user_count_eop_for_dept_sales' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] IN { "SALES" }
-			)
+			[meas.data_logs_user_count_eop]+0,			users_history[trueai_user_role_department] IN { "SALES" }			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 31ce84f9-bae7-4b16-abad-55e7cea9405c
@@ -592,14 +610,15 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_other.
+	/// Purpose: Data Logs User Count Eop For Dept Other.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.data_logs_user_count_eop_for_dept_other' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] IN { "OTHER DEPTS" }
-			)
+			[meas.data_logs_user_count_eop]+0,			users_history[trueai_user_role_department] IN { "OTHER DEPTS" }			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: c5ee2d2f-a382-44a5-b694-7c76dd98edd0
@@ -612,10 +631,13 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_change_perc.
+	/// Purpose: Data Logs User Count Change Perc.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.data_logs_user_count_change_perc' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR __BASELINE_VALUE = [meas.data_logs_user_count_bop]
 			VAR __VALUE_TO_COMPARE = [meas.data_logs_user_count_eop]
 			RETURN
@@ -632,21 +654,25 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_nd.
+	/// Purpose: Data Logs User Count Eop For Nd.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.data_logs_user_count_eop_for_nd' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role]
-			        IN { "ND" }
-			)
+			[meas.data_logs_user_count_eop]+0,			users_history[trueai_user_role]			IN { "ND" }			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 7bcb8763-96e0-4db1-b039-349dbd1c0eec
 
-	/// Measure meas.reps_w_actlvl_pct.
-	measure 'meas.reps_w_actlvl_pct' = ```
+	/// Purpose: Reps W Actlvl Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.reps_w_actlvl_pct' = 
 			
 			var reps_w_acl = [meas.reps_w_actlvl_count]
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]))
@@ -655,28 +681,32 @@ table users_history
 			return res
 			
 			
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _acl_ta_analysis
 		lineageTag: a812b715-d8de-41ae-bfc8-aa462a01927b
 
 		changedProperty = FormatString
 
-	/// Measure meas.reps_w_actlvl_count.
+	/// Purpose: Reps W Actlvl Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.reps_w_actlvl_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(DISTINCTCOUNT([_sys_user_id]), (users_history[ci_act_capt_lvl] > 0)
 			)
 		formatString: #,0
 		displayFolder: _acl_ta_analysis
 		lineageTag: cb1894d2-ba0e-4792-8b22-f9f580f4b5e6
 
-	/// Measure meas.reps_w_time_allocation_pct.
+	/// Purpose: Reps W Time Allocation Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.reps_w_time_allocation_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			var reps_w_ta = [meas.reps_w_time_allocation_count]
 			var reps_tot = [meas.data_logs_user_count_eop]
 			
@@ -694,8 +724,12 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.reps_w_time_allocation_count.
-	measure 'meas.reps_w_time_allocation_count' = ```
+	/// Purpose: Reps W Time Allocation Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.reps_w_time_allocation_count' = 
 			
 			
 			var fromDate =[meas.context_date_min] 
@@ -708,22 +742,26 @@ table users_history
 			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
 			
 			return res // return the res :)
-			```
-			description: "Ratio of users_history[_sys_filt_start_date] to users_history[_sys_filt_start_date]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: 390d2dd9-6f68-455a-a819-a36c90a9703c
 
-	/// Measure meas.users_history_row_filler.
+	/// Purpose: Users History Row Filler.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: 6ddcb848-f676-401c-a8b8-ee85f6065845
 
-	/// Measure meas.sys.user_id_for_am.
+	/// Purpose: Sys User Id For Am.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.sys.user_id_for_am' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "AM" }
@@ -738,14 +776,15 @@ table users_history
 				  "version": 0
 				}
 
-	/// Measure meas.di.trueai_opps_won_amt_am_avg.
+	/// Purpose: Di Trueai Opps Won Amt Am Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.di.trueai_opps_won_amt_am_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			DIVIDE(
-			    SUM(ssr_history[opp_won_amt])+0,
-			    [meas.sys.user_id_for_am]
-			)
+			SUM(ssr_history[opp_won_amt])+0,			[meas.sys.user_id_for_am]			)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: 672dae6d-f8c4-4494-ad53-bf9b1cb93fb6
@@ -758,10 +797,13 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.sys.user_id_for_ae.
+	/// Purpose: Sys User Id For Ae.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.sys.user_id_for_ae' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "AE" }
@@ -770,10 +812,13 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 443717c6-2617-4712-9ee1-236180210cdb
 
-	/// Measure meas.sys.user_id_for_sdr.
+	/// Purpose: Sys User Id For Sdr.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.sys.user_id_for_sdr' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "SDR" }
@@ -782,10 +827,13 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: b95fcde4-0bcd-4deb-8ac0-ef02a18103d6
 
-	/// Measure meas.sys.user_id_for_nd.
+	/// Purpose: Sys User Id For Nd.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.sys.user_id_for_nd' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "ND" }
@@ -794,10 +842,13 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 60ef9f77-bd16-4f97-a5b9-a3d8fd5f0927
 
-	/// Measure meas.sys.user_id_for_other.
+	/// Purpose: Sys User Id For Other.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.sys.user_id_for_other' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "OTHER" }
@@ -806,64 +857,71 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: a67bea40-cc9d-4b93-b763-4082390316e3
 
-	/// Measure meas.di.trueai_opps_won_amt_ae_avg.
+	/// Purpose: Di Trueai Opps Won Amt Ae Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.di.trueai_opps_won_amt_ae_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			DIVIDE(
-			    SUM(ssr_history[opp_won_amt])+0,
-			    [meas.sys.user_id_for_ae]
-			)
+			SUM(ssr_history[opp_won_amt])+0,			[meas.sys.user_id_for_ae]			)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: 4e7673c7-6ba5-4aaa-8092-0bb53c634fad
 
 		changedProperty = FormatString
 
-	/// Measure meas.di.trueai_opps_won_amt_sdr_avg.
+	/// Purpose: Di Trueai Opps Won Amt Sdr Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.di.trueai_opps_won_amt_sdr_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			DIVIDE(
-			    SUM(ssr_history[opp_won_amt])+0,
-			    [meas.sys.user_id_for_sdr]
-			)
+			SUM(ssr_history[opp_won_amt])+0,			[meas.sys.user_id_for_sdr]			)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: 98385d82-fa66-49df-896d-e5ab747667eb
 
 		changedProperty = FormatString
 
-	/// Measure meas.di.trueai_opps_won_amt_nd_avg.
+	/// Purpose: Di Trueai Opps Won Amt Nd Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.di.trueai_opps_won_amt_nd_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			DIVIDE(
-			    SUM(ssr_history[opp_won_amt])+0,
-			    [meas.sys.user_id_for_nd]
-			)
+			SUM(ssr_history[opp_won_amt])+0,			[meas.sys.user_id_for_nd]			)
 		displayFolder: _results_analysis
 		lineageTag: 225d81ac-2ee8-468b-b631-d57e12f9c289
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.di.trueai_opps_won_amt_mgr_avg.
+	/// Purpose: Di Trueai Opps Won Amt Mgr Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.di.trueai_opps_won_amt_mgr_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			DIVIDE(
-			    SUM(ssr_history[opp_won_amt])+0,
-			    [meas.sys.user_id_for_mgr]
-			)
+			SUM(ssr_history[opp_won_amt])+0,			[meas.sys.user_id_for_mgr]			)
 		displayFolder: _results_analysis
 		lineageTag: adeb39fc-4055-4ab4-8198-862c0d190999
 
 		changedProperty = FormatString
 
-	/// Measure meas.sys.user_id_for_mgr.
+	/// Purpose: Sys User Id For Mgr.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.sys.user_id_for_mgr' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_function] IN { "MGMT" }
@@ -872,108 +930,112 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 8421e203-c9d1-468b-affe-165f59ada1ae
 
-	/// Measure meas.di.trueai_opps_won_amt_other_avg.
+	/// Purpose: Di Trueai Opps Won Amt Other Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.di.trueai_opps_won_amt_other_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			DIVIDE(
-			    SUM(ssr_history[opp_won_amt])+0,
-			    [meas.sys.user_id_for_other]
-			)
+			SUM(ssr_history[opp_won_amt])+0,			[meas.sys.user_id_for_other]			)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: e4a86f1b-abb3-4193-95f4-fcbed163093b
 
 		changedProperty = FormatString
 
-	/// _rep
-	measure 'meas.count_trueai_user_role_account_executive' = ```
+	/// Purpose: Count Trueai User Role Account Executive.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.count_trueai_user_role_account_executive' = 
 			
 			var min_date = [meas.context_date_min]
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date)
 			
 			var res = CALCULATE(
-			    DISTINCTCOUNT(users_history[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "Account Executive"  },user_filt
-			)
+			DISTINCTCOUNT(users_history[_sys_user_id])+0,			users_history[trueai_user_role] IN { "Account Executive"  },user_filt			)
 			return res 
-			```
-			description: "Distinct count of users_history[_sys_user_id]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: f9380111-412f-4044-b400-0d2ca99a2968
 
-	/// _rep
-	measure 'meas.count_trueai_user_role_account_manager' = ```
+	/// Purpose: Count Trueai User Role Account Manager.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.count_trueai_user_role_account_manager' = 
 			
 			var min_date = [meas.context_date_min]
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date)
 			
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "Account Manager"  },user_filt
-			)
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,			users_history[trueai_user_role] IN { "Account Manager"  },user_filt			)
 			return res 
-			```
-			description: "Distinct count of users_history[trueai_user_role]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: 5569d550-425e-4fd9-99b5-14bb55a3efff
 
-	/// _rep
-	measure 'meas.count_trueai_user_role_sales_manager' = ```
+	/// Purpose: Count Trueai User Role Sales Manager.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.count_trueai_user_role_sales_manager' = 
 			
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
 			
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "Sales Manager"  },user_filt
-			)
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,			users_history[trueai_user_role] IN { "Sales Manager"  },user_filt			)
 			return res 
-			```
-			description: "Ratio based on users_history[trueai_user_role]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: b6ac59ea-d721-4ef6-8c5b-230bf0de8e09
 
-	/// _rep
-	measure 'meas.count_trueai_user_role_nd' = ```
+	/// Purpose: Count Trueai User Role Nd.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.count_trueai_user_role_nd' = 
 			
 			var min_date = [meas.context_date_min]
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date)
 			
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "ND"  },user_filt
-			)
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,			users_history[trueai_user_role] IN { "ND"  },user_filt			)
 			return res 
-			```
-			description: "Distinct count of users_history[trueai_user_role]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 42d75b4a-4848-4708-8151-7a0816e02c31
 
-	/// _rep
-	measure 'meas.count_trueai_user_role_sales_development_rep' = ```
+	/// Purpose: Count Trueai User Role Sales Development Rep.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.count_trueai_user_role_sales_development_rep' = 
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
 			
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "Sales Development Rep"  },user_filt
-			)
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,			users_history[trueai_user_role] IN { "Sales Development Rep"  },user_filt			)
 			return res 
-			```
-			description: "Ratio based on users_history[trueai_user_role]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: be269a0b-7718-4e82-ac59-c6b6bda76360
 
-	/// Measure meas.user_history_count_dept_sales.
+	/// Purpose: User History Count Dept Sales.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.user_history_count_dept_sales' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
 				DISTINCTCOUNT('users_history'[_sys_user_id]),
 				'users_history'[trueai_user_role_department] IN { "SALES" }
@@ -988,14 +1050,15 @@ table users_history
 				  "version": 0
 				}
 
-	/// _rep
+	/// Purpose: Count Trueai User Role Account Executive In Group Nd.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.count_trueai_user_role_account_executive_in_group_nd' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.count_trueai_user_role_account_executive],
-			    users_history[trueai_group] IN { "ND" }
-			)
+			[meas.count_trueai_user_role_account_executive],			users_history[trueai_group] IN { "ND" }			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 9ca49175-64b3-4320-a764-4d0ddba97eed
@@ -1008,96 +1071,102 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// _rep
-	measure 'meas.count_trueai_user_role_all_salesteam' = ```
+	/// Purpose: Count Trueai User Role All Salesteam.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.count_trueai_user_role_all_salesteam' = 
 			var min_date = [meas.context_date_min]
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date)
 			
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN { "Account Executive", "Account Manager", "Sales Development Rep", "Sales Manager", "ND", "Other", "Sales Executive"  },user_filt
-			)
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,			users_history[trueai_user_role] IN { "Account Executive", "Account Manager", "Sales Development Rep", "Sales Manager", "ND", "Other", "Sales Executive"  },user_filt			)
 			return res 
 			
-			```
-			description: "Distinct count of users_history[trueai_user_role]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 5ba6ff62-c218-4a8c-a401-b26f5bbba04f
 
-	/// _rep
-	measure 'meas.count_trueai_user_role_other' = ```
+	/// Purpose: Count Trueai User Role Other.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.count_trueai_user_role_other' = 
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
 			
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role_function] IN { "OTHER ROLES"  },user_filt
-			)
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,			users_history[trueai_user_role_function] IN { "OTHER ROLES"  },user_filt			)
 			return res 
-			```
-			description: "Ratio based on users_history[trueai_user_role_function]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 2096bd64-ff8b-4b2f-8629-80b6e89051cb
 
-	/// _rep
-	measure 'meas.count_trueai_user_role_sales_executive' = ```
+	/// Purpose: Count Trueai User Role Sales Executive.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.count_trueai_user_role_sales_executive' = 
 			
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
 			
 			var res = CALCULATE(
-			    DISTINCTCOUNT('users_history'[_sys_user_id])+0,
-			    users_history[trueai_user_role] IN {"Sales Executive"},user_filt
-			)
+			DISTINCTCOUNT('users_history'[_sys_user_id])+0,			users_history[trueai_user_role] IN {"Sales Executive"},user_filt			)
 			return res 
-			```
-			description: "Ratio based on users_history[trueai_user_role]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 32655af9-d185-476f-9a78-27fbb9ffbcb5
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_support.
+	/// Purpose: Data Logs User Count Eop For Dept Support.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.data_logs_user_count_eop_for_dept_support' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] IN { "SUPPORT" }
-			)
+			[meas.data_logs_user_count_eop]+0,			users_history[trueai_user_role_department] IN { "SUPPORT" }			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: 1e6d0ed8-aaae-4efe-b4d3-51a8c8c2b16c
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_ops.
+	/// Purpose: Data Logs User Count Eop For Dept Ops.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.data_logs_user_count_eop_for_dept_ops' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] IN { "OPS" }
-			)
+			[meas.data_logs_user_count_eop]+0,			users_history[trueai_user_role_department] IN { "OPS" }			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: e9b2eb17-1691-4b12-825c-1f151ac84361
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_nd.
+	/// Purpose: Data Logs User Count Eop For Dept Nd.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.data_logs_user_count_eop_for_dept_nd' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.data_logs_user_count_eop]+0,
-			    users_history[trueai_user_role_department] IN { "ND" }
-			)
+			[meas.data_logs_user_count_eop]+0,			users_history[trueai_user_role_department] IN { "ND" }			)
 		formatString: #,0
 		displayFolder: _rep_count_analysis
 		lineageTag: b7c20247-953b-46d0-b3ca-169b075bde67
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg.
+	/// Purpose: Data Logs Won Amt User Eop Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.data_logs_won_amt_user_eop_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			DIVIDE(
 				SUM(ssr_history[opp_won_amt]),
 				[meas.data_logs_user_count_eop]
@@ -1114,14 +1183,15 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_pipeline_amt_user_eop_avg.
+	/// Purpose: Data Logs Pipeline Amt User Eop Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.data_logs_pipeline_amt_user_eop_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			DIVIDE(
-			        SUM('ssr_history'[opp_pipeline_amt]),
-			        [meas.data_logs_user_count_eop]
-			)
+			SUM('ssr_history'[opp_pipeline_amt]),			[meas.data_logs_user_count_eop]			)
 		displayFolder: _results_analysis
 		lineageTag: e3899a10-a1ed-4134-b2f9-aa52c0d6645e
 
@@ -1129,16 +1199,18 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_new_logo_selling.
-	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_logo_selling' = ```
+	/// Purpose: Data Logs Won Amt User Eop Avg For New Logo Selling.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_logo_selling' = 
 			
 			var reps = [meas.data_logs_user_count_eop]
 			var won_amt = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] IN { "New Logo Selling" })
 			
 			var res = DIVIDE(won_amt, reps)
 			return res 
-			```
-			description: "Ratio of ssr_history[opp_won_amt] to ssr_history[step_name]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: e942f6df-814c-42d0-a743-58d166e9dce8
@@ -1153,8 +1225,12 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_existing_acv.
-	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_acv' = ```
+	/// Purpose: Data Logs Won Amt User Eop Avg For Existing Acv.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_acv' = 
 			
 			var reps = [meas.data_logs_user_count_eop]
 			var won_amt = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] IN { "New Logo Selling", "Existing Customer Selling" } && ssr_history[col.opp_acv_classification] = 
@@ -1162,16 +1238,18 @@ table users_history
 			
 			var res = DIVIDE(won_amt, reps)
 			return res 
-			```
-			description: "Ratio of ssr_history[opp_won_amt] to ssr_history[step_name]. Respects the current filter context."
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _results_analysis
 		lineageTag: 5fcf4a6a-efa3-4459-988e-6eb31406c216
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_new_acv.
-	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_acv' = ```
+	/// Purpose: Data Logs Won Amt User Eop Avg For New Acv.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_acv' = 
 			
 			var reps = [meas.data_logs_user_count_eop]
 			var won_amt = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] IN { "New Logo Selling", "Existing Customer Selling" } && ssr_history[col.opp_acv_classification] = 
@@ -1179,8 +1257,6 @@ table users_history
 			
 			var res = DIVIDE(won_amt, reps)
 			return res 
-			```
-			description: "Ratio of ssr_history[opp_won_amt] to ssr_history[step_name]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: 0b8c546c-cfa8-4fad-9bdc-f3d297110235
@@ -1195,138 +1271,182 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.user_history_user_new_hires_terminated_in_12_month_pos.
-	measure 'meas.user_history_user_new_hires_terminated_in_12_month_pos' = ```
+	/// Purpose: User History User New Hires Terminated In 12 Month Pos.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.user_history_user_new_hires_terminated_in_12_month_pos' = 
 			
 			
 			var fromDate =[meas.context_date_min] 
 			var toDate = [meas.context_date_max] 
 			var termed_within12 = CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), 
-			           users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year
-			           && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) < users_history[trueai_hire_date] +365) -- terminated within a year
-			
+			users_history[trueai_hire_date] >= fromDate &&     users_history[trueai_hire_date]  <= toDate -- hired this year			&& if(isblank(users_history[trueai_termination_date]), date(2100,1,1),users_history[trueai_termination_date]) < users_history[trueai_hire_date] +365) -- terminated within a year			
 			var res = if(isblank(termed_within12),0,termed_within12 )
 			return res
-			```
-			description: "Distinct count of users_history[_sys_user_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ramp_analysis
 		lineageTag: 640150f5-397a-4029-bd36-e53852d020d0
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_existing_customer_selling.
-	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_customer_selling' = ```
+	/// Purpose: Data Logs Won Amt User Eop Avg For Existing Customer Selling.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_customer_selling' = 
 			
 			var reps = [meas.data_logs_user_count_eop]
 			var won_amt = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] IN { "Existing Customer Selling" })
 			
 			var res = DIVIDE(won_amt, reps)
 			return res 
-			```
-			description: "Ratio of ssr_history[opp_won_amt] to ssr_history[step_name]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _results_analysis
 		lineageTag: f32bbee9-a90c-45cb-abb0-8f9a96ef2221
 
 		changedProperty = FormatString
 
-	/// Measure meas.users_history_row_filler2.
+	/// Purpose: Users History Row Filler2.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler2' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: edeb15e2-b186-459d-8646-a21595bab838
 
-	/// Measure meas.users_history_row_filler3.
+	/// Purpose: Users History Row Filler3.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler3' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: fb5ce7e1-3b57-4caa-b47c-75f38cf431ca
 
-	/// Measure meas.users_history_row_filler4.
+	/// Purpose: Users History Row Filler4.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler4' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: 8980361f-9d0f-4b4f-a5b9-adfe40234d48
 
-	/// Measure meas.users_history_row_filler5.
+	/// Purpose: Users History Row Filler5.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler5' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: c1e1b654-df56-4f96-a7f2-b175c3e859ef
 
-	/// Measure meas.users_history_row_filler6.
+	/// Purpose: Users History Row Filler6.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler6' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: 2f5a5d5a-b880-4048-a7c5-e5d12008ee28
 
-	/// Measure meas.users_history_row_filler7.
+	/// Purpose: Users History Row Filler7.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler7' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: 3e1bb5f9-21ff-4763-b675-e056bebbc144
 
-	/// Measure meas.users_history_row_filler8.
+	/// Purpose: Users History Row Filler8.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler8' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: 7aa1bc6d-19ee-4f88-8447-c4ebd53bf512
 
-	/// Measure meas.users_history_row_filler9.
+	/// Purpose: Users History Row Filler9.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler9' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: 969c4058-2234-4575-ba9f-0cc3d76a47ce
 
-	/// Measure meas.users_history_row_filler10.
+	/// Purpose: Users History Row Filler10.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler10' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: f362c584-a411-4e49-bbf6-31cb18a66a80
 
-	/// Measure meas.users_history_row_filler11.
+	/// Purpose: Users History Row Filler11.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler11' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: a6884327-0fed-4df0-8827-faaeeda5986f
 
-	/// Measure meas.users_history_row_filler12.
+	/// Purpose: Users History Row Filler12.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler12' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: 13189c9e-d0d2-42cd-a41c-e2969b8dab74
 
-	/// Measure meas.users_history_row_filler13.
+	/// Purpose: Users History Row Filler13.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler13' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: 68cc992c-591e-4f1f-9386-89571ceb05af
 
-	/// Measure meas.users_history_row_filler14.
+	/// Purpose: Users History Row Filler14.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler14' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: 272625e7-1621-4db5-a38a-56e0f218088a
 
-	/// Measure meas.users_history_row_filler15.
+	/// Purpose: Users History Row Filler15.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_row_filler15' = ""
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _filler
 		lineageTag: bce5d1d3-b76b-4858-862e-46f081a4d53b
 
-	/// Measure meas.data_logs_user_turnover_pct.
+	/// Purpose: Data Logs User Turnover Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.data_logs_user_turnover_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			var res =DIVIDE(
 				[meas.data_logs_user_new_terminations_pos],
 				[meas.data_logs_user_count_bop]
 			)
 			RETURN
 			IF(
-			    res=BLANK(),
-			    0,
-			    res
-			)
+			res=BLANK(),			0,			res			)
 		formatString: 0%;-0%;0%
 		displayFolder: _rep_count_analysis
 		lineageTag: c17b7b54-4e31-4d1e-bf1c-4aea962f150d
@@ -1337,10 +1457,13 @@ table users_history
 				  "version": 0
 				}
 
-	/// Measure meas.time_allocation_total_not_eng.
+	/// Purpose: Time Allocation Total Not Eng.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.time_allocation_total_not_eng' =
 			
-			description: "TODO: provide business definition for this measure."
 			AVERAGE('users_history'[ci_time_alloc_tot]) - AVERAGE('users_history'[ci_time_alloc_tot_eng])
 		displayFolder: _ta_analysis
 		lineageTag: 73db7ecd-c91c-482b-93eb-8deebec2a09f
@@ -1355,25 +1478,30 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ta_potential_vs_actual.
-	measure 'meas.users_history_ta_potential_vs_actual' = ```
+	/// Purpose: Users History Ta Potential Vs Actual.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_history_ta_potential_vs_actual' = 
 			
 			var uh_filt_tbl = CALCULATETABLE(users_history, users_history[ci_time_alloc_tot] <> blank())
 			var ratio = AVERAGEX(uh_filt_tbl, DIVIDE(users_history[ci_time_alloc_tot] * users_history[ci_time_alloc_month_to_week_adjustment], users_history[col.ci_ta_potential_hours]) )
 			var res  = ratio
 			return res
 			
-			```
-			description: "Ratio of users_history[ci_time_alloc_tot] to users_history[ci_time_alloc_tot]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _ta_analysis
 		lineageTag: dd9b7816-b83c-4d60-bfb1-f374cc0531f5
 
-	/// Measure meas.data_logs_user_turnover_pct_regrettable.
+	/// Purpose: Data Logs User Turnover Pct Regrettable.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.data_logs_user_turnover_pct_regrettable' =
 			
 			
-			description: "TODO: provide business definition for this measure."
 			var res = DIVIDE(
 				[meas.data_logs_user_new_terminations_regrettable],
 				[meas.data_logs_user_count_bop]
@@ -1386,8 +1514,12 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 36204f55-92aa-45d3-846e-38ef4694b4bb
 
-	/// Measure meas.data_logs_user_new_terminations_regrettable.
-	measure 'meas.data_logs_user_new_terminations_regrettable' = ```
+	/// Purpose: Data Logs User New Terminations Regrettable.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_new_terminations_regrettable' = 
 			
 			var tbl_perf_users = SUMMARIZE(users_history , users_history[_sys_user_id], "months", Count(users_history[_sys_doc_id]), "avg_perf_tier_num", AVERAGE(users_history[ci_perf_qtly_performance_tier_num])+ 0)
 			
@@ -1396,14 +1528,16 @@ table users_history
 			return res
 			
 			
-			```
-			description: "Count of users_history[_sys_user_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: 64a5d1ae-0403-49d9-b03e-a8ef509b3d19
 
-	/// Measure meas.users_history_user_role_function_concat_w_count_eop.
-	measure 'meas.users_history_user_role_function_concat_w_count_eop' = ```
+	/// Purpose: Users History User Role Function Concat W Count Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.users_history_user_role_function_concat_w_count_eop' = 
 			
 			
 			var fromDate =[meas.context_date_min] 
@@ -1425,92 +1559,113 @@ table users_history
 			return res
 			
 			
-			```
-			description: "Ratio of users_history[_sys_filt_start_date] to users_history[_sys_filt_start_date]. Respects the current filter context."
 		lineageTag: d413b1b6-88bb-4362-ba1f-b09ba6abc6ae
 
-	/// Measure meas.exp_rpts_all_avg_perf_tier.
-	measure 'meas.exp_rpts_all_avg_perf_tier' = ```
+	/// Purpose: Exp Rpts All Avg Perf Tier.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.exp_rpts_all_avg_perf_tier' = 
 			
-			 var calc = CALCULATE(AVERAGE(users_history[ci_perf_qtly_performance_tier_num]))
-			var res = if(isblank(calc), blank(),calc)
+			var calc = CALCULATE(AVERAGE(users_history[ci_perf_qtly_performance_tier_num]))			var res = if(isblank(calc), blank(),calc)
 			return res
-			```
-			 description: "Average of users_history[ci_perf_qtly_performance_tier_num]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: ae176c1b-1966-4b3d-bbf0-fa4cbe7fc464
 
-	/// Measure meas.exp_rpts_last_year_avg_perf_tier.
+	/// Purpose: Exp Rpts Last Year Avg Perf Tier.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.exp_rpts_last_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "LAST_YEAR")
-		description: "TODO: provide business definition for this measure."
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: 4cab50c1-511d-439f-89d3-669c0173ffcc
 
-	/// Measure meas.exp_rpts_prior_to_last_year_avg_perf_tier.
+	/// Purpose: Exp Rpts Prior To Last Year Avg Perf Tier.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.exp_rpts_prior_to_last_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "PRIOR_TO_LAST_YEAR")
-		description: "TODO: provide business definition for this measure."
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: c7aef491-020f-4a36-abf4-ec5b554a1bfa
 
-	/// Measure meas.exp_rpts_current_year_avg_perf_tier.
+	/// Purpose: Exp Rpts Current Year Avg Perf Tier.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.exp_rpts_current_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "CURRENT_YEAR")
-		description: "TODO: provide business definition for this measure."
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: db51bd07-3023-4d79-b5df-64359d2834ba
 
-	/// Measure meas.data_logs_user_count_all.
+	/// Purpose: Data Logs User Count All.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.data_logs_user_count_all' = [meas.data_logs_user_count_eop_for_dept_mkt]+[meas.data_logs_user_count_eop_for_dept_nd]+[meas.data_logs_user_count_eop_for_dept_ops]+[meas.data_logs_user_count_eop_for_dept_other]+[meas.data_logs_user_count_eop_for_dept_sales]+[meas.data_logs_user_count_eop_for_dept_support]
-		description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: bd7a4307-ed50-4555-bd87-089699d608ba
 
-	/// Measure meas.calibration_user_role_title.
+	/// Purpose: Calibration User Role Title.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.calibration_user_role_title' = "User Roles - " & [meas.prior_year] & " Full Calendar Year"
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _rep_count_analysis
 		lineageTag: b46bd447-2ddc-4adc-a282-c0bd8c15171d
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_bookings_account_executive.
-	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_executive' = ```
+	/// Purpose: Data Logs Ci Perf Annual Avg Bookings Account Executive.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_executive' = 
 			
 			var end_date =   [meas.companies_history_reference_date]
 			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
 			var res =  CALCULATE(AVERAGE(users_history[ci_perf_qtly_avg_bookings_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date, users_history[trueai_user_role]="Account Executive") // qtly number
 			return res * 4 // annual number
 			
-			```
-			description: "Ratio of users_history[ci_perf_qtly_avg_bookings_peers] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _perf_analysis
 		lineageTag: 03cf934b-81ba-444c-87f7-f0d6df3312dd
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_bookings_account_manager.
-	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_manager' = ```
+	/// Purpose: Data Logs Ci Perf Annual Avg Bookings Account Manager.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_manager' = 
 			
 			var end_date =   [meas.companies_history_reference_date]
 			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
 			var res =  CALCULATE(AVERAGE(users_history[ci_perf_qtly_avg_bookings_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date, users_history[trueai_user_role]="Account Manager") // qtly number
 			return res * 4 // annual number
 			
-			```
-			description: "Ratio of users_history[ci_perf_qtly_avg_bookings_peers] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _perf_analysis
 		lineageTag: f48cadb1-b2f6-4fb7-ba35-e7ebc413f6c9
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_pipeline_created_sdr.
+	/// Purpose: Data Logs Ci Perf Annual Avg Pipeline Created Sdr.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created_sdr' =
 			
-			description: "TODO: provide business definition for this measure."
 			var end_date =   [meas.companies_history_reference_date]
 			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
 			var res =  CALCULATE(AVERAGE(users_history[col.ci.perf_qtly_avg_pipeline_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date, users_history[trueai_user_role]="Sales Development Rep") // qtly number
@@ -1521,26 +1676,39 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.perf_consider_mrasure.
+	/// Purpose: Perf Consider Mrasure.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.perf_consider_mrasure' = "To be considered a Performer, a rep needs to fall within +/- 35% of AAB / AAPC"
-		description: "Ratio measure. Respects the current filter context."
 		displayFolder: _perf_analysis
 		lineageTag: e36df813-494b-4999-a2d5-0c02c594db11
 
-	/// Measure meas.calibration_department_title.
+	/// Purpose: Calibration Department Title.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.calibration_department_title' = "Department - " & [meas.prior_year] & " Full Calendar Year"
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _rep_count_analysis
 		lineageTag: 6f133e82-cd13-456d-ba5f-2bb46c770268
 
-	/// Measure meas.calibration_group_title.
+	/// Purpose: Calibration Group Title.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.calibration_group_title' = "Group - " & [meas.prior_year] & " Full Calendar Year"
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _rep_count_analysis
 		lineageTag: f1b13f39-437e-469b-977e-2ef145c2c495
 
-	/// Measure meas.data_logs_ci_perf_status.
-	measure 'meas.data_logs_ci_perf_status' = ```
+	/// Purpose: Data Logs Ci Perf Status.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.data_logs_ci_perf_status' = 
 			
 			
 			-- get the dates
@@ -1549,27 +1717,21 @@ table users_history
 			
 			
 			var perf_tier_num = CALCULATE(
-			    AVERAGE(
-			        users_history[ci_perf_qtly_performance_tier_num]
-			    ), 
-			    users_history[_sys_filt_end_date] > start_date && users_history[_sys_filt_end_date]<end_date
-			)  
+			AVERAGE(			users_history[ci_perf_qtly_performance_tier_num]			), 			users_history[_sys_filt_end_date] > start_date && users_history[_sys_filt_end_date]<end_date			)  
 			var rounded_num = ROUNDUP(perf_tier_num, 0)
 			
 			RETURN 
 			SWITCH(
-			    TRUE(),
-			    rounded_num =1,  "Underperformer",
-			    rounded_num =2,  "Performer",                       // putting an condition to get the performance 
-			    rounded_num = 3, "Overperformer"
-			)
-			```
-			description: "Ratio of cal_end_dates[Date] to users_history[ci_perf_qtly_performance_tier_num]. Respects the current filter context."
+			TRUE(),			rounded_num =1,  "Underperformer",			rounded_num =2,  "Performer",                       // putting an condition to get the performance 			rounded_num = 3, "Overperformer"			)
 		displayFolder: _perf_analysis
 		lineageTag: a97b7deb-0320-4928-9344-62e8b0ac287e
 
-	/// Measure meas.data_logs_user_12_Mos_ci_perf_status.
-	measure 'meas.data_logs_user_12_Mos_ci_perf_status' = ```
+	/// Purpose: Data Logs User 12 Mos Ci Perf Status.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.data_logs_user_12_Mos_ci_perf_status' = 
 			
 			
 			-- get the dates
@@ -1578,41 +1740,21 @@ table users_history
 			
 			
 			var perf_tier_num = CALCULATE(
-			    AVERAGE(
-			        users_history[ci_perf_qtly_performance_tier_num]
-			    ), 
-			    cal_end_dates[Date] >= start_date && cal_end_dates[Date] <= end_date        // get the avg of qrtly perf tier number
-			)  
+			AVERAGE(			users_history[ci_perf_qtly_performance_tier_num]			), 			cal_end_dates[Date] >= start_date && cal_end_dates[Date] <= end_date        // get the avg of qrtly perf tier number			)  
 			var rounded_num = ROUND(perf_tier_num, 0)           // rounding the avg number with o decimal point
 			
 			var ramp_status = [meas.data_logs_users_ramping_status]
 			
 			RETURN
-			 IF(
-			    MAX(users[trueai_user_role_department])<>"SALES",
-			    "Not in Sales Team",        // result if the user not in sales team
-			    IF(
-			        MAX(users[trueai_user_role_department])="SALES" && ramp_status="Ramping",
-			        "Ramping",          // if the ci_perf_ramping status is ramping then user status 
-			        IF(
-			            MAX(users[trueai_user_role_department])="SALES" && ramp_status ="Ramped",
-			            SWITCH(
-			                TRUE(),
-			                rounded_num =1 ,  "Underperformer",
-			                rounded_num =2 ,  "Performer",                       // putting an condition to get the performance 
-			                rounded_num = 3 , "Overperformer",
-			                "N/A"
-			            )
-			        )
-			    )
-			 )
-			```
-			description: "Ratio of users_history[ci_perf_qtly_performance_tier_num] to cal_end_dates[Date]. Respects the current filter context."
-		displayFolder: _perf_analysis
+			IF(			MAX(users[trueai_user_role_department])<>"SALES",			"Not in Sales Team",        // result if the user not in sales team			IF(			MAX(users[trueai_user_role_department])="SALES" && ramp_status="Ramping",			"Ramping",          // if the ci_perf_ramping status is ramping then user status 			IF(			MAX(users[trueai_user_role_department])="SALES" && ramp_status ="Ramped",			SWITCH(			TRUE(),			rounded_num =1 ,  "Underperformer",			rounded_num =2 ,  "Performer",                       // putting an condition to get the performance 			rounded_num = 3 , "Overperformer",			"N/A"			)			)			)			)		displayFolder: _perf_analysis
 		lineageTag: 7866caef-955b-4d57-9415-64d9df49695c
 
-	/// Measure meas.data_logs_user_count_rep_eop.
-	measure 'meas.data_logs_user_count_rep_eop' = ```
+	/// Purpose: Data Logs User Count Rep Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.data_logs_user_count_rep_eop' = 
 			
 			
 			var end_date = CALCULATE(MAX(cal_end_dates[Date])) // getting the latest date from the cal_end_date(perio_last_date)
@@ -1628,31 +1770,38 @@ table users_history
 			var res = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
 			
 			return res // return the res :)
-			```
-			description: "Ratio of cal_end_dates[Date] to users_history[_sys_filt_start_date]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _rep_count_analysis
 		lineageTag: aa4e48f7-647a-4d50-ae41-06df2fbef33f
 
-	/// Measure meas.ramping_reps_details_title.
+	/// Purpose: Ramping Reps Details Title.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.ramping_reps_details_title' = "Ramping Reps -   " & [meas.step_owner_user_role_aliased]
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _ramp_analysis
 		lineageTag: 2ab3c61d-7f9a-43c9-9555-deafb52b42f8
 
-	/// Measure meas.reps_w_time_allocation_prospecting_count.
+	/// Purpose: Reps W Time Allocation Prospecting Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.reps_w_time_allocation_prospecting_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_prospecting])>0)
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: b9a4709c-76f5-444a-93e1-043c6fba0ff5
 
-	/// Measure meas.reps_w_time_allocation_prospecting_pct.
+	/// Purpose: Reps W Time Allocation Prospecting Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.reps_w_time_allocation_prospecting_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			var reps_w_ta = [meas.reps_w_time_allocation_prospecting_count]
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]))
 			
@@ -1662,19 +1811,25 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 95eb85ee-1b16-496a-b04a-aa3042687603
 
-	/// Measure meas.reps_w_time_allocation_new_logo_count.
+	/// Purpose: Reps W Time Allocation New Logo Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.reps_w_time_allocation_new_logo_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_new_logo])>0)
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: dff9104a-517d-4d51-b63b-64e65bacf531
 
-	/// Measure meas.reps_w_time_allocation_new_logo_pct.
+	/// Purpose: Reps W Time Allocation New Logo Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.reps_w_time_allocation_new_logo_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			var reps_w_ta = [meas.reps_w_time_allocation_new_logo_count]
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]))
 			
@@ -1684,10 +1839,13 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 59a3a1e0-40af-42fd-8513-123844687a12
 
-	/// Measure meas.reps_w_time_allocation_prospect_pct.
+	/// Purpose: Reps W Time Allocation Prospect Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.reps_w_time_allocation_prospect_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			var reps_w_ta = [meas.reps_w_time_allocation_count]
 			var reps_tot = [meas.ssr_history_reps_prospecting]
 			
@@ -1697,28 +1855,30 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: c95cc6f4-094d-425d-8174-a1e11580c6ff
 
-	/// Measure meas.reps_all_time_allocation_count.
+	/// Purpose: Reps All Time Allocation Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.reps_all_time_allocation_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]))
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: aa4c3717-11a2-45fc-b083-3d1126f1fc90
 
-	/// Measure meas.data_logs_user_rep_mgr_ratio_updated.
+	/// Purpose: Data Logs User Rep Mgr Ratio Updated.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.data_logs_user_rep_mgr_ratio_updated' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR _total_role = CALCULATE(
-			    [meas.data_logs_user_count_eop], // get the necessary count filtering role dept
-			    users_history[trueai_user_role_function] in {"AE","AM", "SDR", "OTHER ROLES"}
-			)
+			[meas.data_logs_user_count_eop], // get the necessary count filtering role dept			users_history[trueai_user_role_function] in {"AE","AM", "SDR", "OTHER ROLES"}			)
 			VAR _mgr_count = [meas.data_logs_user_count_eop_for_mgr]   // get the manager count
 			var res  = DIVIDE(
-			    _total_role,
-			    _mgr_count
-			)
+			_total_role,			_mgr_count			)
 			
 			RETURN
 			res
@@ -1726,8 +1886,12 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 12898c88-6b57-432c-b8f8-c7a8c8bbb2c4
 
-	/// Measure meas.data_logs_users_tenure.
-	measure 'meas.data_logs_users_tenure' = ```
+	/// Purpose: Data Logs Users Tenure.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.data_logs_users_tenure' = 
 			
 			-- get the dates
 			var end_date = [meas.last_date_of_previous_quarter]
@@ -1736,25 +1900,23 @@ table users_history
 			
 			
 			var tenure_status =CALCULATE(
-			    MAX(
-			        users_history[trueai_tenure]
-			    ), 
-			    cal_end_dates[Date] >= start_date && cal_end_dates[Date] <= end_date        // get the avg of qrtly perf tier number
-			)  
+			MAX(			users_history[trueai_tenure]			), 			cal_end_dates[Date] >= start_date && cal_end_dates[Date] <= end_date        // get the avg of qrtly perf tier number			)  
 			
 			
 			RETURN
 			tenure_status
-			```
-			description: "Ratio of users_history[trueai_tenure] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: #,##0" Mos."
 		displayFolder: _perf_analysis
 		lineageTag: 65db4a01-5803-4f39-b98e-2d3164d16f6d
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_users_ramping_status.
-	measure 'meas.data_logs_users_ramping_status' = ```
+	/// Purpose: Data Logs Users Ramping Status.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.data_logs_users_ramping_status' = 
 			
 			-- get the dates
 			var end_date = [meas.last_date_of_previous_quarter]
@@ -1763,38 +1925,35 @@ table users_history
 			
 			
 			var _status =CALCULATE(
-			    MAX(
-			        users_history[ci_perf_ramping_status]
-			    ), 
-			    cal_end_dates[Date] = end_date        // get the avg of qrtly perf tier number
-			)  
+			MAX(			users_history[ci_perf_ramping_status]			), 			cal_end_dates[Date] = end_date        // get the avg of qrtly perf tier number			)  
 			
 			
 			RETURN
 			_status
-			```
-			description: "Ratio of users_history[ci_perf_ramping_status] to cal_end_dates[Date]. Respects the current filter context."
 		displayFolder: _perf_analysis
 		lineageTag: a73a5ff6-d27e-40cf-b459-57c7e93a4a0e
 
-	/// Measure meas.users_history_ci_time_alloca_avg_existing_cust_selling.
+	/// Purpose: Users History Ci Time Alloca Avg Existing Cust Selling.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_ci_time_alloca_avg_existing_cust_selling' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    AVERAGE(
-			        users_history[ci_time_alloc_existing_customer_selling]      // get the aVERAGE time for existing customer selling
-			    )
-			)
+			AVERAGE(			users_history[ci_time_alloc_existing_customer_selling]      // get the aVERAGE time for existing customer selling			)			)
 		displayFolder: _perf_analysis
 		lineageTag: 62dae6ec-b5a6-4618-8717-82729a078884
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_time_allocation_confidence.
+	/// Purpose: Users History Time Allocation Confidence.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_time_allocation_confidence' =
 			
-			description: "TODO: provide business definition for this measure."
 			var avg_value = AVERAGE(users_history[ci_time_alloc_conf])    // get the avg of ci time allocation confidence
 			
 			RETURN avg_value
@@ -1803,101 +1962,93 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_time_allocation_confidence_status.
-	measure 'meas.users_history_time_allocation_confidence_status' = ```
+	/// Purpose: Users History Time Allocation Confidence Status.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.users_history_time_allocation_confidence_status' = 
 			
 			
 			var _conf = ROUND(AVERAGE(users_history[ci_time_alloc_conf]),2)*100    // get the avg of ci time allocation confidence
 			
 			var _status_ = 
-			    IF(
-			    _conf >= 0 && _conf <= 49, 1,
-			        IF(
-			            _conf >=50 && _conf <= 74, 2,
-			            IF(
-			                _conf >=75 && _conf <= 84, 3,
-			                IF(
-			                    _conf >=85 && _conf <= 94, 4,
-			                    5
-			                )
-			            )
-			        )
-			)
+			IF(			_conf >= 0 && _conf <= 49, 1,			IF(			_conf >=50 && _conf <= 74, 2,			IF(			_conf >=75 && _conf <= 84, 3,			IF(			_conf >=85 && _conf <= 94, 4,			5			)			)			)			)
 			
 			
 			
 			RETURN 
 			IF(
-			    _conf <>0,
-			    _status_
-			)
+			_conf <>0,			_status_			)
 			
-			```
-			description: "Ratio based on users_history[ci_time_alloc_conf]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: ebe06221-1ce3-4e18-9db4-d9701923fee8
 
-	/// Measure meas.time_allocation_confidence.
-	measure 'meas.time_allocation_confidence' = ```
+	/// Purpose: Time Allocation Confidence.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.time_allocation_confidence' = 
 			
 			
 			var _conf = ROUND(AVERAGE(users_history[ci_time_alloc_conf]),2)*100    // get the avg of ci time allocation confidence
 			
 			var _status_ = 
-			    IF(
-			    _conf >= 0 && _conf <= 49, "Limited",
-			        IF(
-			            _conf >=50 && _conf <= 74, "Fair",
-			            IF(
-			                _conf >=75 && _conf <= 84, "Good",
-			                IF(
-			                    _conf >=85 && _conf <= 94, "Great",
-			                    "Excellent"
-			                )
-			            )
-			        )
-			)
+			IF(			_conf >= 0 && _conf <= 49, "Limited",			IF(			_conf >=50 && _conf <= 74, "Fair",			IF(			_conf >=75 && _conf <= 84, "Good",			IF(			_conf >=85 && _conf <= 94, "Great",			"Excellent"			)			)			)			)
 			
 			
 			
 			RETURN 
 			IF(
-			    _conf <>0,
-			    _status_ & " (" & _conf & ")"  // Convert _conf to integer text format
-			)
+			_conf <>0,			_status_ & " (" & _conf & ")"  // Convert _conf to integer text format			)
 			
-			```
-			description: "Ratio based on users_history[ci_time_alloc_conf]. Respects the current filter context."
 		displayFolder: _acl_ta_analysis
 		lineageTag: 30522698-ba19-4d59-a3c0-a10e54a3a4ae
 
-	/// Measure meas.peek_inside_text_supports_aab.
+	/// Purpose: Peek Inside Text Supports Aab.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.peek_inside_text_supports_aab' = "AAB"
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _helper
 		lineageTag: 43c5b6e1-ce31-496d-8af8-614ac968bdde
 
-	/// Measure meas.peek_inside_text_supports_aapc.
+	/// Purpose: Peek Inside Text Supports Aapc.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.peek_inside_text_supports_aapc' = "AAPC"
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _helper
 		lineageTag: 22918bb7-2e2d-4dfd-98b3-17eb6b7a6c9b
 
-	/// Measure meas.peek_inside_text_supports_ramping_time.
+	/// Purpose: Peek Inside Text Supports Ramping Time.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.peek_inside_text_supports_ramping_time' = "Ramping Time"
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _helper
 		lineageTag: ffd6401d-0cfb-4cf4-bcb1-a7739b744def
 
-	/// Measure meas.peek_inside_text_supports_trueai_reference_date.
+	/// Purpose: Peek Inside Text Supports Trueai Reference Date.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.peek_inside_text_supports_trueai_reference_date' = "TrueAI Reference Date"
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _helper
 		lineageTag: 2bda97e6-525d-43bf-9132-5dac7a60b10b
 
-	/// Measure meas.users_history_r2_bg_color.
-	measure 'meas.users_history_r2_bg_color' = ```
+	/// Purpose: Users History R2 Bg Color.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.users_history_r2_bg_color' = 
 			
 			var pros_r2 = [meas.quality_bucket__prospecting_r2]
 			var new_r2 = [meas.quality_bucket__new_logo_r2]
@@ -1907,46 +2058,29 @@ table users_history
 			var step_name = CALCULATE(MAX(ssr_history[step_name]))
 			
 			var res = SWITCH(
-			    TRUE(),
-			    step_name = "Prospecting" || step_name = "Untouched" ,pros_r2,
-			    step_name = "New Logo Selling", new_r2,
-			    step_name = "Post-Sales Support", post_r2,
-			    step_name = "Existing Customer Selling", exist_r2
-			)
+			TRUE(),			step_name = "Prospecting" || step_name = "Untouched" ,pros_r2,			step_name = "New Logo Selling", new_r2,			step_name = "Post-Sales Support", post_r2,			step_name = "Existing Customer Selling", exist_r2			)
 			
 			
 			var _conf = ROUND(res,2)*100    // get the rounded r2 score
 			
 			var _status_ = 
-			    IF(
-			    _conf >= 0 && _conf <= 49, 1,
-			        IF(
-			            _conf >=50 && _conf <= 74, 2,
-			            IF(
-			                _conf >=75 && _conf <= 84, 3,
-			                IF(
-			                    _conf >=85 && _conf <= 94, 4,
-			                    5
-			                )
-			            )
-			        )
-			)
+			IF(			_conf >= 0 && _conf <= 49, 1,			IF(			_conf >=50 && _conf <= 74, 2,			IF(			_conf >=75 && _conf <= 84, 3,			IF(			_conf >=85 && _conf <= 94, 4,			5			)			)			)			)
 			
 			
 			
 			RETURN 
 			IF(
-			    _conf <>0,
-			    _status_
-			)
-			```
-			description: "Ratio based on ssr_history[step_name]. Respects the current filter context."
+			_conf <>0,			_status_			)
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: b9a6f5fd-0e8e-4a17-99f6-68bb6955b805
 
-	/// Measure meas.users_history_auc_bg_color.
-	measure 'meas.users_history_auc_bg_color' = ```
+	/// Purpose: Users History Auc Bg Color.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.users_history_auc_bg_color' = 
 			
 			var pros_auc = [meas.quality_bucket_prospecting_auc]
 			var new_auc = [meas.quality_bucket_new_logo_auc]
@@ -1956,130 +2090,106 @@ table users_history
 			var step_name = CALCULATE(MAX(ssr_history[step_name]))
 			
 			var res = SWITCH(
-			    TRUE(),
-			    step_name = "Prospecting" || step_name = "Untouched" ,pros_auc,
-			    step_name = "New Logo Selling", new_auc,
-			    step_name = "Post-Sales Support", post_auc,
-			    step_name = "Existing Customer Selling", exist_auc
-			)
+			TRUE(),			step_name = "Prospecting" || step_name = "Untouched" ,pros_auc,			step_name = "New Logo Selling", new_auc,			step_name = "Post-Sales Support", post_auc,			step_name = "Existing Customer Selling", exist_auc			)
 			
 			
 			var _conf = ROUND(res,2)*100    // get the rounded r2 score
 			
 			var _status_ = 
-			    IF(
-			    _conf >= 0 && _conf <= 49, 1,
-			        IF(
-			            _conf >=50 && _conf <= 74, 2,
-			            IF(
-			                _conf >=75 && _conf <= 84, 3,
-			                IF(
-			                    _conf >=85 && _conf <= 94, 4,
-			                    5
-			                )
-			            )
-			        )
-			)
+			IF(			_conf >= 0 && _conf <= 49, 1,			IF(			_conf >=50 && _conf <= 74, 2,			IF(			_conf >=75 && _conf <= 84, 3,			IF(			_conf >=85 && _conf <= 94, 4,			5			)			)			)			)
 			
 			
 			
 			RETURN 
 			IF(
-			    _conf <>0,
-			    _status_
-			)
-			```
-			description: "Ratio based on ssr_history[step_name]. Respects the current filter context."
+			_conf <>0,			_status_			)
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: ebc1dec3-4c25-49a1-b757-cc84b583ae72
 
-	/// Measure meas.users_history_avg_act_capt_lvl.
-	measure 'meas.users_history_avg_act_capt_lvl' = ```
+	/// Purpose: Users History Avg Act Capt Lvl.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.users_history_avg_act_capt_lvl' = 
 			
-			 var _min_date = [meas.context_date_min]        // get the context min date
-			 var _max_date = [meas.context_date_max]        // get the context max date 
-			
+			var _min_date = [meas.context_date_min]        // get the context min date			var _max_date = [meas.context_date_max]        // get the context max date 			
 			var rep_tbl = CALCULATETABLE(
-			    users_history,
-			    cal_end_dates[Date] >= _min_date && cal_end_dates[Date] <= _max_date
-			)
+			users_history,			cal_end_dates[Date] >= _min_date && cal_end_dates[Date] <= _max_date			)
 			
 			var res = CALCULATE(
-			    AVERAGEX(
-			        rep_tbl,
-			        users_history[ci_act_capt_lvl]
-			    )
-			)
+			AVERAGEX(			rep_tbl,			users_history[ci_act_capt_lvl]			)			)
 			
 			RETURN
 			res
-			```
-			 description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		displayFolder: _acl_ta_analysis
 		lineageTag: 3b0377cc-1f96-47ec-95c0-2878eb5243bd
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_prospecting.
+	/// Purpose: Users History Ci Time Alloca Avg Prospecting.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_ci_time_alloca_avg_prospecting' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    AVERAGE(
-			        users_history[ci_time_alloc_prospecting]      // get the aVERAGE time for prospecting
-			    )
-			)
+			AVERAGE(			users_history[ci_time_alloc_prospecting]      // get the aVERAGE time for prospecting			)			)
 		formatString: 0.0
 		displayFolder: _perf_analysis
 		lineageTag: 363287f9-8e11-4afb-a36a-636b9f8eb0c9
 
-	/// Measure meas.users_history_ci_time_alloca_avg_new_logo_selling.
+	/// Purpose: Users History Ci Time Alloca Avg New Logo Selling.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_ci_time_alloca_avg_new_logo_selling' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    AVERAGE(
-			        users_history[ci_time_alloc_new_logo]      // get the aVERAGE time for NEW LOGO SELLING
-			    )
-			)
+			AVERAGE(			users_history[ci_time_alloc_new_logo]      // get the aVERAGE time for NEW LOGO SELLING			)			)
 		displayFolder: _perf_analysis
 		lineageTag: 0f273889-0f09-4cf7-a177-586dde98d57d
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_post_sales_support.
+	/// Purpose: Users History Ci Time Alloca Avg Post Sales Support.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_ci_time_alloca_avg_post_sales_support' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    AVERAGE(
-			        users_history[ci_time_alloc_post_sales]      // get the aVERAGE time for post sales support
-			    )
-			)
+			AVERAGE(			users_history[ci_time_alloc_post_sales]      // get the aVERAGE time for post sales support			)			)
 		displayFolder: _perf_analysis
 		lineageTag: a2e9401e-6bbc-412c-86ff-d210bab347b1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_internel.
+	/// Purpose: Users History Ci Time Alloca Avg Internel.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_ci_time_alloca_avg_internel' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    AVERAGE(
-			        users_history[ci_time_alloc_internal]      // get the aVERAGE time for internel
-			    )
-			)
+			AVERAGE(			users_history[ci_time_alloc_internal]      // get the aVERAGE time for internel			)			)
 		displayFolder: _perf_analysis
 		lineageTag: 076d5fc9-0c65-4ddc-8328-ad90a7ae1d0f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.reps_without_act_lvl_count.
+	/// Purpose: Reps Without Act Lvl Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.reps_without_act_lvl_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]), users_history[ci_act_capt_lvl]=BLANK())
 			RETURN
 			reps_tot
@@ -2087,10 +2197,13 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 823b6167-9d31-4002-92a5-8ef055257123
 
-	/// Measure meas.reps_without_act_lvl_pct.
+	/// Purpose: Reps Without Act Lvl Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.reps_without_act_lvl_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			var reps_w_acl = [meas.reps_without_act_lvl_count]
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]))
 			var res = DIVIDE(reps_w_acl, reps_tot)
@@ -2100,26 +2213,29 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: b4f7597e-76a9-497e-9c04-10bad1c384ba
 
-	/// Measure meas.reps_has_ci_act_capt_lvl.
+	/// Purpose: Reps Has Ci Act Capt Lvl.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.reps_has_ci_act_capt_lvl' =
 			
 			
-			description: "TODO: provide business definition for this measure."
 			var res=IF(
-			    MAX(users_history[ci_act_capt_lvl])=BLANK(),
-			    0,
-			    1
-			)
+			MAX(users_history[ci_act_capt_lvl])=BLANK(),			0,			1			)
 			RETURN
 			res
 		formatString: 0
 		displayFolder: _acl_ta_analysis
 		lineageTag: f7c7a23d-abf3-4d19-83f8-b9268e8cd6cb
 
-	/// Measure meas.ci_act_capt_lvl_pi_owner_act.
+	/// Purpose: Ci Act Capt Lvl Pi Owner Act.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.ci_act_capt_lvl_pi_owner_act' =
 			
-			description: "TODO: provide business definition for this measure."
 			var _prospect_count = SUM(users_history[ci_act_capt_lvl_pi_prospecting_owner_act])
 			var _new_logo_count = SUM(users_history[ci_act_capt_lvl_pi_new_logo_owner_act])
 			var _post_sales_count = SUM(users_history[ci_act_capt_lvl_pi_post_sales_owner_act])
@@ -2130,63 +2246,66 @@ table users_history
 		formatString: 0
 		lineageTag: a9dc1dca-80f1-4459-bf59-70b7dc8b07fe
 
-	/// Measure meas.underperformer_annual_avg.
+	/// Purpose: Underperformer Annual Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.underperformer_annual_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the under performer annual average
-			    users_history[col.ci.perf_annual_performance_tier]="Underperformer"
-			)
+			[meas.data_logs_ci_perf_annual_avg_bookings],   // get the under performer annual average			users_history[col.ci.perf_annual_performance_tier]="Underperformer"			)
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _rep_overview
 		lineageTag: e36c1779-b7a1-4178-aba2-048b42a3657f
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.performer_annual_avg.
+	/// Purpose: Performer Annual Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.performer_annual_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the performer annual average
-			    users_history[col.ci.perf_annual_performance_tier]="Performer"
-			)
+			[meas.data_logs_ci_perf_annual_avg_bookings],   // get the performer annual average			users_history[col.ci.perf_annual_performance_tier]="Performer"			)
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _rep_overview
 		lineageTag: b65fd732-3ba1-4caf-8147-8e81f722dbd1
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.overperformer_annual_avg.
+	/// Purpose: Overperformer Annual Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.overperformer_annual_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the over performer annual average
-			    users_history[col.ci.perf_annual_performance_tier]="Overperformer"
-			)
+			[meas.data_logs_ci_perf_annual_avg_bookings],   // get the over performer annual average			users_history[col.ci.perf_annual_performance_tier]="Overperformer"			)
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _rep_overview
 		lineageTag: 7f890585-40c8-496c-8997-1a9984b5c8f5
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.min_user_role_alias.
+	/// Purpose: Min User Role Alias.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.min_user_role_alias' =
 			
-			description: "TODO: provide business definition for this measure."
 			MINX(
-			    VALUES(users_history[trueai_user_role_alias]),
-			    users_history[trueai_user_role_alias]
-			)
+			VALUES(users_history[trueai_user_role_alias]),			users_history[trueai_user_role_alias]			)
 		lineageTag: 4ebf3e77-dde2-4068-b567-e41f84e4e937
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Column 'col.ci.perf_qtly_bookings_user' = ```.
 	column 'col.ci.perf_qtly_bookings_user' = ```
-			description: "Unclear: Value for col ci perf qtly bookings user."
 			
 			
 			var res = users_history[ci_perf_qtly_bookings_user]
@@ -2205,7 +2324,6 @@ table users_history
 
 	/// Column 'col.ci.perf_qtly_performance_tier' = ```.
 	column 'col.ci.perf_qtly_performance_tier' = ```
-			description: "Unclear: Value for col ci perf qtly performance tier."
 			
 			
 			var res = users_history[ci_perf_qtly_performance_tier]
@@ -2220,7 +2338,6 @@ table users_history
 
 	/// Column 'col.user.user_role_dept' = ```.
 	column 'col.user.user_role_dept' = ```
-			description: "Unclear: Value for col user user role dept."
 			
 			users_history[trueai_user_role_department]
 			 --var res = users_history[trueai_user_role_department]
@@ -2234,7 +2351,6 @@ table users_history
 
 	/// Column 'col.user.user_role_function' = ```.
 	column 'col.user.user_role_function' = ```
-			 description: "Unclear: Value for col user user role function."
 			
 			 var res = users_history[trueai_user_role_function]
 			return If(res = "OTHER", "OTHER ROLES", res)
@@ -2246,7 +2362,6 @@ table users_history
 
 	/// Column 'col.ci.perf_ramping_status' = ```.
 	column 'col.ci.perf_ramping_status' = ```
-			description: "Unclear: Value for col ci perf ramping status."
 			
 			
 			var res = users_history[ci_perf_ramping_status]
@@ -2262,7 +2377,6 @@ table users_history
 
 	/// Column 'col.perf_date_first_reached' =.
 	column 'col.perf_date_first_reached' =
-			description: "Date/time when col perf date first reached."
 			
 			var perf_date = related(users[trueai_performance_lvl_reached_on])
 			var res = if(isblank(perf_date), date(2100,01,01), perf_date)
@@ -2280,7 +2394,6 @@ table users_history
 
 	/// Column 'col.ci.perf_qtly_pipeline_user' =.
 	column 'col.ci.perf_qtly_pipeline_user' =
-			description: "Unclear: Value for col ci perf qtly pipeline user."
 			
 			
 			var res = users_history[ci_perf_qtly_pipeline_user]
@@ -2296,7 +2409,6 @@ table users_history
 
 	/// Column 'col.ci.perf_qtly_avg_pipeline_peers' = ```.
 	column 'col.ci.perf_qtly_avg_pipeline_peers' = ```
-			description: "Unclear: Value for col ci perf qtly avg pipeline peers."
 			
 			
 			var res = users_history[ci_perf_qtly_avg_pipeline_peers]
@@ -2314,7 +2426,6 @@ table users_history
 
 	/// The ID of the document in the remote system (such as Salesforce ID)
 	column _sys_user_id
-		description: "System: Identifier for user."
 		dataType: string
 		lineageTag: e2a62a55-5407-4e09-9f6d-dea84a660ff7
 		summarizeBy: none
@@ -2324,7 +2435,6 @@ table users_history
 
 	/// Average quarterly sum of the booking amounts of opportunities won by the user's peers in the period
 	column ci_perf_qtly_avg_bookings_peers
-		description: "Numeric value for ci perf qtly avg bookings peers."
 		dataType: double
 		lineageTag: d43b5694-6d16-4043-929b-38a8b6196a44
 		summarizeBy: sum
@@ -2338,7 +2448,6 @@ table users_history
 
 	/// Average quarterly sum of the booking amounts of opportunities created by the user's peers in the period
 	column ci_perf_qtly_avg_pipeline_peers
-		description: "Numeric value for ci perf qtly avg pipeline peers."
 		dataType: double
 		lineageTag: 991fdb28-f0aa-48be-8a35-bda196ae993e
 		summarizeBy: sum
@@ -2350,7 +2459,6 @@ table users_history
 
 	/// Quarterly sum of the booking amounts of opportunities won by the user in the period
 	column ci_perf_qtly_bookings_user
-		description: "Numeric value for ci perf qtly bookings user."
 		dataType: double
 		lineageTag: f1ce53e8-d098-44b8-b33e-73013b1b09e9
 		summarizeBy: sum
@@ -2364,7 +2472,6 @@ table users_history
 
 	/// Quarterly sum of the booking amounts of opportunities created by the user in the period
 	column ci_perf_qtly_pipeline_user
-		description: "Numeric value for ci perf qtly pipeline user."
 		dataType: double
 		lineageTag: c2ef63cf-580b-4168-9a73-6a3c93728058
 		summarizeBy: sum
@@ -2376,7 +2483,6 @@ table users_history
 
 	/// User's ramping status indicating whether the user's tenure is lower than 6 months
 	column ci_perf_ramping_status
-		description: "Text label for ci perf ramping status."
 		dataType: string
 		lineageTag: 41b034b9-3dc1-46a2-a478-c5c220bf32d9
 		summarizeBy: none
@@ -2386,7 +2492,6 @@ table users_history
 
 	/// The Cien company ID
 	column _sys_co_id
-		description: "System: Identifier for co."
 		dataType: string
 		lineageTag: da4b2557-1856-4ba0-81c3-058822903a05
 		summarizeBy: none
@@ -2396,7 +2501,6 @@ table users_history
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID) and date
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 32589dc0-ac64-4e4e-b519-ef87934ea2f0
 		summarizeBy: none
@@ -2406,7 +2510,6 @@ table users_history
 
 	/// The last date of the month that the record applies to (for past months) or the last date of aggregated data (for the present month), stripped of time
 	column _sys_filt_end_date
-		description: "System: Date/time when filt end date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: c08cd854-4667-49f7-a57b-3df8f2b7be15
@@ -2421,7 +2524,6 @@ table users_history
 
 	/// The first date of the month that the records applies to, stripped of time
 	column _sys_filt_start_date
-		description: "System: Date/time when filt start date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 559873a4-ce65-41e4-91b6-b8550846a2d9
@@ -2441,7 +2543,6 @@ table users_history
 
 	/// User's act_capture_level score in the period
 	column ci_act_capt_lvl
-		description: "Numeric value for ci act capt lvl."
 		dataType: double
 		lineageTag: cedecab7-6c3f-48d3-9a76-031c73d3fb54
 		summarizeBy: average
@@ -2453,7 +2554,6 @@ table users_history
 
 	/// User's act_capture_level score confidence in the period
 	column ci_act_capt_lvl_conf
-		description: "Numeric value for ci act capt lvl conf."
 		dataType: double
 		lineageTag: 53283eb6-1379-4e75-9be7-51e8b28af86c
 		summarizeBy: average
@@ -2465,7 +2565,6 @@ table users_history
 
 	/// Number of owner activities performed on new logo selling steps that completed in the period
 	column ci_act_capt_lvl_pi_new_logo_owner_act
-		description: "Numeric value for ci act capt lvl pi new logo owner act."
 		dataType: int64
 		formatString: 0
 		lineageTag: 33bdac73-809c-4813-8bd4-88af3eb65b08
@@ -2476,7 +2575,6 @@ table users_history
 
 	/// Duration of activities performed on new logo selling steps that completed in the period
 	column ci_act_capt_lvl_pi_new_logo_owner_dur
-		description: "Numeric value for ci act capt lvl pi new logo owner dur."
 		dataType: double
 		lineageTag: 5e8787fa-d5a8-4827-9362-51346f34a28d
 		summarizeBy: sum
@@ -2488,7 +2586,6 @@ table users_history
 
 	/// Number of new logo selling steps that completed in the period
 	column ci_act_capt_lvl_pi_new_logo_steps
-		description: "Numeric value for ci act capt lvl pi new logo steps."
 		dataType: int64
 		formatString: 0
 		lineageTag: 010cf2aa-e7ef-4e26-aeaa-d8b14c7c7a98
@@ -2499,7 +2596,6 @@ table users_history
 
 	/// Expected duration of activities performed on post-sales support steps that completed in the period
 	column ci_act_capt_lvl_pi_post_sales_expect_owner_dur
-		description: "Numeric value for ci act capt lvl pi post sales expect owner dur."
 		dataType: double
 		lineageTag: 426bf139-3706-45c2-bd8f-8d8663801111
 		summarizeBy: sum
@@ -2511,7 +2607,6 @@ table users_history
 
 	/// Number of owner activities performed on post-sales support steps that completed in the period
 	column ci_act_capt_lvl_pi_post_sales_owner_act
-		description: "Numeric value for ci act capt lvl pi post sales owner act."
 		dataType: int64
 		formatString: 0
 		lineageTag: def48617-cbe0-4079-afe8-b773e0d447ea
@@ -2522,7 +2617,6 @@ table users_history
 
 	/// Duration of activities performed on post-sales support steps that completed in the period
 	column ci_act_capt_lvl_pi_post_sales_owner_dur
-		description: "Numeric value for ci act capt lvl pi post sales owner dur."
 		dataType: double
 		lineageTag: 25070f5e-4b17-4bac-aca0-254d2d7caebe
 		summarizeBy: sum
@@ -2534,7 +2628,6 @@ table users_history
 
 	/// Number of post-sales support steps that completed in the period
 	column ci_act_capt_lvl_pi_post_sales_steps
-		description: "Numeric value for ci act capt lvl pi post sales steps."
 		dataType: int64
 		formatString: 0
 		lineageTag: a4498441-f8b6-4808-989e-e3b873839411
@@ -2545,7 +2638,6 @@ table users_history
 
 	/// Expected duration of activities performed on prospecting steps that completed in the period
 	column ci_act_capt_lvl_pi_prospecting_expect_owner_dur
-		description: "Numeric value for ci act capt lvl pi prospecting expect owner dur."
 		dataType: double
 		lineageTag: de6871f6-200c-4cc5-bb3d-16279fc08302
 		summarizeBy: sum
@@ -2557,7 +2649,6 @@ table users_history
 
 	/// Number of owner activities performed on prospecting steps that completed in the period
 	column ci_act_capt_lvl_pi_prospecting_owner_act
-		description: "Numeric value for ci act capt lvl pi prospecting owner act."
 		dataType: int64
 		formatString: 0
 		lineageTag: 156facd6-0d87-4cc6-9c85-b65d6a47248e
@@ -2568,7 +2659,6 @@ table users_history
 
 	/// Duration of activities performed on prospecting steps that completed in the period
 	column ci_act_capt_lvl_pi_prospecting_owner_dur
-		description: "Numeric value for ci act capt lvl pi prospecting owner dur."
 		dataType: double
 		lineageTag: 8c70edb1-c66c-46a7-ad96-b65767cc326b
 		summarizeBy: sum
@@ -2580,7 +2670,6 @@ table users_history
 
 	/// Number of prospecting steps that completed in the period
 	column ci_act_capt_lvl_pi_prospecting_steps
-		description: "Numeric value for ci act capt lvl pi prospecting steps."
 		dataType: int64
 		formatString: 0
 		lineageTag: e2d28d37-bb46-43a7-8eda-ce8316cdfc4a
@@ -2591,7 +2680,6 @@ table users_history
 
 	/// User's timeliness score in the period
 	column ci_act_capt_lvl_pi_timeliness
-		description: "Date/time when ci act capt lvl pi timeliness."
 		dataType: double
 		lineageTag: 780906d6-2f18-405e-91c2-7184cfb2cfe8
 		summarizeBy: sum
@@ -2603,7 +2691,6 @@ table users_history
 
 	/// act_capture_level adjustment factor to account for the user's act_capture_level score
 	column ci_time_alloc_act_capt_lvl_adjustment
-		description: "Date/time when ci time alloc act capt lvl adjustment."
 		dataType: double
 		lineageTag: 4c5900c1-713a-4bea-9722-8f3ac8fcfe89
 		summarizeBy: sum
@@ -2615,7 +2702,6 @@ table users_history
 
 	/// User's time allocation values confidence in the period
 	column ci_time_alloc_conf
-		description: "Date/time when ci time alloc conf."
 		dataType: double
 		lineageTag: e1d5eb9b-09a3-41b6-8662-ed5b23c90bd1
 		summarizeBy: sum
@@ -2627,7 +2713,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on internal activities in the period
 	column ci_time_alloc_internal
-		description: "Date/time when ci time alloc internal."
 		dataType: double
 		lineageTag: 13300d16-fbf5-49f7-910c-5b31a16fdb0f
 		summarizeBy: sum
@@ -2639,7 +2724,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on engaged internal activities in the period
 	column ci_time_alloc_internal_eng
-		description: "Date/time when ci time alloc internal eng."
 		dataType: double
 		lineageTag: 72b50157-c613-4cc3-b150-7dbb8fab9c12
 		summarizeBy: sum
@@ -2651,7 +2735,6 @@ table users_history
 
 	/// Week adjustment factor to convert monthly to weekly
 	column ci_time_alloc_month_to_week_adjustment
-		description: "Date/time when ci time alloc month to week adjustment."
 		dataType: double
 		lineageTag: 7bd82971-b7f0-4ff1-aa47-b310b7e6496f
 		summarizeBy: sum
@@ -2663,7 +2746,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on new logo selling activities in the period
 	column ci_time_alloc_new_logo
-		description: "Date/time when ci time alloc new logo."
 		dataType: double
 		lineageTag: e0ba2bcc-dca3-4bac-9621-775926260a0f
 		summarizeBy: sum
@@ -2675,7 +2757,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on engaged new logo selling activities in the period
 	column ci_time_alloc_new_logo_eng
-		description: "Date/time when ci time alloc new logo eng."
 		dataType: double
 		lineageTag: 0a57136a-61da-4153-97a6-b19ac5793f8c
 		summarizeBy: sum
@@ -2687,7 +2768,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on post-sales support activities in the period
 	column ci_time_alloc_post_sales
-		description: "Date/time when ci time alloc post sales."
 		dataType: double
 		lineageTag: 117284d7-5a41-4cc5-a2b8-001980d17c32
 		summarizeBy: sum
@@ -2699,7 +2779,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on engaged post-sales support activities in the period
 	column ci_time_alloc_post_sales_eng
-		description: "Date/time when ci time alloc post sales eng."
 		dataType: double
 		lineageTag: cdea35cd-162a-4e86-bd14-69933ffb8aeb
 		summarizeBy: sum
@@ -2711,7 +2790,6 @@ table users_history
 
 	/// Prep adjustment factor to account for the preparation time needed apart from sales related activities
 	column ci_time_alloc_prep_adjustment
-		description: "Date/time when ci time alloc prep adjustment."
 		dataType: double
 		lineageTag: 49c90b85-68a6-4b44-88d1-2308b444e1e3
 		summarizeBy: sum
@@ -2723,7 +2801,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on prospecting activities in the period
 	column ci_time_alloc_prospecting
-		description: "Date/time when ci time alloc prospecting."
 		dataType: double
 		lineageTag: 9237a3a2-908e-467c-811c-f5e9c9f23b6b
 		summarizeBy: sum
@@ -2735,7 +2812,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on engaged prospecting activities in the period
 	column ci_time_alloc_prospecting_eng
-		description: "Date/time when ci time alloc prospecting eng."
 		dataType: double
 		lineageTag: f5bf03e8-8958-48a8-b728-6d8650788d04
 		summarizeBy: sum
@@ -2747,7 +2823,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on activities in the period
 	column ci_time_alloc_tot
-		description: "Date/time when ci time alloc tot."
 		dataType: double
 		lineageTag: 43a23bf6-1c7f-4abb-b4a1-d1c6a2aa3252
 		summarizeBy: sum
@@ -2759,7 +2834,6 @@ table users_history
 
 	/// Duration of the activities the user performed in the period
 	column ci_time_alloc_tot_dur
-		description: "Date/time when ci time alloc tot dur."
 		dataType: double
 		lineageTag: f9f2a426-29ce-42c3-855c-ce9f8ab42b3e
 		summarizeBy: sum
@@ -2771,7 +2845,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on engaged activities in the period
 	column ci_time_alloc_tot_eng
-		description: "Date/time when ci time alloc tot eng."
 		dataType: double
 		lineageTag: 81e56d15-594b-4172-85ee-173338fc2986
 		summarizeBy: sum
@@ -2783,7 +2856,6 @@ table users_history
 
 	/// Duration of the engaged activities the user performed in the period
 	column ci_time_alloc_tot_eng_dur
-		description: "Date/time when ci time alloc tot eng dur."
 		dataType: double
 		lineageTag: bca305da-8bd2-4192-8a25-7e0dc65d3fc0
 		summarizeBy: sum
@@ -2795,7 +2867,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on sales related activities in the period
 	column ci_time_alloc_tot_selling
-		description: "Date/time when ci time alloc tot selling."
 		dataType: double
 		lineageTag: 45f51f39-22ec-4b5d-8ffb-05b5edd17532
 		summarizeBy: sum
@@ -2807,7 +2878,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on engaged sales related activities in the period
 	column ci_time_alloc_tot_selling_eng
-		description: "Date/time when ci time alloc tot selling eng."
 		dataType: double
 		lineageTag: cdf91be9-72ba-4ca8-aba5-6b709e2f222d
 		summarizeBy: sum
@@ -2819,7 +2889,6 @@ table users_history
 
 	/// User's last login time in the CRM
 	column crm_last_login_time
-		description: "CRM: Date/time when last login time."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 11fd96c0-6eb9-43ad-a5b4-5729bf91ed18
@@ -2835,7 +2904,6 @@ table users_history
 
 	/// User's group
 	column trueai_group
-		description: "TrueAI: Text label for group."
 		dataType: string
 		lineageTag: 36d8cda1-723e-4564-b957-bcc4935a74bf
 		summarizeBy: none
@@ -2845,7 +2913,6 @@ table users_history
 
 	/// User's hire date
 	column trueai_hire_date
-		description: "TrueAI: Date/time when hire date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 85b6ced2-ce0e-4e54-b540-492f776919c9
@@ -2865,7 +2932,6 @@ table users_history
 
 	/// Number of months since the user's hire date
 	column trueai_tenure
-		description: "TrueAI: Numeric value for tenure."
 		dataType: int64
 		lineageTag: 9a92bd5f-1f5e-4c79-9e26-3622af124e95
 		summarizeBy: sum
@@ -2879,7 +2945,6 @@ table users_history
 
 	/// User's termination date
 	column trueai_termination_date
-		description: "TrueAI: Date/time when termination date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 0ecbd518-7f37-4517-9551-2661a4652706
@@ -2899,7 +2964,6 @@ table users_history
 
 	/// User's standardized and combined role
 	column trueai_user_role
-		description: "TrueAI: Text label for user role."
 		dataType: string
 		lineageTag: 9733a575-c52c-474d-854f-96a859fe558c
 		summarizeBy: none
@@ -2909,7 +2973,6 @@ table users_history
 
 	/// User's function derived from the standardized and combined role
 	column trueai_user_role_function
-		description: "TrueAI: Text label for user role function."
 		dataType: string
 		lineageTag: 0fe69c05-1a3a-4e40-a4ab-1f635f7dd27e
 		summarizeBy: none
@@ -2921,7 +2984,6 @@ table users_history
 
 	/// User's performance tier expressed as "underperformer", "overperformer" or "performer", based on their quarterly sum of booking amounts of won opportunities compared to their peers
 	column ci_perf_qtly_performance_tier
-		description: "Text label for ci perf qtly performance tier."
 		dataType: string
 		lineageTag: 67717ba0-c518-4efa-b95e-1415ae4e33d5
 		summarizeBy: none
@@ -2931,7 +2993,6 @@ table users_history
 
 	/// Column 'col.ci_perf_qtly_performance_tier_num' = ```.
 	column 'col.ci_perf_qtly_performance_tier_num' = ```
-			description: "Count of col ci perf qtly performance tier num."
 			SWITCH([ci_perf_qtly_performance_tier], "Overperformer", 3, "Performer", 2, "Underperformer", 1) 
 			
 			```
@@ -2943,7 +3004,6 @@ table users_history
 
 	/// Column 'col.ci.perf_annual_performance_tier_num' = ```.
 	column 'col.ci.perf_annual_performance_tier_num' = ```
-			description: "Count of col ci perf annual performance tier num."
 			
 			// do the filter first
 			
@@ -2991,7 +3051,6 @@ table users_history
 
 	/// Column 'col.ci.perf_annual_performance_tier' = ```.
 	column 'col.ci.perf_annual_performance_tier' = ```
-			description: "Unclear: Value for col ci perf annual performance tier."
 			
 			SWITCH(users_history[col.ci.perf_annual_performance_tier_num], 3, "Overperformer", 2, "Performer", 1, "Underperformer")
 			
@@ -3003,7 +3062,6 @@ table users_history
 
 	/// User's performance tier expressed as an integer from 1 to 3, based on their quarterly sum of booking amounts of won opportunities compared to their peers
 	column ci_perf_qtly_performance_tier_num
-		description: "Count of ci perf qtly performance tier num."
 		dataType: int64
 		formatString: 0
 		lineageTag: 5d68fed3-4995-4efa-9635-1b5401c0e7fd
@@ -3014,7 +3072,6 @@ table users_history
 
 	/// Column 'col.ci_ta_potential_hours' = ```.
 	column 'col.ci_ta_potential_hours' = ```
-			description: "Unclear: Value for col ci ta potential hours."
 			
 			var hours_per_cal_day = (250 * 8)/365 // number of work days
 			var as_of = [_sys_as_of] // current month's last day
@@ -3035,7 +3092,6 @@ table users_history
 
 	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_closing_ability_actual_vs_predicted
-		description: "Numeric value for ci sb closing ability actual vs predicted."
 		dataType: double
 		lineageTag: d3ef3092-a25e-45d9-85a8-9be542824dba
 		summarizeBy: sum
@@ -3047,7 +3103,6 @@ table users_history
 
 	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_closing_ability_conf
-		description: "Numeric value for ci sb closing ability conf."
 		dataType: double
 		lineageTag: b372a6fb-c8c0-4024-880c-c15d4df5fa0b
 		summarizeBy: sum
@@ -3059,7 +3114,6 @@ table users_history
 
 	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_closing_ability_peer_actual_vs_predicted
-		description: "Numeric value for ci sb closing ability peer actual vs predicted."
 		dataType: double
 		lineageTag: d229fdb3-1ee0-44dc-b34d-83df64575445
 		summarizeBy: sum
@@ -3071,7 +3125,6 @@ table users_history
 
 	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_discov_skills_actual_vs_predicted
-		description: "Numeric value for ci sb discov skills actual vs predicted."
 		dataType: double
 		lineageTag: 6546394c-2ae3-4626-9f47-8bf8b76975c9
 		summarizeBy: sum
@@ -3083,7 +3136,6 @@ table users_history
 
 	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_discov_skills_conf
-		description: "Numeric value for ci sb discov skills conf."
 		dataType: double
 		lineageTag: ab2e41ff-9e53-46b3-bb6b-bdb1a60ac16f
 		summarizeBy: sum
@@ -3095,7 +3147,6 @@ table users_history
 
 	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_discov_skills_peer_actual_vs_predicted
-		description: "Numeric value for ci sb discov skills peer actual vs predicted."
 		dataType: double
 		formatString: 0
 		lineageTag: 0aaad8ee-eef0-4607-af1c-44c0e466ce9e
@@ -3106,7 +3157,6 @@ table users_history
 
 	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_closing_ability_peer_actual_vs_pred_ratio_derived_max
-		description: "Numeric value for ci sb closing ability peer actual vs pred ratio derived max."
 		dataType: double
 		lineageTag: f6a89d98-299d-4790-a4ca-69fe3f4fc312
 		summarizeBy: sum
@@ -3118,7 +3168,6 @@ table users_history
 
 	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_closing_ability_peer_actual_vs_pred_ratio_derived_min
-		description: "Numeric value for ci sb closing ability peer actual vs pred ratio derived min."
 		dataType: double
 		lineageTag: 7ec7a725-3a35-4692-9c32-1d14e42063e2
 		summarizeBy: sum
@@ -3130,7 +3179,6 @@ table users_history
 
 	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_deal_maxing_conf
-		description: "Numeric value for ci sb deal maxing conf."
 		dataType: double
 		lineageTag: 2a28d51c-1917-4f8d-a5b1-b69d5b7fab81
 		summarizeBy: sum
@@ -3142,7 +3190,6 @@ table users_history
 
 	/// Deal maximizing final score as compared to peers.
 	column ci_sb_deal_maxing_num
-		description: "Count of ci sb deal maxing num."
 		dataType: double
 		lineageTag: 03b48771-de12-4fbf-938a-c71feeead6d2
 		summarizeBy: sum
@@ -3154,7 +3201,6 @@ table users_history
 
 	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_engmt_ability_conf
-		description: "Numeric value for ci sb engmt ability conf."
 		dataType: double
 		lineageTag: 150917d1-51fe-44b0-8041-070e6d0d4bed
 		summarizeBy: sum
@@ -3166,7 +3212,6 @@ table users_history
 
 	/// Engagement ability final score as compared to peers.
 	column ci_sb_engmt_ability_num
-		description: "Count of ci sb engmt ability num."
 		dataType: double
 		lineageTag: 9c50b699-18ee-48cb-9f82-f6d3a7df6dff
 		summarizeBy: sum
@@ -3178,7 +3223,6 @@ table users_history
 
 	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_work_effort_conf
-		description: "Numeric value for ci sb work effort conf."
 		dataType: double
 		lineageTag: 5f93bf7b-cb1c-44a2-a26e-193d8e55511f
 		summarizeBy: sum
@@ -3190,7 +3234,6 @@ table users_history
 
 	/// Work effort final score as compared to peers.
 	column ci_sb_work_effort_num
-		description: "Count of ci sb work effort num."
 		dataType: double
 		lineageTag: f2aeccda-bde2-4b01-bc68-221712c00268
 		summarizeBy: sum
@@ -3202,7 +3245,6 @@ table users_history
 
 	/// The date of the last data request from the platform in UTC
 	column trueai_end_date
-		description: "TrueAI: Date/time when end date."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: f6401d21-4f61-4dd5-a51e-8bcb826d8b41
@@ -3220,7 +3262,6 @@ table users_history
 
 	/// The last date of the month that the record applies to (for past months) or the last date of aggregated data (for the present month)
 	column _sys_as_of
-		description: "System: Date/time when as of."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: f45bccb0-1f4e-48bd-a57e-940c08330b14
@@ -3236,7 +3277,6 @@ table users_history
 
 	/// Boolean flag that indicates whether the record was set to inactive in the remote system
 	column _sys_is_active
-		description: "System: Indicates whether is active."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 41958ca8-ca01-4e94-b6e8-949ab3aeac67
@@ -3247,7 +3287,6 @@ table users_history
 
 	/// Boolean flag that indicates whether the record was set to deleted in the remote system
 	column _sys_is_deleted
-		description: "System: Indicates whether is deleted."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 396c6de1-9f1f-4043-93c4-eb38e29c3db8
@@ -3258,7 +3297,6 @@ table users_history
 
 	/// Expected duration of activities performed on new logo selling steps that completed in the period
 	column ci_act_capt_lvl_pi_new_logo_expected_owner_dur
-		description: "Numeric value for ci act capt lvl pi new logo expected owner dur."
 		dataType: double
 		lineageTag: 6e1ed90d-afba-47ed-91da-18baf1c4efa5
 		summarizeBy: sum
@@ -3270,7 +3308,6 @@ table users_history
 
 	/// User's creation date in the CRM
 	column crm_created_on
-		description: "CRM: Date/time when created on."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 1fb809ed-0a11-415d-b368-51a2eb306268
@@ -3286,7 +3323,6 @@ table users_history
 
 	/// Expected duration of activities performed on existing customer selling steps that completed in the period
 	column ci_act_capt_lvl_pi_exist_cust_expect_owner_dur
-		description: "Numeric value for ci act capt lvl pi exist cust expect owner dur."
 		dataType: double
 		lineageTag: e2a20ea6-6e91-417f-ac91-c9f551bf6a48
 		summarizeBy: sum
@@ -3298,7 +3334,6 @@ table users_history
 
 	/// Number of owner activities performed on existing customer selling steps that completed in the period
 	column ci_act_capt_lvl_pi_exist_cust_owner_act
-		description: "Numeric value for ci act capt lvl pi exist cust owner act."
 		dataType: int64
 		formatString: 0
 		lineageTag: fb01fafb-b9ae-46de-a0a4-575a4e513b7d
@@ -3309,7 +3344,6 @@ table users_history
 
 	/// Duration of activities performed on existing customer selling steps that completed in the period
 	column ci_act_capt_lvl_pi_exist_cust_owner_dur
-		description: "Numeric value for ci act capt lvl pi exist cust owner dur."
 		dataType: double
 		lineageTag: f166d551-cff6-4f73-a3f5-b860f06330c7
 		summarizeBy: sum
@@ -3321,7 +3355,6 @@ table users_history
 
 	/// Number of existing customer selling steps that completed in the period
 	column ci_act_capt_lvl_pi_exist_cust_steps
-		description: "Numeric value for ci act capt lvl pi exist cust steps."
 		dataType: int64
 		formatString: 0
 		lineageTag: a94bb3c7-4bc6-4824-b686-048442588635
@@ -3332,7 +3365,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on existing customer selling activities in the period
 	column ci_time_alloc_existing_customer_selling
-		description: "Date/time when ci time alloc existing customer selling."
 		dataType: double
 		lineageTag: 48e869c0-9a0e-4e68-917f-d963b95acb5b
 		summarizeBy: sum
@@ -3344,7 +3376,6 @@ table users_history
 
 	/// Average number of weekly hours the user spent on engaged existing customer selling activities in the period
 	column ci_time_alloc_existing_customer_selling_eng
-		description: "Date/time when ci time alloc existing customer selling eng."
 		dataType: double
 		lineageTag: 5f99395c-b1a3-417d-af49-9947f5066ab7
 		summarizeBy: sum
@@ -3356,7 +3387,6 @@ table users_history
 
 	/// User's standardized and combined role aliased
 	column trueai_user_role_alias
-		description: "TrueAI: Text label for user role alias."
 		dataType: string
 		lineageTag: 24baa1ad-7363-439d-9b42-3640c9e478ef
 		summarizeBy: none
@@ -3366,7 +3396,6 @@ table users_history
 
 	/// User's performance tier confidence
 	column ci_perf_qtly_performance_tier_conf
-		description: "Numeric value for ci perf qtly performance tier conf."
 		dataType: double
 		lineageTag: c26128f8-4661-4233-99a2-4cbe2b78fde9
 		summarizeBy: sum
@@ -3378,7 +3407,6 @@ table users_history
 
 	/// Number of peers the user was compared to when determining the performance tier
 	column ci_perf_qtly_performance_peer_count
-		description: "Count of ci perf qtly performance peer count."
 		dataType: int64
 		formatString: 0
 		lineageTag: e26b5072-67ed-4c8a-b5f3-d17cf3d8b738
@@ -3389,7 +3417,6 @@ table users_history
 
 	/// Potential number of hours a user can put in during a given month
 	column ci_time_alloc_potential
-		description: "Date/time when ci time alloc potential."
 		dataType: double
 		lineageTag: 97a8326a-5c34-41bd-bfc7-363ac8e3dff5
 		summarizeBy: sum
@@ -3401,7 +3428,6 @@ table users_history
 
 	/// Closing ability final score tier as compared to peers.
 	column ci_sb_closing_ability_tier
-		description: "Text label for ci sb closing ability tier."
 		dataType: string
 		lineageTag: cee04b62-8105-4b27-8b01-e805cf3e3fdd
 		summarizeBy: none
@@ -3411,7 +3437,6 @@ table users_history
 
 	/// Closing ability final score as compared to peers.
 	column ci_sb_closing_ability_num
-		description: "Count of ci sb closing ability num."
 		dataType: double
 		lineageTag: 8ae645ff-5945-469a-9798-be6e8bbdf546
 		summarizeBy: sum
@@ -3423,7 +3448,6 @@ table users_history
 
 	/// Deal maximizing final score tier as compared to peers.
 	column ci_sb_deal_maxing_tier
-		description: "Text label for ci sb deal maxing tier."
 		dataType: string
 		lineageTag: b467483f-bdc3-4217-8bcb-a4c8e547863b
 		summarizeBy: none
@@ -3433,7 +3457,6 @@ table users_history
 
 	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_deal_maxing_actual_vs_predicted
-		description: "Numeric value for ci sb deal maxing actual vs predicted."
 		dataType: double
 		lineageTag: 74373ae0-48ca-46f6-ae43-68a4bf90aec7
 		summarizeBy: sum
@@ -3445,7 +3468,6 @@ table users_history
 
 	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_deal_maxing_peer_actual_vs_pred_ratio_derived_max
-		description: "Numeric value for ci sb deal maxing peer actual vs pred ratio derived max."
 		dataType: double
 		lineageTag: 5462b376-1e86-4285-bb68-ce9957d62dbe
 		summarizeBy: sum
@@ -3457,7 +3479,6 @@ table users_history
 
 	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_deal_maxing_peer_actual_vs_pred_ratio_derived_min
-		description: "Numeric value for ci sb deal maxing peer actual vs pred ratio derived min."
 		dataType: double
 		lineageTag: 33826acf-38c2-4950-bca8-937ee9d7566b
 		summarizeBy: sum
@@ -3469,7 +3490,6 @@ table users_history
 
 	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_deal_maxing_peer_actual_vs_predicted
-		description: "Numeric value for ci sb deal maxing peer actual vs predicted."
 		dataType: double
 		lineageTag: 5d25bd97-a20d-4630-9111-bcdcf42597dd
 		summarizeBy: sum
@@ -3481,7 +3501,6 @@ table users_history
 
 	/// Discovery skills final score tier as compared to peers.
 	column ci_sb_discov_skills_tier
-		description: "Text label for ci sb discov skills tier."
 		dataType: string
 		lineageTag: 2fe6858b-f030-4a36-846d-0a0ee15d08d5
 		summarizeBy: none
@@ -3491,7 +3510,6 @@ table users_history
 
 	/// Discovery skills final score as compared to peers.
 	column ci_sb_discov_skills_num
-		description: "Count of ci sb discov skills num."
 		dataType: double
 		lineageTag: b37f90e8-7268-4131-9eb2-b981435c9c40
 		summarizeBy: sum
@@ -3503,7 +3521,6 @@ table users_history
 
 	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_discov_skills_peer_actual_vs_pred_ratio_derived_max
-		description: "Numeric value for ci sb discov skills peer actual vs pred ratio derived max."
 		dataType: double
 		lineageTag: df281477-a8bc-4cd3-b54f-7288047d5bd0
 		summarizeBy: sum
@@ -3515,7 +3532,6 @@ table users_history
 
 	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_discov_skills_peer_actual_vs_pred_ratio_derived_min
-		description: "Numeric value for ci sb discov skills peer actual vs pred ratio derived min."
 		dataType: double
 		lineageTag: a31d2ce7-f839-4de6-bbea-1013dfdeaf3d
 		summarizeBy: sum
@@ -3527,7 +3543,6 @@ table users_history
 
 	/// Engagement ability final score tier as compared to peers.
 	column ci_sb_engmt_ability_tier
-		description: "Text label for ci sb engmt ability tier."
 		dataType: string
 		lineageTag: 13adc711-1164-4f63-b48b-f63dc6098cb1
 		summarizeBy: none
@@ -3537,7 +3552,6 @@ table users_history
 
 	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_engmt_ability_actual_vs_predicted
-		description: "Numeric value for ci sb engmt ability actual vs predicted."
 		dataType: double
 		lineageTag: d10358fa-989f-467a-90b9-1fc7899926ea
 		summarizeBy: sum
@@ -3549,7 +3563,6 @@ table users_history
 
 	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_engmt_ability_peer_actual_vs_pred_ratio_derived_max
-		description: "Numeric value for ci sb engmt ability peer actual vs pred ratio derived max."
 		dataType: double
 		lineageTag: bb9a5432-5a98-41ff-a3ed-930f05514a6a
 		summarizeBy: sum
@@ -3561,7 +3574,6 @@ table users_history
 
 	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_engmt_ability_peer_actual_vs_pred_ratio_derived_min
-		description: "Numeric value for ci sb engmt ability peer actual vs pred ratio derived min."
 		dataType: double
 		lineageTag: 2bbb99ab-5891-4ddb-8364-7a2549ae34f6
 		summarizeBy: sum
@@ -3573,7 +3585,6 @@ table users_history
 
 	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_engmt_ability_peer_actual_vs_predicted
-		description: "Numeric value for ci sb engmt ability peer actual vs predicted."
 		dataType: double
 		lineageTag: 548d1855-29a8-49f4-9bfa-ba7598591fc3
 		summarizeBy: sum
@@ -3585,7 +3596,6 @@ table users_history
 
 	/// Work effort final score tier as compared to peers.
 	column ci_sb_work_effort_tier
-		description: "Text label for ci sb work effort tier."
 		dataType: string
 		lineageTag: ac6f1e6f-7215-4b94-9d98-4551b8c0bb8c
 		summarizeBy: none
@@ -3595,7 +3605,6 @@ table users_history
 
 	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_work_effort_actual_vs_predicted
-		description: "Numeric value for ci sb work effort actual vs predicted."
 		dataType: double
 		lineageTag: 73991f4d-aa28-4d57-8b41-24bd3ef12050
 		summarizeBy: sum
@@ -3607,7 +3616,6 @@ table users_history
 
 	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_work_effort_peer_actual_vs_pred_ratio_derived_max
-		description: "Numeric value for ci sb work effort peer actual vs pred ratio derived max."
 		dataType: double
 		lineageTag: bacb95de-ff97-4f29-886f-43dafa9f0ebe
 		summarizeBy: sum
@@ -3619,7 +3627,6 @@ table users_history
 
 	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_work_effort_peer_actual_vs_pred_ratio_derived_min
-		description: "Numeric value for ci sb work effort peer actual vs pred ratio derived min."
 		dataType: double
 		lineageTag: 0aefc028-978f-441c-ba3a-687aba96cb1d
 		summarizeBy: sum
@@ -3631,7 +3638,6 @@ table users_history
 
 	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_work_effort_peer_actual_vs_predicted
-		description: "Numeric value for ci sb work effort peer actual vs predicted."
 		dataType: double
 		lineageTag: d644117c-15c6-4f7b-af75-3c04f9f12af8
 		summarizeBy: sum
@@ -3643,7 +3649,6 @@ table users_history
 
 	/// Time management final score tier as compared to peers.
 	column ci_sb_time_management_tier
-		description: "Date/time when ci sb time management tier."
 		dataType: string
 		lineageTag: 97ad7927-fbcc-43bf-ad93-2b080d4f83ad
 		summarizeBy: none
@@ -3653,7 +3658,6 @@ table users_history
 
 	/// Time management final score as compared to peers.
 	column ci_sb_time_management_num
-		description: "Date/time when ci sb time management num."
 		dataType: double
 		lineageTag: 32d3abed-6f31-4a22-85cb-5d0c492ea5e8
 		summarizeBy: sum
@@ -3665,7 +3669,6 @@ table users_history
 
 	/// The confidence value based on the number of actual samples vs. number of expected samples, adjusted with an exponent factor.
 	column ci_sb_time_management_conf
-		description: "Date/time when ci sb time management conf."
 		dataType: double
 		lineageTag: 5430dfbe-8683-4c0a-86e6-74967889d5bc
 		summarizeBy: sum
@@ -3677,7 +3680,6 @@ table users_history
 
 	/// The ratio between actual and expected success rate. Over 1 indicates an overperformance, lower than 1 indicates underperformance.
 	column ci_sb_time_management_actual_vs_predicted
-		description: "Date/time when ci sb time management actual vs predicted."
 		dataType: double
 		lineageTag: 88172038-9977-4b8d-ac78-47d7bf8c587d
 		summarizeBy: sum
@@ -3689,7 +3691,6 @@ table users_history
 
 	/// Two standard deviations above the mean of the average vs expected success rate of the peer group.
 	column ci_sb_time_management_peer_actual_vs_pred_ratio_derived_max
-		description: "Date/time when ci sb time management peer actual vs pred ratio derived max."
 		dataType: double
 		lineageTag: 4fa7abae-c2f8-468a-b95a-49785f21bfaf
 		summarizeBy: sum
@@ -3701,7 +3702,6 @@ table users_history
 
 	/// Two standard deviations below the mean of the average vs expected success rate of the peer group.
 	column ci_sb_time_management_peer_actual_vs_pred_ratio_derived_min
-		description: "Date/time when ci sb time management peer actual vs pred ratio derived min."
 		dataType: double
 		lineageTag: d467e8d8-3eeb-4bea-9646-4fd1f878cc70
 		summarizeBy: sum
@@ -3713,7 +3713,6 @@ table users_history
 
 	/// Mean of the average vs expected success rate of the peer group.
 	column ci_sb_time_management_peer_actual_vs_predicted
-		description: "Date/time when ci sb time management peer actual vs predicted."
 		dataType: double
 		lineageTag: c75eed9b-4045-4c70-9307-dd0a0cbe1d7c
 		summarizeBy: sum
@@ -3725,7 +3724,6 @@ table users_history
 
 	/// User's department derived from the standardized and combined role
 	column trueai_user_role_department
-		description: "TrueAI: Text label for user role department."
 		dataType: string
 		lineageTag: d7442e13-deda-4aa8-8fd6-ae6efe9166dd
 		summarizeBy: none

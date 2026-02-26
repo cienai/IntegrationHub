@@ -1,23 +1,23 @@
 /// Reference list mapping individual predictive scores to their broader analysis categories.
 table metadata_ai_scores_category_links
-	description: "One row per metadata_ai_scores_category_link record. Source fields include System prefixes. Related to LocalDateTable_8b551090-ebee-4d90-9b8b-ef1838732e1b (_sys_modified_on -> Date), metadata_ai_scores_analysis_categories (analysis_category_id -> _sys_doc_id), metadata_ai_scores (score_id -> _sys_doc_id). Supports measures such as meas.metadata_score_weighting_pct."
 	lineageTag: bfb0fc91-05e3-45e9-bdff-3b40f89bcf3f
 
-	/// Measure meas.metadata_score_weighting_pct.
-	measure 'meas.metadata_score_weighting_pct' = ```
+	/// Purpose: Metadata Score Weighting Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.metadata_score_weighting_pct' = 
 			
 			var curr_weight = CALCULATE(SUM(metadata_ai_scores_category_links[weighting]))
 			var all_weights = CALCULATE(SUM(metadata_ai_scores_category_links[weighting]), metadata_ai_scores[score_name] <> "" )
 			var res = DIVIDE(curr_weight, all_weights)
 			return res 
-			```
-			description: "Ratio of metadata_ai_scores_category_links[weighting] to metadata_ai_scores_category_links[weighting]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		lineageTag: a935c4b2-c445-4a96-9f7a-e650a735168b
 
 	/// Unique AI score identifier
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 0ece1910-f4fb-4fe2-a605-6e0f6df1f2be
 		summarizeBy: none
@@ -27,7 +27,6 @@ table metadata_ai_scores_category_links
 
 	/// Is Active
 	column _sys_is_active
-		description: "System: Indicates whether is active."
 		dataType: string
 		lineageTag: ac344033-67e1-44e5-809c-5b9e6026d641
 		summarizeBy: none
@@ -37,7 +36,6 @@ table metadata_ai_scores_category_links
 
 	/// Modified On Date
 	column _sys_modified_on
-		description: "System: Date/time when modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 7052c511-4c34-4634-85b7-fe555e140486
@@ -53,7 +51,6 @@ table metadata_ai_scores_category_links
 
 	/// Score ID
 	column score_id
-		description: "Identifier for score."
 		dataType: int64
 		formatString: 0
 		lineageTag: 8bcc2c1a-fbb2-4c61-9554-045ba36c9435
@@ -64,7 +61,6 @@ table metadata_ai_scores_category_links
 
 	/// Analysis Category ID
 	column analysis_category_id
-		description: "Identifier for analysis category."
 		dataType: string
 		lineageTag: aa076781-8c5d-4913-bcbc-79df68d39d4c
 		summarizeBy: none
@@ -74,7 +70,6 @@ table metadata_ai_scores_category_links
 
 	/// Weighting
 	column weighting
-		description: "Numeric value for weighting."
 		dataType: int64
 		formatString: 0
 		lineageTag: 907a8a0b-f71f-4401-97f2-4a9d20f9d329
@@ -85,7 +80,6 @@ table metadata_ai_scores_category_links
 
 	/// Notes
 	column notes
-		description: "Text label for notes."
 		dataType: string
 		lineageTag: 38057cfb-b926-4920-a702-03f01ed8f13e
 		summarizeBy: none

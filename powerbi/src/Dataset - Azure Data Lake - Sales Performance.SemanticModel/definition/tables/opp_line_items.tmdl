@@ -1,27 +1,31 @@
 /// CRM entity for individual product or service entries linked to an Opportunity enriched with TrueAI predictive insights.
 table opp_line_items
-	description: "One row per opp_line_item record. Source fields include CRM, System, TrueAI prefixes. Related to products (crm_product_id -> _sys_doc_id), LocalDateTable_094cc317-136e-43e7-a1df-9d2f6927bfe2 (_sys_as_of -> Date), LocalDateTable_51d4de53-eac0-4d81-b266-78974241e512 (_sys_last_modified_on -> Date). Supports measures such as meas.opp_line_item_discount_amt, meas.opp_line_item_discount_pct."
 	lineageTag: 686ea3a9-2296-4d86-bcfd-80415925b6e8
 
-	/// Measure meas.opp_line_item_discount_amt.
-	measure 'meas.opp_line_item_discount_amt' = ```
+	/// Purpose: Opp Line Item Discount Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.opp_line_item_discount_amt' = 
 			
 			var res = ([meas.opp_line_item_total_price_before_discount]-[meas.opp_line_item_total_price_after_discount])*-1  // use the existing measures and multiply by -1  
 			RETURN
 			res
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: -$#,##0;-$#,##0;$0
 		displayFolder: discount opp
 		lineageTag: c58a9bec-10b0-4753-95d5-905afcfe0653
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.opp_line_item_discount_pct.
+	/// Purpose: Opp Line Item Discount Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.opp_line_item_discount_pct' =
 			
 			
-			description: "TODO: provide business definition for this measure."
 			var res = DIVIDE(([meas.opp_line_item_discount_amt]*-1), [meas.opp_line_item_total_price_before_discount]) // the diff / original. Turn discount back positive
 			
 			RETURN
@@ -30,19 +34,25 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: dd1dba57-2410-444e-b287-68ada1efc23c
 
-	/// Measure meas.discount_line_opps.
+	/// Purpose: Discount Line Opps.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.discount_line_opps' =
 			
-			description: "TODO: provide business definition for this measure."
 			IF([meas.opp_line_item_discount_pct] = 0, 0,BLANK())
 		formatString: 0
 		displayFolder: discount opp
 		lineageTag: 55bd8ea0-eb11-461f-b799-99a4f1e6e0ac
 
-	/// Measure meas.opp_line_item_dis_pct.
+	/// Purpose: Opp Line Item Dis Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.opp_line_item_dis_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			var orig_cost = SUMX(opp_line_items, [trueai_list_price]*[trueai_qty])              // get the original cost
 			var actual_cost = SUMX(opp_line_items, [trueai_unit_price]*[trueai_qty])            // get the actual cost
 			var res = DIVIDE(orig_cost -actual_cost, orig_cost)             // get the pct
@@ -51,11 +61,14 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: b5f83928-e12e-4884-aa64-e29f8c0e2b70
 
-	/// Measure meas.opp_line_item_total_price_after_discount.
+	/// Purpose: Opp Line Item Total Price After Discount.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opp_line_item_total_price_after_discount' =
 			
 			
-			description: "TODO: provide business definition for this measure."
 			var tbl = CALCULATETABLE(opp_line_items)        // get the calculatd table
 			var new_price = SUMX(tbl, [trueai_unit_price] * [trueai_qty])  // calculating the new price
 			RETURN
@@ -64,8 +77,12 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: 982b866e-1a68-4089-9f0b-fff63419a571
 
-	/// Measure meas.opp_lines_item_discount_pct.
-	measure 'meas.opp_lines_item_discount_pct' = ```
+	/// Purpose: Opp Lines Item Discount Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.opp_lines_item_discount_pct' = 
 			
 			
 			var tbl = CALCULATETABLE(opp_line_items)        // get the opp line items virtual table
@@ -73,42 +90,48 @@ table opp_line_items
 			var actual_cost = SUMX(tbl, [col.trueai_unit_price] * [crm_qty])        // get the actual cost
 			var res = DIVIDE(actual_cost - orig_cost, orig_cost)        // get the pct 
 			RETURN ABS(res)
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: discount opp
 		lineageTag: 92f502aa-be60-41d1-a075-d98ed0682e74
 
-	/// Measure meas.delta_expected_booking_amt.
-	measure 'meas.delta_expected_booking_amt' = ```
+	/// Purpose: Delta Expected Booking Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.delta_expected_booking_amt' = 
 			
 			var wonAmt = [meas.ssr_history_won_amt]     // get the won amt 
 			var pct = [meas.opps_delta_expected_pct]        // get the delta-expected pct
 			
 			var res = wonAmt * pct
 			RETURN res
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: fdd8ec9f-4d49-4be5-9806-37f53f5183ba
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_average_discount_pct.
+	/// Purpose: Opps Average Discount Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_average_discount_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			ABS(CALCULATE(AVERAGE(opps[trueai_discount_pct])))     // get the abs of avg discount pct
 		displayFolder: discount opp
 		lineageTag: 4521bdd7-92e5-4444-a254-49f7cccf9560
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_avg_deals_amt.
+	/// Purpose: Opps Avg Deals Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_avg_deals_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			var Amt = [meas.ssr_history_won_amt] - [meas.opps_deal_discount_amt]        // get the difference amt
 			var totdeals = [meas.ssr_history_step_count]            // total deals count
 			var res = DIVIDE(Amt, totdeals)
@@ -119,8 +142,12 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_deal_discount_amt.
-	measure 'meas.opps_deal_discount_amt' = ```
+	/// Purpose: Opps Deal Discount Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.opps_deal_discount_amt' = 
 			
 			// var pct = ABS([meas.opps_average_discount_pct])
 			// var wonAmt = [meas.ssr_history_won_amt]
@@ -132,16 +159,17 @@ table opp_line_items
 			
 			RETURN disAmt
 			
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: a7e40876-f224-4016-b137-855d4e4bb99c
 
-	/// Measure meas.opps_deals_pct.
+	/// Purpose: Opps Deals Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.opps_deals_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			var stepCount = [meas.ssr_history_step_count]       // calculating the step count
 			var disdeals = CALCULATE(count(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK())  // gt the count of opps that has discount tier
 			
@@ -152,52 +180,52 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: c7df8b8f-3864-41d9-94e5-b44b2836158f
 
-	/// Measure meas.opps_delta_expected_pct.
+	/// Purpose: Opps Delta Expected Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.opps_delta_expected_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR SuccessRate =
-			    CALCULATE(
-			        [meas.ssr_history_success_rate],
-			        KEEPFILTERS(opps)
-			    )
-			VAR ExpectedRate =
-			    CALCULATE(
-			        [meas.ssr_history_success_prob_avg],
-			        KEEPFILTERS(opps)
-			    )
-			RETURN
-			    SuccessRate - ExpectedRate
-		formatString: 0%;-0%;0%
+			CALCULATE(			[meas.ssr_history_success_rate],			KEEPFILTERS(opps)			)			VAR ExpectedRate =
+			CALCULATE(			[meas.ssr_history_success_prob_avg],			KEEPFILTERS(opps)			)			RETURN
+			SuccessRate - ExpectedRate		formatString: 0%;-0%;0%
 		displayFolder: discount opp
 		lineageTag: 9d875de2-fc0a-47b4-86e6-f717b75bf26f
 
-	/// Measure meas.opps_tot_deals.
+	/// Purpose: Opps Tot Deals.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opps_tot_deals' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(COUNT(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK()) // get the total deals count
 		formatString: 0
 		displayFolder: discount opp
 		lineageTag: ba127637-f77b-4fbe-8646-8ee9fea3c6a3
 
-	/// Measure meas.opp_line_items_avg_discount_pct.
+	/// Purpose: Opp Line Items Avg Discount Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_line_items_avg_discount_pct' =
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    AVERAGE(
-			        opps[trueai_discount_pct]      // get the average discount pct
-			    )
-			)
+			AVERAGE(			opps[trueai_discount_pct]      // get the average discount pct			)			)
 		displayFolder: discount opp
 		lineageTag: e2d54ef3-1fa1-4cc1-9829-3af4c599ee90
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_line_item_total_price_before_discount.
+	/// Purpose: Opp Line Item Total Price Before Discount.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opp_line_item_total_price_before_discount' =
 			
-			description: "TODO: provide business definition for this measure."
 			var tbl = CALCULATETABLE(opp_line_items)        // get the calculatd table
 			var orig_cost = SUMX(tbl, [trueai_list_price] * [trueai_qty])  // calculating the original price
 			RETURN orig_cost
@@ -207,66 +235,55 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opp_line_items_trueai_list_price.
+	/// Purpose: Opp Line Items Trueai List Price.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opp_line_items_trueai_list_price' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    MAX(opp_line_items[trueai_list_price])
-			)
+			MAX(opp_line_items[trueai_list_price])			)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: discount opp
 		lineageTag: 317da6da-348b-4ea6-96ac-5b2f9dc328a9
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.avg_discount_pct_change.
+	/// Purpose: Avg Discount Pct Change.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.avg_discount_pct_change' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR MinVisibleDate =
-			    CALCULATE(
-			        MIN('cal_end_dates'[Date]),
-			        ALLSELECTED('cal_end_dates')
-			    )
-			VAR MaxVisibleDate =
-			    CALCULATE(
-			        MAX('cal_end_dates'[Date]),
-			        ALLSELECTED('cal_end_dates')
-			    )
-			
+			CALCULATE(			MIN('cal_end_dates'[Date]),			ALLSELECTED('cal_end_dates')			)			VAR MaxVisibleDate =
+			CALCULATE(			MAX('cal_end_dates'[Date]),			ALLSELECTED('cal_end_dates')			)			
 			VAR StartValue =
-			    CALCULATE(
-			        [meas.opp_line_items_avg_discount_pct],
-			        KEEPFILTERS('cal_end_dates'[Date] = MinVisibleDate)
-			    )
-			
+			CALCULATE(			[meas.opp_line_items_avg_discount_pct],			KEEPFILTERS('cal_end_dates'[Date] = MinVisibleDate)			)			
 			VAR EndValue =
-			    CALCULATE(
-			        [meas.opp_line_items_avg_discount_pct],
-			        KEEPFILTERS('cal_end_dates'[Date] = MaxVisibleDate)
-			    )
-			
+			CALCULATE(			[meas.opp_line_items_avg_discount_pct],			KEEPFILTERS('cal_end_dates'[Date] = MaxVisibleDate)			)			
 			RETURN
-			    EndValue - StartValue
-		lineageTag: 60809788-e731-4fbf-a298-65c5f0ddb9d6
+			EndValue - StartValue		lineageTag: 60809788-e731-4fbf-a298-65c5f0ddb9d6
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_line_items_trueai_total_price.
+	/// Purpose: Opp Line Items Trueai Total Price.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_line_items_trueai_total_price' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    SUM ( opp_line_items[trueai_total_price] )
-			)
+			SUM ( opp_line_items[trueai_total_price] )			)
 		lineageTag: 06d38a15-526f-4563-8dc8-9d781cfd3b81
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 2343c249-79f2-4cdb-bda4-9d09f792ce18
 		summarizeBy: none
@@ -276,7 +293,6 @@ table opp_line_items
 
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
-		description: "System: Identifier for ssr."
 		dataType: string
 		lineageTag: 45b4092f-a962-4ca4-870c-80008d021727
 		summarizeBy: none
@@ -286,7 +302,6 @@ table opp_line_items
 
 	/// Product's currency in the CRM
 	column crm_currency
-		description: "CRM: Text label for currency."
 		dataType: string
 		lineageTag: 30d46d4f-10aa-4bb0-87f5-51e87dca5509
 		summarizeBy: none
@@ -296,7 +311,6 @@ table opp_line_items
 
 	/// Product's description in the CRM
 	column crm_description
-		description: "CRM: Text label for description."
 		dataType: string
 		lineageTag: 5c24954f-db51-48c4-bb6e-3311b911d0c4
 		summarizeBy: none
@@ -306,7 +320,6 @@ table opp_line_items
 
 	/// Product's list_price in the CRM
 	column crm_list_price
-		description: "CRM: Amount for list price."
 		dataType: double
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: 430885fa-3057-4803-b587-f6a95dbaabb9
@@ -319,7 +332,6 @@ table opp_line_items
 
 	/// Product name in the CRM
 	column crm_name
-		description: "CRM: Text label for name."
 		dataType: string
 		lineageTag: b2ba0f34-770d-42be-84e8-951ff7e57ce0
 		summarizeBy: none
@@ -329,7 +341,6 @@ table opp_line_items
 
 	/// Product oppid in the CRM
 	column crm_opp_id
-		description: "CRM: Identifier for opp."
 		dataType: string
 		lineageTag: 7e7b3852-a801-4db2-a7ca-01c57f936c0b
 		summarizeBy: none
@@ -339,7 +350,6 @@ table opp_line_items
 
 	/// Product code in the CRM
 	column crm_product_code
-		description: "CRM: Text label for product code."
 		dataType: string
 		lineageTag: 7f9f9b23-3c64-49aa-86d7-c1340079f055
 		summarizeBy: none
@@ -349,7 +359,6 @@ table opp_line_items
 
 	/// Product product_id in the CRM
 	column crm_product_id
-		description: "CRM: Identifier for product."
 		dataType: string
 		lineageTag: 8726f1fb-0dd7-4b21-891e-a0286af6840e
 		summarizeBy: none
@@ -359,7 +368,6 @@ table opp_line_items
 
 	/// Product's qty in the CRM
 	column crm_qty
-		description: "CRM: Count of qty."
 		dataType: int64
 		formatString: 0
 		lineageTag: 53fbef33-de61-4576-8276-54d0b1c486ac
@@ -370,7 +378,6 @@ table opp_line_items
 
 	/// Product's total_price in the CRM
 	column crm_total_price
-		description: "CRM: Amount for total price."
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 41397175-6fce-498d-a3ef-6bad17a2b2f1
@@ -381,7 +388,6 @@ table opp_line_items
 
 	/// Product's unit_price in the CRM
 	column crm_unit_price
-		description: "CRM: Amount for unit price."
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: e79d467c-249c-45c9-9d65-1c4eca47488c
@@ -392,7 +398,6 @@ table opp_line_items
 
 	/// Product's total price
 	column trueai_total_price
-		description: "TrueAI: Amount for total price."
 		dataType: double
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: 92956dc1-0e28-46d6-8804-f81350306f51
@@ -403,7 +408,6 @@ table opp_line_items
 
 	/// Product's total price rule
 	column trueai_total_price_rule
-		description: "TrueAI: Amount for total price rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7511b56b-cdd0-4419-a641-5f160b7f9abe
@@ -414,7 +418,6 @@ table opp_line_items
 
 	/// Column 'col.trueai_list_price' = [crm_list_price].
 	column 'col.trueai_list_price' = [crm_list_price]
-		description: "Amount for col trueai list price."
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: b1ca80d0-9500-44bd-a852-8abf5dbdfd6f
 		summarizeBy: sum
@@ -423,7 +426,6 @@ table opp_line_items
 
 	/// Column 'col.trueai_unit_price' = [crm_unit_price].
 	column 'col.trueai_unit_price' = [crm_unit_price]
-		description: "Amount for col trueai unit price."
 		lineageTag: b7387413-52ef-4af2-a4fd-d43d72c14f84
 		summarizeBy: sum
 
@@ -433,7 +435,6 @@ table opp_line_items
 
 	/// Column 'col.trueai_prod_category' = "Other".
 	column 'col.trueai_prod_category' = "Other"
-		description: "Unclear: Value for col trueai prod category."
 		lineageTag: ef2adbd1-8667-47a4-956e-6ef1fa55f1c5
 		summarizeBy: none
 
@@ -441,7 +442,6 @@ table opp_line_items
 
 	/// Column 'col.trueai_unit_cogs' = 0.5 * opp_line_items[col.trueai_list_price].
 	column 'col.trueai_unit_cogs' = 0.5 * opp_line_items[col.trueai_list_price]
-		description: "Unclear: Value for col trueai unit cogs."
 		lineageTag: 27d05765-419c-4300-9dbb-a0563138c373
 		summarizeBy: sum
 
@@ -451,7 +451,6 @@ table opp_line_items
 
 	/// The date of the last data request from the platform
 	column _sys_as_of
-		description: "System: Date/time when as of."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 6509b0e6-1fa8-431d-9d8b-310e3fe0526e
@@ -467,7 +466,6 @@ table opp_line_items
 
 	/// Boolean flag that indicates whether the stage was set to deleted in the remote system
 	column _sys_is_deleted
-		description: "System: Indicates whether is deleted."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 3943022f-5d9f-4628-a95a-c5c43eca10be
@@ -478,7 +476,6 @@ table opp_line_items
 
 	/// The date of the last data modification in the platform
 	column _sys_last_modified_on
-		description: "System: Date/time when last modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: ff643a83-58ac-4ad5-b46b-05102aa5e1dc
@@ -494,7 +491,6 @@ table opp_line_items
 
 	/// Product's creation date in the CRM
 	column crm_created_on
-		description: "CRM: Date/time when created on."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 30b9898e-bb66-4677-9c36-de7eaae46edd
@@ -510,7 +506,6 @@ table opp_line_items
 
 	/// Product's modified on date in the CRM
 	column crm_modified_on
-		description: "CRM: Date/time when modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: be8192e9-68ad-46eb-b89a-3946284dba99
@@ -526,7 +521,6 @@ table opp_line_items
 
 	/// Product's list price
 	column trueai_list_price
-		description: "TrueAI: Amount for list price."
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 3a0c83d8-53c9-4f3f-8e64-88c43a548886
@@ -537,7 +531,6 @@ table opp_line_items
 
 	/// Product's list price rule
 	column trueai_list_price_rule
-		description: "TrueAI: Amount for list price rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: ada4dde4-f242-4112-9bc7-1b7a26b17e3d
@@ -548,7 +541,6 @@ table opp_line_items
 
 	/// Products quantity
 	column trueai_qty
-		description: "TrueAI: Count of qty."
 		dataType: double
 		formatString: 0
 		lineageTag: f3130fe1-63fe-4ca1-85e9-900f72859b9d
@@ -561,7 +553,6 @@ table opp_line_items
 
 	/// Product's discount amount
 	column trueai_discount_amt
-		description: "TrueAI: Count of discount amt."
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 7ff6eee9-d3ac-41b1-9635-935a8752d990
@@ -574,7 +565,6 @@ table opp_line_items
 
 	/// Product's discount percentage
 	column trueai_discount_pct
-		description: "TrueAI: Count of discount pct."
 		dataType: double
 		lineageTag: c2794a63-c525-4c11-99a1-ebe3144c5463
 		summarizeBy: sum
@@ -586,7 +576,6 @@ table opp_line_items
 
 	/// Product's unit price
 	column trueai_unit_price
-		description: "TrueAI: Amount for unit price."
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 25d88bfc-00a2-4d6c-912d-77ab6ec85ca7
@@ -599,7 +588,6 @@ table opp_line_items
 
 	/// Product's unit price rule
 	column trueai_unit_price_rule
-		description: "TrueAI: Amount for unit price rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 110cb8f5-6138-40bc-86cb-3b889f78371f
@@ -610,7 +598,6 @@ table opp_line_items
 
 	/// Column 'col.line_items_trueai_list_price' = CALCULATE(MAXX(opp_line_items, opp_line_items[trueai_list_price])).
 	column 'col.line_items_trueai_list_price' = CALCULATE(MAXX(opp_line_items, opp_line_items[trueai_list_price]))
-		description: "Amount for col line items trueai list price."
 		dataType: double
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 957f84b4-b608-4324-8b7a-065e1faaa0bd
@@ -624,7 +611,6 @@ table opp_line_items
 
 	/// cust_text1
 	column cust_text1
-		description: "Text label for cust text1."
 		dataType: string
 		lineageTag: b39b9cba-b1cf-41e3-84b2-58d07416bdc6
 		summarizeBy: none
@@ -634,7 +620,6 @@ table opp_line_items
 
 	/// cust_text2
 	column cust_text2
-		description: "Text label for cust text2."
 		dataType: string
 		lineageTag: 21abdf8a-4c2b-4c1b-8875-2beb1d104e7e
 		summarizeBy: none
@@ -644,7 +629,6 @@ table opp_line_items
 
 	/// cust_text3
 	column cust_text3
-		description: "Text label for cust text3."
 		dataType: string
 		lineageTag: 6d5a8016-c913-4ff4-813f-0b9a33b7e180
 		summarizeBy: none
@@ -654,7 +638,6 @@ table opp_line_items
 
 	/// cust_text4
 	column cust_text4
-		description: "Text label for cust text4."
 		dataType: string
 		lineageTag: 4faa4045-e7f5-4d01-97d7-a13f48c87ec0
 		summarizeBy: none
@@ -664,7 +647,6 @@ table opp_line_items
 
 	/// cust_text5
 	column cust_text5
-		description: "Text label for cust text5."
 		dataType: string
 		lineageTag: 99f759f1-a19a-4728-99c4-9cb6245f1ea2
 		summarizeBy: none
@@ -674,7 +656,6 @@ table opp_line_items
 
 	/// cust_num1
 	column cust_num1
-		description: "Count of cust num1."
 		dataType: double
 		lineageTag: b36f438d-0c39-4d52-97c5-e1444b691c86
 		summarizeBy: sum
@@ -686,7 +667,6 @@ table opp_line_items
 
 	/// cust_num2
 	column cust_num2
-		description: "Count of cust num2."
 		dataType: double
 		lineageTag: 8f87418e-d529-4d8f-9f83-cc7f1ae21d00
 		summarizeBy: sum
@@ -698,7 +678,6 @@ table opp_line_items
 
 	/// cust_num3
 	column cust_num3
-		description: "Count of cust num3."
 		dataType: double
 		lineageTag: 46d48d39-0750-4cd7-a6a3-53e1e05220d3
 		summarizeBy: sum
@@ -710,7 +689,6 @@ table opp_line_items
 
 	/// cust_num4
 	column cust_num4
-		description: "Count of cust num4."
 		dataType: double
 		lineageTag: 9f01b746-3170-4bcb-b404-9021531c5bca
 		summarizeBy: sum
@@ -722,7 +700,6 @@ table opp_line_items
 
 	/// cust_num5
 	column cust_num5
-		description: "Count of cust num5."
 		dataType: double
 		lineageTag: 8be602d6-8751-4757-9c5d-ba0f2448287c
 		summarizeBy: sum
@@ -734,7 +711,6 @@ table opp_line_items
 
 	/// cust_num6
 	column cust_num6
-		description: "Count of cust num6."
 		dataType: double
 		lineageTag: 879fb808-e9e6-4386-9122-aee59165c598
 		summarizeBy: sum
@@ -746,7 +722,6 @@ table opp_line_items
 
 	/// cust_num7
 	column cust_num7
-		description: "Count of cust num7."
 		dataType: double
 		lineageTag: ce7b7fdf-9880-4781-ab86-682487292f37
 		summarizeBy: sum
@@ -758,7 +733,6 @@ table opp_line_items
 
 	/// cust_bool1
 	column cust_bool1
-		description: "Indicates whether cust bool1."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: cb0c2cd9-f44b-451f-bcb0-ceed5cca7b1c
@@ -769,7 +743,6 @@ table opp_line_items
 
 	/// cust_bool2
 	column cust_bool2
-		description: "Indicates whether cust bool2."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 4281878e-6c1f-4c07-94db-23ca8c456ddd
@@ -780,7 +753,6 @@ table opp_line_items
 
 	/// Prompt Used To Classify Product Type
 	column trueai_revenue_type_context
-		description: "TrueAI: Amount for revenue type context."
 		dataType: string
 		lineageTag: e4cdd869-5199-4fe7-848b-a5de41a8f86f
 		summarizeBy: none
@@ -790,7 +762,6 @@ table opp_line_items
 
 	/// Revenue Type
 	column trueai_revenue_type
-		description: "TrueAI: Amount for revenue type."
 		dataType: string
 		lineageTag: 3e6c36eb-2060-4657-a0ac-093356801632
 		summarizeBy: none
@@ -800,7 +771,6 @@ table opp_line_items
 
 	/// Revenue Type Rule
 	column trueai_revenue_type_rule
-		description: "TrueAI: Amount for revenue type rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 8131a728-b9cb-469c-b11c-9177707bc153
@@ -811,7 +781,6 @@ table opp_line_items
 
 	/// Product Type
 	column trueai_product_type
-		description: "TrueAI: Text label for product type."
 		dataType: string
 		lineageTag: 182d0d5f-d7b1-415a-8220-27fb312999a5
 		summarizeBy: none

@@ -1,13 +1,13 @@
 /// Table dupe_summary.
 table dupe_summary
-	description: "One row per dupe_summary record. Source fields include System prefixes. Related to cal_end_dates (_sys_filter_start_date -> date). Supports measures such as meas.crm_dupe_score, meas.crm_dupe_score_industry_avg_display."
 	lineageTag: f7b99aab-df1a-410a-affa-c6c31f68180a
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (tbl_scores, temp, dupe_ratio, res) used later in the expression. Dependencies: Columns: dupe_summary[_sys_docid], dupe_summary[is_dupe], dupe_summary[max_acceptable_pct], dupe_summary[problem] | Measures: [prob_rec_count], [rec_count].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0.00
-	measure 'meas.crm_dupe_score' = ```
+	/// Purpose: Crm Dupe Score.
+	/// Logic: VAR blocks define intermediate values (tbl_scores, temp, dupe_ratio, res) used later in the expression.
+	/// Dependencies: Columns: dupe_summary[_sys_docid], dupe_summary[is_dupe], dupe_summary[max_acceptable_pct], dupe_summary[problem] | Measures: [prob_rec_count], [rec_count].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Decimal
+	measure 'meas.crm_dupe_score' = 
 			
 			//calculate ratio
 			
@@ -20,38 +20,29 @@ table dupe_summary
 			--var temp = SUMX(tbl_scores, [prob_rec_count]) -- just a test
 			
 			var dupe_ratio = AVERAGEX(tbl_scores, 
-			    IF((DIVIDE(DIVIDE([prob_rec_count], [rec_count]), [max_acceptable_pct]))> 1,
-			    0.99,DIVIDE(DIVIDE([prob_rec_count], [rec_count]), [max_acceptable_pct]))
-			) // get the problem record rate divided by the acceptable rate per summarized category and then avg those scores in an avg score (the trick is to calculate per record)
+			IF((DIVIDE(DIVIDE([prob_rec_count], [rec_count]), [max_acceptable_pct]))> 1,			0.99,DIVIDE(DIVIDE([prob_rec_count], [rec_count]), [max_acceptable_pct]))			) // get the problem record rate divided by the acceptable rate per summarized category and then avg those scores in an avg score (the trick is to calculate per record)
 			
 			var res = 1 - dupe_ratio -- invert to get the score
 			
 			return
 			IF(
-			    res=BLANK(),
-			    0,
-			    res
-			)
+			res=BLANK(),			0,			res			)
 			
-			```
-			description: "Ratio of dupe_summary[problem] to dupe_summary[_sys_docid]. Respects the current filter context."
 		formatString: 0.00
 		displayFolder: _dupe_score
 		lineageTag: acf77ee7-4191-4d2b-b5c6-2595509ce4e5
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Crm Dupe Score Industry Avg Display.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Whole number
 	measure 'meas.crm_dupe_score_industry_avg_display' =
-			description: "TODO: provide business definition for this measure."
 			//0.55 * 100
 			var _score = CALCULATE(
-			    MAX(metadata_reference_values[value]),
-			    metadata_reference_values[_sys_doc_id]="dup1"
-			)
+			MAX(metadata_reference_values[value]),			metadata_reference_values[_sys_doc_id]="dup1"			)
 			
 			RETURN
 			_score
@@ -59,11 +50,12 @@ table dupe_summary
 		displayFolder: _dupe_score
 		lineageTag: d0e5e2bd-776d-4c12-bb76-0981cde94199
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (all_recs, prob_recs, non_prob_recs, avg_conf, res) used later in the expression. Dependencies: Columns: dupe_summary[dupe_conf] | Measures: [meas.crm_records], [meas.crm_dupe_problem_records].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
-	measure 'meas.trueai_dupe_score' = ```
+	/// Purpose: Trueai Dupe Score.
+	/// Logic: VAR blocks define intermediate values (all_recs, prob_recs, non_prob_recs, avg_conf, res) used later in the expression.
+	/// Dependencies: Columns: dupe_summary[dupe_conf] | Measures: [meas.crm_records], [meas.crm_dupe_problem_records].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Decimal
+	measure 'meas.trueai_dupe_score' = 
 			
 			var all_recs =  [meas.crm_records]
 			var prob_recs =  [meas.crm_dupe_problem_records] // get the problematic records
@@ -72,12 +64,7 @@ table dupe_summary
 			var res = Divide((non_prob_recs * 1 ) +  (prob_recs * avg_conf) , all_recs) // dedeuct by conf for corrected recrods 
 			return 
 			IF(
-			    res=BLANK(),
-			    0,
-			    res
-			)
-			```
-			description: "Ratio based on dupe_summary[dupe_conf]. Respects the current filter context."
+			res=BLANK(),			0,			res			)
 		displayFolder: _dupe_score
 		lineageTag: 3b35d7b9-f525-4ad5-8374-7ee283d722de
 
@@ -85,38 +72,34 @@ table dupe_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (trueai_score, crm_score, imp, res) used later in the expression. Dependencies: Measures: [meas.trueai_dupe_score_display], [meas.crm_dupe_score_display].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: +#%;-#%;0%
-	measure 'meas.trueai_dupe_score_improvement' = ```
+	/// Purpose: Trueai Dupe Score Improvement.
+	/// Logic: VAR blocks define intermediate values (trueai_score, crm_score, imp, res) used later in the expression.
+	/// Dependencies: Measures: [meas.trueai_dupe_score_display], [meas.crm_dupe_score_display].
+	/// Context: No explicit conditional branching detected.
+	/// Output: Percentage
+	measure 'meas.trueai_dupe_score_improvement' = 
 			
 			var trueai_score = ROUND([meas.trueai_dupe_score_display],2)      // get the trueai dupe score
 			var crm_score = ROUND([meas.crm_dupe_score_display],2)               // get the crm score 
 			var imp = divide(trueai_score - crm_score,  crm_score, blank())
 			var res = imp
 			return res
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: +#%;-#%;0%
 		displayFolder: _dupe_score
 		lineageTag: 0b69f420-2ae6-44c0-bf93-9769337276a2
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: #,0
+	/// Purpose: Crm Dupe Problem Records.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Whole number
 	measure 'meas.crm_dupe_problem_records' =
 			
-			description: "TODO: provide business definition for this measure."
 			var _count = CALCULATE(COUNT(dupe_summary[_sys_docid]), dupe_summary[is_dupe] = true)
 			var res = IF(
-			    _count=BLANK(),
-			    0,          // get the condition for blank with 0
-			    _count
-			)
+			_count=BLANK(),			0,          // get the condition for blank with 0			_count			)
 			
 			RETURN
 			res
@@ -126,13 +109,13 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0.0%;-0.0%;0.0%
+	/// Purpose: Crm Dupe Problem Records Pct.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Percentage
 	measure 'meas.crm_dupe_problem_records_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			var res = divide ([meas.crm_dupe_problem_records], [meas.crm_records] )
 			
 			RETURN
@@ -145,20 +128,17 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: #,0
+	/// Purpose: Crm Records.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Whole number
 	measure 'meas.crm_records' =
 			
-			description: "TODO: provide business definition for this measure."
 			var _count = CALCULATE(COUNT(dupe_summary[_sys_docid]))
 			
 			var res = IF(
-			    _count=BLANK(),
-			    0,
-			    _count
-			)
+			_count=BLANK(),			0,			_count			)
 			
 			RETURN
 			res
@@ -168,19 +148,16 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: #,0
+	/// Purpose: Trueai Corrected Records.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Whole number
 	measure 'meas.trueai_corrected_records' =
 			
-			description: "TODO: provide business definition for this measure."
 			var _count = CALCULATE(count(dupe_summary[_sys_docid]), dupe_summary[is_master] = true)
 			var res = IF(
-			    _count=BLANK(),
-			    0,
-			    _count
-			)
+			_count=BLANK(),			0,			_count			)
 			
 			RETURN
 			res
@@ -190,33 +167,30 @@ table dupe_summary
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Measures: [meas.crm_dupe_score].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Crm Dupe Score Display.
+	/// Logic: No VAR blocks.
+	/// Dependencies: Measures: [meas.crm_dupe_score].
+	/// Context: No explicit conditional branching detected.
+	/// Output: Whole number
 	measure 'meas.crm_dupe_score_display' = [meas.crm_dupe_score] * 100
-		description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _dupe_score
 		lineageTag: 416329b6-8580-4f7c-94e5-3487ae032aaf
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Trueai Dupe Score Display.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Whole number
 	measure 'meas.trueai_dupe_score_display' =
 			
-			description: "TODO: provide business definition for this measure."
 			var _crm_score = [meas.crm_dupe_score_display]              // get the crm sciore(before)
 			var _trueai_score = [meas.trueai_dupe_score]*100                // get the after score
 			
 			var res = IF(
-			    _trueai_score < _crm_score,
-			    _crm_score,                     // condiotinl for score not to show score less then before
-			    _trueai_score
-			)
+			_trueai_score < _crm_score,			_crm_score,                     // condiotinl for score not to show score less then before			_trueai_score			)
 			RETURN
 			res
 		formatString: 0
@@ -227,7 +201,6 @@ table dupe_summary
 
 	/// Column entity.
 	column entity
-		description: "Unclear: Value for entity."
 		lineageTag: 523e1f04-c261-47b1-8921-ab44d54fcfc8
 		summarizeBy: none
 		isNameInferred
@@ -237,7 +210,6 @@ table dupe_summary
 
 	/// Column _sys_docid.
 	column _sys_docid
-		description: "Unclear: System: Value for docid."
 		lineageTag: 539daabb-d59f-47c8-a425-51b226cb343d
 		summarizeBy: none
 		isNameInferred
@@ -247,7 +219,6 @@ table dupe_summary
 
 	/// Column _sys_filter_start_date.
 	column _sys_filter_start_date
-		description: "System: Date/time when filter start date."
 		formatString: General Date
 		lineageTag: 5d9e1e80-2f66-4ab3-aa77-976b45ff9859
 		summarizeBy: none
@@ -258,7 +229,6 @@ table dupe_summary
 
 	/// Column dupe_id.
 	column dupe_id
-		description: "Identifier for dupe."
 		lineageTag: ce11aa73-204f-4d5a-9e41-208154d77b5e
 		summarizeBy: none
 		isNameInferred
@@ -268,7 +238,6 @@ table dupe_summary
 
 	/// Column is_dupe.
 	column is_dupe
-		description: "Indicates whether is dupe."
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: a7c64657-e43c-41d1-a120-7f7360abd140
 		summarizeBy: none
@@ -279,7 +248,6 @@ table dupe_summary
 
 	/// Column is_master.
 	column is_master
-		description: "Indicates whether is master."
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 062f5d3d-4c9b-42fe-9944-2730b60c473d
 		summarizeBy: none
@@ -290,7 +258,6 @@ table dupe_summary
 
 	/// Column problem.
 	column problem
-		description: "Unclear: Value for problem."
 		lineageTag: d4999f60-8446-4c28-b809-1d9220f53af8
 		summarizeBy: none
 		isNameInferred
@@ -300,7 +267,6 @@ table dupe_summary
 
 	/// Column max_acceptable_pct.
 	column max_acceptable_pct
-		description: "Unclear: Value for max acceptable pct."
 		lineageTag: 9d221c38-3a78-4466-939b-2d863aa76d56
 		summarizeBy: sum
 		isNameInferred
@@ -312,7 +278,6 @@ table dupe_summary
 
 	/// Column dupe_conf.
 	column dupe_conf
-		description: "Unclear: Value for dupe conf."
 		lineageTag: a2ad179f-a3c1-454e-a44c-00c1bf70e71a
 		summarizeBy: sum
 		isNameInferred
@@ -324,7 +289,6 @@ table dupe_summary
 
 	/// Column sort.
 	column sort
-		description: "Unclear: Value for sort."
 		formatString: 0
 		lineageTag: 6c94190f-41f3-4a08-bd7f-c54d80f8ed9d
 		summarizeBy: sum

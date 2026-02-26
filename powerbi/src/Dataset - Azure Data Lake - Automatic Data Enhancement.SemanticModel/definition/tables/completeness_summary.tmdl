@@ -1,33 +1,29 @@
 /// Table completeness_summary.
 table completeness_summary
-	description: "One row per completeness_summary record. Source fields include CRM, System, TrueAI prefixes. Related to users (_sys_user_id -> _sys_doc_id), cal_end_dates (_sys_filter_start_date -> date). Supports measures such as meas.crm_completeness_score_display, meas.trueai_completeness_score."
 	lineageTag: 3fb477da-2334-4131-be85-e28100904333
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: Measures: [crm_completeness].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
+	/// Purpose: Crm Completeness Score Display.
+	/// Logic: No VAR blocks.
+	/// Dependencies: Measures: [crm_completeness].
+	/// Context: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Output: Whole number
 	measure 'meas.crm_completeness_score_display' = CALCULATE(AVERAGE([crm_completeness])  * 100)
-		description: "TODO: provide business definition for this measure."
 		formatString: 0
 		displayFolder: _completeness_score
 		lineageTag: 25d350dc-3b66-4cb2-83ae-59852cd3198b
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Trueai Completeness Score.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Whole number
 	measure 'meas.trueai_completeness_score' =
 			
-			description: "TODO: provide business definition for this measure."
 			var _before_score = [meas.crm_completeness_score_display]               // get the crm score(before)
 			var _after_score = CALCULATE(AVERAGE([trueai_completeness])  * 100)             // get the after score
 			
 			VAR res = IF(
-			    _after_score < _before_score,
-			    _before_score,              // create the condition to display the after score less than before score
-			    _after_score
-			)
+			_after_score < _before_score,			_before_score,              // create the condition to display the after score less than before score			_after_score			)
 			
 			RETURN
 			res
@@ -35,17 +31,15 @@ table completeness_summary
 		displayFolder: _completeness_score
 		lineageTag: 220faaec-56c9-48ef-870f-4244580439c6
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Crm Completeness Score Industry Avg.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Whole number
 	measure 'meas.crm_completeness_score_industry_avg' =
 			
-			description: "TODO: provide business definition for this measure."
 			var _score = CALCULATE(
-			    MAX(metadata_reference_values[value]),
-			    metadata_reference_values[_sys_doc_id]="comp2"
-			)
+			MAX(metadata_reference_values[value]),			metadata_reference_values[_sys_doc_id]="comp2"			)
 			
 			RETURN
 			_score
@@ -53,11 +47,12 @@ table completeness_summary
 		displayFolder: _completeness_score
 		lineageTag: 295be6f7-5568-467e-ada1-cb24b46e2ed9
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_completeness], [trueai_completeness].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
-	measure 'meas.trueai_completeness_improvement' = ```
+	/// Purpose: Trueai Completeness Improvement.
+	/// Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression.
+	/// Dependencies: Measures: [crm_completeness], [trueai_completeness].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Decimal
+	measure 'meas.trueai_completeness_improvement' = 
 			
 			var crmval = CALCULATE(AVERAGE([crm_completeness]))
 			var aival = CALCULATE(AVERAGE([trueai_completeness]))
@@ -65,16 +60,15 @@ table completeness_summary
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
 			return res 
 			
-			```
-			description: "Ratio measure. Respects the current filter context."
 		displayFolder: _completeness_score
 		lineageTag: 8cf3d72c-fedc-4ef5-970d-57580fe4ba53
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_completeness_geo], [trueai_completeness_geo].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0%;-0%;0%
-	measure 'meas.trueai_completeness_geo_improvement' = ```
+	/// Purpose: Trueai Completeness Geo Improvement.
+	/// Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression.
+	/// Dependencies: Measures: [crm_completeness_geo], [trueai_completeness_geo].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Percentage
+	measure 'meas.trueai_completeness_geo_improvement' = 
 			
 			var crmval = CALCULATE(AVERAGE([crm_completeness_geo]))
 			var aival = CALCULATE(AVERAGE([trueai_completeness_geo]))
@@ -82,17 +76,16 @@ table completeness_summary
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
 			return res 
 			
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _completeness_score
 		lineageTag: 8f49df2a-bdc7-43e0-aa92-36030435c286
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_completeness_marketing], [trueai_completeness_marketing].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0%;-0%;0%
-	measure 'meas.trueai_completeness_marketing_improvement' = ```
+	/// Purpose: Trueai Completeness Marketing Improvement.
+	/// Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression.
+	/// Dependencies: Measures: [crm_completeness_marketing], [trueai_completeness_marketing].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Percentage
+	measure 'meas.trueai_completeness_marketing_improvement' = 
 			
 			var crmval = CALCULATE(AVERAGE([crm_completeness_marketing]))
 			var aival = CALCULATE(AVERAGE([trueai_completeness_marketing]))
@@ -100,17 +93,16 @@ table completeness_summary
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
 			return res 
 			
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _completeness_score
 		lineageTag: 82d8b5b9-38ea-4989-9adf-d76ea2f2af22
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_completeness_contact], [trueai_completeness_contact].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
-	measure 'meas.trueai_completeness_contact_improvement' = ```
+	/// Purpose: Trueai Completeness Contact Improvement.
+	/// Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression.
+	/// Dependencies: Measures: [crm_completeness_contact], [trueai_completeness_contact].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Decimal
+	measure 'meas.trueai_completeness_contact_improvement' = 
 			
 			var crmval = CALCULATE(AVERAGE([crm_completeness_contact]))
 			var aival = CALCULATE(AVERAGE([trueai_completeness_contact]))
@@ -118,16 +110,15 @@ table completeness_summary
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
 			return res 
 			
-			```
-			description: "Ratio measure. Respects the current filter context."
 		displayFolder: _completeness_score
 		lineageTag: 7cf2b251-0b10-4d7d-ada9-772238f7d953
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression. Dependencies: Measures: [crm_completeness_contact_method], [trueai_completeness_contact_method].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0%;-0%;0%
-	measure 'meas.trueai_completeness_contact_method_improvement' = ```
+	/// Purpose: Trueai Completeness Contact Method Improvement.
+	/// Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression.
+	/// Dependencies: Measures: [crm_completeness_contact_method], [trueai_completeness_contact_method].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Percentage
+	measure 'meas.trueai_completeness_contact_method_improvement' = 
 			
 			var crmval = CALCULATE(AVERAGE([crm_completeness_contact_method]))
 			var aival = CALCULATE(AVERAGE([trueai_completeness_contact_method]))
@@ -135,19 +126,17 @@ table completeness_summary
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
 			return res 
 			
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _completeness_score
 		lineageTag: 770b89c9-ad28-48c3-8957-004b46ed2d56
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: +#%;-#%;0%
+	/// Purpose: Trueai Completeness Score Improvement.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Percentage
 	measure 'meas.trueai_completeness_score_improvement' =
 			
-			description: "TODO: provide business definition for this measure."
 			var trueai_score = ROUND([meas.trueai_completeness_score],2)
 			var crm_score = ROUND([meas.crm_completeness_score_display],2)
 			var imp = divide(trueai_score - crm_score,  crm_score, 0)
@@ -161,7 +150,6 @@ table completeness_summary
 
 	/// Column entity.
 	column entity
-		description: "Unclear: Value for entity."
 		lineageTag: 82e8678d-ea59-42b4-a35d-e6043095aadb
 		summarizeBy: none
 		isNameInferred
@@ -171,7 +159,6 @@ table completeness_summary
 
 	/// Column _sys_docid.
 	column _sys_docid
-		description: "Unclear: System: Value for docid."
 		lineageTag: 6a99baa4-5d68-47c8-9ada-55350670d51b
 		summarizeBy: none
 		isNameInferred
@@ -181,7 +168,6 @@ table completeness_summary
 
 	/// Column _sys_filter_start_date.
 	column _sys_filter_start_date
-		description: "System: Date/time when filter start date."
 		formatString: General Date
 		lineageTag: 317b3218-8ae0-4491-955d-f6fa7d93aac0
 		summarizeBy: none
@@ -192,7 +178,6 @@ table completeness_summary
 
 	/// Column crm_completeness.
 	column crm_completeness
-		description: "Unclear: CRM: Value for completeness."
 		lineageTag: 0ac69f0e-ef6b-4664-b221-d87792de51be
 		summarizeBy: sum
 		isNameInferred
@@ -204,7 +189,6 @@ table completeness_summary
 
 	/// Column crm_completeness_geo.
 	column crm_completeness_geo
-		description: "Unclear: CRM: Value for completeness geo."
 		lineageTag: 0f227e34-8b51-4dbe-8b9a-25544bf2c0ea
 		summarizeBy: sum
 		isNameInferred
@@ -216,7 +200,6 @@ table completeness_summary
 
 	/// Column crm_completeness_marketing.
 	column crm_completeness_marketing
-		description: "Unclear: CRM: Value for completeness marketing."
 		lineageTag: 7134e4ce-5322-4256-8b89-841f1abec6ba
 		summarizeBy: sum
 		isNameInferred
@@ -228,7 +211,6 @@ table completeness_summary
 
 	/// Column crm_completeness_contact.
 	column crm_completeness_contact
-		description: "Unclear: CRM: Value for completeness contact."
 		lineageTag: 82ea1c2f-37be-4bc6-9ae1-0b9cc2585543
 		summarizeBy: sum
 		isNameInferred
@@ -240,7 +222,6 @@ table completeness_summary
 
 	/// Column crm_completeness_contact_method.
 	column crm_completeness_contact_method
-		description: "Unclear: CRM: Value for completeness contact method."
 		lineageTag: 7ce74689-0411-4b3d-8612-b84e840ee524
 		summarizeBy: sum
 		isNameInferred
@@ -252,7 +233,6 @@ table completeness_summary
 
 	/// Column trueai_completeness.
 	column trueai_completeness
-		description: "Unclear: TrueAI: Value for completeness."
 		lineageTag: 8484a2f0-3347-4374-8aaf-3f5558b6c691
 		summarizeBy: sum
 		isNameInferred
@@ -262,7 +242,6 @@ table completeness_summary
 
 	/// Column trueai_completeness_geo.
 	column trueai_completeness_geo
-		description: "Unclear: TrueAI: Value for completeness geo."
 		lineageTag: cc152aae-b5e0-4210-854b-aef0ecebb743
 		summarizeBy: sum
 		isNameInferred
@@ -274,7 +253,6 @@ table completeness_summary
 
 	/// Column trueai_completeness_marketing.
 	column trueai_completeness_marketing
-		description: "Unclear: TrueAI: Value for completeness marketing."
 		lineageTag: ac7fc4bf-8cb9-44a8-84d6-4df1c343c08e
 		summarizeBy: sum
 		isNameInferred
@@ -284,7 +262,6 @@ table completeness_summary
 
 	/// Column trueai_completeness_contact.
 	column trueai_completeness_contact
-		description: "Unclear: TrueAI: Value for completeness contact."
 		lineageTag: 0996c4b7-3886-49ec-afef-235555adf290
 		summarizeBy: sum
 		isNameInferred
@@ -294,7 +271,6 @@ table completeness_summary
 
 	/// Column trueai_completeness_contact_method.
 	column trueai_completeness_contact_method
-		description: "Unclear: TrueAI: Value for completeness contact method."
 		lineageTag: 6d583088-59e0-46df-b464-96cd1e50d573
 		summarizeBy: sum
 		isNameInferred
@@ -306,7 +282,6 @@ table completeness_summary
 
 	/// Column _sys_user_id.
 	column _sys_user_id
-		description: "System: Identifier for user."
 		lineageTag: 8d196aa1-3b2f-421a-8d66-f6aaa93688f3
 		summarizeBy: none
 		isNameInferred
@@ -316,7 +291,6 @@ table completeness_summary
 
 	/// Column sort.
 	column sort
-		description: "Unclear: Value for sort."
 		formatString: 0
 		lineageTag: 0f827162-3e98-40fb-a0b4-64a780bf3e28
 		summarizeBy: sum

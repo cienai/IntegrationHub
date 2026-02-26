@@ -1,129 +1,121 @@
 /// Table ai_conf_nlp_summary.
 table ai_conf_nlp_summary
-	description: "One row per ai_conf_nlp_summary record. Source fields include CRM, System, TrueAI prefixes. Related to LocalDateTable_f242b95c-b7ea-4a57-8aad-99193bfc89bc (_sys_filter_start_date -> Date). Supports measures such as meas.nlp_avg_confidence, meas.nlp_classfied_ratio."
 	lineageTag: 80723354-1b4b-44cf-b991-6d16fde8862a
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (cnt, res) used later in the expression. Dependencies: Measures: [trueai_conf].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0%;-0%;0%
-	measure 'meas.nlp_avg_confidence' = ```
+	/// Purpose: Nlp Avg Confidence.
+	/// Logic: VAR blocks define intermediate values (cnt, res) used later in the expression.
+	/// Dependencies: Measures: [trueai_conf].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Percentage
+	measure 'meas.nlp_avg_confidence' = 
 			
 			var cnt = CALCULATE(AVERAGE('ai_conf_nlp_summary'[trueai_conf]), 'ai_conf_nlp_summary'[trueai_conf] > 0)
 			var res = if(isblank(cnt),0, cnt)
 			return res
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		formatString: 0%;-0%;0%
 		displayFolder: _nlp_scores
 		lineageTag: 986b635c-6494-4d9f-bea0-fe20c5d9db7d
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.nlp_classified_records], [meas.nlp_total_records].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0%;-0%;0%
-	measure 'meas.nlp_classfied_ratio' = ```
+	/// Purpose: Nlp Classfied Ratio.
+	/// Logic: VAR blocks define intermediate values (res) used later in the expression.
+	/// Dependencies: Measures: [meas.nlp_classified_records], [meas.nlp_total_records].
+	/// Context: No explicit conditional branching detected.
+	/// Output: Percentage
+	measure 'meas.nlp_classfied_ratio' = 
 			
 			var res = divide('ai_conf_nlp_summary'[meas.nlp_classified_records],'ai_conf_nlp_summary'[meas.nlp_total_records] )
 			return res 
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _nlp_scores
 		lineageTag: 9441cd56-3303-4734-a538-a2268b6e1efd
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (cnt, res) used later in the expression. Dependencies: Measures: [trueai_value].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
-	measure 'meas.nlp_classified_records' = ```
+	/// Purpose: Nlp Classified Records.
+	/// Logic: VAR blocks define intermediate values (cnt, res) used later in the expression.
+	/// Dependencies: Measures: [trueai_value].
+	/// Context: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Output: Whole number
+	measure 'meas.nlp_classified_records' = 
 			
 			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]), 'ai_conf_nlp_summary'[trueai_value] <> "ND")
 			var res = cnt
 			return res
 			
-			```
-			description: "Count of records. Respects the current filter context."
 		formatString: 0
 		displayFolder: _nlp_scores
 		lineageTag: 4a5f7fd8-5d5d-40d3-97d1-85258fd8a4b1
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.nlp_not_classified_records_due_to_ambiguity], [meas.nlp_total_records].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0%;-0%;0%
-	measure 'meas.nlp_not_classified_due_to_ambiguity_ratio' = ```
+	/// Purpose: Nlp Not Classified Due To Ambiguity Ratio.
+	/// Logic: VAR blocks define intermediate values (res) used later in the expression.
+	/// Dependencies: Measures: [meas.nlp_not_classified_records_due_to_ambiguity], [meas.nlp_total_records].
+	/// Context: No explicit conditional branching detected.
+	/// Output: Percentage
+	measure 'meas.nlp_not_classified_due_to_ambiguity_ratio' = 
 			
 			var res = divide('ai_conf_nlp_summary'[meas.nlp_not_classified_records_due_to_ambiguity],'ai_conf_nlp_summary'[meas.nlp_total_records] )
 			return res 
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _nlp_scores
 		lineageTag: b7b44f01-5bbe-40f3-8922-8c6b1ad05cd9
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Measures: [meas.nlp_not_classified_records_due_to_missing], [meas.nlp_total_records].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0%;-0%;0%
-	measure 'meas.nlp_not_classified_due_to_missing_ratio' = ```
+	/// Purpose: Nlp Not Classified Due To Missing Ratio.
+	/// Logic: VAR blocks define intermediate values (res) used later in the expression.
+	/// Dependencies: Measures: [meas.nlp_not_classified_records_due_to_missing], [meas.nlp_total_records].
+	/// Context: No explicit conditional branching detected.
+	/// Output: Percentage
+	measure 'meas.nlp_not_classified_due_to_missing_ratio' = 
 			
 			var res = divide('ai_conf_nlp_summary'[meas.nlp_not_classified_records_due_to_missing],'ai_conf_nlp_summary'[meas.nlp_total_records] )
 			return res 
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _nlp_scores
 		lineageTag: f3334a93-084f-429c-9cc1-a27403334f71
 
 		changedProperty = FormatString
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (cnt, res) used later in the expression. Dependencies: Measures: [trueai_value], [trueai_conf].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0
-	measure 'meas.nlp_not_classified_records_due_to_ambiguity' = ```
+	/// Purpose: Nlp Not Classified Records Due To Ambiguity.
+	/// Logic: VAR blocks define intermediate values (cnt, res) used later in the expression.
+	/// Dependencies: Measures: [trueai_value], [trueai_conf].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Whole number
+	measure 'meas.nlp_not_classified_records_due_to_ambiguity' = 
 			
 			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]), 'ai_conf_nlp_summary'[trueai_value] = "ND" && 'ai_conf_nlp_summary'[trueai_conf] > 0)
 			var res = if(isblank(cnt),0, cnt)
 			return res
 			
-			```
-			description: "Count of records. Respects the current filter context."
 		formatString: 0
 		displayFolder: _nlp_scores
 		lineageTag: fbaa1588-57a2-4faa-aa7e-892fee69ac89
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (cnt, res) used later in the expression. Dependencies: Measures: [trueai_value], [trueai_conf].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0
-	measure 'meas.nlp_not_classified_records_due_to_missing' = ```
+	/// Purpose: Nlp Not Classified Records Due To Missing.
+	/// Logic: VAR blocks define intermediate values (cnt, res) used later in the expression.
+	/// Dependencies: Measures: [trueai_value], [trueai_conf].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Whole number
+	measure 'meas.nlp_not_classified_records_due_to_missing' = 
 			
 			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]), 'ai_conf_nlp_summary'[trueai_conf] = 0)
 			var res = if(isblank(cnt),0, cnt)
 			return res
 			
-			```
-			description: "Count of records. Respects the current filter context."
 		formatString: 0
 		displayFolder: _nlp_scores
 		lineageTag: 15b83134-0406-4e6d-bfae-8c6c1c69e21b
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Nlp Score.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Whole number
 	measure 'meas.nlp_score' =
 			
-			description: "TODO: provide business definition for this measure."
 			var res = 'ai_conf_nlp_summary'[meas.nlp_avg_confidence] * 100
 			return res
 		formatString: 0
@@ -134,39 +126,36 @@ table ai_conf_nlp_summary
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (score, res) used later in the expression. Dependencies: Measures: [meas.nlp_score].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: Not specified.
-	measure 'meas.nlp_score_text' = ```
+	/// Purpose: Nlp Score Text.
+	/// Logic: VAR blocks define intermediate values (score, res) used later in the expression.
+	/// Dependencies: Measures: [meas.nlp_score].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Decimal
+	measure 'meas.nlp_score_text' = 
 			
 			var score = 'ai_conf_nlp_summary'[meas.nlp_score]
 			var res = If (score >= 95, "Excellent", if(score >= 85,  "Great",If(score >= 75, "Good",If(score >= 50, "Fair", "Limited" ))))
 			return  res 
-			```
-			description: "TODO: provide business definition for this measure."
 		displayFolder: _nlp_scores
 		lineageTag: ccb36d0b-16af-465e-835e-b9fcffed948c
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (cnt, res) used later in the expression. Dependencies: Measures: [trueai_value].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: 0
-	measure 'meas.nlp_total_records' = ```
+	/// Purpose: Nlp Total Records.
+	/// Logic: VAR blocks define intermediate values (cnt, res) used later in the expression.
+	/// Dependencies: Measures: [trueai_value].
+	/// Context: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Output: Whole number
+	measure 'meas.nlp_total_records' = 
 			
 			var cnt = CALCULATE(Count('ai_conf_nlp_summary'[trueai_value]))
 			var res = cnt
 			return res
 			
-			```
-			description: "Count of records. Respects the current filter context."
 		formatString: 0
 		displayFolder: _nlp_scores
 		lineageTag: fbeb6f9b-281b-489a-b65a-227188a13f88
 
 	/// Column sort.
 	column sort
-		description: "Unclear: Value for sort."
 		formatString: 0
 		lineageTag: ae65e043-8c63-442d-914d-b48628efedb8
 		summarizeBy: sum
@@ -177,7 +166,6 @@ table ai_conf_nlp_summary
 
 	/// Column field.
 	column field
-		description: "Unclear: Value for field."
 		lineageTag: 9151fc7a-42d5-4187-adef-e7fd1df0d7d4
 		summarizeBy: none
 		isNameInferred
@@ -187,7 +175,6 @@ table ai_conf_nlp_summary
 
 	/// Column entity.
 	column entity
-		description: "Unclear: Value for entity."
 		lineageTag: 930b3b5c-2198-4ee7-9f62-f96266735bf1
 		summarizeBy: none
 		isNameInferred
@@ -197,7 +184,6 @@ table ai_conf_nlp_summary
 
 	/// Column crm_value.
 	column crm_value
-		description: "CRM: Amount for value."
 		lineageTag: dd94f213-aea3-4ac1-bd88-6d426db8900a
 		summarizeBy: none
 		isNameInferred
@@ -207,7 +193,6 @@ table ai_conf_nlp_summary
 
 	/// Column trueai_value.
 	column trueai_value
-		description: "TrueAI: Amount for value."
 		lineageTag: 3119ddf1-c1ab-4149-a7fb-554a1ddc53b6
 		summarizeBy: none
 		isNameInferred
@@ -217,7 +202,6 @@ table ai_conf_nlp_summary
 
 	/// Column trueai_rule.
 	column trueai_rule
-		description: "Unclear: TrueAI: Value for rule."
 		formatString: 0
 		lineageTag: b659351e-3f1f-45b9-887e-313a0807a778
 		summarizeBy: sum
@@ -228,7 +212,6 @@ table ai_conf_nlp_summary
 
 	/// Column trueai_conf.
 	column trueai_conf
-		description: "Unclear: TrueAI: Value for conf."
 		formatString: #,0.00
 		lineageTag: 09af1bff-2b97-4d3c-b66a-9db3343c2a78
 		summarizeBy: sum
@@ -240,7 +223,6 @@ table ai_conf_nlp_summary
 
 	/// Column _sys_docid.
 	column _sys_docid
-		description: "Unclear: System: Value for docid."
 		lineageTag: 40cdec56-1e17-46d8-8e70-a54594caf619
 		summarizeBy: none
 		isNameInferred
@@ -250,7 +232,6 @@ table ai_conf_nlp_summary
 
 	/// Column _sys_user_id.
 	column _sys_user_id
-		description: "System: Identifier for user."
 		lineageTag: fa215d22-e2c1-4162-a7f8-5e0e4070ba38
 		summarizeBy: none
 		isNameInferred
@@ -260,7 +241,6 @@ table ai_conf_nlp_summary
 
 	/// Column _sys_filter_start_date.
 	column _sys_filter_start_date
-		description: "System: Date/time when filter start date."
 		formatString: Short Date
 		lineageTag: 921fd4c2-786b-4e33-bedc-7ee0125e36cd
 		summarizeBy: none

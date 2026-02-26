@@ -1,10 +1,14 @@
+/// Table act_capture_level_summary.
 table act_capture_level_summary
-	description: "One row per act_capture_level_summary record. Source fields include CRM, System prefixes. Related to LocalDateTable_5b05e348-650f-43cc-bd93-4a7e09ed398e (_sys_filter_start_date -> Date), LocalDateTable_d6eca468-3e02-4d61-8174-4ee8c28a9d1d (_sys_filter_end_date -> Date). Supports measures such as _debug_start_val_optimal, _debug_won_amt_check."
 	lineageTag: 000847f7-9192-461b-a532-21ff165a1ddd
 
+	/// Purpose: Debug Start Val Optimal.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure _debug_start_val_optimal =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR Label = SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(TRIM([meas.opps_optimal_disc_level]),"%",""),"+",""),UNICHAR(8211),"-"),UNICHAR(8212),"-")," ","")
 			VAR DashPos = FIND("-", Label, 1, 0)
 			RETURN IF(DashPos>0, VALUE(LEFT(Label,DashPos-1)), VALUE(Label))
@@ -12,26 +16,29 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Purpose: Debug Won Amt Check.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure _debug_won_amt_check =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    SUM(ssr_history[opp_won_amt]),
-			    TREATAS(
-			        VALUES( FORMAT(opps[_sys_doc_id], "") ),
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			SUM(ssr_history[opp_won_amt]),			TREATAS(			VALUES( FORMAT(opps[_sys_doc_id], "") ),			ssr_history[_sys_doc_id]			)			)
 		lineageTag: e4f646aa-21f9-4fab-8972-67ed25c4772b
 
+	/// Purpose: Measure.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure Measure
-		description: "TODO: provide business definition for this measure."
 		lineageTag: e8173c43-d77a-4aee-a303-299812fe7ce6
 
 		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
 
+	/// Column sort.
 	column sort
-		description: "Unclear: Value for sort."
 		formatString: 0
 		lineageTag: d5477c80-d67a-4f28-a71f-88ccd6353074
 		summarizeBy: sum
@@ -40,8 +47,8 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column _sys_docid.
 	column _sys_docid
-		description: "Unclear: System: Value for docid."
 		lineageTag: 17fb9331-55b2-4a65-888f-60610819b97a
 		summarizeBy: none
 		isNameInferred
@@ -49,8 +56,8 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column _sys_user_id.
 	column _sys_user_id
-		description: "System: Identifier for user."
 		lineageTag: ad66f36c-a040-4415-8edf-05a8dacdbca0
 		summarizeBy: none
 		isNameInferred
@@ -58,8 +65,8 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column _sys_filter_start_date.
 	column _sys_filter_start_date
-		description: "System: Date/time when filter start date."
 		formatString: General Date
 		lineageTag: 18e3cdb2-3dda-414e-b7b4-95bc81df1ae0
 		summarizeBy: none
@@ -73,8 +80,8 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column _sys_filter_end_date.
 	column _sys_filter_end_date
-		description: "System: Date/time when filter end date."
 		formatString: General Date
 		lineageTag: 306bab70-e8d6-4f2f-861e-3a58fc1cd295
 		summarizeBy: none
@@ -88,8 +95,8 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column full_name.
 	column full_name
-		description: "Unclear: Value for full name."
 		lineageTag: ade3ec7a-eaae-4572-8409-d43b723080e2
 		summarizeBy: none
 		isNameInferred
@@ -97,8 +104,8 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column user_role_function.
 	column user_role_function
-		description: "Unclear: Value for user role function."
 		lineageTag: 539c7295-3670-406c-93ae-420c171c7479
 		summarizeBy: none
 		isNameInferred
@@ -106,8 +113,8 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column step_id.
 	column step_id
-		description: "Identifier for step."
 		formatString: 0
 		lineageTag: 3bcd9903-defd-42c5-8bac-67971bebf046
 		summarizeBy: sum
@@ -116,8 +123,8 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column step_name.
 	column step_name
-		description: "Unclear: Value for step name."
 		lineageTag: f63250ee-a334-4bed-8685-1dbf35dbd4ba
 		summarizeBy: none
 		isNameInferred
@@ -125,8 +132,8 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column crm_activity_count.
 	column crm_activity_count
-		description: "CRM: Count of activity count."
 		formatString: 0
 		lineageTag: 2bbe305f-3eb6-4b94-a5de-32abbd85f8fe
 		summarizeBy: sum
@@ -135,8 +142,8 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column steps.
 	column steps
-		description: "Unclear: Value for steps."
 		formatString: 0
 		lineageTag: 98687fa6-bffe-4b5b-98d9-6f1364836b98
 		summarizeBy: sum
@@ -145,8 +152,8 @@ table act_capture_level_summary
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column time_alloc.
 	column time_alloc
-		description: "Date/time when time alloc."
 		lineageTag: 292edb80-cf46-4036-9529-d60dd21d871a
 		summarizeBy: sum
 		isNameInferred
@@ -156,8 +163,8 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_eng.
 	column time_alloc_eng
-		description: "Date/time when time alloc eng."
 		lineageTag: abce36ae-34a6-406d-bc8f-a3e22a3ce860
 		summarizeBy: sum
 		isNameInferred
@@ -167,8 +174,8 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column time_alloc_no_eng.
 	column time_alloc_no_eng
-		description: "Date/time when time alloc no eng."
 		lineageTag: eee4de94-ae24-418e-9788-86ebd9cf4697
 		summarizeBy: sum
 		isNameInferred
@@ -178,8 +185,8 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column total_duration.
 	column total_duration
-		description: "Unclear: Value for total duration."
 		lineageTag: 40d70502-8aea-4f2b-8552-15160890f319
 		summarizeBy: sum
 		isNameInferred
@@ -189,8 +196,8 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column expect_duration.
 	column expect_duration
-		description: "Unclear: Value for expect duration."
 		lineageTag: ff31b5a8-13a1-4c97-92f8-47af2cab939e
 		summarizeBy: sum
 		isNameInferred
@@ -200,8 +207,8 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column capped_duration.
 	column capped_duration
-		description: "Unclear: Value for capped duration."
 		lineageTag: 24f709fd-bcbf-4a45-a52a-46d82320a0b8
 		summarizeBy: sum
 		isNameInferred
@@ -211,8 +218,8 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column month_to_week_adjustment.
 	column month_to_week_adjustment
-		description: "Unclear: Value for month to week adjustment."
 		lineageTag: 4d08139c-2b6e-49ab-8a52-ed28c197fa69
 		summarizeBy: sum
 		isNameInferred
@@ -222,8 +229,8 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column act_capture_level.
 	column act_capture_level
-		description: "Unclear: Value for act capture level."
 		lineageTag: 6706cc8f-300f-4b95-8bf2-072305447924
 		summarizeBy: sum
 		isNameInferred
@@ -233,8 +240,8 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column act_capture_level_conf.
 	column act_capture_level_conf
-		description: "Unclear: Value for act capture level conf."
 		lineageTag: dd1aacd1-5fbd-4030-bfc8-8992816bdefe
 		summarizeBy: sum
 		isNameInferred
@@ -244,8 +251,8 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column raw_ratio.
 	column raw_ratio
-		description: "Unclear: Value for raw ratio."
 		lineageTag: 30f623fa-d382-48d8-af2b-ec7632459177
 		summarizeBy: sum
 		isNameInferred
@@ -255,8 +262,8 @@ table act_capture_level_summary
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Column capped_ratio.
 	column capped_ratio
-		description: "Unclear: Value for capped ratio."
 		lineageTag: 1a5287ea-a4d7-4a9c-b856-e7477f1dc38f
 		summarizeBy: sum
 		isNameInferred

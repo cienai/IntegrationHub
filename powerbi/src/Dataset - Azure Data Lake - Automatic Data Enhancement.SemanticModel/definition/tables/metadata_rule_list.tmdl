@@ -1,44 +1,41 @@
 /// Table metadata_rule_list.
 table metadata_rule_list
-	description: "One row per metadata_rule_list record. Source fields include System prefixes. Supports measures such as meas.rules_list_std_crm_owner_rule_applied_count, meas.rules_list_non_crm_owner_rule_applied_count."
 	lineageTag: c0d8a31c-9321-47dd-a2f2-ba06726687cf
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0
-	measure 'meas.rules_list_std_crm_owner_rule_applied_count' = ```
+	/// Purpose: Rules List Std Crm Owner Rule Applied Count.
+	/// Logic: VAR blocks define intermediate values (res) used later in the expression.
+	/// Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Whole number
+	measure 'meas.rules_list_std_crm_owner_rule_applied_count' = 
 			
 			var res = calculate(count(ssr_history[_sys_doc_id]), metadata_rule_list[col.rule_is_std_crm]=true) // determine how many standard 
 			return if(isblank(res), 0, res)
-			```
-			description: "Ratio based on ssr_history[_sys_doc_id]. Respects the current filter context."
 		formatString: 0
 		isHidden
 		lineageTag: b974d205-5b39-410b-bea5-1072b77e3c64
 
 		changedProperty = IsHidden
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (res) used later in the expression. Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id].
-	/// Dynamic Behavior: Uses IF for conditional branching.
-	/// Format/Type: 0
-	measure 'meas.rules_list_non_crm_owner_rule_applied_count' = ```
+	/// Purpose: Rules List Non Crm Owner Rule Applied Count.
+	/// Logic: VAR blocks define intermediate values (res) used later in the expression.
+	/// Dependencies: Columns: metadata_rule_list[col.rule_is_std_crm], ssr_history[_sys_doc_id].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Whole number
+	measure 'meas.rules_list_non_crm_owner_rule_applied_count' = 
 			
 			var res = calculate(count(ssr_history[_sys_doc_id]), metadata_rule_list[col.rule_is_std_crm]=false) // determine how many non standard 
 			return if(isblank(res), 0, res)
-			```
-			description: "Ratio based on ssr_history[_sys_doc_id]. Respects the current filter context."
 		formatString: 0
 		lineageTag: 2d35dfde-a3bc-486d-b406-74966c6eef53
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
+	/// Purpose: Rules List Total Crm Owner Rule Applied Count.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Whole number
 	measure 'meas.rules_list_total_crm_owner_rule_applied_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			var res = calculate(count(ssr_history[_sys_doc_id])) // determine how many total
 			return if(isblank(res), 0, res)
 		formatString: 0
@@ -46,7 +43,6 @@ table metadata_rule_list
 
 	/// Column model.
 	column model
-		description: "Text label for model."
 		dataType: string
 		lineageTag: 0d8ae1f8-45ad-4f77-a4fb-4757760ef4b5
 		summarizeBy: none
@@ -56,7 +52,6 @@ table metadata_rule_list
 
 	/// Column description.
 	column description
-		description: "Text label for description."
 		dataType: string
 		isHidden
 		lineageTag: b2c912d3-0265-4f0c-af8b-d60c4a66e7bc
@@ -69,7 +64,6 @@ table metadata_rule_list
 
 	/// Column 'col.rule_is_std_crm' = ```.
 	column 'col.rule_is_std_crm' = ```
-			description: "Unclear: Value for col rule is std crm."
 			
 			var rule_name = metadata_rule_list[rule_name] & "" // get the rele id
 			var res =  If (rule_name in {
@@ -112,7 +106,6 @@ table metadata_rule_list
 
 	/// Column rule_name.
 	column rule_name
-		description: "Text label for rule name."
 		dataType: string
 		lineageTag: 14dbd987-8d15-4ef2-aa62-d555800a7a8f
 		summarizeBy: none
@@ -122,7 +115,6 @@ table metadata_rule_list
 
 	/// Column 'col.rule_type' = ```.
 	column 'col.rule_type' = ```
-			description: "Unclear: Value for col rule type."
 			
 			var reg_case = SWITCH([model],
 			 "LeadsOwnerid", "CRM Entity Ownership",  "AccountsOwnerid", "CRM Entity Ownership","OppsOwnerid", "CRM Entity Ownership", "OppsCreatorid", "CRM Entity Ownership",   // owner ship models
@@ -150,7 +142,6 @@ table metadata_rule_list
 
 	/// Column _sys_doc_id.
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 8f3c1e2f-d4a1-437e-8a1e-6ff8b461cf24
 		summarizeBy: none
@@ -160,7 +151,6 @@ table metadata_rule_list
 
 	/// Column is_default_rule.
 	column is_default_rule
-		description: "Indicates whether is default rule."
 		dataType: string
 		lineageTag: c3067d53-6efe-4727-921b-7ba8dd77ea76
 		summarizeBy: none

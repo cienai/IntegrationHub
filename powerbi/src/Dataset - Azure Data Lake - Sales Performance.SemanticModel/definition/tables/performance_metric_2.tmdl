@@ -1,93 +1,100 @@
 /// Table performance_metric_2.
 table performance_metric_2
-	description: "One row per performance_metric_2 record. Source fields include System prefixes. Supports measures such as meas.selected_string_full_metrics, meas.selected_string_metric_2."
 	lineageTag: 515c2a53-2fdd-414c-b72b-b0bcac860d6a
 
-	/// Measure meas.selected_string_full_metrics.
+	/// Purpose: Selected String Full Metrics.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.selected_string_full_metrics' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR metric1 = SELECTEDVALUE(performance_metric_1[name])
 			VAR metric2 = SELECTEDVALUE(performance_metric_2[name])
 			RETURN
-			    metric1 & " - " & metric2
-		lineageTag: dc518dce-23d0-4315-8ef1-5b7e6e9bac60
+			metric1 & " - " & metric2		lineageTag: dc518dce-23d0-4315-8ef1-5b7e6e9bac60
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.selected_string_metric_2.
+	/// Purpose: Selected String Metric 2.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.selected_string_metric_2' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR metric2 = SELECTEDVALUE(performance_metric_2[name])
 			RETURN
-			    metric2
-		lineageTag: 399952ea-05a0-4d8b-911b-5399adb8cb65
+			metric2		lineageTag: 399952ea-05a0-4d8b-911b-5399adb8cb65
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.sort_performace_metric.
+	/// Purpose: Sort Performace Metric.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.sort_performace_metric' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR _choice = SELECTEDVALUE ( all_act_support[SortMetric], "User Name" )
 			
 			/* Alphabetical ranking by name (numeric and stable)*/
 			VAR _nameRank =
-			    RANKX (
-			        ALL ( users[col.full_name] ),
-			        SELECTEDVALUE ( users[col.full_name] ),
-			        ,
-			        ASC,
-			        DENSE
-			    )
-			
+			RANKX (			ALL ( users[col.full_name] ),			SELECTEDVALUE ( users[col.full_name] ),			,			ASC,			DENSE			)			
 			/* Metrics with BLANK management and tie resolution by name */
 			VAR _a = COALESCE ( [meas.rep_overview_metric_1], 0 ) + _nameRank / 1000000
 			VAR _b = COALESCE ( [meas.rep_overview_metric_2], 0 ) + _nameRank / 1000000
 			
 			RETURN
 			SWITCH (
-			    _choice,
-			    "User Name", _nameRank,
-			    "Metric 1", _a,
-			    "Metric 2", _b
-			)
+			_choice,			"User Name", _nameRank,			"Metric 1", _a,			"Metric 2", _b			)
 		lineageTag: e47cc42e-d96d-45ab-b091-83831774407e
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.selected_metric_1_value.
+	/// Purpose: Selected Metric 1 Value.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.selected_metric_1_value' =
 			
-			description: "TODO: provide business definition for this measure."
 			SELECTEDVALUE(performance_metric_1[name])  // get the selected value from metric_1
 		lineageTag: f31dac9b-9b1e-4c47-9b38-09a4e976325e
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.selected_metric_2_value.
+	/// Purpose: Selected Metric 2 Value.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.selected_metric_2_value' =
 			
-			description: "TODO: provide business definition for this measure."
 			SELECTEDVALUE(performance_metric_2[name])  // get the selected value from metric_2
 		lineageTag: ffcfbd5a-a671-404c-bd44-2bcfdf5f053e
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.selected_string_metric_1.
+	/// Purpose: Selected String Metric 1.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.selected_string_metric_1' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR metric1 = SELECTEDVALUE(performance_metric_1[name])
 			RETURN
-			    metric1
-		lineageTag: 78528a99-9cda-49a2-acc7-0f74bbf73c02
+			metric1		lineageTag: 78528a99-9cda-49a2-acc7-0f74bbf73c02
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_value_secondary_avg.
-	measure 'meas.performance_metric_value_secondary_avg' = ```
+	/// Purpose: Performance Metric Value Secondary Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_avg' = 
 			
 			  
 			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
@@ -99,14 +106,16 @@ table performance_metric_2
 			
 			RETURN perf_metric_average_per_rep
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: cdb4ea0c-3075-4dac-96cb-ece8e07648d3
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_value_secondary_sum.
-	measure 'meas.performance_metric_value_secondary_sum' = ```
+	/// Purpose: Performance Metric Value Secondary Sum.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_sum' = 
 			
 			
 			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
@@ -117,14 +126,16 @@ table performance_metric_2
 			var perf_metric_average_per_rep = SUMX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
 			
 			RETURN perf_metric_average_per_rep
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: 950ff1b5-8c2d-4687-860a-375a40ff9be1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_value_secondary_min.
-	measure 'meas.performance_metric_value_secondary_min' = ```
+	/// Purpose: Performance Metric Value Secondary Min.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_min' = 
 			
 			
 			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
@@ -135,14 +146,16 @@ table performance_metric_2
 			var perf_metric_average_per_rep = MINX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
 			
 			RETURN perf_metric_average_per_rep
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: 34d83961-544e-412e-be8c-c9395d4aa77d
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_value_secondary_max.
-	measure 'meas.performance_metric_value_secondary_max' = ```
+	/// Purpose: Performance Metric Value Secondary Max.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_max' = 
 			
 			
 			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
@@ -153,14 +166,16 @@ table performance_metric_2
 						var perf_metric_average_per_rep = MAXX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
 						
 						RETURN perf_metric_average_per_rep
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: 0be383e4-533d-4470-af71-1c5083100cd1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_value_secondary_count.
-	measure 'meas.performance_metric_value_secondary_count' = ```
+	/// Purpose: Performance Metric Value Secondary Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.performance_metric_value_secondary_count' = 
 			
 			
 			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
@@ -171,13 +186,15 @@ table performance_metric_2
 						var perf_metric_average_per_rep = COUNTROWS(pre_agg_tbl_by_rep)
 						
 						RETURN perf_metric_average_per_rep
-			```
-			description: "Count of users[trueai_full_name]. Respects the current filter context."
 		formatString: 0
 		lineageTag: f4977a8c-d096-4d98-9c5d-8c41fad1c792
 
-	/// Measure meas.performance_metric_value_secondary_median.
-	measure 'meas.performance_metric_value_secondary_median' = ```
+	/// Purpose: Performance Metric Value Secondary Median.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_median' = 
 			
 			
 			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
@@ -188,14 +205,16 @@ table performance_metric_2
 						var perf_metric_average_per_rep = MEDIANX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
 						
 						RETURN perf_metric_average_per_rep
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: 31c06472-5fe4-41fb-ac2a-12a3b48cecdc
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_value_secondary_std_deviation.
-	measure 'meas.performance_metric_value_secondary_std_deviation' = ```
+	/// Purpose: Performance Metric Value Secondary Std Deviation.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_std_deviation' = 
 			
 			
 			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
@@ -206,164 +225,124 @@ table performance_metric_2
 						var perf_metric_average_per_rep = STDEVX.P( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
 						
 						RETURN perf_metric_average_per_rep
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: 3b1b8cd0-2374-4a50-b64c-e654c08beab7
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_secondary_name.
+	/// Purpose: Performance Metric Secondary Name.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.performance_metric_secondary_name' =
 			
-			description: "TODO: provide business definition for this measure."
 			SELECTEDVALUE(metadata_performance_metrics_secondary[metric_name], "Multiple Selected Metrics for Metric2")
 		lineageTag: b2cc8052-29dc-43dd-a789-8986c9d2279e
 
-	/// Measure meas.concat_selected_perf_metric1_and_metric2_names.
+	/// Purpose: Concat Selected Perf Metric1 And Metric2 Names.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.concat_selected_perf_metric1_and_metric2_names' =
 			
-			description: "TODO: provide business definition for this measure."
 			[meas.performance_metric_name]&" vs "&[meas.performance_metric_secondary_name]
 		lineageTag: 7147359b-ba6f-4f9e-9d05-8114cb4716d9
 
-	/// Measure meas.performance_metric_sort_select_dynamic_slicer_label.
+	/// Purpose: Performance Metric Sort Select Dynamic Slicer Label.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.performance_metric_sort_select_dynamic_slicer_label' =
 			
-			description: "TODO: provide business definition for this measure."
 			-- We look at the 'Parameter Fields' column to identify the button
 			VAR _CurrentField = SELECTEDVALUE('field_param_perf_metric_sort_selection_slicer'[Parameter Fields])
 			
 			RETURN
 			SWITCH(
-			    _CurrentField,
-			    NAMEOF('performance_metric_1'[meas.performance_metric_name]), [meas.performance_metric_name],
-			    NAMEOF('performance_metric_2'[meas.performance_metric_secondary_name]), [meas.performance_metric_secondary_name],
-			    "Select Metric" -- Fallback text
-			)
+			_CurrentField,			NAMEOF('performance_metric_1'[meas.performance_metric_name]), [meas.performance_metric_name],			NAMEOF('performance_metric_2'[meas.performance_metric_secondary_name]), [meas.performance_metric_secondary_name],			"Select Metric" -- Fallback text			)
 		lineageTag: bbcf69ec-f473-4b69-a5f8-37b37473c7dc
 
-	/// Measure meas.performance_metric_value_secondary_avg_peer.
-	measure 'meas.performance_metric_value_secondary_avg_peer' = ```
+	/// Purpose: Performance Metric Value Secondary Avg Peer.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_avg_peer' = 
 			
-			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
-			        )
-			        RETURN AVERAGEX( tbl , [Measure_Pre_AGG] ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
-			    )
-			
-			```
-			    description: "TODO: provide business definition for this measure."
+			CALCULATE(			VAR tbl = SUMMARIZECOLUMNS(			users[trueai_full_name],			"Measure_Pre_AGG",[meas.performance_metric_value_secondary]			)			RETURN AVERAGEX( tbl , [Measure_Pre_AGG] ),			REMOVEFILTERS(users[trueai_full_name]) 			)			
 		lineageTag: 09a66bc0-4343-41c5-8db0-15036c77ca6b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_value_secondary_count_peer.
-	measure 'meas.performance_metric_value_secondary_count_peer' = ```
+	/// Purpose: Performance Metric Value Secondary Count Peer.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.performance_metric_value_secondary_count_peer' = 
 			
-			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
-			        )
-			        RETURN COUNTROWS( tbl ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
-			    )
-			```
-			    description: "Count of users[trueai_full_name]. Respects the current filter context."
-		formatString: 0
+			CALCULATE(			VAR tbl = SUMMARIZECOLUMNS(			users[trueai_full_name],			"Measure_Pre_AGG",[meas.performance_metric_value_secondary]			)			RETURN COUNTROWS( tbl ),			REMOVEFILTERS(users[trueai_full_name]) 			)		formatString: 0
 		lineageTag: 174ccbee-dd5d-466d-8997-cb21c56591a6
 
-	/// Measure meas.performance_metric_value_secondary_max_peer.
-	measure 'meas.performance_metric_value_secondary_max_peer' = ```
+	/// Purpose: Performance Metric Value Secondary Max Peer.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_max_peer' = 
 			
-			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
-			        )
-			        RETURN MAXX( tbl , [Measure_Pre_AGG] ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
-			    )
-			```
-			    description: "TODO: provide business definition for this measure."
-		lineageTag: f4edecda-db6a-44bf-8661-1bd97f613522
+			CALCULATE(			VAR tbl = SUMMARIZECOLUMNS(			users[trueai_full_name],			"Measure_Pre_AGG",[meas.performance_metric_value_secondary]			)			RETURN MAXX( tbl , [Measure_Pre_AGG] ),			REMOVEFILTERS(users[trueai_full_name]) 			)		lineageTag: f4edecda-db6a-44bf-8661-1bd97f613522
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_value_secondary_median_peer.
-	measure 'meas.performance_metric_value_secondary_median_peer' = ```
+	/// Purpose: Performance Metric Value Secondary Median Peer.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_median_peer' = 
 			
-			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
-			        )
-			        RETURN MEDIANX( tbl , [Measure_Pre_AGG] ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
-			    )
-			```
-			    description: "TODO: provide business definition for this measure."
-		lineageTag: 942d3f9b-4b44-4ce5-b768-5d868641fccb
+			CALCULATE(			VAR tbl = SUMMARIZECOLUMNS(			users[trueai_full_name],			"Measure_Pre_AGG",[meas.performance_metric_value_secondary]			)			RETURN MEDIANX( tbl , [Measure_Pre_AGG] ),			REMOVEFILTERS(users[trueai_full_name]) 			)		lineageTag: 942d3f9b-4b44-4ce5-b768-5d868641fccb
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_value_secondary_min_peer.
-	measure 'meas.performance_metric_value_secondary_min_peer' = ```
+	/// Purpose: Performance Metric Value Secondary Min Peer.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_min_peer' = 
 			
-			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
-			        )
-			        RETURN MINX( tbl , [Measure_Pre_AGG] ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
-			    )
-			```
-			    description: "TODO: provide business definition for this measure."
-		lineageTag: a754c1d1-7d08-406d-9e1f-394f152d4bb2
+			CALCULATE(			VAR tbl = SUMMARIZECOLUMNS(			users[trueai_full_name],			"Measure_Pre_AGG",[meas.performance_metric_value_secondary]			)			RETURN MINX( tbl , [Measure_Pre_AGG] ),			REMOVEFILTERS(users[trueai_full_name]) 			)		lineageTag: a754c1d1-7d08-406d-9e1f-394f152d4bb2
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_value_secondary_std_dev_peer.
-	measure 'meas.performance_metric_value_secondary_std_dev_peer' = ```
+	/// Purpose: Performance Metric Value Secondary Std Dev Peer.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_std_dev_peer' = 
 			
-			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
-			        )
-			        RETURN STDEVX.P( tbl , [Measure_Pre_AGG] ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
-			    )
-			```
-			    description: "TODO: provide business definition for this measure."
-		lineageTag: 1a18f0ce-899f-497e-8b64-b06366ab6ae1
+			CALCULATE(			VAR tbl = SUMMARIZECOLUMNS(			users[trueai_full_name],			"Measure_Pre_AGG",[meas.performance_metric_value_secondary]			)			RETURN STDEVX.P( tbl , [Measure_Pre_AGG] ),			REMOVEFILTERS(users[trueai_full_name]) 			)		lineageTag: 1a18f0ce-899f-497e-8b64-b06366ab6ae1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.performance_metric_value_secondary_sum_peer.
-	measure 'meas.performance_metric_value_secondary_sum_peer' = ```
+	/// Purpose: Performance Metric Value Secondary Sum Peer.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.performance_metric_value_secondary_sum_peer' = 
 			
-			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
-			        )
-			        RETURN SUMX( tbl , [Measure_Pre_AGG] ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
-			    )
-			```
-			    description: "TODO: provide business definition for this measure."
-		lineageTag: ef0385c9-a10c-4817-b0d9-07b6ef3ff713
+			CALCULATE(			VAR tbl = SUMMARIZECOLUMNS(			users[trueai_full_name],			"Measure_Pre_AGG",[meas.performance_metric_value_secondary]			)			RETURN SUMX( tbl , [Measure_Pre_AGG] ),			REMOVEFILTERS(users[trueai_full_name]) 			)		lineageTag: ef0385c9-a10c-4817-b0d9-07b6ef3ff713
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Column _sys_doc_id.
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 7d60f453-d69e-4cec-9cb5-0dec964a7942
 		summarizeBy: none
@@ -373,7 +352,6 @@ table performance_metric_2
 
 	/// Column sort_order.
 	column sort_order
-		description: "Text label for sort order."
 		dataType: string
 		lineageTag: 685c2215-3371-4b08-85fd-5dc3b7921d65
 		summarizeBy: none
@@ -383,7 +361,6 @@ table performance_metric_2
 
 	/// Column pbi_measure.
 	column pbi_measure
-		description: "Text label for pbi measure."
 		dataType: string
 		lineageTag: 82c9742c-8521-485e-b5dd-6198e8a74f0d
 		summarizeBy: none
@@ -393,7 +370,6 @@ table performance_metric_2
 
 	/// Column name.
 	column name
-		description: "Text label for name."
 		dataType: string
 		lineageTag: ff89a37c-ea77-4576-b928-5ab3feaf9304
 		summarizeBy: none

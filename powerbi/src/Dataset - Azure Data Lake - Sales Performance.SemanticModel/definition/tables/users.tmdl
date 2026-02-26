@@ -1,10 +1,13 @@
 /// CRM entity for the user recordsenriched with TrueAI predictive insights.
 table users
-	description: "One row per user record. Source fields include CRM, System, TrueAI prefixes. Related to LocalDateTable_11fc6c4a-c432-4ad2-a5ac-2daa6b506406 (crm_last_login_time -> Date), LocalDateTable_fdd4e3a5-c429-413b-90c0-7eca8a366125 (trueai_hire_date -> Date), LocalDateTable_7bca1e78-af76-46a2-abd5-5551bd7bd92d (trueai_termination_date -> Date). Supports measures such as meas.users_user_roles_concat, meas.users_user_roles_concat_w_count."
 	lineageTag: a820f8fc-c2ef-41f8-bc42-b46f25fc4f43
 
-	/// Measure meas.users_user_roles_concat.
-	measure 'meas.users_user_roles_concat' = ```
+	/// Purpose: Users User Roles Concat.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.users_user_roles_concat' = 
 			
 			-- concats all the crm values for trueai value
 			
@@ -16,13 +19,15 @@ table users
 			
 			var res = str_crm_vals -- output string
 			return res
-			```
-			description: "Count of users[trueai_user_role]. Respects the current filter context."
 		displayFolder: user_role_concats
 		lineageTag: 2e4a5f18-741d-4c16-9371-62736ec5de95
 
-	/// Measure meas.users_user_roles_concat_w_count.
-	measure 'meas.users_user_roles_concat_w_count' = ```
+	/// Purpose: Users User Roles Concat W Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.users_user_roles_concat_w_count' = 
 			
 			-- concats all the crm values for trueai value
 			
@@ -34,13 +39,15 @@ table users
 			
 			var res = str_crm_vals -- output string
 			return res
-			```
-			description: "Count of users[trueai_user_role_alias]. Respects the current filter context."
 		displayFolder: user_role_concats
 		lineageTag: 90265a0f-91d1-49cd-876f-f521314ce19b
 
-	/// Measure meas.users_user_roles_concat_w_count_eop.
-	measure 'meas.users_user_roles_concat_w_count_eop' = ```
+	/// Purpose: Users User Roles Concat W Count Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.users_user_roles_concat_w_count_eop' = 
 			
 			-- concats all the crm values for trueai value for eop
 			
@@ -54,13 +61,15 @@ table users
 			
 			var res = str_crm_vals -- output string
 			return res
-			```
-			description: "Ratio of users_history[_sys_filt_start_date] to users_history[_sys_filt_start_date]. Respects the current filter context."
 		displayFolder: user_role_concats
 		lineageTag: e77c169f-e8d6-48e8-ab2e-87441d66a83b
 
-	/// Measure meas.users_user_roles_function_concat_w_count.
-	measure 'meas.users_user_roles_function_concat_w_count' = ```
+	/// Purpose: Users User Roles Function Concat W Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.users_user_roles_function_concat_w_count' = 
 			
 			-- concats all the crm values for trueai value
 			
@@ -72,21 +81,25 @@ table users
 			
 			var res = str_crm_vals -- output string
 			return res
-			```
-			description: "Count of users[trueai_user_role_function]. Respects the current filter context."
 		displayFolder: user_role_concats
 		lineageTag: cf2e5ac8-6558-41ec-8060-fff13bff2cbd
 
-	/// Measure meas.users_rep_stats_bookings.
+	/// Purpose: Users Rep Stats Bookings.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_rep_stats_bookings' = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] in {"New Logo Selling" , "Existing Customer Selling"})
-		description: "Sum of ssr_history[opp_won_amt]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: rep_stats
 		lineageTag: 98abfde2-24b2-45d4-bff2-09d94f91f1aa
 
-	/// Measure meas.users_rep_stats_bookings 1.
+	/// Purpose: Users Rep Stats Bookings 1.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_rep_stats_bookings 1' =
-			description: "TODO: provide business definition for this measure."
 			var start_date = date(2020,1,1)
 			var end_date = date(2021,1,1)
 			var res = CALCULATE([meas.users_rep_stats_bookings], ssr_history[_sys_filt_end_date] >= start_date &&  ssr_history[_sys_filt_end_date] < end_date )
@@ -95,40 +108,50 @@ table users
 		displayFolder: rep_stats
 		lineageTag: 8359b751-d9bd-4138-80cc-d97135f2e6c8
 
-	/// Measure meas.users_table_row_count.
+	/// Purpose: Users Table Row Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_table_row_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			COUNTROWS(Users)
 		formatString: 0
 		lineageTag: 59d6070a-cbdb-4359-9c06-41be235e091e
 
-	/// Measure meas.users_is_active.
+	/// Purpose: Users Is Active.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_is_active' =
 			
-			description: "TODO: provide business definition for this measure."
 			// var curr_date = CALCULATE(MAX(cal_end_dates[Date]))  // get  the current maximum date
 			// var user_end_date = CALCULATE(MAX(users[_sys_filt_end_date]))  // get the user end date
 			// var res = IF(MAX(users[_sys_filt_end_date]) < curr_date, "True", "False")
 			
 			var res = IF(
-			    ISBLANK(MAX(users[trueai_termination_date])),
-			    1,
-			    0
-			)
+			ISBLANK(MAX(users[trueai_termination_date])),			1,			0			)
 			
 			RETURN res
 		formatString: 0
 		lineageTag: 1431c953-2044-4fbb-97c2-b353ce241402
 
-	/// Measure meas.user_overview_title.
+	/// Purpose: User Overview Title.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.user_overview_title' = "Active Users Overview"
-		description: "TODO: provide business definition for this measure."
 		displayFolder: _active_user_overview
 		lineageTag: db75255d-25c7-45bb-8d82-f23f4ca2fedc
 
-	/// Measure meas.users_overview_win_rate_mtd.
-	measure 'meas.users_overview_win_rate_mtd' = ```
+	/// Purpose: Users Overview Win Rate Mtd.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_win_rate_mtd' = 
 			
 			
 			-- get the dates
@@ -154,29 +177,23 @@ table users
 			var total_filt_tbl = Filter(dates_tbl,  ssr_history[step_name] in{"Existing Customer Selling", "New Logo Selling"} )  // filter the table for total steps
 			
 			var total_steps = CALCULATE( 
-			    COUNTX(
-			        total_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			total_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var success_steps  = CALCULATE(
-			    COUNTX(
-			        success_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			success_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			return res+0
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 310a8955-0807-4928-a59d-3c8abc9da526
 
-	/// Measure meas.users_overview_win_rate_qtd.
-	measure 'meas.users_overview_win_rate_qtd' = ```
+	/// Purpose: Users Overview Win Rate Qtd.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_win_rate_qtd' = 
 			
 			
 			-- get the dates
@@ -202,31 +219,25 @@ table users
 			var total_filt_tbl = Filter(dates_tbl,  ssr_history[step_name] in{"Existing Customer Selling", "New Logo Selling"} )  // filter the table for total steps
 			
 			var total_steps = CALCULATE( 
-			    COUNTX(
-			        total_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			total_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var success_steps  = CALCULATE(
-			    COUNTX(
-			        success_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			success_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			RETURN res+0
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: ebc4d37a-ed87-42fa-ae20-94ae49a81b47
 
-	/// Measure meas.users_overview_win_rate_ytd.
-	measure 'meas.users_overview_win_rate_ytd' = ```
+	/// Purpose: Users Overview Win Rate Ytd.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_win_rate_ytd' = 
 			
 			
 			-- get the dates
@@ -252,31 +263,25 @@ table users
 			var total_filt_tbl = Filter(dates_tbl,  ssr_history[step_name] in{"Existing Customer Selling", "New Logo Selling"} )  // filter the table for total steps
 			
 			var total_steps = CALCULATE( 
-			    COUNTX(
-			        total_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			total_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var success_steps  = CALCULATE(
-			    COUNTX(
-			        success_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			success_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			RETURN res+0
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 0fed3d7e-4822-429b-80b1-b6d73792eabe
 
-	/// Measure meas.users_overview_win_rate_mtd_sply.
-	measure 'meas.users_overview_win_rate_mtd_sply' = ```
+	/// Purpose: Users Overview Win Rate Mtd Sply.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_win_rate_mtd_sply' = 
 			
 			
 			-- get the dates
@@ -302,50 +307,42 @@ table users
 			var total_filt_tbl = Filter(dates_tbl,  ssr_history[step_name] in{"Existing Customer Selling", "New Logo Selling"} )  // filter the table for total steps
 			
 			var total_steps = CALCULATE( 
-			    COUNTX(
-			        total_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			total_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var success_steps  = CALCULATE(
-			    COUNTX(
-			        success_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			success_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			return res+0
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: eb3379cf-b461-48f9-9595-960b3626535f
 
-	/// Measure meas.users_overview_win_rate_mtd_sply_diff.
-	measure 'meas.users_overview_win_rate_mtd_sply_diff' = ```
+	/// Purpose: Users Overview Win Rate Mtd Sply Diff.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_win_rate_mtd_sply_diff' = 
 			
 			var res = DIVIDE([meas.users_overview_win_rate_mtd] - [meas.users_overview_win_rate_mtd_sply], [meas.users_overview_win_rate_mtd])
-			        // get the delta
-			RETURN 
+			// get the delta			RETURN 
 			IF(
-			    res = BLANK(),
-			    "-",
-			    res
-			)
-			```
-			description: "Ratio measure. Respects the current filter context."
+			res = BLANK(),			"-",			res			)
 		formatString: +0%;-0%;"-"
 		displayFolder: _active_user_overview
 		lineageTag: 5a68121d-2018-4772-a757-0b8cd65ef3ed
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_overview_win_rate_qtd_sply.
-	measure 'meas.users_overview_win_rate_qtd_sply' = ```
+	/// Purpose: Users Overview Win Rate Qtd Sply.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_win_rate_qtd_sply' = 
 			
 			
 			-- get the dates
@@ -371,50 +368,44 @@ table users
 			var total_filt_tbl = Filter(dates_tbl,  ssr_history[step_name] in{"Existing Customer Selling", "New Logo Selling"} )  // filter the table for total steps
 			
 			var total_steps = CALCULATE( 
-			    COUNTX(
-			        total_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			total_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var success_steps  = CALCULATE(
-			    COUNTX(
-			        success_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			success_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			RETURN res+0
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 3f8bd10b-3cc4-4760-a4b5-8e732adaee1d
 
-	/// Measure meas.users_overview_win_rate_qtd_sply_diff.
+	/// Purpose: Users Overview Win Rate Qtd Sply Diff.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.users_overview_win_rate_qtd_sply_diff' =
 			
-			description: "TODO: provide business definition for this measure."
 			var res = DIVIDE([meas.users_overview_win_rate_qtd] - [meas.users_overview_win_rate_qtd_sply], [meas.users_overview_win_rate_qtd])
 			// get the delta
 			
 			RETURN
 			IF(
-			    res = BLANK(),
-			    "-",
-			    res
-			)
+			res = BLANK(),			"-",			res			)
 		formatString: +0%;-0%;"-"
 		displayFolder: _active_user_overview
 		lineageTag: 59a218f5-8977-4c38-9050-4c17c812131e
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_overview_win_rate_ytd_sply.
-	measure 'meas.users_overview_win_rate_ytd_sply' = ```
+	/// Purpose: Users Overview Win Rate Ytd Sply.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_win_rate_ytd_sply' = 
 			
 			
 			-- get the dates
@@ -440,31 +431,25 @@ table users
 			var total_filt_tbl = Filter(dates_tbl,  ssr_history[step_name] in{"Existing Customer Selling", "New Logo Selling"} )  // filter the table for total steps
 			
 			var total_steps = CALCULATE( 
-			    COUNTX(
-			        total_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			total_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var success_steps  = CALCULATE(
-			    COUNTX(
-			        success_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			success_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			RETURN res+0
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 07e8a5e9-84ce-4495-8914-7d40a27a3b10
 
-	/// Measure meas.users_overview_win_rate_ytd_sply_diff.
-	measure 'meas.users_overview_win_rate_ytd_sply_diff' = ```
+	/// Purpose: Users Overview Win Rate Ytd Sply Diff.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_win_rate_ytd_sply_diff' = 
 			
 			var res = DIVIDE(([meas.users_overview_win_rate_ytd]-[meas.users_overview_win_rate_ytd_sply]), [meas.users_overview_win_rate_ytd])
 			
@@ -472,20 +457,19 @@ table users
 			
 			RETURN 
 			IF(
-			    res = BLANK(),
-			    "-",
-			    res
-			)
-			```
-			description: "Ratio measure. Respects the current filter context."
+			res = BLANK(),			"-",			res			)
 		formatString: +0%;-0%;"-"
 		displayFolder: _active_user_overview
 		lineageTag: 1a8f810c-0797-490a-bcbc-d31a32001c74
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_mtd.
-	measure 'meas.users_overview_avg_pred_conv_rate_mtd' = ```
+	/// Purpose: Users Overview Avg Pred Conv Rate Mtd.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_avg_pred_conv_rate_mtd' = 
 			
 			
 			-- get the dates
@@ -509,21 +493,19 @@ table users
 			var filt_tbl = Filter(dates_tbl, ssr_history[step_name] in { "New Logo Selling","Post-Sales Support","Prospecting","Existing Customer Selling"} )
 			
 			var res = CALCULATE(
-			    AVERAGEX(
-			        filt_tbl,
-			        ssr_history[step_success_prob]
-			    )
-			)
+			AVERAGEX(			filt_tbl,			ssr_history[step_success_prob]			)			)
 			
 			RETURN res+0
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 948eb230-a8c7-4ff6-bcc4-06359fe0ba6d
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_mtd_sply.
-	measure 'meas.users_overview_avg_pred_conv_rate_mtd_sply' = ```
+	/// Purpose: Users Overview Avg Pred Conv Rate Mtd Sply.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_avg_pred_conv_rate_mtd_sply' = 
 			
 			
 			-- get the dates
@@ -547,39 +529,36 @@ table users
 			var filt_tbl = Filter(dates_tbl, ssr_history[step_name] in { "New Logo Selling","Post-Sales Support","Prospecting","Existing Customer Selling"} )
 			
 			var res = CALCULATE(
-			    AVERAGEX(
-			        filt_tbl,
-			        ssr_history[step_success_prob]
-			    )
-			)+0
+			AVERAGEX(			filt_tbl,			ssr_history[step_success_prob]			)			)+0
 			
 			RETURN res
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 7d964627-3956-4dbf-a6e3-d9d7bcfc2bf5
 
-	/// Measure meas.users_overview_avg_pred_conv_mtd_sply_diff.
-	measure 'meas.users_overview_avg_pred_conv_mtd_sply_diff' = ```
+	/// Purpose: Users Overview Avg Pred Conv Mtd Sply Diff.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_avg_pred_conv_mtd_sply_diff' = 
 			
 			var res = DIVIDE([meas.users_overview_avg_pred_conv_rate_mtd] - [meas.users_overview_avg_pred_conv_rate_mtd_sply], [meas.users_overview_avg_pred_conv_rate_mtd])
 			RETURN 
 			IF(
-			    res = BLANK(),
-			    "-",
-			    res
-			)
-			```
-			description: "Ratio measure. Respects the current filter context."
+			res = BLANK(),			"-",			res			)
 		formatString: +0%;-0%;"-"
 		displayFolder: _active_user_overview
 		lineageTag: 8832b4c5-b603-428b-9ca7-9b20cfaaa3b2
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_qtd.
-	measure 'meas.users_overview_avg_pred_conv_rate_qtd' = ```
+	/// Purpose: Users Overview Avg Pred Conv Rate Qtd.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_avg_pred_conv_rate_qtd' = 
 			
 			
 			-- get the dates
@@ -603,21 +582,19 @@ table users
 			var filt_tbl = Filter(dates_tbl, ssr_history[step_name] in { "New Logo Selling","Post-Sales Support","Prospecting","Existing Customer Selling"} )
 			
 			var res = CALCULATE(
-			    AVERAGEX(
-			        filt_tbl,
-			        ssr_history[step_success_prob]
-			    )
-			)+0
+			AVERAGEX(			filt_tbl,			ssr_history[step_success_prob]			)			)+0
 			
 			RETURN res
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 7703ba0a-e9d0-4a81-ba9d-781cf350d54e
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_qtd_sply.
-	measure 'meas.users_overview_avg_pred_conv_rate_qtd_sply' = ```
+	/// Purpose: Users Overview Avg Pred Conv Rate Qtd Sply.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_avg_pred_conv_rate_qtd_sply' = 
 			
 			
 			-- get the dates
@@ -641,39 +618,36 @@ table users
 			var filt_tbl = Filter(dates_tbl, ssr_history[step_name] in { "New Logo Selling","Post-Sales Support","Prospecting","Existing Customer Selling"})
 			
 			var res = CALCULATE(
-			    AVERAGEX(
-			        filt_tbl,
-			        ssr_history[step_success_prob]
-			    )
-			)+0
+			AVERAGEX(			filt_tbl,			ssr_history[step_success_prob]			)			)+0
 			
 			RETURN res
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 91dd19a6-1fa4-42e5-968a-db02bf828f0e
 
-	/// Measure meas.users_overview_avg_pred_conv_qtd_sply_diff.
-	measure 'meas.users_overview_avg_pred_conv_qtd_sply_diff' = ```
+	/// Purpose: Users Overview Avg Pred Conv Qtd Sply Diff.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_avg_pred_conv_qtd_sply_diff' = 
 			
 			var res = DIVIDE([meas.users_overview_avg_pred_conv_rate_qtd] - [meas.users_overview_avg_pred_conv_rate_qtd_sply], [meas.users_overview_avg_pred_conv_rate_qtd])
 			RETURN 
 			IF(
-			    res = BLANK(),
-			    "-",
-			    res
-			)
-			```
-			description: "Ratio measure. Respects the current filter context."
+			res = BLANK(),			"-",			res			)
 		formatString: +0%;-0%;"-"
 		displayFolder: _active_user_overview
 		lineageTag: 4fc18d35-811b-4d17-8a2b-75517ba44e70
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_ytd.
-	measure 'meas.users_overview_avg_pred_conv_rate_ytd' = ```
+	/// Purpose: Users Overview Avg Pred Conv Rate Ytd.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_avg_pred_conv_rate_ytd' = 
 			
 			
 			-- get the dates
@@ -697,21 +671,19 @@ table users
 			var filt_tbl = Filter(dates_tbl, ssr_history[step_name] in { "New Logo Selling","Post-Sales Support","Prospecting","Existing Customer Selling"})
 			
 			var res = CALCULATE(
-			    AVERAGEX(
-			        filt_tbl,
-			        ssr_history[step_success_prob]
-			    )
-			)+0
+			AVERAGEX(			filt_tbl,			ssr_history[step_success_prob]			)			)+0
 			
 			RETURN res
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: e3eece90-6448-45ce-9ea9-a89ed47c6414
 
-	/// Measure meas.users_overview_avg_pred_conv_rate_ytd_sply.
-	measure 'meas.users_overview_avg_pred_conv_rate_ytd_sply' = ```
+	/// Purpose: Users Overview Avg Pred Conv Rate Ytd Sply.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_avg_pred_conv_rate_ytd_sply' = 
 			
 			
 			-- get the dates
@@ -735,39 +707,36 @@ table users
 			var filt_tbl = Filter(dates_tbl, ssr_history[step_name] in { "New Logo Selling","Post-Sales Support","Prospecting","Existing Customer Selling"})
 			
 			var res = CALCULATE(
-			    AVERAGEX(
-			        filt_tbl,
-			        ssr_history[step_success_prob]
-			    )
-			)+0
+			AVERAGEX(			filt_tbl,			ssr_history[step_success_prob]			)			)+0
 			
 			RETURN res
-			```
-			description: "Ratio of cal_end_dates[Date] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: 92cb3110-77ea-42c3-b92b-6f1ebb40254a
 
-	/// Measure meas.users_overview_avg_pred_conv_ytd_sply_diff.
-	measure 'meas.users_overview_avg_pred_conv_ytd_sply_diff' = ```
+	/// Purpose: Users Overview Avg Pred Conv Ytd Sply Diff.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.users_overview_avg_pred_conv_ytd_sply_diff' = 
 			
 			var res = DIVIDE([meas.users_overview_avg_pred_conv_rate_ytd] - [meas.users_overview_avg_pred_conv_rate_ytd_sply], [meas.users_overview_avg_pred_conv_rate_ytd])       // get the delta
 			RETURN 
 			IF(
-			    res = BLANK(),
-			    "-",
-			    res
-			)
-			```
-			description: "Ratio measure. Respects the current filter context."
+			res = BLANK(),			"-",			res			)
 		formatString: +0%;-0%;"-"
 		displayFolder: _active_user_overview
 		lineageTag: ddbc5fa2-1c77-47d1-b6ff-eba18233148a
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.ssr_history_actual_win_rate.
-	measure 'meas.ssr_history_actual_win_rate' = ```
+	/// Purpose: Ssr History Actual Win Rate.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.ssr_history_actual_win_rate' = 
 			
 			
 			
@@ -776,31 +745,24 @@ table users
 			
 			
 			var total_steps = CALCULATE( 
-			    COUNTX(
-			        ssr_history,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			ssr_history,			ssr_history[_sys_doc_id]			)			)
 			
 			
 			var success_steps  = CALCULATE(
-			    COUNTX(
-			        success_filt_tbl,
-			        ssr_history[_sys_doc_id]
-			    )
-			)
+			COUNTX(			success_filt_tbl,			ssr_history[_sys_doc_id]			)			)
 			var res = DIVIDE(success_steps, total_steps, BLANK())
 			return res+0
-			```
-			description: "Ratio of ssr_history[step_success] to ssr_history[_sys_doc_id]. Respects the current filter context."
 		formatString: 0%;-0%;0%
 		displayFolder: _active_user_overview
 		lineageTag: b697679b-3c93-4420-86f1-f25eb146002f
 
-	/// Measure meas.users_trueai_full_name.
+	/// Purpose: Users Trueai Full Name.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_trueai_full_name' =
 			
-			description: "TODO: provide business definition for this measure."
 			SELECTEDVALUE(users[trueai_full_name])
 		lineageTag: 31d53d83-f813-4c59-a312-df48ed52ef39
 
@@ -808,7 +770,6 @@ table users
 
 	/// User's division in the CRM
 	column crm_division
-		description: "CRM: Text label for division."
 		dataType: string
 		lineageTag: 33550b93-126b-487d-9e30-5ec88ff36709
 		summarizeBy: none
@@ -818,7 +779,6 @@ table users
 
 	/// User's username
 	column crm_username
-		description: "CRM: Text label for username."
 		dataType: string
 		lineageTag: bbcdda99-fb1d-4cc2-bafb-c79586cedb19
 		summarizeBy: none
@@ -828,7 +788,6 @@ table users
 
 	/// User's email
 	column crm_email
-		description: "CRM: Text label for email."
 		dataType: string
 		lineageTag: a6335290-93dc-42cd-a2ce-2de9c5137a5b
 		summarizeBy: none
@@ -838,7 +797,6 @@ table users
 
 	/// User's language locale
 	column crm_language_locale
-		description: "CRM: Text label for language locale."
 		dataType: string
 		lineageTag: 40e21f33-6ae5-46a7-8c18-06e4354f88b1
 		summarizeBy: none
@@ -848,7 +806,6 @@ table users
 
 	/// User's last login time in the CRM
 	column crm_last_login_time
-		description: "CRM: Date/time when last login time."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: b24275a3-13db-4e05-ab17-2e6a117711e6
@@ -864,7 +821,6 @@ table users
 
 	/// User's locale
 	column crm_locale
-		description: "CRM: Text label for locale."
 		dataType: string
 		lineageTag: 399b4143-6c76-4299-ae26-393cf9c2a963
 		summarizeBy: none
@@ -874,7 +830,6 @@ table users
 
 	/// User's avatar URL
 	column crm_profile_url
-		description: "CRM: Text label for profile url."
 		dataType: string
 		lineageTag: ea0574d9-3f71-4e27-a708-f214d2215cc9
 		summarizeBy: none
@@ -884,7 +839,6 @@ table users
 
 	/// User's time zone
 	column crm_time_zone
-		description: "CRM: Date/time when time zone."
 		dataType: string
 		lineageTag: 01e66e1b-d600-4838-9c3b-3a63028092c1
 		summarizeBy: none
@@ -894,7 +848,6 @@ table users
 
 	/// User's CRM role
 	column crm_role
-		description: "CRM: Text label for role."
 		dataType: string
 		lineageTag: 7b0b30a3-2da8-4109-8f97-646b7e68c951
 		summarizeBy: none
@@ -904,7 +857,6 @@ table users
 
 	/// User's CRM title
 	column crm_title
-		description: "CRM: Text label for title."
 		dataType: string
 		lineageTag: eaf0edd9-7aac-46e2-80c7-dbaa5ffb69eb
 		summarizeBy: none
@@ -914,7 +866,6 @@ table users
 
 	/// User's CRM type
 	column crm_user_type
-		description: "CRM: Text label for user type."
 		dataType: string
 		lineageTag: 44f73047-d35f-44cc-be40-abe2bcc9e958
 		summarizeBy: none
@@ -924,7 +875,6 @@ table users
 
 	/// User's hire date
 	column trueai_hire_date
-		description: "TrueAI: Date/time when hire date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: e049536e-c0ac-4f78-b6f0-c63e8bbb1225
@@ -940,7 +890,6 @@ table users
 
 	/// User's termination date
 	column trueai_termination_date
-		description: "TrueAI: Date/time when termination date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: de59aad4-b3c0-436e-b48b-95ba59e20c6e
@@ -956,7 +905,6 @@ table users
 
 	/// User's standardized role
 	column trueai_role
-		description: "TrueAI: Text label for role."
 		dataType: string
 		lineageTag: c529d258-39f0-42a3-b481-829244963fba
 		summarizeBy: none
@@ -966,7 +914,6 @@ table users
 
 	/// User's standardized title
 	column trueai_title
-		description: "TrueAI: Text label for title."
 		dataType: string
 		lineageTag: 376df9b2-b031-4756-8088-e7fdf9d4d8f0
 		summarizeBy: none
@@ -976,7 +923,6 @@ table users
 
 	/// User's standardized and combined role
 	column trueai_user_role
-		description: "TrueAI: Text label for user role."
 		dataType: string
 		lineageTag: 7c85b453-efa0-4534-911c-b80405c92a1d
 		summarizeBy: none
@@ -986,7 +932,6 @@ table users
 
 	/// User's group
 	column trueai_group
-		description: "TrueAI: Text label for group."
 		dataType: string
 		lineageTag: 6bbe1ba9-9650-4c21-9a9b-0422c0e0ecf5
 		summarizeBy: none
@@ -999,7 +944,6 @@ table users
 
 	/// User's number of direct reports
 	column trueai_direct_reports
-		description: "TrueAI: Numeric value for direct reports."
 		dataType: int64
 		formatString: 0
 		lineageTag: a596de3f-dc32-4c2d-849e-db481ba399df
@@ -1010,7 +954,6 @@ table users
 
 	/// Boolean flag that indicates whether the user is billable
 	column trueai_billable
-		description: "TrueAI: Indicates whether billable."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: d0d89462-e5ef-4a24-8137-9813b59c0ead
@@ -1021,7 +964,6 @@ table users
 
 	/// User's function derived from the standardized and combined role
 	column trueai_user_role_function
-		description: "TrueAI: Text label for user role function."
 		dataType: string
 		lineageTag: 64cfb219-565d-44dd-ba77-e725875c7072
 		summarizeBy: none
@@ -1034,7 +976,6 @@ table users
 
 	/// The Cien company ID
 	column _sys_co_id
-		description: "System: Identifier for co."
 		dataType: string
 		lineageTag: 71c257d2-1ef0-4616-9ba5-797ef77c98db
 		summarizeBy: none
@@ -1044,7 +985,6 @@ table users
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: e8e2daec-ae5b-4985-8c92-c68f14abdd97
 		summarizeBy: none
@@ -1054,7 +994,6 @@ table users
 
 	/// The end date of the record, stripped of time
 	column _sys_filt_end_date
-		description: "System: Date/time when filt end date."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 10d9fa5b-ba58-499a-a52e-62e3565a0464
@@ -1072,7 +1011,6 @@ table users
 
 	/// The start date of the record, stripped of time
 	column _sys_filt_start_date
-		description: "System: Date/time when filt start date."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 9c1ce28b-787f-4442-9a65-51b58a91cc8a
@@ -1090,7 +1028,6 @@ table users
 
 	/// User's city in the CRM
 	column crm_addr_city
-		description: "CRM: Text label for addr city."
 		dataType: string
 		lineageTag: 7930dadb-8b5c-4ab8-aac5-6c14641f9258
 		summarizeBy: none
@@ -1100,7 +1037,6 @@ table users
 
 	/// User's country in the CRM
 	column crm_addr_country
-		description: "CRM: Count of addr country."
 		dataType: string
 		lineageTag: e2441aa2-5825-43ab-b80d-d69de529b586
 		summarizeBy: none
@@ -1110,7 +1046,6 @@ table users
 
 	/// User's postal code in the CRM
 	column crm_addr_postal_code
-		description: "CRM: Text label for addr postal code."
 		dataType: string
 		lineageTag: ee2fd37d-f267-44b7-b20c-d0a3c270bcfd
 		summarizeBy: none
@@ -1120,7 +1055,6 @@ table users
 
 	/// User's state in the CRM
 	column crm_addr_state
-		description: "CRM: Text label for addr state."
 		dataType: string
 		lineageTag: 76dbaaa4-5dee-4fd5-84c2-663a5f953eb0
 		summarizeBy: none
@@ -1130,7 +1064,6 @@ table users
 
 	/// User's street in the CRM
 	column crm_addr_street
-		description: "CRM: Text label for addr street."
 		dataType: string
 		lineageTag: f01edc9c-e8e2-443b-a396-d3573b4660c2
 		summarizeBy: none
@@ -1140,7 +1073,6 @@ table users
 
 	/// User creator's id in the CRM
 	column crm_creator_id
-		description: "CRM: Identifier for creator."
 		dataType: string
 		lineageTag: 35ed8194-09ce-4a02-b407-c4a1b358cf3a
 		summarizeBy: none
@@ -1150,7 +1082,6 @@ table users
 
 	/// User's first name
 	column crm_first_name
-		description: "CRM: Text label for first name."
 		dataType: string
 		lineageTag: e132a761-7019-4330-af3a-88ecde498e55
 		summarizeBy: none
@@ -1160,7 +1091,6 @@ table users
 
 	/// User's last name
 	column crm_last_name
-		description: "CRM: Text label for last name."
 		dataType: string
 		lineageTag: 6747da50-f339-4bfc-9f0b-fdd844c87cec
 		summarizeBy: none
@@ -1170,7 +1100,6 @@ table users
 
 	/// First date when the user reached the performance tier of "Performer" or "Overperformer"
 	column trueai_performance_lvl_reached_on
-		description: "TrueAI: Date/time when performance lvl reached on."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 3dc56c4f-fb0a-4baa-8f30-8055944ed328
@@ -1186,7 +1115,6 @@ table users
 
 	/// User's standardized role prediction confidence
 	column trueai_role_conf
-		description: "TrueAI: Numeric value for role conf."
 		dataType: double
 		lineageTag: 1ab4cfc7-edad-4ee2-b503-f9666c72f7f6
 		summarizeBy: sum
@@ -1198,7 +1126,6 @@ table users
 
 	/// Number of months since the user's hire date
 	column trueai_tenure
-		description: "TrueAI: Numeric value for tenure."
 		dataType: int64
 		formatString: #,##0" Mos."
 		lineageTag: 654e1b4a-4a20-4fe0-aa77-db2ea5d0d5b6
@@ -1211,7 +1138,6 @@ table users
 
 	/// User's standardized title prediction confidence
 	column trueai_title_conf
-		description: "TrueAI: Numeric value for title conf."
 		dataType: double
 		lineageTag: 076364ca-9ec0-46c7-8b87-fd4c24d6d5a9
 		summarizeBy: sum
@@ -1223,7 +1149,6 @@ table users
 
 	/// User's number of total reports
 	column trueai_tot_reports
-		description: "TrueAI: Numeric value for tot reports."
 		dataType: int64
 		formatString: 0
 		lineageTag: efe2ffd8-0432-4270-a42a-130df1e159e1
@@ -1234,7 +1159,6 @@ table users
 
 	/// User's standardized behavior
 	column trueai_user_behavior
-		description: "TrueAI: Text label for user behavior."
 		dataType: string
 		lineageTag: 881fa4e2-25db-45d6-bc6e-b3010b4d19d7
 		summarizeBy: none
@@ -1244,7 +1168,6 @@ table users
 
 	/// User's standardized behavior prediction confidence
 	column trueai_user_behavior_conf
-		description: "TrueAI: Numeric value for user behavior conf."
 		dataType: double
 		lineageTag: 6c375721-4e2a-4800-900b-d0982ddde52b
 		summarizeBy: sum
@@ -1256,7 +1179,6 @@ table users
 
 	/// User's group prediction confidence
 	column trueai_group_conf
-		description: "TrueAI: Numeric value for group conf."
 		dataType: double
 		lineageTag: 75242738-9532-4ba2-819d-ff2b71efe356
 		summarizeBy: sum
@@ -1268,7 +1190,6 @@ table users
 
 	/// Rule used to determine user's match with an external HR file
 	column trueai_ext_match_rule
-		description: "TrueAI: Numeric value for ext match rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 999040cd-96d5-4101-8400-df5bc0275885
@@ -1279,7 +1200,6 @@ table users
 
 	/// Rule used to determine user's group
 	column trueai_group_rule
-		description: "TrueAI: Numeric value for group rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7a59b985-736e-446a-855d-7da651a400ad
@@ -1290,7 +1210,6 @@ table users
 
 	/// Lead's city
 	column trueai_addr_city
-		description: "TrueAI: Text label for addr city."
 		dataType: string
 		lineageTag: b9f74bf7-6821-499c-99ea-121d62d53168
 		summarizeBy: none
@@ -1300,7 +1219,6 @@ table users
 
 	/// Lead's country
 	column trueai_addr_country
-		description: "TrueAI: Count of addr country."
 		dataType: string
 		lineageTag: 21759031-884d-48bb-bd54-63165b07c586
 		summarizeBy: none
@@ -1310,7 +1228,6 @@ table users
 
 	/// Lead's latitude
 	column trueai_addr_lat
-		description: "TrueAI: Numeric value for addr lat."
 		dataType: double
 		lineageTag: 65519d9e-e4a0-41f8-be24-64ba7e56a285
 		summarizeBy: sum
@@ -1322,7 +1239,6 @@ table users
 
 	/// Lead's longitude
 	column trueai_addr_long
-		description: "TrueAI: Numeric value for addr long."
 		dataType: double
 		lineageTag: 686624b3-6392-4ca9-b6c3-4b0c0ea6e0d0
 		summarizeBy: sum
@@ -1334,7 +1250,6 @@ table users
 
 	/// Lead's postal code
 	column trueai_addr_postal_code
-		description: "TrueAI: Text label for addr postal code."
 		dataType: string
 		lineageTag: f032fa51-2ef0-4598-a2f6-885ec41caa22
 		summarizeBy: none
@@ -1344,7 +1259,6 @@ table users
 
 	/// Lead's state
 	column trueai_addr_state
-		description: "TrueAI: Text label for addr state."
 		dataType: string
 		lineageTag: 5feaa1a3-4497-4e89-bbe7-bd4049f58e58
 		summarizeBy: none
@@ -1354,7 +1268,6 @@ table users
 
 	/// Lead's street
 	column trueai_addr_street
-		description: "TrueAI: Text label for addr street."
 		dataType: string
 		lineageTag: c63ed787-2d57-41ca-8ee9-58337214e68a
 		summarizeBy: none
@@ -1364,7 +1277,6 @@ table users
 
 	/// User ID in the externel HR file
 	column trueai_ext_match_id
-		description: "TrueAI: Identifier for ext match."
 		dataType: string
 		lineageTag: 7251d3c3-3fe6-4ad1-be7a-c3d5d360c672
 		summarizeBy: none
@@ -1374,7 +1286,6 @@ table users
 
 	/// The date of the last data request from the platform
 	column _sys_as_of
-		description: "System: Date/time when as of."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 4a052658-52b2-4a8c-a868-35b5197a0467
@@ -1390,7 +1301,6 @@ table users
 
 	/// The date of the last data modification in the platform
 	column _sys_last_modified_on
-		description: "System: Date/time when last modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 4d3439f3-cc47-4ea1-9598-023981344416
@@ -1406,7 +1316,6 @@ table users
 
 	/// User creation date in the CRM
 	column crm_created_on
-		description: "CRM: Date/time when created on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 53484041-0449-4cdb-9b8d-1602e78e8ba6
@@ -1422,7 +1331,6 @@ table users
 
 	/// User manager's id in the CRM
 	column crm_mgr_id
-		description: "CRM: Identifier for mgr."
 		dataType: string
 		lineageTag: c2ac481c-edb1-405e-ad05-52b9aa1f63d0
 		summarizeBy: none
@@ -1432,7 +1340,6 @@ table users
 
 	/// Boolean flag that indicates whether the user is a manager
 	column trueai_is_mgr
-		description: "TrueAI: Indicates whether is mgr."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 92bf4983-5528-4698-8fed-197fe9966ade
@@ -1443,7 +1350,6 @@ table users
 
 	/// User manager's id
 	column trueai_mgr_id
-		description: "TrueAI: Identifier for mgr."
 		dataType: string
 		lineageTag: d5697ebe-e0cb-403c-bb15-16cacaa5beb3
 		summarizeBy: none
@@ -1453,7 +1359,6 @@ table users
 
 	/// User's manager's id prediction confidence
 	column trueai_mgr_id_conf
-		description: "TrueAI: Numeric value for mgr id conf."
 		dataType: double
 		lineageTag: 9fdd29b0-ac67-4e23-bce3-062fad89e746
 		summarizeBy: sum
@@ -1465,7 +1370,6 @@ table users
 
 	/// Rule used to determine user's manager's id
 	column trueai_mgr_id_rule
-		description: "TrueAI: Numeric value for mgr id rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 3db2acf8-9f51-46e8-aaa3-b6b51f206ea2
@@ -1476,7 +1380,6 @@ table users
 
 	/// User managers' ids
 	column trueai_mgr_ids
-		description: "TrueAI: Text label for mgr ids."
 		dataType: string
 		lineageTag: 98e65bfd-e87e-4049-ba61-1dd9fc3b3650
 		summarizeBy: none
@@ -1486,7 +1389,6 @@ table users
 
 	/// Column trueai_full_name_title = ```.
 	column trueai_full_name_title = ```
-			description: "Unclear: TrueAI: Value for full name title."
 			IF(
 			    ISBLANK(users[crm_first_name]) , 
 			    users[crm_username] ,  
@@ -1499,7 +1401,6 @@ table users
 
 	/// Column 'col.trueai_group_sort' =.
 	column 'col.trueai_group_sort' =
-			description: "Unclear: Value for col trueai group sort."
 			
 			VAR _group = CALCULATE(MAX(users_history[trueai_group]))
 			
@@ -1518,7 +1419,6 @@ table users
 
 	/// User's standardized and combined role aliased
 	column trueai_user_role_alias
-		description: "TrueAI: Text label for user role alias."
 		dataType: string
 		lineageTag: e7262945-9334-4bdb-9ff3-2d8562c4db5b
 		summarizeBy: none
@@ -1528,7 +1428,6 @@ table users
 
 	/// Boolean flag that indicates whether the user was added to account for all creation and ownership of entries
 	column trueai_is_dummy
-		description: "TrueAI: Indicates whether is dummy."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 9b32f7df-f8e5-44f3-b523-dfe25145e02a
@@ -1539,7 +1438,6 @@ table users
 
 	/// Test model
 	column trueai_test
-		description: "TrueAI: Text label for test."
 		dataType: string
 		lineageTag: b611eac7-d877-4f66-9423-433db44223fa
 		summarizeBy: none
@@ -1549,7 +1447,6 @@ table users
 
 	/// Test model confidence
 	column trueai_test_conf
-		description: "TrueAI: Numeric value for test conf."
 		dataType: double
 		lineageTag: 7996e98e-d82e-4121-8a5a-65afb1f34be6
 		summarizeBy: sum
@@ -1561,7 +1458,6 @@ table users
 
 	/// Test model rule
 	column trueai_test_rule
-		description: "TrueAI: Text label for test rule."
 		dataType: string
 		lineageTag: c8fc1029-13c6-4545-9ba8-c2ebd080c9b1
 		summarizeBy: none
@@ -1571,7 +1467,6 @@ table users
 
 	/// Test model debug information
 	column trueai_test_debug
-		description: "TrueAI: Text label for test debug."
 		dataType: string
 		lineageTag: e67c5c07-a880-45ec-8c1e-0402fe9ac781
 		summarizeBy: none
@@ -1581,7 +1476,6 @@ table users
 
 	/// cust_text1
 	column cust_text1
-		description: "Text label for cust text1."
 		dataType: string
 		lineageTag: aeba5101-8eb8-4172-a959-1720cd620e67
 		summarizeBy: none
@@ -1591,7 +1485,6 @@ table users
 
 	/// cust_text2
 	column cust_text2
-		description: "Text label for cust text2."
 		dataType: string
 		lineageTag: 01f5acb3-9866-4abf-92f3-4ad8e322b309
 		summarizeBy: none
@@ -1601,7 +1494,6 @@ table users
 
 	/// cust_text3
 	column cust_text3
-		description: "Text label for cust text3."
 		dataType: string
 		lineageTag: 1be9b9c0-fdaf-4ed1-9cbf-bfddf3cbac90
 		summarizeBy: none
@@ -1611,7 +1503,6 @@ table users
 
 	/// cust_text4
 	column cust_text4
-		description: "Text label for cust text4."
 		dataType: string
 		lineageTag: 996365ff-7b99-46cb-b2e8-73cb6be7f772
 		summarizeBy: none
@@ -1621,7 +1512,6 @@ table users
 
 	/// cust_text5
 	column cust_text5
-		description: "Text label for cust text5."
 		dataType: string
 		lineageTag: 53fb48ca-ff23-4e5f-8f43-9bbc92e58ff1
 		summarizeBy: none
@@ -1631,7 +1521,6 @@ table users
 
 	/// cust_num1
 	column cust_num1
-		description: "Count of cust num1."
 		dataType: double
 		lineageTag: 39aff411-5a20-4e42-bc66-1e2dffb58f4a
 		summarizeBy: sum
@@ -1643,7 +1532,6 @@ table users
 
 	/// cust_num2
 	column cust_num2
-		description: "Count of cust num2."
 		dataType: double
 		lineageTag: 116a6d32-5a97-48dd-8dc0-ace0f32cd118
 		summarizeBy: sum
@@ -1655,7 +1543,6 @@ table users
 
 	/// cust_num3
 	column cust_num3
-		description: "Count of cust num3."
 		dataType: double
 		lineageTag: edcc5cb2-d532-49cb-bb25-a2c800fff642
 		summarizeBy: sum
@@ -1667,7 +1554,6 @@ table users
 
 	/// cust_num4
 	column cust_num4
-		description: "Count of cust num4."
 		dataType: double
 		lineageTag: afedfc0e-aea1-4f5f-8796-bf8f8c948cf6
 		summarizeBy: sum
@@ -1679,7 +1565,6 @@ table users
 
 	/// cust_num5
 	column cust_num5
-		description: "Count of cust num5."
 		dataType: double
 		lineageTag: 18b2693e-9a69-4b21-9a73-efc7a0df9d46
 		summarizeBy: sum
@@ -1691,7 +1576,6 @@ table users
 
 	/// cust_num6
 	column cust_num6
-		description: "Count of cust num6."
 		dataType: double
 		lineageTag: 587399da-ee82-4b4e-89f4-349238cca390
 		summarizeBy: sum
@@ -1703,7 +1587,6 @@ table users
 
 	/// cust_num7
 	column cust_num7
-		description: "Count of cust num7."
 		dataType: double
 		lineageTag: 7265e1c0-5aab-4812-b88a-6a5ae4fcad4d
 		summarizeBy: sum
@@ -1715,7 +1598,6 @@ table users
 
 	/// cust_bool1
 	column cust_bool1
-		description: "Indicates whether cust bool1."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 6e8a38c2-1792-4cef-b1ef-313dd272f751
@@ -1726,7 +1608,6 @@ table users
 
 	/// cust_bool2
 	column cust_bool2
-		description: "Indicates whether cust bool2."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 0c1efc2b-3163-4a01-9ac6-697d6a828c9a
@@ -1737,7 +1618,6 @@ table users
 
 	/// Column trueai_user_role_sort.
 	column trueai_user_role_sort
-		description: "TrueAI: Numeric value for user role sort."
 		dataType: int64
 		formatString: 0
 		lineageTag: 49f7c349-5d1c-44fe-8a96-9d8431fb1f71
@@ -1748,7 +1628,6 @@ table users
 
 	/// Column trueai_user_role_function_sort.
 	column trueai_user_role_function_sort
-		description: "TrueAI: Numeric value for user role function sort."
 		dataType: int64
 		formatString: 0
 		lineageTag: b510b371-38de-444a-b542-4e63bd9ba57e
@@ -1759,7 +1638,6 @@ table users
 
 	/// Column trueai_user_role_department_sort.
 	column trueai_user_role_department_sort
-		description: "TrueAI: Numeric value for user role department sort."
 		dataType: int64
 		formatString: 0
 		lineageTag: 5bb207ba-8a92-4679-a669-a9d7f3eec9e7
@@ -1770,7 +1648,6 @@ table users
 
 	/// Link to the user in the remote system (such as Salesforce)
 	column crm_deep_link
-		description: "CRM: Text label for deep link."
 		dataType: string
 		lineageTag: e281d443-35d9-4b72-bf57-35ff9ebc1b51
 		summarizeBy: none
@@ -1780,7 +1657,6 @@ table users
 
 	/// User's full name
 	column trueai_full_name
-		description: "TrueAI: Text label for full name."
 		dataType: string
 		lineageTag: 61b18b35-2104-49b7-a370-02d270de24c8
 		summarizeBy: none
@@ -1790,7 +1666,6 @@ table users
 
 	/// Ramping or Ramped depending on users tenure
 	column trueai_ramping_status
-		description: "TrueAI: Text label for ramping status."
 		dataType: string
 		lineageTag: d56d219f-f4bf-414f-9f17-f239c6262bd7
 		summarizeBy: none
@@ -1800,7 +1675,6 @@ table users
 
 	/// Column 'col.is_ext_match_id' =.
 	column 'col.is_ext_match_id' =
-			description: "Identifier for col is ext match."
 			
 			IF ( NOT ISBLANK ( 'users'[trueai_ext_match_id] ), "True", "False" )
 		lineageTag: 66dfae85-06b2-4816-819f-a7c89744ce92
@@ -1810,7 +1684,6 @@ table users
 
 	/// User's department in the CRM
 	column crm_department
-		description: "CRM: Text label for department."
 		dataType: string
 		lineageTag: 5fdc2d49-f63b-469e-a0e7-c09a25af8ad5
 		summarizeBy: none
@@ -1820,7 +1693,6 @@ table users
 
 	/// User's department derived from the standardized and combined role
 	column trueai_user_role_department
-		description: "TrueAI: Text label for user role department."
 		dataType: string
 		lineageTag: 1ec8bc33-5ad9-44eb-b239-9cf6c71ebe5a
 		summarizeBy: none

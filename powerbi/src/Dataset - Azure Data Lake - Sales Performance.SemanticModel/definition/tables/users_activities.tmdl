@@ -1,71 +1,67 @@
 /// Derived entity for daily aggregates of user activity. One row per user per day. Provides high-level activity volume and type summaries. Historical depth: 6 years retroactive.
 table users_activities
-	description: "One row per users_activity record. Source fields include System, TrueAI prefixes. Related to LocalDateTable_ac80f08e-9944-4350-9a63-63557455e54f (trueai_end_date -> Date), users (_sys_user_id -> _sys_doc_id), LocalDateTable_1a63f0a0-a64d-48de-8834-a68eb08e2b8c (_sys_filt_start_date -> Date). Supports measures such as meas.act_capt_lvl_adj_total_eng_dur_hr, meas.act_capt_lvl_reps_all_count."
 	lineageTag: fb2d1c4a-d460-4eb9-94bd-25ddedeb3f9c
 
-	/// Measure meas.act_capt_lvl_adj_total_eng_dur_hr.
-	measure 'meas.act_capt_lvl_adj_total_eng_dur_hr' = ```
+	/// Purpose: Act Capt Lvl Adj Total Eng Dur Hr.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.act_capt_lvl_adj_total_eng_dur_hr' = 
 			
 			
 			var act_capt_lvl_adj  = CALCULATE(
-			    SUMX(
-			        users_activities, 
-			        users_activities[trueai_adj_eng_dur]
-			    )   // sum adj. duration 
-			)
+			SUMX(			users_activities, 			users_activities[trueai_adj_eng_dur]			)   // sum adj. duration 			)
 			
 			var res = DIVIDE(
-			    act_capt_lvl_adj,
-			    3600
-			)
+			act_capt_lvl_adj,			3600			)
 			RETURN 
 			res
-			```
-			description: "Ratio based on users_activities[trueai_adj_eng_dur]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 5a1cc8ee-8722-453e-a3bc-109bfb86222d
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.act_capt_lvl_reps_all_count.
+	/// Purpose: Act Capt Lvl Reps All Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.act_capt_lvl_reps_all_count' =
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    COUNT(
-			        users_activities[_sys_user_id]      // get the count of the users
-			    )
-			)
+			COUNT(			users_activities[_sys_user_id]      // get the count of the users			)			)
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 3aec840e-5730-46b3-a256-0725ff6e0d42
 
-	/// Measure meas.act_capt_lvl_reps_count.
-	measure 'meas.act_capt_lvl_reps_count' = ```
+	/// Purpose: Act Capt Lvl Reps Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.act_capt_lvl_reps_count' = 
 			
 			var res = CALCULATE(
-			    [meas.act_capt_lvl_reps_all_count], 
-			    users_activities[trueai_owner_act_capt_lvl] > 0.4 // get the users/reps count owner_capt_lvl greater than 0.4
-			)
+			[meas.act_capt_lvl_reps_all_count], 			users_activities[trueai_owner_act_capt_lvl] > 0.4 // get the users/reps count owner_capt_lvl greater than 0.4			)
 			RETURN 
 			res
-			```
-			description: "Ratio based on users_activities[trueai_owner_act_capt_lvl]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: b1d73a7c-accc-49b5-bcb8-b555e0f014a1
 
-	/// Measure meas.act_capt_lvl_adj_dur_per_reps.
+	/// Purpose: Act Capt Lvl Adj Dur Per Reps.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.act_capt_lvl_adj_dur_per_reps' =
 			
-			description: "TODO: provide business definition for this measure."
 			var reps_count = [meas.act_capt_lvl_reps_count]
 			var adj_dur = [meas.act_capt_lvl_adj_total_dur_hr]
 			
 			var res = DIVIDE(
-			    adj_dur,
-			    reps_count
-			)
+			adj_dur,			reps_count			)
 			RETURN
 			res
 		displayFolder: _act_capt_lvl
@@ -73,17 +69,18 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_eng_dur_per_reps.
+	/// Purpose: Act Capt Lvl Adj Eng Dur Per Reps.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.act_capt_lvl_adj_eng_dur_per_reps' =
 			
-			description: "TODO: provide business definition for this measure."
 			var reps_count = [meas.act_capt_lvl_reps_count]
 			var adj_dur = [meas.act_capt_lvl_adj_total_eng_dur_hr]
 			
 			var res = DIVIDE(
-			    adj_dur,
-			    reps_count
-			)
+			adj_dur,			reps_count			)
 			RETURN
 			res
 		displayFolder: _act_capt_lvl
@@ -91,27 +88,31 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_non_eng_dur_per_reps.
+	/// Purpose: Act Capt Lvl Adj Non Eng Dur Per Reps.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.act_capt_lvl_adj_non_eng_dur_per_reps' =
 			
-			description: "TODO: provide business definition for this measure."
 			var _adjtot_dur = [meas.act_capt_lvl_adj_dur_per_reps]
 			var _eng_dur = [meas.act_capt_lvl_adj_eng_dur_per_reps]
 			
 			var res = (_adjtot_dur-_eng_dur)
 			RETURN
 			IF(
-			    res >0,
-			    res,
-			    0
-			)
+			res >0,			res,			0			)
 		displayFolder: _act_capt_lvl
 		lineageTag: a3dbf368-b24e-4f3e-9424-15e8b749c587
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_total_non_eng_dur_hr.
-	measure 'meas.act_capt_lvl_adj_total_non_eng_dur_hr' = ```
+	/// Purpose: Act Capt Lvl Adj Total Non Eng Dur Hr.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.act_capt_lvl_adj_total_non_eng_dur_hr' = 
 			
 			
 			var _adj_tot_dur = [meas.act_capt_lvl_adj_total_dur_hr]
@@ -119,140 +120,130 @@ table users_activities
 			var res = (_adj_tot_dur-_eng_tot_dur)
 			RETURN 
 			res
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 3734d695-d5f3-4c05-97fb-33803f44371b
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.act_capt_lvl_reps_count_pct.
+	/// Purpose: Act Capt Lvl Reps Count Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.act_capt_lvl_reps_count_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			var _tot_reps_count = [meas.act_capt_lvl_reps_all_count]        // get the all reps/users count
 			var _reps_count = [meas.act_capt_lvl_reps_count]                // get the reps/users count act_capt_lvl greater than 0.4
 			
 			var res  = DIVIDE(
-			    _reps_count,
-			    _tot_reps_count     // get the % of reps/users
-			)
+			_reps_count,			_tot_reps_count     // get the % of reps/users			)
 			RETURN
 			res
 		formatString: 0%;-0%;0%
 		displayFolder: _act_capt_lvl
 		lineageTag: fe446259-6784-46e4-bee3-43279a4ee0be
 
-	/// Measure meas.act_capt_lvl_trueai_total_dur_hr.
-	measure 'meas.act_capt_lvl_trueai_total_dur_hr' = ```
+	/// Purpose: Act Capt Lvl Trueai Total Dur Hr.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.act_capt_lvl_trueai_total_dur_hr' = 
 			
 			
 			var _trueai_dur  = CALCULATE(
-			    SUMX(
-			        users_activities, 
-			        users_activities[trueai_dur]        // get the sum of truai_dur 
-			    )
-			)
+			SUMX(			users_activities, 			users_activities[trueai_dur]        // get the sum of truai_dur 			)			)
 			
 			var res = DIVIDE(
-			    _trueai_dur,
-			    3600
-			)
+			_trueai_dur,			3600			)
 			RETURN 
 			res
-			```
-			description: "Ratio based on users_activities[trueai_dur]. Respects the current filter context."
 		displayFolder: _act_capt_lvl
 		lineageTag: 56919be7-90fe-4d0f-9a1b-1b9b70c66ea1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_trueai_dur_per_reps.
-	measure 'meas.act_capt_lvl_trueai_dur_per_reps' = ```
+	/// Purpose: Act Capt Lvl Trueai Dur Per Reps.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.act_capt_lvl_trueai_dur_per_reps' = 
 			
 			var reps_count = [meas.act_capt_lvl_reps_count]     // get the reps/users count act_capt_lvl greater than 0.4
 			var adj_dur = [meas.act_capt_lvl_trueai_total_dur_hr]       // get the total dur 
 			
 			var res = DIVIDE(
-			    adj_dur,
-			    reps_count      // get the difference
-			)
+			adj_dur,			reps_count      // get the difference			)
 			RETURN
 			res
-			```
-			description: "Ratio measure. Respects the current filter context."
 		displayFolder: _act_capt_lvl
 		lineageTag: d99d0f9b-25cb-4df0-ab62-eaa3060d46cb
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_avg_capture_adj_factor.
+	/// Purpose: Act Capt Lvl Avg Capture Adj Factor.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.act_capt_lvl_avg_capture_adj_factor' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    AVERAGE(
-			        users_activities[trueai_owner_act_capt_lvl]      // get the average of owner act_capt_lvl
-			    )
-			)
+			AVERAGE(			users_activities[trueai_owner_act_capt_lvl]      // get the average of owner act_capt_lvl			)			)
 		displayFolder: _act_capt_lvl
 		lineageTag: 3171ac6f-63d6-4757-a1dd-a3b929e86ecf
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_avg_prep_factor.
+	/// Purpose: Act Capt Lvl Avg Prep Factor.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.act_capt_lvl_avg_prep_factor' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    AVERAGE(
-			        users_activities[trueai_owner_prep_factor]      // get the average of owner prep factor
-			    )
-			)
+			AVERAGE(			users_activities[trueai_owner_prep_factor]      // get the average of owner prep factor			)			)
 		displayFolder: _act_capt_lvl
 		lineageTag: b1bc2dc5-6cc9-487d-8331-5476a6f7b9d1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.act_capt_lvl_adj_total_dur_hr.
-	measure 'meas.act_capt_lvl_adj_total_dur_hr' = ```
+	/// Purpose: Act Capt Lvl Adj Total Dur Hr.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.act_capt_lvl_adj_total_dur_hr' = 
 			
 			
 			var act_capt_lvl_adj  = CALCULATE(
-			    SUMX(
-			        users_activities, 
-			        users_activities[trueai_adj_dur]        // sum of the adj. duration
-			    )
-			)
+			SUMX(			users_activities, 			users_activities[trueai_adj_dur]        // sum of the adj. duration			)			)
 			
 			var res = DIVIDE(
-			    act_capt_lvl_adj,
-			    3600
-			)
+			act_capt_lvl_adj,			3600			)
 			RETURN 
 			res
-			```
-			description: "Ratio based on users_activities[trueai_adj_dur]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 545ac815-9222-429f-a470-4c9b680a9366
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.act_capt_lvl_bar_date_filter.
+	/// Purpose: Act Capt Lvl Bar Date Filter.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.act_capt_lvl_bar_date_filter' =
 			
-			description: "TODO: provide business definition for this measure."
 			var _min_date = [meas.context_date_min]         // get the screen min date from slicer
 			var _max_date = [meas.context_date_max]         // get the screen max date from the slicer
 			
 			var res = IF(
-			    MAX(users_activities[_sys_filt_end_date]) >= _min_date &&
-			    MAX(users_activities[_sys_filt_end_date]) <= _max_date,             // create a condition if the bar date is within the selected date in the slicer
-			    1,
-			    0
-			)
+			MAX(users_activities[_sys_filt_end_date]) >= _min_date &&			MAX(users_activities[_sys_filt_end_date]) <= _max_date,             // create a condition if the bar date is within the selected date in the slicer			1,			0			)
 			
 			RETURN
 			res
@@ -260,50 +251,53 @@ table users_activities
 		displayFolder: _act_capt_lvl
 		lineageTag: 76b901f4-e8d2-426f-9790-a30d3e7a2717
 
-	/// Measure meas.act_capt_lvl_reps_all_distinct_count.
+	/// Purpose: Act Capt Lvl Reps All Distinct Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.act_capt_lvl_reps_all_distinct_count' =
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    DISTINCTCOUNT(
-			        users_activities[_sys_user_id]      // get the distinct count of the users
-			    )
-			)
+			DISTINCTCOUNT(			users_activities[_sys_user_id]      // get the distinct count of the users			)			)
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 6cebb7de-b574-496d-aa40-cc0140e390bd
 
-	/// Measure meas.act_capt_lvl_reps_distinct_count.
+	/// Purpose: Act Capt Lvl Reps Distinct Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.act_capt_lvl_reps_distinct_count' =
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    DISTINCTCOUNT(
-			        users_activities[_sys_user_id]      // get the distinct count of the users
-			    ),
-			    users_activities[trueai_owner_act_capt_lvl] > 0.4 // get the users/reps count owner_capt_lvl greater than 0.4
-			)
+			DISTINCTCOUNT(			users_activities[_sys_user_id]      // get the distinct count of the users			),			users_activities[trueai_owner_act_capt_lvl] > 0.4 // get the users/reps count owner_capt_lvl greater than 0.4			)
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 90d9e0c7-f44d-4bbd-af85-06d9abf127ce
 
-	/// Measure meas.users_activities_trueai_email_count.
+	/// Purpose: Users Activities Trueai Email Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_trueai_email_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    SUM(users_activities[trueai_type_auto_email_count])
-			)
+			SUM(users_activities[trueai_type_auto_email_count])			)
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 14a0bbf4-0d9b-4108-b92a-8b501be0c185
 
-	/// Measure meas.users_activities_trueai_email_dur.
+	/// Purpose: Users Activities Trueai Email Dur.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_trueai_email_dur' =
 			
 			
-			description: "TODO: provide business definition for this measure."
 			var _dur = CALCULATE(
-			    SUM(users_activities[trueai_type_auto_email_dur])           // total duration
-			)
+			SUM(users_activities[trueai_type_auto_email_dur])           // total duration			)
 			var res = _dur/3600                 // converting into hours
 			
 			RETURN
@@ -314,25 +308,29 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_call_count.
+	/// Purpose: Users Activities Trueai Call Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_trueai_call_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    sum(users_activities[trueai_type_call_count])
-			)
+			sum(users_activities[trueai_type_call_count])			)
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 583a0940-97a3-43cc-8626-a6a72e3668c0
 
-	/// Measure meas.users_activities_trueai_call_dur.
+	/// Purpose: Users Activities Trueai Call Dur.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_trueai_call_dur' =
 			
 			
-			description: "TODO: provide business definition for this measure."
 			var _dur = CALCULATE(
-			    SUM(users_activities[trueai_type_call_dur])         // get the total duration
-			)
+			SUM(users_activities[trueai_type_call_dur])         // get the total duration			)
 			var res = _dur/3600                 // converting into hours
 			
 			RETURN
@@ -343,25 +341,29 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_social_count.
+	/// Purpose: Users Activities Trueai Social Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_trueai_social_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    sum(users_activities[trueai_type_social_count])
-			)
+			sum(users_activities[trueai_type_social_count])			)
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: ac7f3891-0901-4135-8ecc-e0dade833dfb
 
-	/// Measure meas.users_activities_trueai_social_dur.
+	/// Purpose: Users Activities Trueai Social Dur.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_trueai_social_dur' =
 			
 			
-			description: "TODO: provide business definition for this measure."
 			var _dur = CALCULATE(
-			    sum(users_activities[trueai_type_social_dur])
-			)
+			sum(users_activities[trueai_type_social_dur])			)
 			var res = _dur/3600                 // converting into hours
 			
 			RETURN
@@ -372,32 +374,33 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_history_ci_act_capt_lvl_latest_month.
-	measure 'meas.users_history_ci_act_capt_lvl_latest_month' = ```
+	/// Purpose: Users History Ci Act Capt Lvl Latest Month.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.users_history_ci_act_capt_lvl_latest_month' = 
 			
 			var latest_row  = CALCULATETABLE(TOPN(1,users_history, users_history[_sys_filt_end_date], DESC))  // get the latest row
 			VAR latest_date = MAXX(latest_row, users_history[_sys_filt_end_date])       //Extract the latest date
 			
 			VAR previous_month_row = 
-			    CALCULATETABLE(
-			        users_history,
-			        users_history[_sys_filt_end_date] >= EOMONTH(latest_date, -2) + 1, 
-			        users_history[_sys_filt_end_date] <= EOMONTH(latest_date, -1)
-			    )  // Get rows from the previous month
-			
+			CALCULATETABLE(			users_history,			users_history[_sys_filt_end_date] >= EOMONTH(latest_date, -2) + 1, 			users_history[_sys_filt_end_date] <= EOMONTH(latest_date, -1)			)  // Get rows from the previous month			
 			VAR res = AVERAGEX(previous_month_row, users_history[ci_act_capt_lvl])
 			
 			RETURN
 			res
-			```
-			description: "Ratio of users_history[_sys_filt_end_date] to users_history[_sys_filt_end_date]. Respects the current filter context."
 		displayFolder: _act_capt_lvl
 		lineageTag: 14087102-69ba-4af7-aa1d-ae17dd6bd437
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_act_capt_lvl_most_latest_previous.
-	measure 'meas.users_history_ci_act_capt_lvl_most_latest_previous' = ```
+	/// Purpose: Users History Ci Act Capt Lvl Most Latest Previous.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.users_history_ci_act_capt_lvl_most_latest_previous' = 
 			
 			VAR latest_row = CALCULATETABLE(TOPN(1, users_history, users_history[_sys_filt_end_date], DESC))  // Get the latest row
 			
@@ -408,40 +411,38 @@ table users_activities
 			VAR one_month_back_end = EOMONTH(latest_date, -2)               //End of that month
 			
 			VAR one_month_back_row = 
-			    CALCULATETABLE(
-			        users_history,
-			        users_history[_sys_filt_end_date] >= one_month_back_start,      // Get rows from the month 1 month before the previous month
-			        users_history[_sys_filt_end_date] <= one_month_back_end
-			    )  
-			
+			CALCULATETABLE(			users_history,			users_history[_sys_filt_end_date] >= one_month_back_start,      // Get rows from the month 1 month before the previous month			users_history[_sys_filt_end_date] <= one_month_back_end			)  			
 			VAR res = AVERAGEX(one_month_back_row, users_history[ci_act_capt_lvl])
 			
 			RETURN
 			res
-			```
-			description: "Ratio of users_history[_sys_filt_end_date] to users_history[_sys_filt_end_date]. Respects the current filter context."
 		displayFolder: _act_capt_lvl
 		lineageTag: 496440bc-039e-47a5-9caf-86e55ec83ca0
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_avg_ci_act_capt_lvl.
+	/// Purpose: Users History Avg Ci Act Capt Lvl.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.users_history_avg_ci_act_capt_lvl' =
 			
-			description: "TODO: provide business definition for this measure."
 			var res = CALCULATE(
-			    AVERAGEX(users_history, users_history[ci_act_capt_lvl])     // get the avegare of ci_act_capt lvl
-			)
+			AVERAGEX(users_history, users_history[ci_act_capt_lvl])     // get the avegare of ci_act_capt lvl			)
 			RETURN
 			res
 		formatString: 0%;-0%;0%
 		displayFolder: _act_capt_lvl
 		lineageTag: 09188a3f-50bd-4b1c-bfba-66ef796ac30c
 
-	/// Measure meas.users_history_ci_act_capt_lvl_latest_previous_diff.
+	/// Purpose: Users History Ci Act Capt Lvl Latest Previous Diff.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.users_history_ci_act_capt_lvl_latest_previous_diff' =
 			
-			description: "TODO: provide business definition for this measure."
 			var latest = [meas.users_history_ci_act_capt_lvl_latest_month]          // get the latest ci_act_capt_lvl
 			var _previous = [meas.users_history_ci_act_capt_lvl_most_latest_previous]           // get the previous
 			var res = (latest - _previous)
@@ -453,93 +454,100 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_activities_trueai_call_dur_weekly.
-	measure 'meas.users_activities_trueai_call_dur_weekly' = ```
+	/// Purpose: Users Activities Trueai Call Dur Weekly.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.users_activities_trueai_call_dur_weekly' = 
 			
 			var _min_date = [meas.context_date_min]             // get the context min date
 			var _max_date = [meas.context_date_max]             // get the context max date
 			var _dur = CALCULATE(
-			    SUM(users_activities[trueai_type_call_dur])         // get the total duration
-			)
+			SUM(users_activities[trueai_type_call_dur])         // get the total duration			)
 			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count 
 			var _hrs = _dur/3600                 // converting into hours
 			var res = (_hrs/_week)              // get the weekly 
 			
 			RETURN
 			res
-			```
-			description: "Ratio based on users_activities[trueai_type_call_dur]. Respects the current filter context."
 		formatString: #,##0" hrs"
 		displayFolder: _act_capt_lvl
 		lineageTag: 27eb394b-0b2c-472a-81db-24fc52b391fa
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_email_dur_weekly.
-	measure 'meas.users_activities_trueai_email_dur_weekly' = ```
+	/// Purpose: Users Activities Trueai Email Dur Weekly.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.users_activities_trueai_email_dur_weekly' = 
 			
 			
 			var _min_date = [meas.context_date_min]             // get the context min date
 			var _max_date = [meas.context_date_max]             // get the context max date
 			var _dur = CALCULATE(
-			    SUM(users_activities[trueai_type_auto_email_dur])           // total duration
-			)
+			SUM(users_activities[trueai_type_auto_email_dur])           // total duration			)
 			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count 
 			var _hrs = _dur/3600                 // converting into hours
 			var res = (_hrs/_week)              // get the weekly 
 			
 			RETURN
 			res
-			```
-			description: "Ratio based on users_activities[trueai_type_auto_email_dur]. Respects the current filter context."
 		formatString: #,##0" hrs"
 		displayFolder: _act_capt_lvl
 		lineageTag: fca004a1-3954-4d10-aff0-3d1d43ecb4f2
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_social_dur_weekly.
-	measure 'meas.users_activities_trueai_social_dur_weekly' = ```
+	/// Purpose: Users Activities Trueai Social Dur Weekly.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.users_activities_trueai_social_dur_weekly' = 
 			
 			
 			var _min_date = [meas.context_date_min]             // get the context min date
 			var _max_date = [meas.context_date_max]             // get the context max date
 			var _dur = CALCULATE(
-			    sum(users_activities[trueai_type_social_dur])
-			)
+			sum(users_activities[trueai_type_social_dur])			)
 			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count 
 			var _hrs = _dur/3600                 // converting into hours
 			var res = (_hrs/_week)              // get the weekly 
 			
 			RETURN
 			res
-			```
-			description: "Ratio based on users_activities[trueai_type_social_dur]. Respects the current filter context."
 		formatString: #,##0" hrs"
 		displayFolder: _act_capt_lvl
 		lineageTag: 46735ce5-09d7-48ba-a08a-e1ced67ca7c9
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_meeting_count.
+	/// Purpose: Users Activities Trueai Meeting Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_trueai_meeting_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    sum(users_activities[trueai_type_meeting_count])
-			)
+			sum(users_activities[trueai_type_meeting_count])			)
 		formatString: 0
 		displayFolder: _act_capt_lvl
 		lineageTag: 95b895ec-9000-41b5-99a1-c6c36f471dc0
 
-	/// Measure meas.users_activities_trueai_meeting_dur.
+	/// Purpose: Users Activities Trueai Meeting Dur.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_trueai_meeting_dur' =
 			
 			
-			description: "TODO: provide business definition for this measure."
 			var _dur = CALCULATE(
-			    sum(users_activities[trueai_type_meeting_dur])
-			)
+			sum(users_activities[trueai_type_meeting_dur])			)
 			var res = _dur/3600                 // converting into hours
 			
 			RETURN
@@ -550,87 +558,97 @@ table users_activities
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_trueai_meeting_dur_weekly.
-	measure 'meas.users_activities_trueai_meeting_dur_weekly' = ```
+	/// Purpose: Users Activities Trueai Meeting Dur Weekly.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.users_activities_trueai_meeting_dur_weekly' = 
 			
 			
 			var _min_date = [meas.context_date_min]             // get the context min date
 			var _max_date = [meas.context_date_max]             // get the context max date
 			var _dur = CALCULATE(
-			    sum(users_activities[trueai_type_meeting_dur])
-			)
+			sum(users_activities[trueai_type_meeting_dur])			)
 			var _week = DATEDIFF(_min_date,_max_date,WEEK)                  // get the week count 
 			var _hrs = _dur/3600                 // converting into hours
 			var res = (_hrs/_week)              // get the weekly 
 			
 			RETURN
 			res
-			```
-			description: "Ratio based on users_activities[trueai_type_meeting_dur]. Respects the current filter context."
 		formatString: #,##0" hrs"
 		displayFolder: _act_capt_lvl
 		lineageTag: e602cd49-d55e-4496-b714-80faa96803d7
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.users_activities_prospecting_count.
+	/// Purpose: Users Activities Prospecting Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_prospecting_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    SUM(users_activities[trueai_purpose_prospecting_count])     // get the total prosprecting act count
-			)
+			SUM(users_activities[trueai_purpose_prospecting_count])     // get the total prosprecting act count			)
 		formatString: 0
 		displayFolder: _step_activities
 		lineageTag: 5e7edb4a-4fde-4263-b9aa-7fd3957cbe38
 
-	/// Measure meas.users_activities_new_logo_count.
+	/// Purpose: Users Activities New Logo Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_new_logo_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    SUM(users_activities[trueai_purpose_new_logo_count])     // get the total new logo act count
-			)
+			SUM(users_activities[trueai_purpose_new_logo_count])     // get the total new logo act count			)
 		formatString: 0
 		displayFolder: _step_activities
 		lineageTag: 9fb93954-0da2-4918-a58d-a247c88c8085
 
-	/// Measure meas.users_activities_post_sales_count.
+	/// Purpose: Users Activities Post Sales Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_post_sales_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    SUM(users_activities[trueai_purpose_post_sales_count])     // get the total post sales  act count
-			)
+			SUM(users_activities[trueai_purpose_post_sales_count])     // get the total post sales  act count			)
 		formatString: 0
 		displayFolder: _step_activities
 		lineageTag: c3005fc1-3c14-43c1-8df1-5724c8a97233
 
-	/// Measure meas.users_activities_existing_customer_count.
+	/// Purpose: Users Activities Existing Customer Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_existing_customer_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    SUM(users_activities[trueai_purpose_exist_cust_selling_count])     // get the total existing customer act count
-			)
+			SUM(users_activities[trueai_purpose_exist_cust_selling_count])     // get the total existing customer act count			)
 		formatString: 0
 		displayFolder: _step_activities
 		lineageTag: f3e51cac-e237-45bd-a998-a7e1b91b94bc
 
-	/// Measure meas.users_activities_internal_count.
+	/// Purpose: Users Activities Internal Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.users_activities_internal_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    SUM(users_activities[trueai_purpose_internal_count])     // get the total internal act count
-			)
+			SUM(users_activities[trueai_purpose_internal_count])     // get the total internal act count			)
 		formatString: 0
 		displayFolder: _step_activities
 		lineageTag: 511529c4-a270-4137-a221-a9bd209ad403
 
 	/// The ID of the document in the remote system (such as Salesforce ID)
 	column _sys_user_id
-		description: "System: Identifier for user."
 		dataType: string
 		lineageTag: 3cd7e0d5-077d-43a7-a02a-714059e71dbc
 		summarizeBy: none
@@ -640,7 +658,6 @@ table users_activities
 
 	/// The date of the last data request from the platform in UTC
 	column trueai_end_date
-		description: "TrueAI: Date/time when end date."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 86b26ec3-525e-47ca-ad93-b41c11c0aa7b
@@ -658,7 +675,6 @@ table users_activities
 
 	/// User's standardized and combined role
 	column trueai_user_role
-		description: "TrueAI: Text label for user role."
 		dataType: string
 		lineageTag: 519977bd-63e8-4b03-8c5e-d06639c29d8b
 		summarizeBy: none
@@ -668,7 +684,6 @@ table users_activities
 
 	/// User's function derived from the standardized and combined role
 	column trueai_user_role_function
-		description: "TrueAI: Text label for user role function."
 		dataType: string
 		lineageTag: c5edfbe6-3ab1-433f-893a-08745a7c5c9d
 		summarizeBy: none
@@ -678,7 +693,6 @@ table users_activities
 
 	/// Activities Total Count
 	column trueai_count
-		description: "TrueAI: Count of count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 76d55110-925c-40f7-a325-7c70986372d9
@@ -689,7 +703,6 @@ table users_activities
 
 	/// Activities Total Duration
 	column trueai_dur
-		description: "TrueAI: Numeric value for dur."
 		dataType: int64
 		lineageTag: 97d319d6-7ab3-4ad1-be9b-e6c6485b6a9d
 		summarizeBy: sum
@@ -701,7 +714,6 @@ table users_activities
 
 	/// Activities Engaged Count
 	column trueai_eng_count
-		description: "TrueAI: Count of eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 133ba012-866c-4e8c-8449-79ffa0fe618b
@@ -712,7 +724,6 @@ table users_activities
 
 	/// Activities Engaged Duration
 	column trueai_eng_dur
-		description: "TrueAI: Numeric value for eng dur."
 		dataType: double
 		lineageTag: 06cb50bc-bdef-4e6f-a3be-10e25e2109c4
 		summarizeBy: sum
@@ -724,7 +735,6 @@ table users_activities
 
 	/// Activities Total Unique Ids
 	column trueai_unique_ssr_ids
-		description: "TrueAI: Numeric value for unique ssr ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 914498a7-2b7d-47d3-849d-55b02bd3de68
@@ -735,7 +745,6 @@ table users_activities
 
 	/// Activities Engaged Unique Ids
 	column trueai_eng_unique_ssr_ids
-		description: "TrueAI: Numeric value for eng unique ssr ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 111a17bf-c024-4768-8093-6fdb98624c72
@@ -746,7 +755,6 @@ table users_activities
 
 	/// Activities Total Adj Duration
 	column trueai_adj_dur
-		description: "TrueAI: Numeric value for adj dur."
 		dataType: double
 		formatString: 0.00
 		lineageTag: bc49f54d-c0f9-44d4-9ad1-bc1146c1732f
@@ -757,7 +765,6 @@ table users_activities
 
 	/// Activities Total Adj Duration Rule
 	column trueai_adj_dur_rule
-		description: "TrueAI: Numeric value for adj dur rule."
 		dataType: double
 		lineageTag: e516c07d-6f73-46cf-9332-bf7a6ed6603d
 		summarizeBy: sum
@@ -769,7 +776,6 @@ table users_activities
 
 	/// Activities Call Count
 	column trueai_type_call_count
-		description: "TrueAI: Count of type call count."
 		dataType: int64
 		formatString: 0
 		lineageTag: d1d8a30d-7b42-47ce-ac8e-4270997496d4
@@ -780,7 +786,6 @@ table users_activities
 
 	/// Activities Call Engaged Count
 	column trueai_type_call_eng_count
-		description: "TrueAI: Count of type call eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 61d5a4ba-6979-48d9-b50a-6b3c2cea83e1
@@ -791,7 +796,6 @@ table users_activities
 
 	/// Activities Call Duration
 	column trueai_type_call_dur
-		description: "TrueAI: Numeric value for type call dur."
 		dataType: double
 		lineageTag: 5dcd55de-58c5-4216-afcd-37153168e897
 		summarizeBy: sum
@@ -803,7 +807,6 @@ table users_activities
 
 	/// Activities Call Engaged Duration
 	column trueai_type_call_eng_dur
-		description: "TrueAI: Numeric value for type call eng dur."
 		dataType: double
 		lineageTag: 94efcdc9-06c5-4618-bb1f-a10c19a90893
 		summarizeBy: sum
@@ -815,7 +818,6 @@ table users_activities
 
 	/// Activities Call Unique Ids
 	column trueai_type_call_unique_ids
-		description: "TrueAI: Numeric value for type call unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 2f5c0560-523f-45fe-b2e1-b952a46b207f
@@ -826,7 +828,6 @@ table users_activities
 
 	/// Activities Call Engaged Unique Ids
 	column trueai_type_call_eng_unique_ids
-		description: "TrueAI: Numeric value for type call eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 6c7413bc-1916-4573-929a-a02a7355d6ab
@@ -837,7 +838,6 @@ table users_activities
 
 	/// Activities Email Count
 	column trueai_type_email_count
-		description: "TrueAI: Count of type email count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1e99f791-cbfe-47c0-8d92-f648c1812b83
@@ -848,7 +848,6 @@ table users_activities
 
 	/// Activities Email Engaged Count
 	column trueai_type_email_eng_count
-		description: "TrueAI: Count of type email eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1835312f-6095-4b2d-8b91-e6d13b0a3656
@@ -859,7 +858,6 @@ table users_activities
 
 	/// Activities Email Duration
 	column trueai_type_email_dur
-		description: "TrueAI: Numeric value for type email dur."
 		dataType: double
 		lineageTag: 0a4b30fa-7485-453e-b043-d72f1a485d89
 		summarizeBy: sum
@@ -871,7 +869,6 @@ table users_activities
 
 	/// Activities Email Engaged Duration
 	column trueai_type_email_eng_dur
-		description: "TrueAI: Numeric value for type email eng dur."
 		dataType: double
 		lineageTag: 6f0f2642-421b-4b62-9379-a172842b5c07
 		summarizeBy: sum
@@ -883,7 +880,6 @@ table users_activities
 
 	/// Activities Email Unique Ids
 	column trueai_type_email_unique_ids
-		description: "TrueAI: Numeric value for type email unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 12d21bc2-e02f-4563-b0db-3632e7ad4ee8
@@ -894,7 +890,6 @@ table users_activities
 
 	/// Activities Email Engaged Unique Ids
 	column trueai_type_email_eng_unique_ids
-		description: "TrueAI: Numeric value for type email eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: e11674f1-a12b-4332-994f-ce22185d63fb
@@ -905,7 +900,6 @@ table users_activities
 
 	/// Activities Meeting Count
 	column trueai_type_meeting_count
-		description: "TrueAI: Count of type meeting count."
 		dataType: int64
 		formatString: 0
 		lineageTag: f66d144a-e6a5-40af-8c09-a6c48880ea22
@@ -916,7 +910,6 @@ table users_activities
 
 	/// Activities Meeting Engaged Count
 	column trueai_type_meeting_eng_count
-		description: "TrueAI: Count of type meeting eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 5cb70e26-3337-4329-9f4d-75b33cdb3691
@@ -927,7 +920,6 @@ table users_activities
 
 	/// Activities Meeting Duration
 	column trueai_type_meeting_dur
-		description: "TrueAI: Numeric value for type meeting dur."
 		dataType: double
 		lineageTag: 1a488ee7-e3de-45d9-a4a9-873bbe3bd6c4
 		summarizeBy: sum
@@ -939,7 +931,6 @@ table users_activities
 
 	/// Activities Meeting Engaged Duration
 	column trueai_type_meeting_eng_dur
-		description: "TrueAI: Numeric value for type meeting eng dur."
 		dataType: double
 		lineageTag: be46b861-11d3-4def-8927-7002dbc6adb6
 		summarizeBy: sum
@@ -951,7 +942,6 @@ table users_activities
 
 	/// Activities Meeting Unique Ids
 	column trueai_type_meeting_unique_ids
-		description: "TrueAI: Numeric value for type meeting unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: a8c56382-bd3d-4dfc-a3a8-5cc50735f466
@@ -962,7 +952,6 @@ table users_activities
 
 	/// Activities Meeting Engaged Unique Ids
 	column trueai_type_meeting_eng_unique_ids
-		description: "TrueAI: Numeric value for type meeting eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: ea70ff85-0248-4101-8039-67328702b375
@@ -973,7 +962,6 @@ table users_activities
 
 	/// Activities Social Count
 	column trueai_type_social_count
-		description: "TrueAI: Count of type social count."
 		dataType: int64
 		formatString: 0
 		lineageTag: d3054b60-349b-4ba8-a876-fa0476ee00dc
@@ -984,7 +972,6 @@ table users_activities
 
 	/// Activities Social Engaged Count
 	column trueai_type_social_eng_count
-		description: "TrueAI: Count of type social eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 6cbb4ad8-6606-4b5f-90ad-a8a416e6a81a
@@ -995,7 +982,6 @@ table users_activities
 
 	/// Activities Social Duration
 	column trueai_type_social_dur
-		description: "TrueAI: Numeric value for type social dur."
 		dataType: double
 		lineageTag: d6683630-bba9-44e4-91fd-358360deed33
 		summarizeBy: sum
@@ -1007,7 +993,6 @@ table users_activities
 
 	/// Activities Social Engaged Duration
 	column trueai_type_social_eng_dur
-		description: "TrueAI: Numeric value for type social eng dur."
 		dataType: double
 		lineageTag: 212a3704-4a07-457c-b143-e2393ad85df0
 		summarizeBy: sum
@@ -1019,7 +1004,6 @@ table users_activities
 
 	/// Activities Social Unique Ids
 	column trueai_type_social_unique_ids
-		description: "TrueAI: Numeric value for type social unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 58b15078-b5ab-41ea-902c-0dbee3ee66fe
@@ -1030,7 +1014,6 @@ table users_activities
 
 	/// Activities Social Engaged Unique Ids
 	column trueai_type_social_eng_unique_ids
-		description: "TrueAI: Numeric value for type social eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7c6e1a4e-069d-4031-b347-2e47eab1fbd2
@@ -1041,7 +1024,6 @@ table users_activities
 
 	/// Activities Automated Email Count
 	column trueai_type_auto_email_count
-		description: "TrueAI: Count of type auto email count."
 		dataType: int64
 		formatString: 0
 		lineageTag: a90ff33f-e5aa-4f00-8d62-e0d0091624be
@@ -1052,7 +1034,6 @@ table users_activities
 
 	/// Activities Automated Email Engaged Count
 	column trueai_type_auto_email_eng_count
-		description: "TrueAI: Count of type auto email eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: c8a53df2-8ba9-4a7f-b837-162c0b306cda
@@ -1063,7 +1044,6 @@ table users_activities
 
 	/// Activities Automated Email Duration
 	column trueai_type_auto_email_dur
-		description: "TrueAI: Numeric value for type auto email dur."
 		dataType: double
 		lineageTag: 89b577fb-5a59-442b-8684-3c94298ee7a6
 		summarizeBy: sum
@@ -1075,7 +1055,6 @@ table users_activities
 
 	/// Activities Automated Email Engaged Duration
 	column trueai_type_auto_email_eng_dur
-		description: "TrueAI: Numeric value for type auto email eng dur."
 		dataType: double
 		lineageTag: ca0421b4-9190-4837-a3e9-71f95d7d227e
 		summarizeBy: sum
@@ -1087,7 +1066,6 @@ table users_activities
 
 	/// Activities Automated Email Unique Ids
 	column trueai_type_auto_email_unique_ids
-		description: "TrueAI: Numeric value for type auto email unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 80ee1b08-0a50-4ed7-b074-3f0a7d2cd5ce
@@ -1098,7 +1076,6 @@ table users_activities
 
 	/// Activities Automated Email Engaged Unique Ids
 	column trueai_type_auto_email_eng_unique_ids
-		description: "TrueAI: Numeric value for type auto email eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: a7e17b3c-50bb-4c2b-98cc-77b29afb87d6
@@ -1109,7 +1086,6 @@ table users_activities
 
 	/// Activities No Interaction Count
 	column trueai_type_no_interaction_count
-		description: "TrueAI: Count of type no interaction count."
 		dataType: int64
 		formatString: 0
 		lineageTag: fad0a47b-2647-4120-9f27-ab3d13d07279
@@ -1120,7 +1096,6 @@ table users_activities
 
 	/// Activities No Interaction Engaged Count
 	column trueai_type_no_interaction_eng_count
-		description: "TrueAI: Count of type no interaction eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 75041784-1eb1-45f8-a25c-3b0efafcc7cc
@@ -1131,7 +1106,6 @@ table users_activities
 
 	/// Activities No Interaction Duration
 	column trueai_type_no_interaction_dur
-		description: "TrueAI: Numeric value for type no interaction dur."
 		dataType: double
 		lineageTag: 2a59e221-7640-467c-916b-bf7a41bc5436
 		summarizeBy: sum
@@ -1143,7 +1117,6 @@ table users_activities
 
 	/// Activities No Interaction Engaged Duration
 	column trueai_type_no_interaction_eng_dur
-		description: "TrueAI: Numeric value for type no interaction eng dur."
 		dataType: double
 		lineageTag: e2994dd8-1b2e-4795-9a1f-777a1b60a8a9
 		summarizeBy: sum
@@ -1155,7 +1128,6 @@ table users_activities
 
 	/// Activities No Interaction Unique Ids
 	column trueai_type_no_interaction_unique_ids
-		description: "TrueAI: Numeric value for type no interaction unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7265e462-8021-4717-9465-f07adb4432d7
@@ -1166,7 +1138,6 @@ table users_activities
 
 	/// Activities No Interaction Engaged Unique Ids
 	column trueai_type_no_interaction_eng_unique_ids
-		description: "TrueAI: Numeric value for type no interaction eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 817682b5-59d2-44f1-91b6-124a1612d20c
@@ -1177,7 +1148,6 @@ table users_activities
 
 	/// Activities Non Determinable Count
 	column trueai_type_nd_count
-		description: "TrueAI: Count of type nd count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 4e020027-fdfb-41f7-8c73-19e127c0a66f
@@ -1188,7 +1158,6 @@ table users_activities
 
 	/// Activities Non Determinable Engaged Count
 	column trueai_type_nd_eng_count
-		description: "TrueAI: Count of type nd eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 84026310-9891-4f87-a7fa-8336ae63a97e
@@ -1199,7 +1168,6 @@ table users_activities
 
 	/// Activities Non Determinable Duration
 	column trueai_type_nd_dur
-		description: "TrueAI: Numeric value for type nd dur."
 		dataType: double
 		lineageTag: a33bb4e7-2088-4056-8e50-f7a94fa60e7f
 		summarizeBy: sum
@@ -1211,7 +1179,6 @@ table users_activities
 
 	/// Activities Non Determinable Engaged Duration
 	column trueai_type_nd_eng_dur
-		description: "TrueAI: Numeric value for type nd eng dur."
 		dataType: double
 		lineageTag: 6489f0fb-d5ac-406d-8ede-fa410225164b
 		summarizeBy: sum
@@ -1223,7 +1190,6 @@ table users_activities
 
 	/// Activities Non Determinable Unique Ids
 	column trueai_type_nd_unique_ids
-		description: "TrueAI: Numeric value for type nd unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: ff327d56-4ffa-45ad-80a6-6d85c0d2893e
@@ -1234,7 +1200,6 @@ table users_activities
 
 	/// Activities Non Determinable Engaged Unique Ids
 	column trueai_type_nd_eng_unique_ids
-		description: "TrueAI: Numeric value for type nd eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: bb5a6e47-ee22-44f0-bc79-8b7b528a90ad
@@ -1245,7 +1210,6 @@ table users_activities
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 4d493adc-826f-4c98-be0c-3d9f0e3d3ac9
 		summarizeBy: none
@@ -1255,7 +1219,6 @@ table users_activities
 
 	/// The Cien company ID
 	column _sys_co_id
-		description: "System: Identifier for co."
 		dataType: string
 		lineageTag: a7d0dda1-41c8-44ed-8edd-c7bf088e60c7
 		summarizeBy: none
@@ -1265,7 +1228,6 @@ table users_activities
 
 	/// The date of the last data request from the platform
 	column _sys_as_of
-		description: "System: Date/time when as of."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 3b963115-9edf-4442-ac19-20b4c4f66afc
@@ -1281,7 +1243,6 @@ table users_activities
 
 	/// Boolean flag that indicates whether the record was set to inactive in the remote system
 	column _sys_is_active
-		description: "System: Indicates whether is active."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 8e0264f7-4dbe-49cd-985f-c65170dd41f9
@@ -1292,7 +1253,6 @@ table users_activities
 
 	/// Boolean flag that indicates whether the record was set to deleted in the remote system
 	column _sys_is_deleted
-		description: "System: Indicates whether is deleted."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 58f9b86e-c5d9-4310-940d-de6ea5b88d87
@@ -1303,7 +1263,6 @@ table users_activities
 
 	/// The last date of the month that the record applies to (for past months) or the last date of aggregated data (for the present month), stripped of time
 	column _sys_filt_end_date
-		description: "System: Date/time when filt end date."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 832b5cdb-3ebb-4b03-9bdb-e216de2bb61b
@@ -1316,7 +1275,6 @@ table users_activities
 
 	/// The first date of the month that the records applies to, stripped of time
 	column _sys_filt_start_date
-		description: "System: Date/time when filt start date."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 0e078b96-c3a1-4d1a-bd8d-27199f6eda50
@@ -1334,7 +1292,6 @@ table users_activities
 
 	/// Activities Capture Level
 	column trueai_owner_act_capt_lvl
-		description: "TrueAI: Numeric value for owner act capt lvl."
 		dataType: double
 		lineageTag: 7e38ee1e-2a36-4662-a4b4-6a154299b2e9
 		summarizeBy: sum
@@ -1346,7 +1303,6 @@ table users_activities
 
 	/// Prep factor
 	column trueai_owner_prep_factor
-		description: "TrueAI: Numeric value for owner prep factor."
 		dataType: double
 		lineageTag: a3537cdc-2b10-4a07-968d-abfba23c9fa7
 		summarizeBy: sum
@@ -1358,7 +1314,6 @@ table users_activities
 
 	/// Activities Capture Level Confidence
 	column trueai_owner_act_capt_lvl_conf
-		description: "TrueAI: Numeric value for owner act capt lvl conf."
 		dataType: double
 		lineageTag: 63f2b50c-cdd2-47ff-afa5-51f957674793
 		summarizeBy: sum
@@ -1370,7 +1325,6 @@ table users_activities
 
 	/// Activities Prospecting Count
 	column trueai_purpose_prospecting_count
-		description: "TrueAI: Count of purpose prospecting count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 378ce99b-30f0-474b-850c-398517363764
@@ -1381,7 +1335,6 @@ table users_activities
 
 	/// Activities Prospecting Engaged Count
 	column trueai_purpose_prospecting_eng_count
-		description: "TrueAI: Count of purpose prospecting eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: ba661c15-8570-43eb-b742-7e36d1fead2a
@@ -1392,7 +1345,6 @@ table users_activities
 
 	/// Activities Prospecting Duration
 	column trueai_purpose_prospecting_dur
-		description: "TrueAI: Numeric value for purpose prospecting dur."
 		dataType: double
 		lineageTag: 9cf65e1e-dcd1-48ca-97a6-1b9fe0182304
 		summarizeBy: sum
@@ -1404,7 +1356,6 @@ table users_activities
 
 	/// Activities Prospecting Engaged Duration
 	column trueai_purpose_prospecting_eng_dur
-		description: "TrueAI: Numeric value for purpose prospecting eng dur."
 		dataType: double
 		lineageTag: 105d283b-3383-4659-8f8d-4b783e615be8
 		summarizeBy: sum
@@ -1416,7 +1367,6 @@ table users_activities
 
 	/// Activities Prospecting Unique Ids
 	column trueai_purpose_prospecting_unique_ids
-		description: "TrueAI: Numeric value for purpose prospecting unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 28872740-bb62-4bdc-93dc-654043e1e421
@@ -1427,7 +1377,6 @@ table users_activities
 
 	/// Activities Prospecting Engaged Unique Ids
 	column trueai_purpose_prospecting_eng_unique_ids
-		description: "TrueAI: Numeric value for purpose prospecting eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 399a9c47-c0f2-42ce-8587-0dbf6412297f
@@ -1438,7 +1387,6 @@ table users_activities
 
 	/// Activities New Logo Count
 	column trueai_purpose_new_logo_count
-		description: "TrueAI: Count of purpose new logo count."
 		dataType: int64
 		formatString: 0
 		lineageTag: b40f03ac-1df3-4276-b9de-980c7faa479c
@@ -1449,7 +1397,6 @@ table users_activities
 
 	/// Activities New Logo Engaged Count
 	column trueai_purpose_new_logo_eng_count
-		description: "TrueAI: Count of purpose new logo eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 90cb088d-d129-4b23-bda5-ae636f8efaf3
@@ -1460,7 +1407,6 @@ table users_activities
 
 	/// Activities New Logo Duration
 	column trueai_purpose_new_logo_dur
-		description: "TrueAI: Numeric value for purpose new logo dur."
 		dataType: double
 		lineageTag: b58880aa-44f4-45f3-a79d-d4a2b56d1c9f
 		summarizeBy: sum
@@ -1472,7 +1418,6 @@ table users_activities
 
 	/// Activities New Logo Engaged Duration
 	column trueai_purpose_new_logo_eng_dur
-		description: "TrueAI: Numeric value for purpose new logo eng dur."
 		dataType: double
 		lineageTag: 68e99b17-1901-4eac-84c0-a098b2894d9f
 		summarizeBy: sum
@@ -1484,7 +1429,6 @@ table users_activities
 
 	/// Activities New Logo Unique Ids
 	column trueai_purpose_new_logo_unique_ids
-		description: "TrueAI: Numeric value for purpose new logo unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 8ffbf1ce-5855-4b2c-8180-99a68dabfded
@@ -1495,7 +1439,6 @@ table users_activities
 
 	/// Activities New Logo Engaged Unique Ids
 	column trueai_purpose_new_logo_eng_unique_ids
-		description: "TrueAI: Numeric value for purpose new logo eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 85dc892b-b7be-4dd2-b732-f9a2ff7cd0f4
@@ -1506,7 +1449,6 @@ table users_activities
 
 	/// Activities Post Selling Count
 	column trueai_purpose_post_sales_count
-		description: "TrueAI: Count of purpose post sales count."
 		dataType: int64
 		formatString: 0
 		lineageTag: cb8507cc-8fc1-46ff-afa2-5eac482f89ae
@@ -1517,7 +1459,6 @@ table users_activities
 
 	/// Activities Post Selling Engaged Count
 	column trueai_purpose_post_sales_eng_count
-		description: "TrueAI: Count of purpose post sales eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 6901b173-2f7c-4a85-9805-d37cdad8f73b
@@ -1528,7 +1469,6 @@ table users_activities
 
 	/// Activities Post Selling Duration
 	column trueai_purpose_post_sales_dur
-		description: "TrueAI: Numeric value for purpose post sales dur."
 		dataType: double
 		lineageTag: e805a723-e154-4f5c-8d9e-43d7509fe334
 		summarizeBy: sum
@@ -1540,7 +1480,6 @@ table users_activities
 
 	/// Activities Post Selling Engaged Duration
 	column trueai_purpose_post_sales_eng_dur
-		description: "TrueAI: Numeric value for purpose post sales eng dur."
 		dataType: double
 		lineageTag: 99f22cab-cf55-4c97-af95-b476e7de6c8a
 		summarizeBy: sum
@@ -1552,7 +1491,6 @@ table users_activities
 
 	/// Activities Post Selling Unique Ids
 	column trueai_purpose_post_sales_unique_ids
-		description: "TrueAI: Numeric value for purpose post sales unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: a35ab8b5-4ec3-4b56-b3a4-1f88e0eb0686
@@ -1563,7 +1501,6 @@ table users_activities
 
 	/// Activities Post Selling Engaged Unique Ids
 	column trueai_purpose_post_sales_eng_unique_ids
-		description: "TrueAI: Numeric value for purpose post sales eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7341fd03-2231-4ae8-800d-e0ceb2a8d2e4
@@ -1574,7 +1511,6 @@ table users_activities
 
 	/// Activities Internal Count
 	column trueai_purpose_internal_count
-		description: "TrueAI: Count of purpose internal count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 78c7fcbd-7793-403f-b54d-09ace7b9ff68
@@ -1585,7 +1521,6 @@ table users_activities
 
 	/// Activities Internal Engaged Count
 	column trueai_purpose_internal_eng_count
-		description: "TrueAI: Count of purpose internal eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 8e1d5efc-ecd7-4b6b-be74-7c54ebf2a072
@@ -1596,7 +1531,6 @@ table users_activities
 
 	/// Activities Internal Duration
 	column trueai_purpose_internal_dur
-		description: "TrueAI: Numeric value for purpose internal dur."
 		dataType: double
 		lineageTag: e822ff61-a9d0-404d-af0a-2bbbf0cef73a
 		summarizeBy: sum
@@ -1608,7 +1542,6 @@ table users_activities
 
 	/// Activities Internal Engaged Duration
 	column trueai_purpose_internal_eng_dur
-		description: "TrueAI: Numeric value for purpose internal eng dur."
 		dataType: double
 		lineageTag: c0268d28-8e2d-4155-96ba-974d5a6094d1
 		summarizeBy: sum
@@ -1620,7 +1553,6 @@ table users_activities
 
 	/// Activities Internal Unique Ids
 	column trueai_purpose_internal_unique_ids
-		description: "TrueAI: Numeric value for purpose internal unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 248dff4e-69dd-4396-8eba-9f119b6e5e6c
@@ -1631,7 +1563,6 @@ table users_activities
 
 	/// Activities Internal Engaged Unique Ids
 	column trueai_purpose_internal_eng_unique_ids
-		description: "TrueAI: Numeric value for purpose internal eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: f46c4b5f-d4ae-464d-85c0-370b4e9487c7
@@ -1642,7 +1573,6 @@ table users_activities
 
 	/// Activities Call ProspectingCount
 	column trueai_type_call_purpose_prospecting_count
-		description: "TrueAI: Count of type call purpose prospecting count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 5be91eeb-42b0-4475-ab20-d4eadffff06a
@@ -1653,7 +1583,6 @@ table users_activities
 
 	/// Activities Call Prospecting Engaged Count
 	column trueai_type_call_purpose_prospecting_eng_count
-		description: "TrueAI: Count of type call purpose prospecting eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1a3bbd2f-6dcb-46b0-8a00-a981e9fbb2bd
@@ -1664,7 +1593,6 @@ table users_activities
 
 	/// Activities Call New Logo Count
 	column trueai_type_call_purpose_new_logo_count
-		description: "TrueAI: Count of type call purpose new logo count."
 		dataType: int64
 		formatString: 0
 		lineageTag: efa01898-e803-4185-8d3e-071bf0552fda
@@ -1675,7 +1603,6 @@ table users_activities
 
 	/// Activities Call New Logo Engaged Count
 	column trueai_type_call_purpose_new_logo_eng_count
-		description: "TrueAI: Count of type call purpose new logo eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 984edef8-3611-4e2b-88ce-abb67d18d411
@@ -1686,7 +1613,6 @@ table users_activities
 
 	/// Activities Call Post Selling Count
 	column trueai_type_call_purpose_post_sales_count
-		description: "TrueAI: Count of type call purpose post sales count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 8f09e2ac-c6a7-4ab6-9e06-76a409b15661
@@ -1697,7 +1623,6 @@ table users_activities
 
 	/// Activities Call Post Selling Engaged Count
 	column trueai_type_call_purpose_post_sales_eng_count
-		description: "TrueAI: Count of type call purpose post sales eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 8cf18a9b-f97c-4a7c-a3d2-5ede16ee8b57
@@ -1708,7 +1633,6 @@ table users_activities
 
 	/// Activities Call Internal Count
 	column trueai_type_call_purpose_internal_count
-		description: "TrueAI: Count of type call purpose internal count."
 		dataType: int64
 		formatString: 0
 		lineageTag: e7cac88d-f45f-4e86-8325-733128bfdf3d
@@ -1719,7 +1643,6 @@ table users_activities
 
 	/// Activities Call Internal Engaged Count
 	column trueai_type_call_purpose_internal_eng_count
-		description: "TrueAI: Count of type call purpose internal eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 61eba4fd-b51b-489d-8616-7300d6c4a8d1
@@ -1730,7 +1653,6 @@ table users_activities
 
 	/// Activities Call Prospecting Count
 	column trueai_type_email_purpose_prospecting_count
-		description: "TrueAI: Count of type email purpose prospecting count."
 		dataType: int64
 		formatString: 0
 		lineageTag: b808b8a6-b6ec-4910-b238-9b8c1cb4f12b
@@ -1741,7 +1663,6 @@ table users_activities
 
 	/// Activities Call Prospecting Engaged Count
 	column trueai_type_email_purpose_prospecting_eng_count
-		description: "TrueAI: Count of type email purpose prospecting eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 2fa1ef17-bc29-4487-ae35-fe88f0b9318c
@@ -1752,7 +1673,6 @@ table users_activities
 
 	/// Activities Email New Logo Count
 	column trueai_type_email_purpose_new_logo_count
-		description: "TrueAI: Count of type email purpose new logo count."
 		dataType: int64
 		formatString: 0
 		lineageTag: bb291bc1-1765-46d3-a7ff-b2695bafe977
@@ -1763,7 +1683,6 @@ table users_activities
 
 	/// Activities Email New Logo Engaged Count
 	column trueai_type_email_purpose_new_logo_eng_count
-		description: "TrueAI: Count of type email purpose new logo eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 3335dbca-9976-4299-be41-18e587faf261
@@ -1774,7 +1693,6 @@ table users_activities
 
 	/// Activities Email Post Selling Count
 	column trueai_type_email_purpose_post_sales_count
-		description: "TrueAI: Count of type email purpose post sales count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 26c475dd-43b0-4086-8731-a744d93b1692
@@ -1785,7 +1703,6 @@ table users_activities
 
 	/// Activities Email Post Selling Engaged Count
 	column trueai_type_email_purpose_post_sales_eng_count
-		description: "TrueAI: Count of type email purpose post sales eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: f742707a-4cf5-49c2-8689-d6fd74ca850e
@@ -1796,7 +1713,6 @@ table users_activities
 
 	/// Activities Email Internal Count
 	column trueai_type_email_purpose_internal_count
-		description: "TrueAI: Count of type email purpose internal count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 9fdf10d4-c991-4669-bbd6-d85ba2c054f2
@@ -1807,7 +1723,6 @@ table users_activities
 
 	/// Activities Email Internal Engaged Count
 	column trueai_type_email_purpose_internal_eng_count
-		description: "TrueAI: Count of type email purpose internal eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1958f6c1-4f87-4982-aade-825699906088
@@ -1818,7 +1733,6 @@ table users_activities
 
 	/// Activities Meeting Prospecting Count
 	column trueai_type_meeting_purpose_prospecting_count
-		description: "TrueAI: Count of type meeting purpose prospecting count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 90a0ead8-6226-4ad2-b310-8ed47a2cf6a0
@@ -1829,7 +1743,6 @@ table users_activities
 
 	/// Activities Meeting Prospecting Engaged Count
 	column trueai_type_meeting_purpose_prospecting_eng_count
-		description: "TrueAI: Count of type meeting purpose prospecting eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 4f4c754c-4a99-429c-9c36-911490641709
@@ -1840,7 +1753,6 @@ table users_activities
 
 	/// Activities Meeting New Logo Count
 	column trueai_type_meeting_purpose_new_logo_count
-		description: "TrueAI: Count of type meeting purpose new logo count."
 		dataType: int64
 		formatString: 0
 		lineageTag: a6323442-5eab-474f-97af-d0bae5578a6b
@@ -1851,7 +1763,6 @@ table users_activities
 
 	/// Activities Meeting New Logo Engaged Count
 	column trueai_type_meeting_purpose_new_logo_eng_count
-		description: "TrueAI: Count of type meeting purpose new logo eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 38c3cc25-e01c-40f5-b111-699d0b0fa573
@@ -1862,7 +1773,6 @@ table users_activities
 
 	/// Activities Meeting Post Selling Count
 	column trueai_type_meeting_purpose_post_sales_count
-		description: "TrueAI: Count of type meeting purpose post sales count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 5b6809a0-d3de-41b9-a5d0-3ada64977499
@@ -1873,7 +1783,6 @@ table users_activities
 
 	/// Activities Meeting Post Selling Engaged Count
 	column trueai_type_meeting_purpose_post_sales_eng_count
-		description: "TrueAI: Count of type meeting purpose post sales eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 92885e49-1b6a-47ef-b030-10335527b79a
@@ -1884,7 +1793,6 @@ table users_activities
 
 	/// Activities Meeting Internal Count
 	column trueai_type_meeting_purpose_internal_count
-		description: "TrueAI: Count of type meeting purpose internal count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7b32c04e-03b4-4005-8ec7-bf680c322bef
@@ -1895,7 +1803,6 @@ table users_activities
 
 	/// Activities Meeting Internal Engaged Count
 	column trueai_type_meeting_purpose_internal_eng_count
-		description: "TrueAI: Count of type meeting purpose internal eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 00dbd03e-4a72-4f14-ae73-f9e33dad92cb
@@ -1906,7 +1813,6 @@ table users_activities
 
 	/// Activities Social Prospecting Count
 	column trueai_type_social_purpose_prospecting_count
-		description: "TrueAI: Count of type social purpose prospecting count."
 		dataType: int64
 		formatString: 0
 		lineageTag: ee4281a1-9416-4018-8e55-79ab38203a48
@@ -1917,7 +1823,6 @@ table users_activities
 
 	/// Activities Social Prospecting Engaged Count
 	column trueai_type_social_purpose_prospecting_eng_count
-		description: "TrueAI: Count of type social purpose prospecting eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 691277ba-bb73-49f7-a76f-e6e09586894f
@@ -1928,7 +1833,6 @@ table users_activities
 
 	/// Activities Social New Logo Count
 	column trueai_type_social_purpose_new_logo_count
-		description: "TrueAI: Count of type social purpose new logo count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 2d016616-09d2-4e5b-bd8c-54618fe749db
@@ -1939,7 +1843,6 @@ table users_activities
 
 	/// Activities Social New Logo Engaged Count
 	column trueai_type_social_purpose_new_logo_eng_count
-		description: "TrueAI: Count of type social purpose new logo eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1238c575-a2d5-4f7e-a735-afbb2301e37b
@@ -1950,7 +1853,6 @@ table users_activities
 
 	/// Activities Social Post Selling Count
 	column trueai_type_social_purpose_post_sales_count
-		description: "TrueAI: Count of type social purpose post sales count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 6d564d64-f7b7-4a30-a74d-8a114319f8e1
@@ -1961,7 +1863,6 @@ table users_activities
 
 	/// Activities Social Post Selling Engaged Count
 	column trueai_type_social_purpose_post_sales_eng_count
-		description: "TrueAI: Count of type social purpose post sales eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 33fa4395-3218-47dd-b011-47e8a4ea0bb1
@@ -1972,7 +1873,6 @@ table users_activities
 
 	/// Activities Social Internal Count
 	column trueai_type_social_purpose_internal_count
-		description: "TrueAI: Count of type social purpose internal count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 3de0ac28-28c0-4dca-9745-7cb89e4fb9cf
@@ -1983,7 +1883,6 @@ table users_activities
 
 	/// Activities Social Internal Engaged Count
 	column trueai_type_social_purpose_internal_eng_count
-		description: "TrueAI: Count of type social purpose internal eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: c4e22b88-34cf-49d1-befa-9db1463a7bc8
@@ -1994,7 +1893,6 @@ table users_activities
 
 	/// Activities Automated Email Prospecting Count
 	column trueai_type_auto_email_purpose_prospecting_count
-		description: "TrueAI: Count of type auto email purpose prospecting count."
 		dataType: int64
 		formatString: 0
 		lineageTag: b2af9ba7-84eb-4a09-92a4-35a261f10d95
@@ -2005,7 +1903,6 @@ table users_activities
 
 	/// Activities Automated Email Prospecting Engaged Count
 	column trueai_type_auto_email_purpose_prospecting_eng_count
-		description: "TrueAI: Count of type auto email purpose prospecting eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: bcc89d82-61d2-4dd9-87b6-1eb2b1a33db4
@@ -2016,7 +1913,6 @@ table users_activities
 
 	/// Activities Automated Email New Logo Count
 	column trueai_type_auto_email_purpose_new_logo_count
-		description: "TrueAI: Count of type auto email purpose new logo count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 6d398881-d307-4543-9d54-17d131e8f4fd
@@ -2027,7 +1923,6 @@ table users_activities
 
 	/// Activities Automated Email New Logo Engaged Count
 	column trueai_type_auto_email_purpose_new_logo_eng_count
-		description: "TrueAI: Count of type auto email purpose new logo eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 94471208-5594-49f7-a8f4-2b93895d2736
@@ -2038,7 +1933,6 @@ table users_activities
 
 	/// Activities Automated Email Post Selling Count
 	column trueai_type_auto_email_purpose_post_sales_count
-		description: "TrueAI: Count of type auto email purpose post sales count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 84d54857-0d71-44ff-b539-529c6d7d60c5
@@ -2049,7 +1943,6 @@ table users_activities
 
 	/// Activities Automated Email Post Selling Engaged Count
 	column trueai_type_auto_email_purpose_post_sales_eng_count
-		description: "TrueAI: Count of type auto email purpose post sales eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 4286cda0-668f-490a-b714-091474eef1bd
@@ -2060,7 +1953,6 @@ table users_activities
 
 	/// Activities Automated Email Internal Count
 	column trueai_type_auto_email_purpose_internal_count
-		description: "TrueAI: Count of type auto email purpose internal count."
 		dataType: int64
 		formatString: 0
 		lineageTag: dfe8baf0-354a-432f-8228-a6fc6e589edb
@@ -2071,7 +1963,6 @@ table users_activities
 
 	/// Activities Automated Email Internal Engaged Count
 	column trueai_type_auto_email_purpose_internal_eng_count
-		description: "TrueAI: Count of type auto email purpose internal eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7d2d77f0-705b-4ed7-bc4a-934e6cf7ad8c
@@ -2082,7 +1973,6 @@ table users_activities
 
 	/// Activities No Interaction Prospecting Count
 	column trueai_type_no_interaction_purpose_prospecting_count
-		description: "TrueAI: Count of type no interaction purpose prospecting count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 9182de21-9617-48f8-97b5-7cd91bae6fa7
@@ -2093,7 +1983,6 @@ table users_activities
 
 	/// Activities No Interaction Prospecting Engaged Count
 	column trueai_type_no_interaction_purpose_prospecting_eng_count
-		description: "TrueAI: Count of type no interaction purpose prospecting eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: ed62b1b4-e19c-4a81-bb71-f8a12ec3dd40
@@ -2104,7 +1993,6 @@ table users_activities
 
 	/// Activities No Interaction New Logo Count
 	column trueai_type_no_interaction_purpose_new_logo_count
-		description: "TrueAI: Count of type no interaction purpose new logo count."
 		dataType: int64
 		formatString: 0
 		lineageTag: ca942af2-bde8-4291-a8cc-940f0878df37
@@ -2115,7 +2003,6 @@ table users_activities
 
 	/// Activities No Interaction New Logo Engaged Count
 	column trueai_type_no_interaction_purpose_new_logo_eng_count
-		description: "TrueAI: Count of type no interaction purpose new logo eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 01d479e4-eece-494b-8768-d0697843811f
@@ -2126,7 +2013,6 @@ table users_activities
 
 	/// Activities No Interaction Post Selling Count
 	column trueai_type_no_interaction_purpose_post_sales_count
-		description: "TrueAI: Count of type no interaction purpose post sales count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 8a0158d3-86d3-4468-a164-68fb386ce31b
@@ -2137,7 +2023,6 @@ table users_activities
 
 	/// Activities No Interaction Post Selling Engaged Count
 	column trueai_type_no_interaction_purpose_post_sales_eng_count
-		description: "TrueAI: Count of type no interaction purpose post sales eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 4ec1b149-7915-4bb3-bfd2-74e154f801a4
@@ -2148,7 +2033,6 @@ table users_activities
 
 	/// Activities No Interaction Internal Count
 	column trueai_type_no_interaction_purpose_internal_count
-		description: "TrueAI: Count of type no interaction purpose internal count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 06064ea5-8d7b-49b2-bc2e-c8695addfdb1
@@ -2159,7 +2043,6 @@ table users_activities
 
 	/// Activities No Interaction Internal Engaged Count
 	column trueai_type_no_interaction_purpose_internal_eng_count
-		description: "TrueAI: Count of type no interaction purpose internal eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7b6e71f5-e632-40ac-bd34-d7fe54d49ad0
@@ -2170,7 +2053,6 @@ table users_activities
 
 	/// Activities Non Determinable Prospecting Count
 	column trueai_type_nd_purpose_prospecting_count
-		description: "TrueAI: Count of type nd purpose prospecting count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1f808149-8d8c-4c30-b0ec-e10d2a3f9661
@@ -2181,7 +2063,6 @@ table users_activities
 
 	/// Activities Non Determinable Prospecting Engaged Count
 	column trueai_type_nd_purpose_prospecting_eng_count
-		description: "TrueAI: Count of type nd purpose prospecting eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: a98195ab-b565-4660-963b-0cd8d2bff611
@@ -2192,7 +2073,6 @@ table users_activities
 
 	/// Activities Non Determinable New Logo Count
 	column trueai_type_nd_purpose_new_logo_count
-		description: "TrueAI: Count of type nd purpose new logo count."
 		dataType: int64
 		formatString: 0
 		lineageTag: eb2eb78d-70d7-45ee-9353-adf9c3c72548
@@ -2203,7 +2083,6 @@ table users_activities
 
 	/// Activities Non Determinable New Logo Engaged Count
 	column trueai_type_nd_purpose_new_logo_eng_count
-		description: "TrueAI: Count of type nd purpose new logo eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 9d0ea991-bd3b-456d-b174-a28d25480781
@@ -2214,7 +2093,6 @@ table users_activities
 
 	/// Activities Non Determinable Post Selling Count
 	column trueai_type_nd_purpose_post_sales_count
-		description: "TrueAI: Count of type nd purpose post sales count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 885db2e3-cd7c-476c-829d-6de89a736665
@@ -2225,7 +2103,6 @@ table users_activities
 
 	/// Activities Non Determinable Post Selling Engaged Count
 	column trueai_type_nd_purpose_post_sales_eng_count
-		description: "TrueAI: Count of type nd purpose post sales eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 8179ad06-5423-425e-a279-d4e0c1d533dd
@@ -2236,7 +2113,6 @@ table users_activities
 
 	/// Activities Non Determinable Internal Count
 	column trueai_type_nd_purpose_internal_count
-		description: "TrueAI: Count of type nd purpose internal count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1aa0c2e7-71b8-4d63-b2da-37c2e4d62713
@@ -2247,7 +2123,6 @@ table users_activities
 
 	/// Activities Non Determinable Internal Engaged Count
 	column trueai_type_nd_purpose_internal_eng_count
-		description: "TrueAI: Count of type nd purpose internal eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1f67bb05-d80e-4dc8-8d14-5c7e16e61c74
@@ -2258,7 +2133,6 @@ table users_activities
 
 	/// Activities Engaged Adj Duration
 	column trueai_adj_eng_dur
-		description: "TrueAI: Numeric value for adj eng dur."
 		dataType: double
 		lineageTag: 568c494f-236e-4d04-8349-9313de4753f4
 		summarizeBy: sum
@@ -2270,7 +2144,6 @@ table users_activities
 
 	/// Activities Existing Customer Selling Count
 	column trueai_purpose_exist_cust_selling_count
-		description: "TrueAI: Count of purpose exist cust selling count."
 		dataType: int64
 		formatString: 0
 		lineageTag: d5d7c84d-b76f-4762-a483-ae0124459992
@@ -2281,7 +2154,6 @@ table users_activities
 
 	/// Activities Existing Customer Selling Engaged Count
 	column trueai_purpose_exist_cust_selling_eng_count
-		description: "TrueAI: Count of purpose exist cust selling eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 2a70e01f-9d41-4b20-822b-354db6829d6c
@@ -2292,7 +2164,6 @@ table users_activities
 
 	/// Activities Existing Customer Selling Duration
 	column trueai_purpose_exist_cust_selling_dur
-		description: "TrueAI: Numeric value for purpose exist cust selling dur."
 		dataType: double
 		lineageTag: 799b6b3d-576f-48aa-9bae-c3058d18e99d
 		summarizeBy: sum
@@ -2304,7 +2175,6 @@ table users_activities
 
 	/// Activities Existing Customer Selling Engaged Duration
 	column trueai_purpose_exist_cust_selling_eng_dur
-		description: "TrueAI: Numeric value for purpose exist cust selling eng dur."
 		dataType: double
 		lineageTag: 31c3a1da-ef83-42fb-96a0-4b8488adcf6f
 		summarizeBy: sum
@@ -2316,7 +2186,6 @@ table users_activities
 
 	/// Activities Existing Customer Selling Unique Ids
 	column trueai_purpose_exist_cust_selling_unique_ids
-		description: "TrueAI: Numeric value for purpose exist cust selling unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: b2b7634d-93f9-4103-8b2c-d37b77ab3c82
@@ -2327,7 +2196,6 @@ table users_activities
 
 	/// Activities Existing Customer Selling Engaged Unique Ids
 	column trueai_purpose_exist_cust_selling_eng_unique_ids
-		description: "TrueAI: Numeric value for purpose exist cust selling eng unique ids."
 		dataType: int64
 		formatString: 0
 		lineageTag: 0fabaaa3-8ef9-44fc-b65f-079b655ef9a7
@@ -2338,7 +2206,6 @@ table users_activities
 
 	/// Activities Call Existing Customer Selling Count
 	column trueai_type_call_purpose_exist_cust_selling_count
-		description: "TrueAI: Count of type call purpose exist cust selling count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7638fe53-6169-4742-b7aa-73245bf431f9
@@ -2349,7 +2216,6 @@ table users_activities
 
 	/// Activities Call Existing Customer Selling Engaged Count
 	column trueai_type_call_purpose_exist_cust_selling_eng_count
-		description: "TrueAI: Count of type call purpose exist cust selling eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 4545560a-10f3-426e-9f19-8f99769ad9c5
@@ -2360,7 +2226,6 @@ table users_activities
 
 	/// Activities Email Existing Customer Selling Count
 	column trueai_type_email_purpose_exist_cust_selling_count
-		description: "TrueAI: Count of type email purpose exist cust selling count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 6eeabcf6-cfeb-4610-9da8-0c707e16ba64
@@ -2371,7 +2236,6 @@ table users_activities
 
 	/// Activities Email Existing Customer Selling Engaged Count
 	column trueai_type_email_purpose_exist_cust_selling_eng_count
-		description: "TrueAI: Count of type email purpose exist cust selling eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 47f0483d-851c-4de4-ba1a-4b57671fa467
@@ -2382,7 +2246,6 @@ table users_activities
 
 	/// Activities Meeting Existing Customer Selling Count
 	column trueai_type_meeting_purpose_exist_cust_selling_count
-		description: "TrueAI: Count of type meeting purpose exist cust selling count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 5ff5138a-b0d2-41ba-bf28-958201f42cc6
@@ -2393,7 +2256,6 @@ table users_activities
 
 	/// Activities Meeting Existing Customer Selling Engaged Count
 	column trueai_type_meeting_purpose_exist_cust_selling_eng_count
-		description: "TrueAI: Count of type meeting purpose exist cust selling eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: b7fbdc0a-6861-46bb-ada7-7af5c5a93d41
@@ -2404,7 +2266,6 @@ table users_activities
 
 	/// Activities Social Existing Customer Selling Count
 	column trueai_type_social_purpose_exist_cust_selling_count
-		description: "TrueAI: Count of type social purpose exist cust selling count."
 		dataType: int64
 		formatString: 0
 		lineageTag: fb30aee1-8dcc-4351-9753-7e92ab997424
@@ -2415,7 +2276,6 @@ table users_activities
 
 	/// Activities Social Existing Customer Selling Engaged Count
 	column trueai_type_social_purpose_exist_cust_selling_eng_count
-		description: "TrueAI: Count of type social purpose exist cust selling eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1fe14cd8-780d-47bf-b348-5bc9e339de74
@@ -2426,7 +2286,6 @@ table users_activities
 
 	/// Activities Automated Email Existing Customer Selling Count
 	column trueai_type_auto_email_purpose_exist_cust_selling_count
-		description: "TrueAI: Count of type auto email purpose exist cust selling count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 2c802ca5-924d-4b55-885a-e8439ba90114
@@ -2437,7 +2296,6 @@ table users_activities
 
 	/// Activities Automated Email Existing Customer Selling Engaged Count
 	column trueai_type_auto_email_purpose_exist_cust_selling_eng_count
-		description: "TrueAI: Count of type auto email purpose exist cust selling eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 79484496-bdbe-4795-b5d9-0850a67856c3
@@ -2448,7 +2306,6 @@ table users_activities
 
 	/// Activities No Interaction Existing Customer Selling Count
 	column trueai_type_no_interaction_purpose_exist_cust_selling_count
-		description: "TrueAI: Count of type no interaction purpose exist cust selling count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 186643dd-6ed0-4495-9cfb-4bab97b2baee
@@ -2459,7 +2316,6 @@ table users_activities
 
 	/// Activities No Interaction Existing Customer Selling Engaged Count
 	column trueai_type_no_interaction_purpose_exist_cust_selling_eng_count
-		description: "TrueAI: Count of type no interaction purpose exist cust selling eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: ff1a508e-bd3b-4fe6-8c32-ad4e40eef66c
@@ -2470,7 +2326,6 @@ table users_activities
 
 	/// Activities Non Determinable Existing Customer Selling Count
 	column trueai_type_nd_purpose_exist_cust_selling_count
-		description: "TrueAI: Count of type nd purpose exist cust selling count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 879fde80-963e-4536-9276-f19b2d51af0e
@@ -2481,7 +2336,6 @@ table users_activities
 
 	/// Activities Non Determinable Existing Customer Selling Engaged Count
 	column trueai_type_nd_purpose_exist_cust_selling_eng_count
-		description: "TrueAI: Count of type nd purpose exist cust selling eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: d4d775aa-b504-4c38-9f0c-dc0c70dc1750
@@ -2492,7 +2346,6 @@ table users_activities
 
 	/// User's standardized and combined role aliased
 	column trueai_user_role_alias
-		description: "TrueAI: Text label for user role alias."
 		dataType: string
 		lineageTag: 434950dd-872f-41e1-bdd9-c2d5ca480c6c
 		summarizeBy: none
@@ -2502,7 +2355,6 @@ table users_activities
 
 	/// User's department derived from the standardized and combined role
 	column trueai_user_role_department
-		description: "TrueAI: Text label for user role department."
 		dataType: string
 		lineageTag: 5b2e2612-3a3a-4850-b792-f30010d4196a
 		summarizeBy: none

@@ -1,13 +1,13 @@
 /// Table strat_summary.
 table strat_summary
-	description: "One row per strat_summary record. Source fields include System prefixes. Related to users (_sys_user_id -> _sys_doc_id), cal_end_dates (_sys_filter_end_date -> Date). Supports measures such as meas.strat_summary_delta_prev_period, meas.strat_summary_score."
 	lineageTag: ed1b27bf-eb0f-4e9b-b221-10ffd26ab22c
 
-	/// Purpose: Returns percent change in key metric vs the previous period.
-	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(AVERAGE) and DIVIDE over current vs previous period.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE applies date filters on cal_end_dates[Date].
-	/// Format/Type: +0%;-0%;0%
-	measure 'meas.strat_summary_delta_prev_period' = ```
+	/// Purpose: Strat Summary Delta Prev Period.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.strat_summary_delta_prev_period' = 
 			
 			
 			var fromDate =[meas.context_date_min] 
@@ -24,18 +24,17 @@ table strat_summary
 			return res 
 			
 			
-			```
-			description: "Ratio of strat_summary[key_metric_value] to strat_summary[key_metric_value]. Respects the current filter context."
 		formatString: +0%;-0%;0%
 		lineageTag: 82e43cdd-6fc2-467b-bb4c-7674b260c804
 
 		changedProperty = FormatString
 
-	/// Purpose: Returns a capped score based on actual vs reference key metric, with optional inversion.
-	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(AVERAGE/MAX), DIVIDE, IF, MIN/MAX to derive score and apply coefficients.
-	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary metric fields.
-	/// Format/Type: Unspecified
-	measure 'meas.strat_summary_score' = ```
+	/// Purpose: Strat Summary Score.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.strat_summary_score' = 
 			
 			--var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			--var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -365) -- create a filter that applies last year
@@ -50,65 +49,56 @@ table strat_summary
 			return   if(ISBLANK(actual_val), blank(), res )
 			
 			
-			```
-			description: "Ratio of cal_end_dates[Date] to strat_summary[key_metric_value]. Respects the current filter context."
 		lineageTag: d24f1d2f-3b43-4850-a366-3df70aa26def
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Returns a trend score derived from prior period delta.
-	/// Calculation Logic: Uses VAR/RETURN with [meas.strat_summary_delta_prev_period], exponentiation, and MIN/MAX cap.
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the delta measure.
-	/// Format/Type: Unspecified
-	measure 'meas.strat_summary_trend_score' = ```
+	/// Purpose: Strat Summary Trend Score.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.strat_summary_trend_score' = 
 			
 			
-			 var delta =  [meas.strat_summary_delta_prev_period]
-			 var delta_coeff = .6-- CALCULATE(AVERAGE(strat_summary[key_metric_trend_coeff]))
-			 var score =  ((delta + 1 ) ^ delta_coeff) - 0.5
-			 var capped_score =  MAX(0.05, MIN(0.95, score))
-			 var res = capped_score
-			 return res
+			var delta =  [meas.strat_summary_delta_prev_period]			var delta_coeff = .6-- CALCULATE(AVERAGE(strat_summary[key_metric_trend_coeff]))			var score =  ((delta + 1 ) ^ delta_coeff) - 0.5			var capped_score =  MAX(0.05, MIN(0.95, score))			var res = capped_score			return res			
 			
-			
-			```
-			 description: "Average of strat_summary[key_metric_trend_coeff]. Respects the current filter context."
 		lineageTag: 3d5b6690-0192-4c58-9bb5-4bdd921b2202
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Displays strat summary score as a percentage (score * 100).
-	/// Calculation Logic: Direct expression multiplying [meas.strat_summary_score] by 100.
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the score measure.
-	/// Format/Type: 0
-	measure 'meas.strat_summary_display_score' = ```
+	/// Purpose: Strat Summary Display Score.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.strat_summary_display_score' = 
 			strat_summary[meas.strat_summary_score] * 100
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		formatString: 0
 		lineageTag: 900adbfe-b098-46b6-9e52-d2c67154d556
 
 		changedProperty = FormatString
 
-	/// Purpose: Returns the average key metric value as a percentage.
-	/// Calculation Logic: Uses CALCULATE with AVERAGE over strat_summary[key_metric_value].
-	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary[key_metric_value].
-	/// Format/Type: 0.0%;-0.0%;0.0%
+	/// Purpose: Strat Summary Display Key Metric Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.strat_summary_display_key_metric_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(AVERAGE(strat_summary[key_metric_value]) )
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: f0422331-3943-4ca3-9d2f-58d99b0c36ac
 
 		changedProperty = FormatString
 
-	/// Purpose: Returns end-of-period score displayed as a percentage.
-	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(AVERAGE/MAX), DIVIDE, IF, MIN/MAX, and applies a 100x scale.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE filters cal_end_dates[Date] to the last day.
-	/// Format/Type: 0
-	measure 'meas.strat_summary_score_display_eop' = ```
+	/// Purpose: Strat Summary Score Display Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.strat_summary_score_display_eop' = 
 			
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -1) -- create a filter that applies last year
@@ -124,20 +114,18 @@ table strat_summary
 			
 			
 			
-			```
-			description: "Ratio of cal_end_dates[Date] to strat_summary[key_metric_value]. Respects the current filter context."
 		formatString: 0
 		lineageTag: e2526f51-ac84-4165-94ac-3bafd28f860a
 
 		changedProperty = FormatString
 
-	/// Purpose: Returns average key metric value over the last 30 days as a percentage.
-	/// Calculation Logic: Uses VAR/RETURN with FILTER and CALCULATE(AVERAGE).
-	/// Dynamic Behavior: Respects current filter context; CALCULATE applies a rolling 30-day filter on cal_end_dates[Date].
-	/// Format/Type: 0%;-0%;0%
+	/// Purpose: Strat Summary Key Metric Display Pct Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.strat_summary_key_metric_display_pct_eop' =
 			
-			description: "TODO: provide business definition for this measure."
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
 			
@@ -148,24 +136,25 @@ table strat_summary
 
 		changedProperty = FormatString
 
-	/// Purpose: Returns the average key metric reference value as a percentage.
-	/// Calculation Logic: Uses CALCULATE with AVERAGE over strat_summary[key_metric_reference].
-	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary[key_metric_reference].
-	/// Format/Type: 0%;-0%;0%
+	/// Purpose: Strat Summary Display Reference Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.strat_summary_display_reference_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: 0%;-0%;0%
 		lineageTag: a77c2788-c85b-428c-8253-13e25284ee52
 
 		changedProperty = FormatString
 
-	/// Purpose: Returns percent change vs the comparable prior period (12 months back).
-	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(AVERAGE) and DIVIDE over current vs prior windows.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE applies date filters on cal_end_dates[Date].
-	/// Format/Type: +0%;-0%;0%
-	measure 'meas.strat_summary_delta_12mo_eop' = ```
+	/// Purpose: Strat Summary Delta 12mo Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.strat_summary_delta_12mo_eop' = 
 			
 			
 			var fromDate =[meas.context_date_max] - 90
@@ -182,20 +171,18 @@ table strat_summary
 			return res 
 			
 			
-			```
-			description: "Ratio of strat_summary[key_metric_value] to cal_end_dates[Date]. Respects the current filter context."
 		formatString: +0%;-0%;0%
 		lineageTag: d15bb079-82a5-4e6b-a51b-bf25c3739dc5
 
 		changedProperty = FormatString
 
-	/// Purpose: Returns average key metric value over the last 30 days as a ratio display.
-	/// Calculation Logic: Uses VAR/RETURN with FILTER and CALCULATE(AVERAGE).
-	/// Dynamic Behavior: Respects current filter context; CALCULATE applies a rolling 30-day filter on cal_end_dates[Date].
-	/// Format/Type: #.0 ":1"
+	/// Purpose: Strat Summary Key Metric Display Ratio Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.strat_summary_key_metric_display_ratio_eop' =
 			
-			description: "TODO: provide business definition for this measure."
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
 			
@@ -208,74 +195,73 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Returns the average key metric reference value as a ratio display.
-	/// Calculation Logic: Uses CALCULATE with AVERAGE over strat_summary[key_metric_reference].
-	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary[key_metric_reference].
-	/// Format/Type: 0":1"
+	/// Purpose: Strat Summary Display Reference Ratio.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.strat_summary_display_reference_ratio' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: 0":1"
 		lineageTag: 1bc2643f-9c54-4121-aa0e-0a47687a4d7e
 
 		changedProperty = FormatString
 
-	/// Purpose: Returns concern score as the geometric mean of score and trend score.
-	/// Calculation Logic: Uses VAR/RETURN with [meas.strat_summary_score] and [meas.strat_summary_trend_score], exponentiation.
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting both score measures.
-	/// Format/Type: Unspecified
-	measure 'meas.strat_summary_concern_score' = ```
+	/// Purpose: Strat Summary Concern Score.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.strat_summary_concern_score' = 
 			
 			var val_score = strat_summary[meas.strat_summary_score]
 			var val_trend_score = strat_summary[meas.strat_summary_trend_score]
 			
 			var res = (val_score * val_trend_score ) ^ 0.5  
 			return res
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: 4fe7cef8-6834-4cd2-afde-02df60c2998a
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Displays concern score as Low/Medium/High based on thresholds.
-	/// Calculation Logic: Uses IF to map [meas.strat_summary_concern_score] to text labels.
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the concern score.
-	/// Format/Type: Unspecified
+	/// Purpose: Strat Summary Concern Score Display.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.strat_summary_concern_score_display' =
 			
-			description: "TODO: provide business definition for this measure."
 			var res = IF([meas.strat_summary_concern_score] > 0.66, "Low", IF([meas.strat_summary_concern_score] > 0.33, "Medium", "High"))
 			return res
 		lineageTag: e8d32342-6ef1-4d93-88c4-986a1f524e93
 
-	/// Purpose: Displays trend as Improving/Steady/Declining based on trend score.
-	/// Calculation Logic: Uses IF to map [meas.strat_summary_trend_score] to text labels.
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the trend score.
-	/// Format/Type: 0
+	/// Purpose: Strat Summary Trend Display.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.strat_summary_trend_display' =
 			
-			description: "TODO: provide business definition for this measure."
 			var res = IF([meas.strat_summary_trend_score] > 0.66, "Improving", IF([meas.strat_summary_trend_score] > 0.33, "Steady", "Declining"))
 			return res
 		lineageTag: 9432771d-5fb2-467d-924b-fa9d6c1041b4
 
-	/// Purpose: Returns a hard-coded industry score display value.
-	/// Calculation Logic: Direct constant value (52).
-	/// Dynamic Behavior: Not filter-dependent.
-	/// Format/Type: 0
+	/// Purpose: Strat Summary Industry Score Display.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'measure.strat_summary_industry_score_display' = 52
-		description: "TODO: provide business definition for this measure."
 		formatString: 0
 		lineageTag: 18b3dd43-84ac-49f4-8cd7-d2283175eed2
 
-	/// Purpose: Returns average key metric value over the last 30 days as hours.
-	/// Calculation Logic: Uses VAR/RETURN with FILTER and CALCULATE(AVERAGE).
-	/// Dynamic Behavior: Respects current filter context; CALCULATE applies a rolling 30-day filter on cal_end_dates[Date].
-	/// Format/Type: #,##0.0"hrs"
+	/// Purpose: Strat Summary Key Metric Display Hrs Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.strat_summary_key_metric_display_hrs_eop' =
 			
-			description: "TODO: provide business definition for this measure."
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
 			
@@ -288,13 +274,13 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Returns average key metric value over the last 30 days as a decimal.
-	/// Calculation Logic: Uses VAR/RETURN with FILTER and CALCULATE(AVERAGE).
-	/// Dynamic Behavior: Respects current filter context; CALCULATE applies a rolling 30-day filter on cal_end_dates[Date].
-	/// Format/Type: #,##0.0
+	/// Purpose: Strat Summary Key Metric Display Decimal Eop.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.strat_summary_key_metric_display_decimal_eop' =
 			
-			description: "TODO: provide business definition for this measure."
 			var max_date = cal_end_dates[meas.context_date_max] -- get the last date
 			var filt = filter(cal_end_dates,cal_end_dates[Date] > max_date -30) -- create a filter that applies last year
 			
@@ -307,88 +293,86 @@ table strat_summary
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Returns the average key metric reference value as hours.
-	/// Calculation Logic: Uses CALCULATE with AVERAGE over strat_summary[key_metric_reference].
-	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary[key_metric_reference].
-	/// Format/Type: #,##0.0" hrs"
+	/// Purpose: Strat Summary Display Reference Hrs.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.strat_summary_display_reference_hrs' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: #,##0.0" hrs"
 		lineageTag: 288edd56-dc77-461f-a6b8-4e5f3325257b
 
 		changedProperty = FormatString
 
-	/// Purpose: Returns the average key metric reference value as a decimal.
-	/// Calculation Logic: Uses CALCULATE with AVERAGE over strat_summary[key_metric_reference].
-	/// Dynamic Behavior: Respects current filter context; responds to filters on strat_summary[key_metric_reference].
-	/// Format/Type: #,##0.0
+	/// Purpose: Strat Summary Display Reference Decimal.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.strat_summary_display_reference_decimal' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(AVERAGE(strat_summary[key_metric_reference]) )
 		formatString: #,##0.0
 		lineageTag: 0b85899b-d33f-4316-a84f-85b3efc5acb3
 
 		changedProperty = FormatString
 
-	/// Purpose: End-of-period score display filtered to Existing Customer Revenue summary category.
-	/// Calculation Logic: Uses CALCULATE to filter [meas.strat_summary_score_display_eop] by strat_summary[summary_cat].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE applies summary_cat filter.
-	/// Format/Type: Unspecified
-	measure 'meas.strat_summary_score_display_eop_existing_cust_exp' = ```
+	/// Purpose: Strat Summary Score Display Eop Existing Cust Exp.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.strat_summary_score_display_eop_existing_cust_exp' = 
 			
 			CALCULATE(
 				[meas.strat_summary_score_display_eop],
 				'strat_summary'[summary_cat] IN { "Existing Customer Revenue" }
 			)
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: 33430290-9c5e-405b-84e7-3d2a0a289077
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: End-of-period score display filtered to New Logo Sales summary category.
-	/// Calculation Logic: Uses CALCULATE to filter [meas.strat_summary_score_display_eop] by strat_summary[summary_cat].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE applies summary_cat filter.
-	/// Format/Type: Unspecified
-	measure 'meas.strat_summary_score_display_eop_for_new_logo_sales' = ```
+	/// Purpose: Strat Summary Score Display Eop For New Logo Sales.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.strat_summary_score_display_eop_for_new_logo_sales' = 
 			
 			CALCULATE(
 				[meas.strat_summary_score_display_eop],
 				'strat_summary'[summary_cat] IN { "New Logo Sales" }
 			)
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: e4fcb2ff-37fa-470d-8456-9a2498a9ffa7
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: End-of-period score display filtered to Rep Performance summary category.
-	/// Calculation Logic: Uses CALCULATE to filter [meas.strat_summary_score_display_eop] by strat_summary[summary_cat].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE applies summary_cat filter.
-	/// Format/Type: Unspecified
-	measure 'meas.strat_summary_score_display_eop_for_rep_perf' = ```
+	/// Purpose: Strat Summary Score Display Eop For Rep Perf.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.strat_summary_score_display_eop_for_rep_perf' = 
 			
 			CALCULATE(
 				[meas.strat_summary_score_display_eop],
 				'strat_summary'[summary_cat] IN { "Rep Performance" }
 			)
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: 54bad410-5b58-49e4-b157-b94643407276
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: End-of-period score display filtered to Sales & Marketing Alignment summary category.
-	/// Calculation Logic: Uses CALCULATE to filter [meas.strat_summary_score_display_eop] by strat_summary[summary_cat].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE applies summary_cat filter.
-	/// Format/Type: Unspecified
-	measure 'meas.strat_summary_score_display_eop_for_sales_and_market' = ```
+	/// Purpose: Strat Summary Score Display Eop For Sales And Market.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.strat_summary_score_display_eop_for_sales_and_market' = 
 			
 			CALCULATE(
 				[meas.strat_summary_score_display_eop],
@@ -396,34 +380,32 @@ table strat_summary
 					IN { "Sales & Marketing Alignment" }
 			)
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: b0a32b4e-3082-45c3-89da-dd1861e01461
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: End-of-period score display filtered to Targeting & Segmenting summary category.
-	/// Calculation Logic: Uses CALCULATE to filter [meas.strat_summary_score_display_eop] by strat_summary[summary_cat].
-	/// Dynamic Behavior: Respects current filter context; CALCULATE applies summary_cat filter.
-	/// Format/Type: Unspecified
-	measure 'meas.strat_summary_score_display_eop_for_target_and_segment' = ```
+	/// Purpose: Strat Summary Score Display Eop For Target And Segment.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.strat_summary_score_display_eop_for_target_and_segment' = 
 			
 			CALCULATE(
 				[meas.strat_summary_score_display_eop],
 				'strat_summary'[summary_cat] IN { "Targeting & Segmenting" }
 			)
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: 9dcc1a6a-d26e-4dee-b408-a3f118fc332b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Purpose: Returns the average of five category scores and rounds to whole number.
-	/// Calculation Logic: Uses VAR/RETURN with arithmetic average and ROUND.
-	/// Dynamic Behavior: Respects current filter context; responds to filters affecting the component measures.
-	/// Format/Type: Unspecified
-	measure 'meas.strat_summary_all_score' = ```
+	/// Purpose: Strat Summary All Score.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.strat_summary_all_score' = 
 			
 			var score = (strat_summary[meas.strat_summary_score_display_eop_existing_cust_exp] + strat_summary[meas.strat_summary_score_display_eop_for_new_logo_sales] 
 			+ strat_summary[meas.strat_summary_score_display_eop_for_rep_perf] 
@@ -434,15 +416,12 @@ table strat_summary
 			var res = round(score, 0)
 			return res
 			
-			```
-			description: "Ratio measure. Respects the current filter context."
 		lineageTag: 7d990357-1036-46de-b650-2b9a15e8103f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Column _sys_docid.
 	column _sys_docid
-		description: "Unclear: System: Value for docid."
 		lineageTag: 776d91c0-dc9d-47f5-9187-626563359320
 		summarizeBy: none
 		isNameInferred
@@ -452,7 +431,6 @@ table strat_summary
 
 	/// Column _sys_user_id.
 	column _sys_user_id
-		description: "System: Identifier for user."
 		lineageTag: b522b9f2-de3d-4fb9-b3dd-b8234b5fab7a
 		summarizeBy: none
 		isNameInferred
@@ -462,7 +440,6 @@ table strat_summary
 
 	/// Column _sys_filter_end_date.
 	column _sys_filter_end_date
-		description: "System: Date/time when filter end date."
 		formatString: General Date
 		lineageTag: efdd6fb6-28fe-4cf9-b214-7da47a01b262
 		summarizeBy: none
@@ -473,7 +450,6 @@ table strat_summary
 
 	/// Column summary_cat.
 	column summary_cat
-		description: "Unclear: Value for summary cat."
 		lineageTag: 37d8d845-231d-44c4-868c-974913754ed7
 		summarizeBy: none
 		isNameInferred
@@ -483,7 +459,6 @@ table strat_summary
 
 	/// Column summary_dimension.
 	column summary_dimension
-		description: "Unclear: Value for summary dimension."
 		lineageTag: 873b3a91-6726-4d34-ac25-43ac132cb79b
 		summarizeBy: none
 		isNameInferred
@@ -493,7 +468,6 @@ table strat_summary
 
 	/// Column key_metric_name.
 	column key_metric_name
-		description: "Unclear: Value for key metric name."
 		lineageTag: 8fd265f4-378e-47d3-81de-603e54118a42
 		summarizeBy: none
 		isNameInferred
@@ -503,7 +477,6 @@ table strat_summary
 
 	/// Column dd.
 	column dd
-		description: "Unclear: Value for dd."
 		formatString: 0
 		lineageTag: fc14fe31-0ea7-4164-bff6-ec07bf9a53a4
 		summarizeBy: sum
@@ -514,7 +487,6 @@ table strat_summary
 
 	/// Column key_metric_value.
 	column key_metric_value
-		description: "Amount for key metric value."
 		lineageTag: d249ae43-2d03-4090-aa4d-49dd78fdc2af
 		summarizeBy: average
 		isNameInferred
@@ -526,7 +498,6 @@ table strat_summary
 
 	/// Column key_metric_reference.
 	column key_metric_reference
-		description: "Unclear: Value for key metric reference."
 		lineageTag: b78e1e91-ff2c-4d8e-a450-74650e87efe9
 		summarizeBy: average
 		isNameInferred
@@ -538,7 +509,6 @@ table strat_summary
 
 	/// Column key_metric_inversed.
 	column key_metric_inversed
-		description: "Unclear: Value for key metric inversed."
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 3e57b584-8803-4854-99c3-e79b17e77b74
 		summarizeBy: none
@@ -549,7 +519,6 @@ table strat_summary
 
 	/// Column key_metric_coeff.
 	column key_metric_coeff
-		description: "Unclear: Value for key metric coeff."
 		lineageTag: fa14b161-28d2-49f5-b2be-678ec68dcb35
 		summarizeBy: sum
 		isNameInferred
@@ -561,7 +530,6 @@ table strat_summary
 
 	/// Column key_metric_trend_coeff.
 	column key_metric_trend_coeff
-		description: "Unclear: Value for key metric trend coeff."
 		lineageTag: 8769dd8d-bb33-4cde-abd4-d3a1eb26b006
 		summarizeBy: sum
 		isNameInferred

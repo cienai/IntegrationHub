@@ -1,186 +1,185 @@
 /// CRM entity for opportunity records enriched with TrueAI predictive insights.
 table opps
-	description: "One row per opp record. Source fields include CRM, System, TrueAI prefixes. Related to LocalDateTable_13f4f704-f348-4cd9-8666-42fbbd986b71 (_sys_filt_start_date -> Date), LocalDateTable_fcaea0e2-d7e0-4a55-8ced-8a82a2761917 (crm_close_date -> Date), LocalDateTable_2d31ddae-87fe-4ec5-8896-d87a04765d4c (crm_last_act_time -> Date). Supports measures such as meas.opps_count, meas.opps_won_amt."
 	lineageTag: 94b5d4f0-c14b-4b61-8e6f-fc611c85e6de
 
-	/// Measure meas.opps_count.
+	/// Purpose: Opps Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opps_count' = CALCULATE(Count(opps[_sys_doc_id]))  // count of opportunity
-		description: "Ratio based on opps[_sys_doc_id]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _success_metrics
 		lineageTag: 2cc843ff-f70c-4756-bc7f-55b6fe32f6b0
 
-	/// Measure meas.opps_won_amt.
+	/// Purpose: Opps Won Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opps_won_amt' = CALCULATE(SUM(opps[trueai_booking_amt]),opps[trueai_is_won] = True ) // get the won opps  booking amount
-		description: "Ratio of opps[trueai_booking_amt] to opps[trueai_is_won]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
 		lineageTag: dba34eb5-a79e-4e3d-83c2-2494b57fe4d4
 
 		annotation PBI_FormatHint = {"currencyCulture":""}
 
-	/// Measure meas.opps_won_count.
+	/// Purpose: Opps Won Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opps_won_count' = CALCULATE(Count(opps[_sys_doc_id]),opps[trueai_is_won] = True )// count of won opps
-		description: "Ratio of opps[_sys_doc_id] to opps[trueai_is_won]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _success_metrics
 		lineageTag: d06a26ea-8130-4af3-99b3-4a9e2d505033
 
-	/// Measure meas.opps_lost_count.
+	/// Purpose: Opps Lost Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opps_lost_count' = CALCULATE(Count(opps[_sys_doc_id]),opps[trueai_is_won] = False ) // get the lost opps count
-		description: "Ratio of opps[_sys_doc_id] to opps[trueai_is_won]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _success_metrics
 		lineageTag: 8a99d981-2d57-4959-a3a1-1438b9c03dc9
 
-	/// Measure meas.opps_won_new_logo_existing_cust_count.
-	measure 'meas.opps_won_new_logo_existing_cust_count' = ```
+	/// Purpose: Opps Won New Logo Existing Cust Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.opps_won_new_logo_existing_cust_count' = 
 			
 			CALCULATE(
-			    Count(opps[_sys_doc_id]),           // count of won opps for step new logo and existing customer 
-			    opps[trueai_is_won] = True,
-			    ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}
-			)
-			```
-			description: "Ratio of opps[_sys_doc_id] to opps[trueai_is_won]. Respects the current filter context."
+			Count(opps[_sys_doc_id]),           // count of won opps for step new logo and existing customer 			opps[trueai_is_won] = True,			ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}			)
 		formatString: #,0
 		displayFolder: _success_metrics
 		lineageTag: d581aaf4-aff3-4ab8-ac67-5e6ec53b0421
 
-	/// Measure meas.opps_new_logo_existing_customer_selling_won_amt.
-	measure 'meas.opps_new_logo_existing_customer_selling_won_amt' = ```
+	/// Purpose: Opps New Logo Existing Customer Selling Won Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.opps_new_logo_existing_customer_selling_won_amt' = 
 			
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			    ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}
-			    ) 
-			```
-			description: "Ratio of opps[trueai_booking_amt] to opps[trueai_is_won]. Respects the current filter context."
-		formatString: \$#,0;(\$#,0);\$#,0
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step			opps[trueai_is_won] = True,			ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}			) 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
 		lineageTag: 7514faf0-42d0-4b93-ae3c-94eceb969fcd
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_existing_customer_selling_won_amt.
-	measure 'meas.opps_existing_customer_selling_won_amt' = ```
+	/// Purpose: Opps Existing Customer Selling Won Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.opps_existing_customer_selling_won_amt' = 
 			
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			     ssr_history[step_name] in {"Existing Customer Selling"}
-			    ) 
-			```
-			description: "Ratio of opps[trueai_booking_amt] to opps[trueai_is_won]. Respects the current filter context."
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step			opps[trueai_is_won] = True,			ssr_history[step_name] in {"Existing Customer Selling"}			) 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: 111331cb-f7bd-4425-b319-a1c0b7cdd742
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_new_logo_selling_won_amt.
-	measure 'meas.opps_new_logo_selling_won_amt' = ```
+	/// Purpose: Opps New Logo Selling Won Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.opps_new_logo_selling_won_amt' = 
 			
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			    ssr_history[step_name] = "New Logo Selling"
-			    ) 
-			```
-			description: "Ratio of opps[trueai_booking_amt] to opps[trueai_is_won]. Respects the current filter context."
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step			opps[trueai_is_won] = True,			ssr_history[step_name] = "New Logo Selling"			) 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: 9eab312a-8420-4bdd-ab53-bf08169e77e5
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_post_sales_support_won_amt.
-	measure 'meas.opps_post_sales_support_won_amt' = ```
+	/// Purpose: Opps Post Sales Support Won Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.opps_post_sales_support_won_amt' = 
 			
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			     ssr_history[step_name] in {"Post-Sales Support"}
-			    ) 
-			```
-			description: "Ratio of opps[trueai_booking_amt] to opps[trueai_is_won]. Respects the current filter context."
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step			opps[trueai_is_won] = True,			ssr_history[step_name] in {"Post-Sales Support"}			) 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: 6fec311e-00d4-437b-b8e5-82a3661b84be
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_prospecting_won_amt.
-	measure 'meas.opps_prospecting_won_amt' = ```
+	/// Purpose: Opps Prospecting Won Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.opps_prospecting_won_amt' = 
 			
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			     ssr_history[step_name] in {"Prospecting"}
-			    ) 
-			```
-			description: "Ratio of opps[trueai_booking_amt] to opps[trueai_is_won]. Respects the current filter context."
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step			opps[trueai_is_won] = True,			ssr_history[step_name] in {"Prospecting"}			) 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: c0905b74-1adb-4d7d-8437-3d27281bc94b
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_all_step_won_amt.
-	measure 'meas.opps_all_step_won_amt' = ```
+	/// Purpose: Opps All Step Won Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.opps_all_step_won_amt' = 
 			
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step
-			    opps[trueai_is_won] = True,
-			     ssr_history[step_name] in {"New Logo Selling", "Prospecting", "Existing Customer Selling", "Post-Sales Support"}
-			    ) 
-			```
-			description: "Ratio of opps[trueai_booking_amt] to opps[trueai_is_won]. Respects the current filter context."
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			SUM(opps[trueai_booking_amt]),              // get the won opps  booking amount for new logo and existing customer selling step			opps[trueai_is_won] = True,			ssr_history[step_name] in {"New Logo Selling", "Prospecting", "Existing Customer Selling", "Post-Sales Support"}			) 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: e4c8572b-5411-4add-9f95-1ad840289871
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_trueai_booking_amt.
-	measure 'meas.opps_trueai_booking_amt' = ```
+	/// Purpose: Opps Trueai Booking Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.opps_trueai_booking_amt' = 
 			
 			
 			CALCULATE(
-			    SUM(opps[trueai_booking_amt]),
-			    FILTER(
-			        opps,
-			        COUNTROWS(RELATEDTABLE(opp_line_items)) > 0     // get the opps booking amt  
-			    )
-			)
+			SUM(opps[trueai_booking_amt]),			FILTER(			opps,			COUNTROWS(RELATEDTABLE(opp_line_items)) > 0     // get the opps booking amt  			)			)
 			
-			```
-			description: "Ratio based on opps[trueai_booking_amt]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
 		lineageTag: 20fc4bb7-bc67-44ca-be7d-258a4215b929
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opp_line_items_trueai_booking_amt.
+	/// Purpose: Opp Line Items Trueai Booking Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_line_items_trueai_booking_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    SUM(opp_line_items[trueai_total_price]),
-			    RELATEDTABLE(opps)
-			)
+			SUM(opp_line_items[trueai_total_price]),			RELATEDTABLE(opps)			)
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: 7fc77c41-4348-493f-aefa-925c01369030
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opp_book_amt_opp_line_book_amt_diff.
+	/// Purpose: Opp Book Amt Opp Line Book Amt Diff.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_book_amt_opp_line_book_amt_diff' =
 			
-			description: "TODO: provide business definition for this measure."
 			var opps_amt = [meas.opps_trueai_booking_amt]   // get the opps booking amt
 			var oli_amt = [meas.opp_line_items_trueai_booking_amt]          // get the oli booking amt
 			var res  = opps_amt - oli_amt
@@ -193,75 +192,80 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_crm_booking_amt.
+	/// Purpose: Opps Crm Booking Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opps_crm_booking_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    SUM(
-			        opps[crm_booking_amt]
-			    )
-			)
+			SUM(			opps[crm_booking_amt]			)			)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
 		lineageTag: 3c033b02-a215-4b6c-a54f-4391f82c7cb0
 
-	/// Measure meas.open_opps_is_open.
-	measure 'meas.open_opps_is_open' = ```
+	/// Purpose: Open Opps Is Open.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.open_opps_is_open' = 
 			
 			var  asof_date = date(2024,1,1) // the "current" date
 				
 			// filter down only open opps and associated history steps for that period (include anything started on or before the as if date and not finished on as of date
 			var res = CALCULATE(
-			    DISTINCTCOUNT(opps[_sys_doc_id]), 
-			    opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date 
-			)
+			DISTINCTCOUNT(opps[_sys_doc_id]), 			opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date 			)
 			return res 
-			```
-			description: "Ratio of opps[_sys_doc_id] to opps[_sys_filt_end_date]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 386df656-540e-4d43-90bf-29fe8a75c043
 
-	/// Measure meas.open_opps_order.
-	measure 'meas.open_opps_order' = ```
+	/// Purpose: Open Opps Order.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.open_opps_order' = 
+			// get th date we care about 
+			// the "current" date
+			var  asof_date = date(2024,1,1)
 			
+			// filter down only open opps and associated history steps for that period (include anything started on or before the as if date and not finished on as of date
+			var tbl_curr_open_opps= CALCULATETABLE((opps),  opps[_sys_doc_id] <> "123"   && opps[trueai_stage] <> "123"   && opps[crm_stage_name] <> "123"  && opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date )
 			
+			// wnsure that end date is unique otherwise weird results
+			var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(
+				tbl_curr_open_opps,
+				"oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(00, "00")
+			)
 			
-				// get th date we care about 
-				var  asof_date = date(2024,1,1) // the "current" date
-				
-				// filter down only open opps and associated history steps for that period (include anything started on or before the as if date and not finished on as of date
-				var tbl_curr_open_opps= CALCULATETABLE((opps),  opps[_sys_doc_id] <> "123"   && opps[trueai_stage] <> "123"   && opps[crm_stage_name] <> "123"  && opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date )
-			
-			
-			    // wnsure that end date is unique otherwise weird results
-				var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(tbl_curr_open_opps,
-						"oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(00, "00")
+			// determine the number of prior steps present for the same opps
+			var tbl_curr_open_opps_prior_oh_entries =
+			ADDCOLUMNS(
+				tbl_curr_open_opps_unique_end_date,
+				"opp_id_count",
+				VAR CurrentOppID = (opps[_sys_doc_id])
+				VAR tblTemp = tbl_curr_open_opps_unique_end_date
+				RETURN COUNTX(
+					FILTER(tblTemp, opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date),
+					[_sys_doc_id]
 				)
-					
-				// determine the number of prior steps present for the same opps
-				var tbl_curr_open_opps_prior_oh_entries = 
-				ADDCOLUMNS(
-			    tbl_curr_open_opps_unique_end_date,
-			    "opp_id_count", 
-			    VAR CurrentOppID = (opps[_sys_doc_id])
-				var tblTemp = tbl_curr_open_opps_unique_end_date
-			    RETURN COUNTX(filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date  ),[_sys_doc_id] ))
+			)
+			var oh_cnt = MAXx(tbl_curr_open_opps_prior_oh_entries, [opp_id_count])
+			return oh_cnt
 			
-			    var oh_cnt = MAXx(tbl_curr_open_opps_prior_oh_entries, [opp_id_count])
-			
-			    return oh_cnt
-			
-			
-			```
-				description: "Ratio of opps[_sys_doc_id] to opps[trueai_stage]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: f94ab53f-b321-4774-ade9-7010b94d9687
 
-	/// Measure meas.open_opps_rec.
-	measure 'meas.open_opps_rec' = ```
+	/// Purpose: Open Opps Rec.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.open_opps_rec' = 
 			
 				var  asof_date = date(2024,1,1) // the "current" date
 				
@@ -272,14 +276,16 @@ table opps
 			
 			var res  = countx(tbl_curr_open_opps, IF( LEFT([_sys_doc_id], 1) = "A", [_sys_doc_id], blank()) )
 			return res 
-			```
-				description: "Ratio of opps[_sys_filt_end_date] to opps[_sys_filt_start_date]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 8896c5d8-5860-4419-9167-539af4c288e4
 
-	/// Measure meas.open_opps_step_by_step.
-	measure 'meas.open_opps_step_by_step' = ```
+	/// Purpose: Open Opps Step By Step.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.open_opps_step_by_step' = 
 			
 			
 			var  asof_date = date(2024,1,1) // the "current" date
@@ -287,42 +293,31 @@ table opps
 			var tbl_curr_open_opps= FIlter((ff),  opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date )
 			
 			
-			    // wnsure that end date is unique otherwise weird results
-				var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(tbl_curr_open_opps,
+			// wnsure that end date is unique otherwise weird results				var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(tbl_curr_open_opps,
 						"oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(00, "00")
-			            // "oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(opps[_trueai_step_sequence], "00")
-				)
+			// "oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(opps[_trueai_step_sequence], "00")				)
 					
 				// determine the number of prior steps present for the same opps
 				var tbl_curr_open_opps_prior_oh_entries = 
 				ADDCOLUMNS(
-			    tbl_curr_open_opps_unique_end_date,
-			    "oh_doc_id", 
-			    VAR CurrentOppID = (opps[_sys_doc_id])
-				var tblTemp = tbl_curr_open_opps_unique_end_date
-			    var doc_id =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date  ), opps[_sys_filt_end_date],FALSE), opps[_sys_doc_id])
-			    var doc_id2 =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID  ), opps[_sys_filt_end_date],True), opps[_sys_doc_id])
-			    var res_doc_id =If (doc_id = BLANK(), doc_id2, doc_id)
-			    RETURN res_doc_id)
+			tbl_curr_open_opps_unique_end_date,			"oh_doc_id", 			VAR CurrentOppID = (opps[_sys_doc_id])				var tblTemp = tbl_curr_open_opps_unique_end_date
+			var doc_id =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date  ), opps[_sys_filt_end_date],FALSE), opps[_sys_doc_id])			var doc_id2 =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID  ), opps[_sys_filt_end_date],True), opps[_sys_doc_id])			var res_doc_id =If (doc_id = BLANK(), doc_id2, doc_id)			RETURN res_doc_id)			
 			
 			
-			
-			    var filter_tbl = FILTER(tbl_curr_open_opps_prior_oh_entries, [oh_doc_id] =[_sys_doc_id])
-			
-			    var res =    CALCULATE(count(opps[_sys_doc_id]), filter_tbl )
-			    return res
-			
-			```
-			description: "Ratio of opps[_sys_filt_end_date] to opps[_sys_filt_start_date]. Respects the current filter context."
+			var filter_tbl = FILTER(tbl_curr_open_opps_prior_oh_entries, [oh_doc_id] =[_sys_doc_id])			
+			var res =    CALCULATE(count(opps[_sys_doc_id]), filter_tbl )			return res			
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 5c8c0dc1-4e98-4864-84aa-d8e220345f38
 
-	/// Measure meas.open_opps_step_by_step_amt.
+	/// Purpose: Open Opps Step By Step Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.open_opps_step_by_step_amt' =
 			
 			
-			description: "TODO: provide business definition for this measure."
 			var tbl = filter((opps), LEFT(opps[_sys_doc_id],1) = "B")
 			
 			var res = CALCULATE(sum(opps[trueai_booking_amt]),tbl)
@@ -334,8 +329,12 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.open_opps_step_by_step_slicer.
-	measure 'meas.open_opps_step_by_step_slicer' = ```
+	/// Purpose: Open Opps Step By Step Slicer.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.open_opps_step_by_step_slicer' = 
 			
 			
 			
@@ -343,613 +342,539 @@ table opps
 			var tbl_curr_open_opps =  CALCULATETABLE(opps , opps[_sys_doc_id] <> "abc" && opps[_sys_doc_id] <> "abc" && opps[_sys_filt_end_date] >= asof_date &&  opps[_sys_filt_start_date] < asof_date )
 			
 			
-			    // wnsure that end date is unique otherwise weird results
-				var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(tbl_curr_open_opps,
+			// wnsure that end date is unique otherwise weird results				var tbl_curr_open_opps_unique_end_date = ADDCOLUMNS(tbl_curr_open_opps,
 						"oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(00, "00")
-			            // "oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(open_opps[oh_trueai_step_sequence], "00")
-				)
+			// "oh_end_date", FORMAT(opps[_sys_filt_end_date], "YYYYMMDD") & "-" &  FORMAT(open_opps[oh_trueai_step_sequence], "00")				)
 					
 				// determine the number of prior steps present for the same opps
 				var tbl_curr_open_opps_prior_oh_entries = 
 				ADDCOLUMNS(
-			    tbl_curr_open_opps_unique_end_date,
-			    "oh_doc_id", 
-			    VAR CurrentOppID = (opps[_sys_doc_id])
-				var tblTemp = tbl_curr_open_opps_unique_end_date
-			    var doc_id =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date  ), opps[_sys_filt_end_date],FALSE), opps[_sys_doc_id])
-			    var doc_id2 =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID  ), opps[_sys_filt_end_date],True), opps[_sys_doc_id])
-			    var res_doc_id =If (doc_id = BLANK(), doc_id2, doc_id)
-			    RETURN res_doc_id)
+			tbl_curr_open_opps_unique_end_date,			"oh_doc_id", 			VAR CurrentOppID = (opps[_sys_doc_id])				var tblTemp = tbl_curr_open_opps_unique_end_date
+			var doc_id =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID &&  opps[_sys_filt_end_date] <= asof_date  ), opps[_sys_filt_end_date],FALSE), opps[_sys_doc_id])			var doc_id2 =  MAXX(TOPN(1,filter(tblTemp,  opps[_sys_doc_id] = CurrentOppID  ), opps[_sys_filt_end_date],True), opps[_sys_doc_id])			var res_doc_id =If (doc_id = BLANK(), doc_id2, doc_id)			RETURN res_doc_id)			
 			
 			
-			
-			    var filter_tbl = FILTER(tbl_curr_open_opps_prior_oh_entries, [oh_doc_id] =[_sys_doc_id])
-			
-			    var res =    MAXX(filter_tbl,  [oh_doc_id])
-			    return res
-			
-			```
-			description: "Ratio of opps[_sys_doc_id] to opps[_sys_doc_id]. Respects the current filter context."
+			var filter_tbl = FILTER(tbl_curr_open_opps_prior_oh_entries, [oh_doc_id] =[_sys_doc_id])			
+			var res =    MAXX(filter_tbl,  [oh_doc_id])			return res			
 		displayFolder: _open_opps_pipeline
 		lineageTag: d6a78e90-d5b6-4c05-8a4a-81b5971753f0
 
-	/// Measure meas.ssr_history_opps_is_open.
-	measure 'meas.ssr_history_opps_is_open' = ```
+	/// Purpose: Ssr History Opps Is Open.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.ssr_history_opps_is_open' = 
 			
 			var  asof_date = [meas.sel_date] // the "current" date
 				
 			// filter down only open opps and associated history steps for that period (include anything started on or before the as if date and not finished on as of date
 			var res = CALCULATE(
-			    count(opps[_sys_doc_id]), 
-			    opps[_sys_filt_end_date] > asof_date &&  opps[_sys_filt_start_date] < asof_date 
-			)
+			count(opps[_sys_doc_id]), 			opps[_sys_filt_end_date] > asof_date &&  opps[_sys_filt_start_date] < asof_date 			)
 			return res 
-			```
-			description: "Ratio of opps[_sys_doc_id] to opps[_sys_filt_end_date]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _opps
 		lineageTag: 10a98a67-885b-4ca7-aa63-5dd5d2e57d1b
 
-	/// Measure meas.total_opp_count.
+	/// Purpose: Total Opp Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.total_opp_count' = count(opps[_sys_doc_id])
-		description: "Count of opps[_sys_doc_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _opps
 		lineageTag: d17e8206-08e5-44bc-bc7a-e2ebbf39d72c
 
-	/// Measure meas.opps_name.
+	/// Purpose: Opps Name.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_name' =
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    MAX(opps[crm_name])
-			)
+			MAX(opps[crm_name])			)
 		lineageTag: ca7bd717-4604-47eb-963c-306b7343bb15
 
-	/// Measure meas.opps_booking_lost_amt.
+	/// Purpose: Opps Booking Lost Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opps_booking_lost_amt' = CALCULATE(SUM(opps[trueai_booking_amt]),opps[trueai_is_won] = False ) // get the lost opps  booking amount
-		description: "Ratio of opps[trueai_booking_amt] to opps[trueai_is_won]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
 		lineageTag: 1ffbc42c-1acf-476e-8a06-e9f51390f25f
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.opps_avg_deal_size_amt.
+	/// Purpose: Opps Avg Deal Size Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_avg_deal_size_amt' = CALCULATE(Average(opps[trueai_booking_amt]), opps[trueai_booking_amt] > 0 )
-		description: "Average of opps[trueai_booking_amt]. Respects the current filter context."
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _success_metrics
 		lineageTag: 415c9aee-bf6f-4607-9601-ebe0db8d3162
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.count_of_crm_deep_link.
+	/// Purpose: Count Of Crm Deep Link.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.count_of_crm_deep_link' =
 			
-			description: "TODO: provide business definition for this measure."
 			DISTINCTCOUNT(opps[crm_deep_link])
 		formatString: 0
 		lineageTag: 212bd76d-4e51-41b4-ba2f-ea7b7160fc31
 
-	/// Measure meas.opps_cust_num1.
+	/// Purpose: Opps Cust Num1.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_cust_num1' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM(opps[cust_num1])
 		displayFolder: _opps_verification
 		lineageTag: 52f7557f-90ac-41af-8fa1-3f5be2fac8a9
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num2.
+	/// Purpose: Opps Cust Num2.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_cust_num2' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM(opps[cust_num2])
 		displayFolder: _opps_verification
 		lineageTag: 0e1671dd-07af-4b69-864a-e3d37e2f37bd
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num3.
+	/// Purpose: Opps Cust Num3.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_cust_num3' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM(opps[cust_num3])
 		displayFolder: _opps_verification
 		lineageTag: 4c3ed9b3-6d46-4b41-8e94-7092d0cc5c0b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num4.
+	/// Purpose: Opps Cust Num4.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_cust_num4' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM(opps[cust_num4])
 		displayFolder: _opps_verification
 		lineageTag: f5381680-13e5-4c8d-b8e5-8bc82968b744
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num5.
+	/// Purpose: Opps Cust Num5.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_cust_num5' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM(opps[cust_num5])
 		displayFolder: _opps_verification
 		lineageTag: c92f1116-77c7-483c-8af8-925d042d1abf
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num6.
+	/// Purpose: Opps Cust Num6.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_cust_num6' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM(opps[cust_num6])
 		displayFolder: _opps_verification
 		lineageTag: 5ee9da03-25c8-4b34-837e-90be69bf79ea
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_cust_num7.
+	/// Purpose: Opps Cust Num7.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_cust_num7' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM(opps[cust_num7])
 		displayFolder: _opps_verification
 		lineageTag: 7f545910-d104-48da-ab5c-7e6bdf38eb9a
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.won_amt.
+	/// Purpose: Won Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.won_amt' = CALCULATE(sum(opps[trueai_booking_amt]), opps[trueai_is_won] = true)
-		description: "Sum of opps[trueai_booking_amt]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 79ef7551-1b06-4a8a-8b63-141ca9196a8c
 
-	/// Measure meas.won_count.
+	/// Purpose: Won Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.won_count' = CALCULATE(count(opps[trueai_booking_amt]), opps[trueai_is_won] = true)
-		description: "Count of opps[trueai_booking_amt]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _opps
 		lineageTag: ec154535-f996-4fb0-a39a-ee15e2abb37c
 
-	/// Measure meas.opps_booking_amt_total.
-	measure 'meas.opps_booking_amt_total' = ```
+	/// Purpose: Opps Booking Amt Total.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.opps_booking_amt_total' = 
 			
 			CALCULATE(
-			    [meas.opps_booking_amt],
-			    ALLSELECTED() 
-			)
+			[meas.opps_booking_amt],			ALLSELECTED() 			)
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 3e4fd190-bb25-4c89-a94b-61cc9b045123
 
-	/// Measure meas.lost_count.
+	/// Purpose: Lost Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.lost_count' = CALCULATE(count(opps[trueai_booking_amt]), opps[trueai_is_won] = false)
-		description: "Count of opps[trueai_booking_amt]. Respects the current filter context."
 		formatString: #,0
 		displayFolder: _opps
 		lineageTag: 00e5941e-43c3-4a97-92c3-a7760510aba7
 
-	/// Measure meas.opps_booking_amt_avg.
+	/// Purpose: Opps Booking Amt Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opps_booking_amt_avg' = CALCULATE(AVERAGE((opps[trueai_booking_amt])))
-		description: "Average of opps[trueai_booking_amt]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 4a249f2a-182f-4d9d-a156-f5a27543751b
 
-	/// Measure meas.opps_sales_cycle_avg_days.
-	measure 'meas.opps_sales_cycle_avg_days' = ```
+	/// Purpose: Opps Sales Cycle Avg Days.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.opps_sales_cycle_avg_days' = 
 			
 			var res = CALCULATE(AVERAGE(opps[col.trueai_days]))
 			return res 
-			```
-			description: "TODO: provide business definition for this measure."
 		formatString: #,##0" Days"
 		displayFolder: _opps
 		lineageTag: 575eeaba-caa4-408c-9594-805b91564343
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.lost_amt.
+	/// Purpose: Lost Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.lost_amt' = CALCULATE(sum(opps[trueai_booking_amt]), opps[trueai_is_won] = false)
-		description: "Sum of opps[trueai_booking_amt]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: bf734b04-1e82-434c-8912-c972ddb30ac3
 
-	/// Measure meas.opps_lost_amt_in_stage_pct.
+	/// Purpose: Opps Lost Amt In Stage Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.opps_lost_amt_in_stage_pct' = DIVIDE([meas.opps_booking_lost_amt],[meas.opps_booking_amt])
-		description: "Ratio measure. Respects the current filter context."
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _success_metrics
 		lineageTag: 8ade373a-56e3-49bd-8f59-3c84379ba6f8
 
-	/// Measure meas.opps_booking_amt.
+	/// Purpose: Opps Booking Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opps_booking_amt' = CALCULATE( sum(opps[trueai_booking_amt]))
-		description: "Sum of opps[trueai_booking_amt]. Respects the current filter context."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 4529b0ce-1347-4c49-81c8-a51245ee0275
 
-	/// Measure meas.opps_booking_lost_amt_pct.
+	/// Purpose: Opps Booking Lost Amt Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.opps_booking_lost_amt_pct' = DIVIDE([meas.opps_booking_lost_amt], [meas.opps_booking_amt_total])
-		description: "Ratio measure. Respects the current filter context."
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _success_metrics
 		lineageTag: 585994fc-6fc1-4e21-bae3-2ee24c6e8902
 
-	/// Measure meas.opps_max_stages.
+	/// Purpose: Opps Max Stages.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opps_max_stages' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUMX(
-			    VALUES(opps[_sys_doc_id]),
-			    CALCULATE(
-			        DISTINCTCOUNT(open_pipeline[trueai_stage_name]),
-			        opps[trueai_is_won] = TRUE()
-			    )
-			)
+			VALUES(opps[_sys_doc_id]),			CALCULATE(			DISTINCTCOUNT(open_pipeline[trueai_stage_name]),			opps[trueai_is_won] = TRUE()			)			)
 		formatString: 0
 		displayFolder: _success_metrics
 		lineageTag: 40d5b9b3-a8b1-495b-95bb-dd379d53e138
 
-	/// Measure meas.opps_win_rate_value.
+	/// Purpose: Opps Win Rate Value.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.opps_win_rate_value' = DIVIDE([meas.won_amt],[meas.opps_booking_amt_total])
-		description: "Ratio measure. Respects the current filter context."
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _success_metrics
 		lineageTag: a94c7b43-59b3-4861-97be-92d7b828c957
 
-	/// Measure meas.opps_booking_amt_stage.
-	measure 'meas.opps_booking_amt_stage' = ```
+	/// Purpose: Opps Booking Amt Stage.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.opps_booking_amt_stage' = 
 			[meas.opps_booking_amt_total] - [meas.opps_booking_amt] 
-			```
-			description: "TODO: provide business definition for this measure."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _opps
 		lineageTag: 04beffda-c477-4ae0-8bee-c4cf2fa5db12
 
-	/// Measure meas.opps_booking_amt_reached_next_stage.
-	measure 'meas.opps_booking_amt_reached_next_stage' = ```
+	/// Purpose: Opps Booking Amt Reached Next Stage.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.opps_booking_amt_reached_next_stage' = 
 			
 			VAR curIdx =
-			    MAX ( open_pipeline[trueai_sort_id] )
-			VAR nextIdx =
-			    CALCULATE (
-			        MINX (
-			            FILTER ( ALL ( open_pipeline[trueai_sort_id] ),
-			                open_pipeline[trueai_sort_id] > curIdx
-			            ),
-			            open_pipeline[trueai_sort_id]
-			        )
-			    )
-			RETURN
+			MAX ( open_pipeline[trueai_sort_id] )			VAR nextIdx =
+			CALCULATE (			MINX (			FILTER ( ALL ( open_pipeline[trueai_sort_id] ),			open_pipeline[trueai_sort_id] > curIdx			),			open_pipeline[trueai_sort_id]			)			)			RETURN
 			IF (
-			    ISBLANK ( nextIdx ),
-			    BLANK(),
-			    CALCULATE (
-			        [meas.opps_booking_amt],
-			        REMOVEFILTERS (
-			            open_pipeline[trueai_sort_id],
-			            open_pipeline[trueai_stage],
-			            open_pipeline[trueai_stage_name],
-			            open_pipeline[trueai_stage_num]
-			        ),
-			        open_pipeline[trueai_stage_name] <> "Closed Lost",
-			         open_pipeline[trueai_stage_name] <> "Closed Won",
-			        TREATAS ( { nextIdx }, open_pipeline[trueai_sort_id] )
-			    )
-			)
+			ISBLANK ( nextIdx ),			BLANK(),			CALCULATE (			[meas.opps_booking_amt],			REMOVEFILTERS (			open_pipeline[trueai_sort_id],			open_pipeline[trueai_stage],			open_pipeline[trueai_stage_name],			open_pipeline[trueai_stage_num]			),			open_pipeline[trueai_stage_name] <> "Closed Lost",			open_pipeline[trueai_stage_name] <> "Closed Won",			TREATAS ( { nextIdx }, open_pipeline[trueai_sort_id] )			)			)
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _success_metrics
 		lineageTag: aa23b27a-3667-4817-9d76-eca8052fa0b2
 
-	/// Measure meas.opps_total_crm_booking_amt.
+	/// Purpose: Opps Total Crm Booking Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_total_crm_booking_amt' = SUM(opps[crm_booking_amt])
-		description: "Sum of opps[crm_booking_amt]. Respects the current filter context."
 		lineageTag: 9f546c8e-a727-4045-b9a7-e88973fb9cd1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_optimal_disc_level.
+	/// Purpose: Opps Optimal Disc Level.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_optimal_disc_level' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR TierStats =
-			    ADDCOLUMNS (
-			        DimDiscountTier,
-			        "OppCount",
-			            CALCULATE (
-			                COUNTROWS ( opps ),
-			                TREATAS ( { DimDiscountTier[trueai_discount_pct_tier] }, opps[trueai_discount_pct_tier] )
-			            ),
-			        "DeltaVal",
-			            CALCULATE (
-			                [meas.opps_delta_expected_pct],
-			                TREATAS ( { DimDiscountTier[trueai_discount_pct_tier] }, opps[trueai_discount_pct_tier] )
-			            )
-			    )
-			
+			ADDCOLUMNS (			DimDiscountTier,			"OppCount",			CALCULATE (			COUNTROWS ( opps ),			TREATAS ( { DimDiscountTier[trueai_discount_pct_tier] }, opps[trueai_discount_pct_tier] )			),			"DeltaVal",			CALCULATE (			[meas.opps_delta_expected_pct],			TREATAS ( { DimDiscountTier[trueai_discount_pct_tier] }, opps[trueai_discount_pct_tier] )			)			)			
 			VAR TierFiltered =
-			    FILTER ( TierStats, [OppCount] >= 3 )
-			
+			FILTER ( TierStats, [OppCount] >= 3 )			
 			VAR TierRanked =
-			    ADDCOLUMNS (
-			        TierFiltered,
-			        "TierRank",
-			            RANKX ( TierFiltered, DimDiscountTier[SortKey], , ASC, DENSE )
-			    )
-			
+			ADDCOLUMNS (			TierFiltered,			"TierRank",			RANKX ( TierFiltered, DimDiscountTier[SortKey], , ASC, DENSE )			)			
 			VAR Baseline =
-			    AVERAGEX ( FILTER ( TierRanked, [TierRank] <= 2 ), [DeltaVal] )
-			
+			AVERAGEX ( FILTER ( TierRanked, [TierRank] <= 2 ), [DeltaVal] )			
 			VAR Threshold = Baseline + 0.05
 			
 			VAR OptimalSortKey =
-			    MINX (
-			        FILTER (
-			            TierRanked,
-			            [TierRank] > 2 &&
-			            [DeltaVal] >= Threshold
-			        ),
-			        DimDiscountTier[SortKey]
-			    )
-			
+			MINX (			FILTER (			TierRanked,			[TierRank] > 2 &&			[DeltaVal] >= Threshold			),			DimDiscountTier[SortKey]			)			
 			RETURN COALESCE ( OptimalSortKey, -1 )
 		lineageTag: 66645cae-a7a3-415a-869b-7803897fe2f0
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_optimal_discount_deal_count_pct.
+	/// Purpose: Opps Optimal Discount Deal Count Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.opps_optimal_discount_deal_count_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			-- Step 1: Get the result from your existing "Optimal Discount Level" measure
 			VAR BestTier = [meas.opps_optimal_disc_level]   -- e.g. returns "30–40%"
 			
 			-- Step 2: Count deals in that tier
 			VAR OptimalTierDeals =
-			    CALCULATE(
-			        [meas.ssr_history_step_count],
-			        TREATAS({ BestTier }, opps[trueai_discount_pct_tier])  -- apply tier filter at opp_line_items level
-			    )
-			
+			CALCULATE(			[meas.ssr_history_step_count],			TREATAS({ BestTier }, opps[trueai_discount_pct_tier])  -- apply tier filter at opp_line_items level			)			
 			-- Step 3: Count total deals across all tiers
 			VAR TotalDeals =
-			    CALCULATE(
-			        [meas.ssr_history_step_count],
-			        ALL(opps[trueai_discount_pct_tier])
-			    )
-			
+			CALCULATE(			[meas.ssr_history_step_count],			ALL(opps[trueai_discount_pct_tier])			)			
 			-- Step 4: Return % of deals in the optimal tier
 			RETURN
-			    DIVIDE(OptimalTierDeals, TotalDeals)
-		formatString: 0.00%;-0.00%;0.00%
+			DIVIDE(OptimalTierDeals, TotalDeals)		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 4088315a-082d-4abf-93a2-2fafde065533
 
-	/// Measure meas.opps_over_discounted_deal_pct.
+	/// Purpose: Opps Over Discounted Deal Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.opps_over_discounted_deal_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			-- Step 1: Get the optimal discount tier (e.g. "30-40%" or "40%+")
 			VAR BestTier = [meas.opps_optimal_disc_level]
 			
 			-- Step 2: Clean and parse the upper bound of that tier
 			VAR BestTierClean =
-			    SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(TRIM(BestTier), "–", "-"), "—", "-"), " ", "")
-			VAR BestTierUpper =
-			    VAR parts = SUBSTITUTE(BestTierClean, "%", "")
-			    VAR dashPos = SEARCH("-", parts, 1, BLANK())
-			    VAR upperText =
-			        SWITCH(
-			            TRUE(),
-			            NOT ISBLANK(dashPos), MID(parts, dashPos + 1, LEN(parts) - dashPos),  -- "30-40%" → "40"
-			            RIGHT(parts, 1) = "+", LEFT(parts, LEN(parts) - 1),                   -- "40%+"   → "40"
-			            TRUE(), parts                                                        -- "0%"     → "0"
-			        )
-			    RETURN VALUE(upperText)
-			
+			SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(TRIM(BestTier), "–", "-"), "—", "-"), " ", "")			VAR BestTierUpper =
+			VAR parts = SUBSTITUTE(BestTierClean, "%", "")			VAR dashPos = SEARCH("-", parts, 1, BLANK())			VAR upperText =			SWITCH(			TRUE(),			NOT ISBLANK(dashPos), MID(parts, dashPos + 1, LEN(parts) - dashPos),  -- "30-40%" → "40"			RIGHT(parts, 1) = "+", LEFT(parts, LEN(parts) - 1),                   -- "40%+"   → "40"			TRUE(), parts                                                        -- "0%"     → "0"			)			RETURN VALUE(upperText)			
 			-- Step 3: Build a lookup of all tiers with numeric upper bounds
 			VAR Tiers =
-			    ADDCOLUMNS(
-			        VALUES(opps[trueai_discount_pct_tier]),
-			        "Upper",
-			            VAR clean = SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(TRIM(opps[trueai_discount_pct_tier]), "–", "-"), "—", "-"), " ", "")
-			            VAR p = SUBSTITUTE(clean, "%", "")
-			            VAR dashPos = SEARCH("-", p, 1, BLANK())
-			            VAR upperText =
-			                SWITCH(
-			                    TRUE(),
-			                    RIGHT(p, 1) = "+", "999",                      -- treat “%+” as open-ended top bucket
-			                    NOT ISBLANK(dashPos), MID(p, dashPos + 1, LEN(p) - dashPos),
-			                    TRUE(), p
-			                )
-			            RETURN VALUE(upperText)
-			    )
-			
+			ADDCOLUMNS(			VALUES(opps[trueai_discount_pct_tier]),			"Upper",			VAR clean = SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(TRIM(opps[trueai_discount_pct_tier]), "–", "-"), "—", "-"), " ", "")			VAR p = SUBSTITUTE(clean, "%", "")			VAR dashPos = SEARCH("-", p, 1, BLANK())			VAR upperText =			SWITCH(			TRUE(),			RIGHT(p, 1) = "+", "999",                      -- treat “%+” as open-ended top bucket			NOT ISBLANK(dashPos), MID(p, dashPos + 1, LEN(p) - dashPos),			TRUE(), p			)			RETURN VALUE(upperText)			)			
 			-- Step 4: Select tiers whose numeric upper bound is higher than the optimal tier
 			VAR OverTiers =
-			    SELECTCOLUMNS(
-			        FILTER(Tiers, [Upper] > BestTierUpper),
-			        "Tier", opps[trueai_discount_pct_tier]
-			    )
-			
+			SELECTCOLUMNS(			FILTER(Tiers, [Upper] > BestTierUpper),			"Tier", opps[trueai_discount_pct_tier]			)			
 			-- Step 5: Count deals in those “over-discounted” tiers
 			VAR OverDeals =
-			    CALCULATE(
-			        [meas.ssr_history_step_count],
-			        TREATAS(OverTiers, opps[trueai_discount_pct_tier])
-			    )
-			
+			CALCULATE(			[meas.ssr_history_step_count],			TREATAS(OverTiers, opps[trueai_discount_pct_tier])			)			
 			-- Step 6: Count all deals (for denominator)
 			VAR TotalDeals =
-			    CALCULATE(
-			        [meas.ssr_history_step_count],
-			        ALL(opps[trueai_discount_pct_tier])
-			    )
-			
+			CALCULATE(			[meas.ssr_history_step_count],			ALL(opps[trueai_discount_pct_tier])			)			
 			-- Step 7: Return % of deals over optimal tier
 			RETURN
-			    COALESCE(DIVIDE(OverDeals, TotalDeals), 0)
-		formatString: 0.00%;-0.00%;0.00%
+			COALESCE(DIVIDE(OverDeals, TotalDeals), 0)		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 63b0aff0-9501-46ad-a241-5c4d4be19b7d
 
-	/// Measure meas.opps_no_discount_count.
+	/// Purpose: Opps No Discount Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_no_discount_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    [meas.ssr_history_step_count],                 -- or COUNT of opps if you prefer
-			    TREATAS({ "0%" }, opps[trueai_discount_pct_tier])
-			)
+			[meas.ssr_history_step_count],                 -- or COUNT of opps if you prefer			TREATAS({ "0%" }, opps[trueai_discount_pct_tier])			)
 		lineageTag: 7f17629f-a273-407d-9136-24660f365ac5
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_over_discount_deal_count.
+	/// Purpose: Opps Over Discount Deal Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_over_discount_deal_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			
 			VAR OverTiers =
-			    FILTER (
-			        DimDiscountTier,
-			        DimDiscountTier[SortKey] > BestSortKey
-			    )
-			
+			FILTER (			DimDiscountTier,			DimDiscountTier[SortKey] > BestSortKey			)			
 			RETURN
-			    CALCULATE (
-			        [meas.ssr_history_step_count],
-			        TREATAS (
-			            SELECTCOLUMNS (
-			                OverTiers,
-			                "TierLabel", DimDiscountTier[trueai_discount_pct_tier]
-			            ),
-			            opps[trueai_discount_pct_tier]
-			        )
-			    )
-		lineageTag: 25e3810a-7540-4eaf-ae38-99d14a3688c4
+			CALCULATE (			[meas.ssr_history_step_count],			TREATAS (			SELECTCOLUMNS (			OverTiers,			"TierLabel", DimDiscountTier[trueai_discount_pct_tier]			),			opps[trueai_discount_pct_tier]			)			)		lineageTag: 25e3810a-7540-4eaf-ae38-99d14a3688c4
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_optimal_discount_deal_count.
+	/// Purpose: Opps Optimal Discount Deal Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
 	measure 'meas.opps_optimal_discount_deal_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR BestTier = [meas.opps_optimal_disc_level]
 			RETURN
-			    CALCULATE(
-			        [meas.ssr_history_step_count],
-			        TREATAS({ BestTier }, opps[trueai_discount_pct_tier])
-			    )
-		formatString: 0
+			CALCULATE(			[meas.ssr_history_step_count],			TREATAS({ BestTier }, opps[trueai_discount_pct_tier])			)		formatString: 0
 		lineageTag: 3df4757a-4c6f-4c6e-b5a8-fb9c558fe44f
 
-	/// Measure meas.opps_no_discount_pct.
+	/// Purpose: Opps No Discount Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_no_discount_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR NoDiscDeals =
-			    CALCULATE(
-			        [meas.ssr_history_step_count],
-			        TREATAS({ "0%" }, opps[trueai_discount_pct_tier])
-			    )
-			VAR TotalDeals =
-			    CALCULATE(
-			        [meas.ssr_history_step_count],
-			        ALL(opps[trueai_discount_pct_tier])
-			    )
-			RETURN
-			    DIVIDE(NoDiscDeals, TotalDeals)
-		lineageTag: 112e76c9-31a5-4380-ab5e-d65f6a54ef96
+			CALCULATE(			[meas.ssr_history_step_count],			TREATAS({ "0%" }, opps[trueai_discount_pct_tier])			)			VAR TotalDeals =
+			CALCULATE(			[meas.ssr_history_step_count],			ALL(opps[trueai_discount_pct_tier])			)			RETURN
+			DIVIDE(NoDiscDeals, TotalDeals)		lineageTag: 112e76c9-31a5-4380-ab5e-d65f6a54ef96
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_under_discount_deal_count.
+	/// Purpose: Opps Under Discount Deal Count.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_under_discount_deal_count' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			
 			VAR UnderTiers =
-			    FILTER (
-			        DimDiscountTier,
-			        DimDiscountTier[SortKey] < BestSortKey
-			    )
-			
+			FILTER (			DimDiscountTier,			DimDiscountTier[SortKey] < BestSortKey			)			
 			RETURN
-			    CALCULATE (
-			        [meas.ssr_history_step_count],
-			        TREATAS (
-			            SELECTCOLUMNS (
-			                UnderTiers,
-			                "TierLabel", DimDiscountTier[trueai_discount_pct_tier]
-			            ),
-			            opps[trueai_discount_pct_tier]
-			        )
-			    )
-		lineageTag: fc573d3e-78f1-4f98-8026-133216143789
+			CALCULATE (			[meas.ssr_history_step_count],			TREATAS (			SELECTCOLUMNS (			UnderTiers,			"TierLabel", DimDiscountTier[trueai_discount_pct_tier]			),			opps[trueai_discount_pct_tier]			)			)		lineageTag: fc573d3e-78f1-4f98-8026-133216143789
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_under_discount_deal_pct.
+	/// Purpose: Opps Under Discount Deal Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_under_discount_deal_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR UnderCount = [meas.opps_under_discount_deal_count]
 			VAR TotalCount =
-			    CALCULATE(
-			        [meas.ssr_history_step_count],
-			        ALL(opps[trueai_discount_pct_tier])
-			    )
-			RETURN
-			    DIVIDE(UnderCount, TotalCount)
-		lineageTag: f65c7a41-f806-4a0e-ac7c-1780f66da52f
+			CALCULATE(			[meas.ssr_history_step_count],			ALL(opps[trueai_discount_pct_tier])			)			RETURN
+			DIVIDE(UnderCount, TotalCount)		lineageTag: f65c7a41-f806-4a0e-ac7c-1780f66da52f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.optimal_discount_tier_background.
+	/// Purpose: Optimal Discount Tier Background.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.optimal_discount_tier_background' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR OptimalSortKey =
-			    CALCULATE(
-			        [meas.opps_optimal_disc_level],
-			        REMOVEFILTERS(opps)
-			    )
-			
+			CALCULATE(			[meas.opps_optimal_disc_level],			REMOVEFILTERS(opps)			)			
 			VAR ThisSortKey =
-			    CALCULATE(
-			        MAX(DimDiscountTier[SortKey]),
-			        TREATAS( { SELECTEDVALUE(opps[trueai_discount_pct_tier]) }, DimDiscountTier[trueai_discount_pct_tier] )
-			    )
-			
+			CALCULATE(			MAX(DimDiscountTier[SortKey]),			TREATAS( { SELECTEDVALUE(opps[trueai_discount_pct_tier]) }, DimDiscountTier[trueai_discount_pct_tier] )			)			
 			RETURN
-			    SWITCH(
-			        TRUE(),
-			        ThisSortKey = OptimalSortKey, "#78903B",   -- Optimal (green)
-			        ThisSortKey < OptimalSortKey, "#595B6F",   -- Under optimal (blue-gray)
-			        ThisSortKey > OptimalSortKey, "#912452",   -- Over optimal (purple-rose)
-			        "#1E1E1E"                                  -- Default
-			    )
-		lineageTag: e358cd7c-fade-48a9-8d27-8493a0f1bce1
+			SWITCH(			TRUE(),			ThisSortKey = OptimalSortKey, "#78903B",   -- Optimal (green)			ThisSortKey < OptimalSortKey, "#595B6F",   -- Under optimal (blue-gray)			ThisSortKey > OptimalSortKey, "#912452",   -- Over optimal (purple-rose)			"#1E1E1E"                                  -- Default			)		lineageTag: e358cd7c-fade-48a9-8d27-8493a0f1bce1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_optimal_discount_pct.
+	/// Purpose: Opps Optimal Discount Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_optimal_discount_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			-- Get the optimal discount tier text (e.g. "30-40%")
 			VAR TierText = [meas.opps_optimal_disc_level]
 			
@@ -958,133 +883,99 @@ table opps
 			
 			-- Extract the upper bound of the range (e.g. "40" from "30-40%")
 			VAR UpperPart =
-			    IF(
-			        ISBLANK(DashPos),
-			        SUBSTITUTE(TierText, "%", ""),         -- if no dash, just remove "%"
-			        MID(TierText, DashPos + 1, LEN(TierText))  -- else get text after "-"
-			    )
-			
+			IF(			ISBLANK(DashPos),			SUBSTITUTE(TierText, "%", ""),         -- if no dash, just remove "%"			MID(TierText, DashPos + 1, LEN(TierText))  -- else get text after "-"			)			
 			-- Convert upper bound text to a number and divide by 100 to get percent (e.g. "40" → 0.4)
 			VAR UpperPct = VALUE(SUBSTITUTE(SUBSTITUTE(UpperPart, "%", ""), "+", "")) / 100
 			
 			-- Extract the lower bound of the range (e.g. "30" from "30-40%")
 			VAR LowerPart =
-			    IF(
-			        ISBLANK(DashPos),
-			        SUBSTITUTE(TierText, "%", ""),         -- if no dash, just use the single number
-			        LEFT(TierText, DashPos - 1)            -- else get text before "-"
-			    )
-			
+			IF(			ISBLANK(DashPos),			SUBSTITUTE(TierText, "%", ""),         -- if no dash, just use the single number			LEFT(TierText, DashPos - 1)            -- else get text before "-"			)			
 			-- Convert lower bound text to a number and divide by 100 (e.g. "30" → 0.3)
 			VAR LowerPct = VALUE(SUBSTITUTE(SUBSTITUTE(LowerPart, "%", ""), "+", "")) / 100
 			
 			-- Return the midpoint of the range (e.g. (0.3 + 0.4) / 2 = 0.35)
 			RETURN
-			    DIVIDE(UpperPct + LowerPct, 2)
-		lineageTag: 4bebb021-1832-44b1-bd86-13afcb8a7888
+			DIVIDE(UpperPct + LowerPct, 2)		lineageTag: 4bebb021-1832-44b1-bd86-13afcb8a7888
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_over_discount_amount.
+	/// Purpose: Opps Over Discount Amount.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_over_discount_amount' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			
 			VAR OverTiers =
-			    FILTER (
-			        DimDiscountTier,
-			        DimDiscountTier[SortKey] > BestSortKey
-			    )
-			
+			FILTER (			DimDiscountTier,			DimDiscountTier[SortKey] > BestSortKey			)			
 			RETURN
-			    CALCULATE (
-			        SUM ( opps[trueai_discount_amt] ),
-			        TREATAS (
-			            SELECTCOLUMNS (
-			                OverTiers,
-			                "TierLabel", DimDiscountTier[trueai_discount_pct_tier]
-			            ),
-			            opps[trueai_discount_pct_tier]
-			        )
-			    )
-		lineageTag: 507893f4-f755-4633-8227-88d3a5e498e8
+			CALCULATE (			SUM ( opps[trueai_discount_amt] ),			TREATAS (			SELECTCOLUMNS (			OverTiers,			"TierLabel", DimDiscountTier[trueai_discount_pct_tier]			),			opps[trueai_discount_pct_tier]			)			)		lineageTag: 507893f4-f755-4633-8227-88d3a5e498e8
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_under_discount_amount.
+	/// Purpose: Opps Under Discount Amount.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_under_discount_amount' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			
 			VAR UnderTiers =
-			    FILTER (
-			        DimDiscountTier,
-			        DimDiscountTier[SortKey] < BestSortKey
-			    )
-			
+			FILTER (			DimDiscountTier,			DimDiscountTier[SortKey] < BestSortKey			)			
 			RETURN
-			    CALCULATE (
-			        SUM ( opps[trueai_discount_amt] ),
-			        TREATAS (
-			            SELECTCOLUMNS (
-			                UnderTiers,
-			                "TierLabel", DimDiscountTier[trueai_discount_pct_tier]
-			            ),
-			            opps[trueai_discount_pct_tier]
-			        )
-			    )
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			CALCULATE (			SUM ( opps[trueai_discount_amt] ),			TREATAS (			SELECTCOLUMNS (			UnderTiers,			"TierLabel", DimDiscountTier[trueai_discount_pct_tier]			),			opps[trueai_discount_pct_tier]			)			)		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 3b0c2120-0320-4b5f-b0ee-169487a43ba8
 
-	/// Measure meas.opps_discount_avg_pct.
+	/// Purpose: Opps Discount Avg Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_discount_avg_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			AVERAGEX(
-			    VALUES('opps'[_sys_doc_id]),
-			    VAR BookedAmt =
-			        CALCULATE(SUM('opps'[trueai_booking_amt]))
-			    VAR ListAmt =
-			        CALCULATE(SUM('opp_line_items'[trueai_list_price]))
-			    RETURN
-			        IF(
-			            ListAmt > 0,
-			            ABS(DIVIDE(ListAmt - BookedAmt, ListAmt)),   // ← always positive
-			            BLANK()
-			        )
-			)
+			VALUES('opps'[_sys_doc_id]),			VAR BookedAmt =			CALCULATE(SUM('opps'[trueai_booking_amt]))			VAR ListAmt =			CALCULATE(SUM('opp_line_items'[trueai_list_price]))			RETURN			IF(			ListAmt > 0,			ABS(DIVIDE(ListAmt - BookedAmt, ListAmt)),   // ← always positive			BLANK()			)			)
 		lineageTag: 0a4f6d01-86d8-4647-a75d-6f5468467ccb
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.trueai_discount_avg_pct.
-	measure 'meas.trueai_discount_avg_pct' = ```
+	/// Purpose: Trueai Discount Avg Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
+	measure 'meas.trueai_discount_avg_pct' = 
 			
 			VAR list_price = CALCULATE(SUM (opps[col.trueai_list_price_amt])) 
 			VAR booking = CALCULATE(SUM (opps[trueai_booking_amt])) 
 			VAR res = DIVIDE(list_price - booking, list_price, BLANK()) 
 			RETURN res
-			```
-			description: "Ratio based on opps[trueai_booking_amt]. Respects the current filter context."
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 6e72aa0a-1689-423c-a601-75d453bd1b16
 
-	/// Measure meas.opps_avg_discount_pct.
-	measure 'meas.opps_avg_discount_pct' = ```
+	/// Purpose: Opps Avg Discount Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.opps_avg_discount_pct' = 
 			
 			AVERAGE('opps'[trueai_discount_pct]) 
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: d7195d3c-688d-44b8-94cb-20117f9b2a55
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas._diagnostic_delta_test.
+	/// Purpose: Diagnostic Delta Test.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas._diagnostic_delta_test' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR SuccessRate = CALCULATE([meas.ssr_history_success_rate], KEEPFILTERS(opps))
 			VAR ExpectedRate = CALCULATE([meas.ssr_history_success_prob_avg], KEEPFILTERS(opps))
 			RETURN
@@ -1093,260 +984,241 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_over_discounted_total.
+	/// Purpose: Opps Over Discounted Total.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_over_discounted_total' =
 			
-			description: "TODO: provide business definition for this measure."
 			CALCULATE(
-			    SUMX(
-			        FILTER(
-			            VALUES(opps[trueai_discount_pct_tier]),
-			            NOT ISBLANK(opps[trueai_discount_pct_tier])
-			        ),
-			        [meas.opps_over_discount_amount]
-			    ),
-			    REMOVEFILTERS(opps[trueai_discount_pct_tier])
-			)
+			SUMX(			FILTER(			VALUES(opps[trueai_discount_pct_tier]),			NOT ISBLANK(opps[trueai_discount_pct_tier])			),			[meas.opps_over_discount_amount]			),			REMOVEFILTERS(opps[trueai_discount_pct_tier])			)
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 49d051de-1b3e-4ab6-82a4-f958870a76bf
 
-	/// Measure meas.trueai_disc_avg_pct.
+	/// Purpose: Trueai Disc Avg Pct.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Percentage
 	measure 'meas.trueai_disc_avg_pct' =
 			
-			description: "TODO: provide business definition for this measure."
 			AVERAGE(opps[trueai_discount_pct])
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: b02b6b3e-be61-49ab-bceb-67e1d3616691
 
-	/// Measure meas.opp_valid_amount.
+	/// Purpose: Opp Valid Amount.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_valid_amount' =
 			
-			description: "TODO: provide business definition for this measure."
 			IF (
-			    MAX('ssr_history'[opp_won_amt]) > 0,
-			    1,
-			    0
-			)
+			MAX('ssr_history'[opp_won_amt]) > 0,			1,			0			)
 		lineageTag: 55035ed9-e8f2-47e5-a5d8-b2e18fd447e0
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_optimal_disc_label.
+	/// Purpose: Opps Optimal Disc Label.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_optimal_disc_label' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR BestSortKey =
-			    CALCULATE(
-			        [meas.opps_optimal_disc_level],
-			        REMOVEFILTERS( DimDiscountTier )
-			    )
-			RETURN
-			    MAXX(
-			        FILTER( DimDiscountTier, DimDiscountTier[SortKey] = BestSortKey ),
-			        DimDiscountTier[trueai_discount_pct_tier]
-			    )
-		lineageTag: c2af94f1-ae16-4c71-a3c2-2f29204b57a5
+			CALCULATE(			[meas.opps_optimal_disc_level],			REMOVEFILTERS( DimDiscountTier )			)			RETURN
+			MAXX(			FILTER( DimDiscountTier, DimDiscountTier[SortKey] = BestSortKey ),			DimDiscountTier[trueai_discount_pct_tier]			)		lineageTag: c2af94f1-ae16-4c71-a3c2-2f29204b57a5
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_deals_in_optimal_tier.
+	/// Purpose: Opps Deals In Optimal Tier.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_deals_in_optimal_tier' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR BestSortKey =
-			    CALCULATE ( [meas.opps_optimal_disc_level], REMOVEFILTERS( opps ) )
-			
+			CALCULATE ( [meas.opps_optimal_disc_level], REMOVEFILTERS( opps ) )			
 			VAR OptimalTierTable =
-			    FILTER (
-			        DimDiscountTier,
-			        DimDiscountTier[SortKey] = BestSortKey
-			    )
-			
+			FILTER (			DimDiscountTier,			DimDiscountTier[SortKey] = BestSortKey			)			
 			RETURN
 			IF (
-			    ISBLANK ( BestSortKey ),
-			    BLANK(),
-			    CALCULATE (
-			        [meas.ssr_history_step_count],   -- your deal count measure
-			        TREATAS (
-			            SELECTCOLUMNS (
-			                OptimalTierTable,
-			                "TierLabel", DimDiscountTier[trueai_discount_pct_tier]
-			            ),
-			            opps[trueai_discount_pct_tier]
-			        )
-			    )
-			)
+			ISBLANK ( BestSortKey ),			BLANK(),			CALCULATE (			[meas.ssr_history_step_count],   -- your deal count measure			TREATAS (			SELECTCOLUMNS (			OptimalTierTable,			"TierLabel", DimDiscountTier[trueai_discount_pct_tier]			),			opps[trueai_discount_pct_tier]			)			)			)
 		lineageTag: aa937972-ddbf-43af-bdee-0ef2919d2932
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_excess_over_discount_amount.
+	/// Purpose: Opps Excess Over Discount Amount.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_excess_over_discount_amount' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			
 			-- All tiers above optimal
 			VAR OverTiers =
-			    FILTER( DimDiscountTier, DimDiscountTier[SortKey] > BestSortKey )
-			
+			FILTER( DimDiscountTier, DimDiscountTier[SortKey] > BestSortKey )			
 			VAR OptimalPct = [meas.optimal_discount_pct_midpoint]
 			
 			RETURN
 			SUMX(
-			    FILTER(
-			        opps,
-			        opps[trueai_discount_pct_tier] IN
-			            SELECTCOLUMNS(
-			                OverTiers,
-			                "TierLabel", DimDiscountTier[trueai_discount_pct_tier]
-			            )
-			    ),
-			    VAR ActualDiscount = opps[trueai_discount_amt]
-			    VAR BookingAmt     = opps[trueai_booking_amt]          -- Won amount per deal
-			    VAR ListPrice      = BookingAmt + ActualDiscount
-			    VAR ExpectedDiscountAtOptimal = ListPrice * OptimalPct
-			    VAR Excess = ActualDiscount - ExpectedDiscountAtOptimal
-			    RETURN MAX(Excess, 0)  -- clamp negative leakage to zero
-			)
+			FILTER(			opps,			opps[trueai_discount_pct_tier] IN			SELECTCOLUMNS(			OverTiers,			"TierLabel", DimDiscountTier[trueai_discount_pct_tier]			)			),			VAR ActualDiscount = opps[trueai_discount_amt]			VAR BookingAmt     = opps[trueai_booking_amt]          -- Won amount per deal			VAR ListPrice      = BookingAmt + ActualDiscount			VAR ExpectedDiscountAtOptimal = ListPrice * OptimalPct			VAR Excess = ActualDiscount - ExpectedDiscountAtOptimal			RETURN MAX(Excess, 0)  -- clamp negative leakage to zero			)
 		lineageTag: 69403608-0911-41c1-8e07-1730d51bcb9a
 
-	/// Measure meas.optimal_discount_pct_midpoint.
+	/// Purpose: Optimal Discount Pct Midpoint.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.optimal_discount_pct_midpoint' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR BestSortKey = [meas.opps_optimal_disc_level]
 			RETURN
-			    AVERAGEX(
-			        FILTER( DimDiscountTier, DimDiscountTier[SortKey] = BestSortKey ),
-			        ( DimDiscountTier[TierStart] + DimDiscountTier[TierEnd] ) / 2
-			    ) / 100
-		lineageTag: d427d18f-5e29-4780-b45d-b4474b77d256
+			AVERAGEX(			FILTER( DimDiscountTier, DimDiscountTier[SortKey] = BestSortKey ),			( DimDiscountTier[TierStart] + DimDiscountTier[TierEnd] ) / 2			) / 100		lineageTag: d427d18f-5e29-4780-b45d-b4474b77d256
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_excess_over_discount_amount_by_tier.
+	/// Purpose: Opps Excess Over Discount Amount By Tier.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_excess_over_discount_amount_by_tier' =
 			
-			description: "TODO: provide business definition for this measure."
 			VAR BestSortKey =
-			    CALCULATE ( [meas.opps_optimal_disc_level], REMOVEFILTERS( opps ) )
-			
+			CALCULATE ( [meas.opps_optimal_disc_level], REMOVEFILTERS( opps ) )			
 			VAR ThisSortKey =
-			    CALCULATE (
-			        MAX ( DimDiscountTier[SortKey] ),
-			        KEEPFILTERS( DimDiscountTier )
-			    )
-			
+			CALCULATE (			MAX ( DimDiscountTier[SortKey] ),			KEEPFILTERS( DimDiscountTier )			)			
 			VAR OptimalPct =
-			    [meas.optimal_discount_pct_midpoint]
-			
+			[meas.optimal_discount_pct_midpoint]			
 			RETURN
 			IF (
-			    ISBLANK ( ThisSortKey ) || ISBLANK ( BestSortKey ) || ThisSortKey <= BestSortKey,
-			    BLANK(),          -- <<< This ensures optimal & under tiers show NOTHING
-			    SUMX (
-			        opps,          -- opps table is filtered by current tier automatically
-			        VAR ActualDiscount = opps[trueai_discount_amt]
-			        VAR BookingAmt     = opps[trueai_booking_amt]
-			        VAR ListPrice      = BookingAmt + ActualDiscount
-			        VAR Expected       = ListPrice * OptimalPct
-			        VAR Excess         = ActualDiscount - Expected
-			        RETURN MAX ( Excess, 0 )
-			    )
-			)
+			ISBLANK ( ThisSortKey ) || ISBLANK ( BestSortKey ) || ThisSortKey <= BestSortKey,			BLANK(),          -- <<< This ensures optimal & under tiers show NOTHING			SUMX (			opps,          -- opps table is filtered by current tier automatically			VAR ActualDiscount = opps[trueai_discount_amt]			VAR BookingAmt     = opps[trueai_booking_amt]			VAR ListPrice      = BookingAmt + ActualDiscount			VAR Expected       = ListPrice * OptimalPct			VAR Excess         = ActualDiscount - Expected			RETURN MAX ( Excess, 0 )			)			)
 		lineageTag: f9d49b07-aa70-4715-8772-9628091580b5
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_nd_amt.
+	/// Purpose: Opp Nd Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_nd_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM ( opps[trueai_nd_amt] )
 		lineageTag: 03045633-016e-4492-9659-cc27636d00bb
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_nnb_amt.
-	measure 'meas.opp_nnb_amt' = ```
+	/// Purpose: Opp Nnb Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.opp_nnb_amt' = 
 			
 			SUM ( opps[trueai_nnb_amt] )
 			
-			```
-			description: "TODO: provide business definition for this measure."
 		lineageTag: efe1d8fb-30b1-4ab3-89e7-804be31fb5dd
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_downgrade_amt.
+	/// Purpose: Opp Downgrade Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_downgrade_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM ( opps[trueai_downgrade_amt] )
 		lineageTag: 6f61a270-93c2-4d9b-a3b6-0d9401d9dfb8
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_cross_sale_amt.
+	/// Purpose: Opp Cross Sale Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_cross_sale_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM ( opps[trueai_cross_sale_amt] )
 		lineageTag: a5c87d1c-4dcc-4ec0-8f2b-63b6fb6bfb77
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_renewal_amt.
+	/// Purpose: Opp Renewal Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_renewal_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM ( opps[trueai_renewal_amt] )
 		lineageTag: 4ac06b0a-b120-4372-8791-aad52081fe68
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_arr_amt.
+	/// Purpose: Opp Arr Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_arr_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM ( opps[trueai_arr_amt] )
 		lineageTag: d14fb762-ef99-4ec6-9aa4-04f50d08f0cb
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_one_time_amt.
+	/// Purpose: Opp One Time Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_one_time_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM ( opps[trueai_one_time_amt] )
 		lineageTag: 73387f7c-1bdc-4587-9605-88d477f6790c
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_mrr_amt.
+	/// Purpose: Opp Mrr Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_mrr_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			DIVIDE( [meas.opp_arr_amt], 12 )
 		lineageTag: 2f7a6496-8c0e-4236-bc17-b61e4a8c2e85
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opp_expansion_amt.
+	/// Purpose: Opp Expansion Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opp_expansion_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			SUM ( opps[trueai_expansion_amt] )
 		lineageTag: 3eb58e07-0156-413b-b2f8-efcbf9ec8cff
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_non_nnb_amt.
+	/// Purpose: Opps Non Nnb Amt.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.opps_non_nnb_amt' =
 			
-			description: "TODO: provide business definition for this measure."
 			[meas.opps_booking_amt] - [meas.opp_nnb_amt]
 		lineageTag: ede2a06f-8f34-430d-889a-82b9010afa15
 
@@ -1354,7 +1226,6 @@ table opps
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 88fcbd55-d718-43f8-9717-ccc01592c495
 		summarizeBy: count
@@ -1364,7 +1235,6 @@ table opps
 
 	/// The end date of the record, stripped of time
 	column _sys_filt_end_date
-		description: "System: Date/time when filt end date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: a6cf0900-2913-4ba5-8576-b6c2f8985e72
@@ -1382,7 +1252,6 @@ table opps
 
 	/// The start date of the record, stripped of time
 	column _sys_filt_start_date
-		description: "System: Date/time when filt start date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 49367a97-76a2-44aa-88af-dc267da57b6f
@@ -1400,7 +1269,6 @@ table opps
 
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
-		description: "System: Identifier for ssr."
 		dataType: string
 		lineageTag: f55be3c2-25bd-49a6-954e-d1f0612cf4c6
 		summarizeBy: none
@@ -1410,7 +1278,6 @@ table opps
 
 	/// Custom categorical variable on the account
 	column crm_account_custom_value_1
-		description: "CRM: Count of account custom value 1."
 		dataType: string
 		lineageTag: 539d75b9-5ab4-4caa-b2f8-bf8d77f44b89
 		summarizeBy: none
@@ -1420,7 +1287,6 @@ table opps
 
 	/// Custom categorical variable on the account
 	column crm_account_custom_value_2
-		description: "CRM: Count of account custom value 2."
 		dataType: string
 		lineageTag: 06fad6ce-b10b-4c5e-84de-67a29f9e9823
 		summarizeBy: none
@@ -1430,7 +1296,6 @@ table opps
 
 	/// Custom categorical variable on the account
 	column crm_account_custom_value_3
-		description: "CRM: Count of account custom value 3."
 		dataType: string
 		lineageTag: 06c8997d-4a29-4ce3-8b8b-66395e2e2dfb
 		summarizeBy: none
@@ -1440,7 +1305,6 @@ table opps
 
 	/// CRM account id of the opportunity
 	column crm_account_id
-		description: "CRM: Identifier for account."
 		dataType: string
 		lineageTag: 3b3bbf19-5963-4e2c-99cc-2dc675dee1fb
 		summarizeBy: none
@@ -1450,7 +1314,6 @@ table opps
 
 	/// Opportunity's booking amount in the CRM
 	column crm_booking_amt
-		description: "CRM: Amount for booking amt."
 		dataType: double
 		lineageTag: d4c3d431-20a1-4523-a30f-6ee2253ba7f0
 		summarizeBy: sum
@@ -1462,7 +1325,6 @@ table opps
 
 	/// Opportunity's close date in the CRM
 	column crm_close_date
-		description: "CRM: Date/time when close date."
 		dataType: dateTime
 		formatString: mm/dd/yyyy
 		lineageTag: 1144a88b-9c5c-4e96-bd8d-ec0c252506be
@@ -1480,7 +1342,6 @@ table opps
 
 	/// Opportunity's completeness score based on the CRM data
 	column crm_complt
-		description: "CRM: Numeric value for complt."
 		dataType: double
 		lineageTag: 301775ce-0f4e-4462-8146-aab775558b0a
 		summarizeBy: sum
@@ -1492,7 +1353,6 @@ table opps
 
 	/// Opportunity's contact information completeness score based on the CRM data
 	column crm_complt_contact
-		description: "CRM: Numeric value for complt contact."
 		dataType: double
 		lineageTag: eade5a58-25b1-468d-85b1-85a314c26af2
 		summarizeBy: sum
@@ -1504,7 +1364,6 @@ table opps
 
 	/// Opportunity's marketing completeness score based on the CRM data
 	column crm_complt_marketing
-		description: "CRM: Numeric value for complt marketing."
 		dataType: double
 		formatString: 0
 		lineageTag: 328ed236-1d4d-4f62-93f9-67343b9bab44
@@ -1515,7 +1374,6 @@ table opps
 
 	/// Opportunity creator's id in the CRM
 	column crm_creator_id
-		description: "CRM: Identifier for creator."
 		dataType: string
 		lineageTag: 613e63ab-3957-4d55-97e3-dd80ae42582e
 		summarizeBy: none
@@ -1525,7 +1383,6 @@ table opps
 
 	/// Opportunity's currency in the CRM
 	column crm_currency
-		description: "CRM: Text label for currency."
 		dataType: string
 		lineageTag: 354b9eed-4b20-4502-914c-6be919b3e8a7
 		summarizeBy: none
@@ -1535,7 +1392,6 @@ table opps
 
 	/// Custom categorical variable
 	column crm_custom_value_1
-		description: "CRM: Amount for custom value 1."
 		dataType: string
 		lineageTag: b325e3f8-159a-4139-80c2-f4ea62659ec9
 		summarizeBy: none
@@ -1545,7 +1401,6 @@ table opps
 
 	/// Custom categorical variable
 	column crm_custom_value_2
-		description: "CRM: Amount for custom value 2."
 		dataType: string
 		lineageTag: fb20b56e-f861-4804-8b00-9d04b3f5b9ac
 		summarizeBy: none
@@ -1555,7 +1410,6 @@ table opps
 
 	/// Custom categorical variable
 	column crm_custom_value_3
-		description: "CRM: Amount for custom value 3."
 		dataType: string
 		lineageTag: 5f5e1f09-00dc-4c26-a98c-c4d46b1a625a
 		summarizeBy: none
@@ -1565,7 +1419,6 @@ table opps
 
 	/// Link to the opportunity in the remote system (such as Salesforce)
 	column crm_deep_link
-		description: "CRM: Text label for deep link."
 		dataType: string
 		lineageTag: 05cfe5dc-9176-41d2-bc8f-d8e3ed614fae
 		dataCategory: WebUrl
@@ -1576,7 +1429,6 @@ table opps
 
 	/// Opportunity's last activity time in the CRM
 	column crm_last_act_time
-		description: "CRM: Date/time when last act time."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 5c7e8412-72f6-450c-9ba3-ed6b7c8711ef
@@ -1592,7 +1444,6 @@ table opps
 
 	/// Opportunity's lead source in the CRM
 	column crm_leadsource
-		description: "CRM: Text label for leadsource."
 		dataType: string
 		lineageTag: b6507793-1bf2-4c7d-a00d-b28b7913bff4
 		summarizeBy: none
@@ -1602,7 +1453,6 @@ table opps
 
 	/// Name of the opportunity
 	column crm_name
-		description: "CRM: Text label for name."
 		dataType: string
 		lineageTag: 79e788de-2051-412d-8200-cf3df4ee4551
 		summarizeBy: none
@@ -1612,7 +1462,6 @@ table opps
 
 	/// Opportunity owner's id in the CRM
 	column crm_owner_id
-		description: "CRM: Identifier for owner."
 		dataType: string
 		lineageTag: bd6b991f-9561-4de2-be85-0bee8e163bd1
 		summarizeBy: none
@@ -1622,7 +1471,6 @@ table opps
 
 	/// Opportunity's stage name in the CRM
 	column crm_stage_name
-		description: "CRM: Text label for stage name."
 		dataType: string
 		lineageTag: e4656938-bbe9-46ad-aadb-956c45e34181
 		summarizeBy: none
@@ -1632,7 +1480,6 @@ table opps
 
 	/// Opportunity's stage number in the CRM
 	column crm_stage_num
-		description: "CRM: Count of stage num."
 		dataType: int64
 		formatString: 0
 		lineageTag: 65b93c39-2f42-40fe-a741-b04610e837b3
@@ -1643,7 +1490,6 @@ table opps
 
 	/// Opportunity's type in the CRM
 	column crm_type
-		description: "CRM: Text label for type."
 		dataType: string
 		lineageTag: 430a5fb9-2142-4084-a963-b6339dcee13b
 		summarizeBy: none
@@ -1653,7 +1499,6 @@ table opps
 
 	/// Opportunity's city
 	column trueai_addr_city
-		description: "TrueAI: Text label for addr city."
 		dataType: string
 		lineageTag: e40d7176-d074-4d0c-ae30-b94c5758edb2
 		summarizeBy: none
@@ -1663,7 +1508,6 @@ table opps
 
 	/// Opportunity's country
 	column trueai_addr_country
-		description: "TrueAI: Count of addr country."
 		dataType: string
 		lineageTag: ca9a4f05-9adf-4b2a-aa5f-30564d36e24e
 		summarizeBy: none
@@ -1673,7 +1517,6 @@ table opps
 
 	/// Opportunity's latitude
 	column trueai_addr_lat
-		description: "TrueAI: Numeric value for addr lat."
 		dataType: double
 		lineageTag: 982db127-41e6-4eb1-945f-6df7d988b7f1
 		summarizeBy: sum
@@ -1685,7 +1528,6 @@ table opps
 
 	/// Opportunity's longitude
 	column trueai_addr_long
-		description: "TrueAI: Numeric value for addr long."
 		dataType: double
 		lineageTag: 088de29a-5fe4-4f25-9e10-53f6a5d20733
 		summarizeBy: sum
@@ -1697,7 +1539,6 @@ table opps
 
 	/// Opportunity's postal code
 	column trueai_addr_postal_code
-		description: "TrueAI: Text label for addr postal code."
 		dataType: string
 		lineageTag: 7299d1a8-1541-455d-aceb-02fb839dabc5
 		summarizeBy: none
@@ -1707,7 +1548,6 @@ table opps
 
 	/// Opportunity's address prediction rule
 	column trueai_addr_rule
-		description: "TrueAI: Numeric value for addr rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 51bddaa5-a4cd-40cc-bed2-0d58550fad47
@@ -1718,7 +1558,6 @@ table opps
 
 	/// Opportunity's state
 	column trueai_addr_state
-		description: "TrueAI: Text label for addr state."
 		dataType: string
 		lineageTag: 29ad86e7-f924-4bce-89de-c9564e3cc600
 		summarizeBy: none
@@ -1728,7 +1567,6 @@ table opps
 
 	/// Opportunity's street
 	column trueai_addr_street
-		description: "TrueAI: Text label for addr street."
 		dataType: string
 		lineageTag: 25418c07-50cc-4637-835c-135aee79b467
 		summarizeBy: none
@@ -1738,7 +1576,6 @@ table opps
 
 	/// Opportunity's booking amount
 	column trueai_booking_amt
-		description: "TrueAI: Amount for booking amt."
 		dataType: double
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: 0dd848ff-b00b-4113-b2b2-3ff214292dd3
@@ -1749,7 +1586,6 @@ table opps
 
 	/// Opportunity's booking amount rule related to the presence or absence of opp line items and custom mappings
 	column trueai_booking_amt_rule
-		description: "TrueAI: Amount for booking amt rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 554ca8fc-a26c-4a6d-8dd9-43588a45ebdb
@@ -1760,7 +1596,6 @@ table opps
 
 	/// Opportunity's close date
 	column trueai_close_date
-		description: "TrueAI: Date/time when close date."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 59cdc35d-bc26-4406-895b-410b02f3cbdb
@@ -1776,7 +1611,6 @@ table opps
 
 	/// Opportunity's standardized company size
 	column trueai_company_size
-		description: "TrueAI: Text label for company size."
 		dataType: string
 		lineageTag: 268a37ef-e827-4ce9-b4a7-c43329dc0152
 		summarizeBy: none
@@ -1786,7 +1620,6 @@ table opps
 
 	/// Opportunity's standardized company size prediction rule
 	column trueai_company_size_rule
-		description: "TrueAI: Numeric value for company size rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: f2d94749-9b87-4c34-9bd7-567e1523c0b6
@@ -1797,7 +1630,6 @@ table opps
 
 	/// Completeness score of the opportunity based on the standardized data
 	column trueai_complt
-		description: "TrueAI: Numeric value for complt."
 		dataType: double
 		lineageTag: 05b2a018-d2f5-46bd-984e-8c1d7d0f506b
 		summarizeBy: sum
@@ -1809,7 +1641,6 @@ table opps
 
 	/// Contact information completeness score of the opportunity based on the standardized data
 	column trueai_complt_contact
-		description: "TrueAI: Numeric value for complt contact."
 		dataType: double
 		lineageTag: 3f30935c-ee61-4310-b564-1af485ae9b22
 		summarizeBy: sum
@@ -1821,7 +1652,6 @@ table opps
 
 	/// Marketing completeness score of the opportunity based on the standardized data
 	column trueai_complt_marketing
-		description: "TrueAI: Numeric value for complt marketing."
 		dataType: double
 		formatString: 0
 		lineageTag: 1b759883-c0f7-4ee4-8437-c15e5711ba73
@@ -1832,7 +1662,6 @@ table opps
 
 	/// Opportunity creator's id
 	column trueai_creator_id
-		description: "TrueAI: Identifier for creator."
 		dataType: string
 		lineageTag: 54cf8b74-c048-47ef-af1b-aa98afdfdb39
 		summarizeBy: none
@@ -1842,7 +1671,6 @@ table opps
 
 	/// Total duration of activities performed on the opportunity
 	column trueai_dur
-		description: "TrueAI: Numeric value for dur."
 		dataType: int64
 		formatString: 0
 		lineageTag: 2f02e986-448a-4e27-aae1-7ac31a266f66
@@ -1853,7 +1681,6 @@ table opps
 
 	/// Opportunity's standardized industry
 	column trueai_industry
-		description: "TrueAI: Text label for industry."
 		dataType: string
 		lineageTag: 35410a22-5548-4df5-8dc1-fba4ff93f30e
 		summarizeBy: none
@@ -1863,7 +1690,6 @@ table opps
 
 	/// Opportunity's standardized industry prediction confidence
 	column trueai_industry_conf
-		description: "TrueAI: Numeric value for industry conf."
 		dataType: double
 		lineageTag: 219a06c1-7dfe-4f51-8bf4-424a3991d64b
 		summarizeBy: sum
@@ -1875,7 +1701,6 @@ table opps
 
 	/// Opportunity's standardized industry prediction rule
 	column trueai_industry_rule
-		description: "TrueAI: Numeric value for industry rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 45918e18-c642-4294-8359-37135937cf61
@@ -1886,7 +1711,6 @@ table opps
 
 	/// Boolean flag that indicates whether the opportunity is a new logo
 	column trueai_is_new_logo
-		description: "TrueAI: Indicates whether is new logo."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 473bcf62-22df-4375-930d-75c05f10697a
@@ -1897,7 +1721,6 @@ table opps
 
 	/// Opportunity's standardized lead source
 	column trueai_leadsource
-		description: "TrueAI: Text label for leadsource."
 		dataType: string
 		lineageTag: abda2696-27f8-4d81-b78f-caeab4af7e96
 		summarizeBy: none
@@ -1907,7 +1730,6 @@ table opps
 
 	/// Opportunity's standardized lead source prediction confidence
 	column trueai_leadsource_conf
-		description: "TrueAI: Numeric value for leadsource conf."
 		dataType: double
 		lineageTag: 3215f56d-0c96-4264-8a78-1abe5702f7f3
 		summarizeBy: sum
@@ -1919,7 +1741,6 @@ table opps
 
 	/// Opportunity's standardized lead source prediction rule
 	column trueai_leadsource_rule
-		description: "TrueAI: Numeric value for leadsource rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: a1cc073d-8aed-4f29-8ac9-e30155bc3758
@@ -1930,7 +1751,6 @@ table opps
 
 	/// Date when the opportunity entered the late stage
 	column trueai_opp_stage_late_date
-		description: "TrueAI: Date/time when opp stage late date."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: efbb5160-f1ba-435e-9d0a-20d8be4ce82d
@@ -1946,7 +1766,6 @@ table opps
 
 	/// Date when the opportunity entered the middle stage
 	column trueai_opp_stage_mid_date
-		description: "TrueAI: Date/time when opp stage mid date."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 39e03763-3094-4a0b-8d78-7907c7ebd0f0
@@ -1962,7 +1781,6 @@ table opps
 
 	/// Opportunity owner's id
 	column trueai_owner_id
-		description: "TrueAI: Identifier for owner."
 		dataType: string
 		lineageTag: d7eae22d-928e-4b5b-95d5-afa5e71416b2
 		summarizeBy: none
@@ -1970,33 +1788,30 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Quality bucket based on the probability of win
-	column trueai_qual_bucket
-		description: "TrueAI: Text label for qual bucket."
+	/// Propensity based on the probability of win
+	column trueai_propensity
 		dataType: string
 		lineageTag: f9ca256f-982f-4e74-8ba4-bb9073321080
 		summarizeBy: none
-		sourceColumn: trueai_qual_bucket
-		sortByColumn: trueai_qual_bucket_num
+		sourceColumn: trueai_propensity
+		sortByColumn: trueai_propensity_num
 
 		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Quality bucket expressed as an integer from 1 to 5 based on the probability of win
-	column trueai_qual_bucket_num
-		description: "TrueAI: Count of qual bucket num."
+	/// Propensity expressed as an integer from 1 to 5 based on the probability of win
+	column trueai_propensity_num
 		dataType: int64
 		formatString: 0
 		lineageTag: 45b3966e-03c2-4582-9323-719ead28155e
 		summarizeBy: sum
-		sourceColumn: trueai_qual_bucket_num
+		sourceColumn: trueai_propensity_num
 
 		annotation SummarizationSetBy = Automatic
 
 	/// Opportunity's sale type
 	column trueai_sale_type
-		description: "TrueAI: Text label for sale type."
 		dataType: string
 		lineageTag: 07005dac-4d02-4068-91fd-dc61de938357
 		summarizeBy: none
@@ -2009,7 +1824,6 @@ table opps
 
 	/// Opportunity's sale type prediction confidence
 	column trueai_sale_type_conf
-		description: "TrueAI: Numeric value for sale type conf."
 		dataType: double
 		lineageTag: 215ed405-cde1-4f5c-a9a3-6cb3b58cde6e
 		summarizeBy: sum
@@ -2021,7 +1835,6 @@ table opps
 
 	/// Opportunity's custom completeness score based on the CRM data
 	column crm_complt_custom
-		description: "CRM: Numeric value for complt custom."
 		dataType: double
 		lineageTag: 5999492c-d926-4832-98ab-554786c282fd
 		summarizeBy: sum
@@ -2033,7 +1846,6 @@ table opps
 
 	/// The date of the last data request from the platform
 	column _sys_as_of
-		description: "System: Date/time when as of."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: c7f5019a-1c24-4def-954f-0feda653998f
@@ -2049,7 +1861,6 @@ table opps
 
 	/// Boolean flag that indicates whether the opportunity is active
 	column _sys_is_active
-		description: "System: Indicates whether is active."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 8d15dfa8-d8b0-4f03-8ceb-085049a0275d
@@ -2060,7 +1871,6 @@ table opps
 
 	/// The date of the last data modification in the platform
 	column _sys_last_modified_on
-		description: "System: Date/time when last modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 928dd265-7cd0-4ba5-abc6-37e4f8c1660f
@@ -2076,7 +1886,6 @@ table opps
 
 	/// Opportunity creation date in the CRM
 	column crm_created_on
-		description: "CRM: Date/time when created on."
 		dataType: dateTime
 		formatString: mm/dd/yyyy
 		lineageTag: 62264037-ceeb-4dfe-b533-d6f672fad326
@@ -2094,7 +1903,6 @@ table opps
 
 	/// Boolean flag that indicates whether the opportunity is closed in the CRM
 	column crm_is_closed
-		description: "CRM: Indicates whether is closed."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 5eea1041-471a-407c-a0ab-e9c415cfd495
@@ -2105,7 +1913,6 @@ table opps
 
 	/// Boolean flag that indicates whether the opportunity is won in the CRM
 	column crm_is_won
-		description: "CRM: Indicates whether is won."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 53a19397-2f50-494e-8d99-35fccf120d2b
@@ -2116,7 +1923,6 @@ table opps
 
 	/// Opportunity modified on date in the CRM
 	column crm_modified_on
-		description: "CRM: Date/time when modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 07331f49-c5ab-4cc1-a634-b12cbf861274
@@ -2132,7 +1938,6 @@ table opps
 
 	/// Opportunity's prospecting entity
 	column trueai_created_from_entity
-		description: "TrueAI: Text label for created from entity."
 		dataType: string
 		lineageTag: 742606d0-e93f-4ebc-8d08-c078da19668d
 		summarizeBy: none
@@ -2142,7 +1947,6 @@ table opps
 
 	/// Opportunity's prospecting object's id
 	column trueai_created_from_id
-		description: "TrueAI: Identifier for created from."
 		dataType: string
 		lineageTag: aa27386e-90e5-4f08-9ca3-51edf081d66a
 		summarizeBy: none
@@ -2152,7 +1956,6 @@ table opps
 
 	/// Opportunity creation date
 	column trueai_created_on
-		description: "TrueAI: Date/time when created on."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 4ac75f07-9bff-4eb9-955f-62f41b038c16
@@ -2168,7 +1971,6 @@ table opps
 
 	/// Boolean flag that indicates whether the opportunity is won
 	column trueai_is_won
-		description: "TrueAI: Indicates whether is won."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 54610216-0dc2-4191-b4d9-07c2600e15ca
@@ -2179,7 +1981,6 @@ table opps
 
 	/// Opportunity's normalized stage
 	column trueai_stage
-		description: "TrueAI: Text label for stage."
 		dataType: string
 		lineageTag: 6d231412-b655-416f-85f6-fcd506b75399
 		summarizeBy: none
@@ -2189,7 +1990,6 @@ table opps
 
 	/// Probability of win
 	column trueai_prob_of_win
-		description: "TrueAI: Numeric value for prob of win."
 		dataType: double
 		lineageTag: e96f5ead-faa8-42cb-a0c4-25e6e468cd04
 		summarizeBy: sum
@@ -2201,7 +2001,6 @@ table opps
 
 	/// Opportunity discount amount
 	column trueai_discount_amt
-		description: "TrueAI: Count of discount amt."
 		dataType: double
 		lineageTag: dd9afbc5-9311-4dbb-90fd-76e9c3596e80
 		summarizeBy: sum
@@ -2213,7 +2012,6 @@ table opps
 
 	/// Opportunity discount percentage
 	column trueai_discount_pct
-		description: "TrueAI: Count of discount pct."
 		dataType: double
 		lineageTag: d298504b-9662-4b09-9aab-80a719e715be
 		summarizeBy: sum
@@ -2225,7 +2023,6 @@ table opps
 
 	/// Opportunity's booking amount currency conversion rule
 	column trueai_booking_amt_currency_rule
-		description: "TrueAI: Amount for booking amt currency rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7b6cd046-3091-4b34-b6ea-a53f77229ffc
@@ -2236,7 +2033,6 @@ table opps
 
 	/// Boolean flag indicating whether the opportunity should be treated as an order instead.
 	column trueai_is_erp
-		description: "TrueAI: Indicates whether is erp."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 7d9e4a19-7c94-4224-ad6f-c5331b95b036
@@ -2247,7 +2043,6 @@ table opps
 
 	/// Opportunity's account id
 	column trueai_account_id
-		description: "TrueAI: Identifier for account."
 		dataType: string
 		lineageTag: 38aace67-e071-4e69-8e17-bfe4b3611c6b
 		summarizeBy: none
@@ -2257,7 +2052,6 @@ table opps
 
 	/// Opportunity's account id rule
 	column trueai_account_id_rule
-		description: "TrueAI: Count of account id rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: ada4f524-9e2e-49ea-8afa-8bb8d8bf6e1e
@@ -2268,7 +2062,6 @@ table opps
 
 	/// Opportunity's account id confidence
 	column trueai_account_id_conf
-		description: "TrueAI: Count of account id conf."
 		dataType: double
 		lineageTag: 47a16c39-3029-4312-8b23-238b97b72a29
 		summarizeBy: sum
@@ -2280,7 +2073,6 @@ table opps
 
 	/// Test model
 	column trueai_test
-		description: "TrueAI: Text label for test."
 		dataType: string
 		lineageTag: 8235a218-47c3-488d-94b6-f0fc6734df6a
 		summarizeBy: none
@@ -2290,7 +2082,6 @@ table opps
 
 	/// Test model confidence
 	column trueai_test_conf
-		description: "TrueAI: Numeric value for test conf."
 		dataType: double
 		lineageTag: c26bab90-9678-4bff-a19d-3c932528c7de
 		summarizeBy: sum
@@ -2302,7 +2093,6 @@ table opps
 
 	/// Test model rule
 	column trueai_test_rule
-		description: "TrueAI: Text label for test rule."
 		dataType: string
 		lineageTag: bb9e0b1e-408f-4af7-8170-f562456c840b
 		summarizeBy: none
@@ -2312,7 +2102,6 @@ table opps
 
 	/// Test model debug information
 	column trueai_test_debug
-		description: "TrueAI: Text label for test debug."
 		dataType: string
 		lineageTag: b2c5a489-baa2-4e76-9490-72ff85b96c81
 		summarizeBy: none
@@ -2322,7 +2111,6 @@ table opps
 
 	/// Opportunity's close date rule
 	column trueai_close_date_rule
-		description: "TrueAI: Date/time when close date rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 4a805e69-9ff1-4921-9f82-d28e45171d26
@@ -2333,7 +2121,6 @@ table opps
 
 	/// Opportunity's start date rule
 	column trueai_start_date_rule
-		description: "TrueAI: Date/time when start date rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 97453820-32b1-4563-9da8-f3df29fc9a57
@@ -2344,7 +2131,6 @@ table opps
 
 	/// Opportunity creation date rule
 	column trueai_created_on_rule
-		description: "TrueAI: Numeric value for created on rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: c0fbf987-1837-4e35-b070-79819bf797be
@@ -2355,7 +2141,6 @@ table opps
 
 	/// Opportunity creator's id rule
 	column trueai_creator_id_rule
-		description: "TrueAI: Numeric value for creator id rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: dcbe66ad-1b7d-48af-af14-ea824512d9ba
@@ -2366,7 +2151,6 @@ table opps
 
 	/// Opportunity owner's id rule
 	column trueai_owner_id_rule
-		description: "TrueAI: Numeric value for owner id rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7e8df0f3-1876-44dd-83cf-d5f5d63aa703
@@ -2377,7 +2161,6 @@ table opps
 
 	/// cust_text1
 	column cust_text1
-		description: "Text label for cust text1."
 		dataType: string
 		lineageTag: e48fcd0a-3356-4007-a9e6-6d394a682b00
 		summarizeBy: none
@@ -2387,7 +2170,6 @@ table opps
 
 	/// cust_text2
 	column cust_text2
-		description: "Text label for cust text2."
 		dataType: string
 		lineageTag: 5ebbaece-ef39-4c52-b8ff-6172a75cae84
 		summarizeBy: none
@@ -2397,7 +2179,6 @@ table opps
 
 	/// cust_text3
 	column cust_text3
-		description: "Text label for cust text3."
 		dataType: string
 		lineageTag: c6437621-96ff-47ba-bcf9-194ddadcc939
 		summarizeBy: none
@@ -2407,7 +2188,6 @@ table opps
 
 	/// cust_text4
 	column cust_text4
-		description: "Text label for cust text4."
 		dataType: string
 		lineageTag: d5b944c2-4b57-4489-9bd4-46eedae481f3
 		summarizeBy: none
@@ -2417,7 +2197,6 @@ table opps
 
 	/// cust_text5
 	column cust_text5
-		description: "Text label for cust text5."
 		dataType: string
 		lineageTag: c0b6e9c7-8274-4915-8d1c-de54e2859974
 		summarizeBy: none
@@ -2427,7 +2206,6 @@ table opps
 
 	/// cust_num1
 	column cust_num1
-		description: "Count of cust num1."
 		dataType: double
 		lineageTag: 1703943b-4f7a-4ea8-9e41-044d05ba67e3
 		summarizeBy: sum
@@ -2439,7 +2217,6 @@ table opps
 
 	/// cust_num2
 	column cust_num2
-		description: "Count of cust num2."
 		dataType: double
 		lineageTag: 158a4065-a0b1-43e1-987b-408d2b323a9c
 		summarizeBy: sum
@@ -2451,7 +2228,6 @@ table opps
 
 	/// cust_num3
 	column cust_num3
-		description: "Count of cust num3."
 		dataType: double
 		lineageTag: a955c0ad-aad2-4b12-9e60-bdbbcf47ff30
 		summarizeBy: sum
@@ -2463,7 +2239,6 @@ table opps
 
 	/// cust_num4
 	column cust_num4
-		description: "Count of cust num4."
 		dataType: double
 		lineageTag: 253ab445-e75c-43eb-8931-0406d3bf798a
 		summarizeBy: sum
@@ -2475,7 +2250,6 @@ table opps
 
 	/// cust_num5
 	column cust_num5
-		description: "Count of cust num5."
 		dataType: double
 		lineageTag: f8ea7d53-c480-4f9a-aa20-8c84078f9998
 		summarizeBy: sum
@@ -2487,7 +2261,6 @@ table opps
 
 	/// cust_num6
 	column cust_num6
-		description: "Count of cust num6."
 		dataType: double
 		lineageTag: 75d92bbc-8a2a-4892-b6f6-92c3a246fff8
 		summarizeBy: sum
@@ -2499,7 +2272,6 @@ table opps
 
 	/// cust_num7
 	column cust_num7
-		description: "Count of cust num7."
 		dataType: double
 		lineageTag: ed3a4644-5693-4232-820a-d8a7914af484
 		summarizeBy: sum
@@ -2511,7 +2283,6 @@ table opps
 
 	/// cust_bool1
 	column cust_bool1
-		description: "Indicates whether cust bool1."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 71b1d167-6b8d-408b-a435-68e504812741
@@ -2522,7 +2293,6 @@ table opps
 
 	/// cust_bool2
 	column cust_bool2
-		description: "Indicates whether cust bool2."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 190fd143-80cf-4c29-a07e-c8662f559509
@@ -2533,7 +2303,6 @@ table opps
 
 	/// Column trueai_sale_type_num.
 	column trueai_sale_type_num
-		description: "TrueAI: Count of sale type num."
 		dataType: int64
 		formatString: 0
 		lineageTag: d5ad6812-4d01-47da-8e56-fcbda475547e
@@ -2544,7 +2313,6 @@ table opps
 
 	/// Column 'col.opp_age' =.
 	column 'col.opp_age' =
-			description: "Unclear: Value for col opp age."
 			
 			var _current_date = TODAY()
 			var _created_date = opps[crm_created_on]
@@ -2561,7 +2329,6 @@ table opps
 
 	/// Column 'col.trueai_opp_stages_recorded' = ```.
 	column 'col.trueai_opp_stages_recorded' = ```
-			description: "Unclear: Value for col trueai opp stages recorded."
 			
 			var opp_id = opps[_sys_doc_id] // get the opp i
 			var res = CALCULATE(DISTINCTCOUNT(open_pipeline[trueai_stage_name]), open_pipeline[crm_opp_id] = opp_id) // distinct count # of opp_pieline values 
@@ -2575,7 +2342,6 @@ table opps
 
 	/// Column 'col.trueai_days' = ```.
 	column 'col.trueai_days' = ```
-			 description: "Numeric value for col trueai days."
 			
 			 var days = [_sys_filt_end_date] - [_sys_filt_start_date] // get days 
 			 var res = if ( opps[crm_is_closed] = false , BLANK(), days ) // closed only
@@ -2594,7 +2360,6 @@ table opps
 
 	/// Opportunity's loss reason in the CRM
 	column crm_loss_reason
-		description: "CRM: Text label for loss reason."
 		dataType: string
 		lineageTag: 1d8edd5f-2f0e-403b-8819-4223be800caa
 		summarizeBy: none
@@ -2604,7 +2369,6 @@ table opps
 
 	/// CRM pipeline id of the opportunity
 	column crm_pipeline_id
-		description: "CRM: Identifier for pipeline."
 		dataType: string
 		lineageTag: b68cd95a-ec03-4a4d-a7c2-84a9db8377e5
 		summarizeBy: none
@@ -2614,7 +2378,6 @@ table opps
 
 	/// CRM pipeline name of the opportunity
 	column crm_pipeline_name
-		description: "CRM: Text label for pipeline name."
 		dataType: string
 		lineageTag: 098a82b7-496c-47ac-b6d3-f8daea0efa57
 		summarizeBy: none
@@ -2624,7 +2387,6 @@ table opps
 
 	/// Opportunity's loss reason
 	column trueai_loss_reason
-		description: "TrueAI: Text label for loss reason."
 		dataType: string
 		lineageTag: 2227ec9d-5ce9-418c-b27a-316c37be4cbb
 		summarizeBy: none
@@ -2634,7 +2396,6 @@ table opps
 
 	/// Opportunity's stage ID in the CRM
 	column crm_stage_id
-		description: "CRM: Identifier for stage."
 		dataType: string
 		lineageTag: b2fe47bb-23b0-42c2-964a-1654c44a999d
 		summarizeBy: none
@@ -2644,7 +2405,6 @@ table opps
 
 	/// Opportunity's stage ID
 	column trueai_stage_id
-		description: "TrueAI: Identifier for stage."
 		dataType: string
 		lineageTag: 4ca57c41-1c46-41de-89ed-fc4817a0d140
 		summarizeBy: none
@@ -2654,7 +2414,6 @@ table opps
 
 	/// Opportunity's stage name
 	column trueai_stage_name
-		description: "TrueAI: Text label for stage name."
 		dataType: string
 		lineageTag: 0dabd22b-ac43-4dd5-af35-1eeb3d0925ae
 		summarizeBy: none
@@ -2664,7 +2423,6 @@ table opps
 
 	/// Pipeline name of the opportunity
 	column trueai_pipeline_name
-		description: "TrueAI: Text label for pipeline name."
 		dataType: string
 		lineageTag: 9627b322-883d-45f4-8178-4b9ab26ce3d4
 		summarizeBy: none
@@ -2674,7 +2432,6 @@ table opps
 
 	/// Opportunity Age
 	column trueai_age
-		description: "TrueAI: Numeric value for age."
 		dataType: int64
 		formatString: 0
 		lineageTag: cc25fbc2-deb6-42f0-9b30-3f4c6f7aa266
@@ -2685,7 +2442,6 @@ table opps
 
 	/// Opportunity discount percentage tier
 	column trueai_discount_pct_tier
-		description: "TrueAI: Count of discount pct tier."
 		dataType: string
 		lineageTag: d5d56924-c4f6-4819-ab08-6cca48c59b9f
 		summarizeBy: none
@@ -2695,7 +2451,6 @@ table opps
 
 	/// Opportunity's NNB amount
 	column trueai_nnb_amt
-		description: "TrueAI: Amount for nnb amt."
 		dataType: double
 		lineageTag: e9f6bc83-15bd-48c0-91ec-d57c3a73a98b
 		summarizeBy: sum
@@ -2707,7 +2462,6 @@ table opps
 
 	/// Opportunity's downgrade amount
 	column trueai_downgrade_amt
-		description: "TrueAI: Amount for downgrade amt."
 		dataType: double
 		lineageTag: bd379382-b3be-4dd3-8ef7-189895232667
 		summarizeBy: sum
@@ -2719,7 +2473,6 @@ table opps
 
 	/// Opportunity's Cross-Sale amount
 	column trueai_cross_sale_amt
-		description: "TrueAI: Amount for cross sale amt."
 		dataType: double
 		lineageTag: a2b152b4-9691-4e96-8d53-7cac21ea41fe
 		summarizeBy: sum
@@ -2731,7 +2484,6 @@ table opps
 
 	/// Opportunity's renewal amount
 	column trueai_renewal_amt
-		description: "TrueAI: Amount for renewal amt."
 		dataType: double
 		lineageTag: 5130b759-05ac-429f-b8d6-b640da10ec5c
 		summarizeBy: sum
@@ -2743,7 +2495,6 @@ table opps
 
 	/// Opportunity's expansion amount
 	column trueai_expansion_amt
-		description: "TrueAI: Amount for expansion amt."
 		dataType: double
 		lineageTag: 2aa9029e-00e5-4143-b125-ff4976f53cd7
 		summarizeBy: sum
@@ -2755,7 +2506,6 @@ table opps
 
 	/// Opportunity's one time amount
 	column trueai_one_time_amt
-		description: "TrueAI: Date/time when one time amt."
 		dataType: double
 		lineageTag: 89b7956b-1362-4c1b-b5b3-94b83d51344b
 		summarizeBy: sum
@@ -2767,7 +2517,6 @@ table opps
 
 	/// Opportunity's non determinable amount
 	column trueai_nd_amt
-		description: "TrueAI: Amount for nd amt."
 		dataType: double
 		lineageTag: 0ebcb086-8b02-4f52-8347-ba15c0ad5583
 		summarizeBy: sum
@@ -2779,7 +2528,6 @@ table opps
 
 	/// Opportunity's ARR amount
 	column trueai_arr_amt
-		description: "TrueAI: Amount for arr amt."
 		dataType: double
 		lineageTag: 1093cd30-1cdd-48a7-8902-022cc75af8cb
 		summarizeBy: sum
@@ -2791,7 +2539,6 @@ table opps
 
 	/// Column 'col.trueai_list_price_amt' = ```.
 	column 'col.trueai_list_price_amt' = ```
-			description: "Amount for col trueai list price amt."
 			
 			[trueai_booking_amt]-[trueai_discount_amt]
 			
@@ -2804,7 +2551,6 @@ table opps
 
 	/// Opportunity's last crm stage, before it was lost
 	column trueai_lost_crm_stage
-		description: "TrueAI: Text label for lost crm stage."
 		dataType: string
 		lineageTag: 4658f8e3-0042-4231-b182-53675d8cb4a2
 		summarizeBy: none
@@ -2814,7 +2560,6 @@ table opps
 
 	/// Opportunity's Initial Subscription amount
 	column trueai_initial_subscription_amt
-		description: "TrueAI: Amount for initial subscription amt."
 		dataType: double
 		lineageTag: 30ddaf79-4844-4d47-bc28-72376f6f0d3e
 		summarizeBy: sum
@@ -2823,6 +2568,38 @@ table opps
 		annotation SummarizationSetBy = Automatic
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column trueai_pred_booking_amt
+		dataType: string
+		lineageTag: be8c29d5-414a-45f7-9080-c92691b06859
+		summarizeBy: none
+		sourceColumn: trueai_pred_booking_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_pred_close_date
+		dataType: string
+		lineageTag: ba1e2de3-123b-4bba-9662-49a2bb9f0af9
+		summarizeBy: none
+		sourceColumn: trueai_pred_close_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_pred_close_date_if_won
+		dataType: string
+		lineageTag: 1c29cddb-7aa3-47f6-ba9e-74298cc1897d
+		summarizeBy: none
+		sourceColumn: trueai_pred_close_date_if_won
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_pred_close_date_if_lost
+		dataType: string
+		lineageTag: 1f16ad66-2a7a-48ad-b1c9-1523b76c79fb
+		summarizeBy: none
+		sourceColumn: trueai_pred_close_date_if_lost
+
+		annotation SummarizationSetBy = Automatic
 
 	partition opps-844b2383-8abc-4f81-b4fd-92ba5ff8a92a = m
 		mode: import
@@ -2910,8 +2687,8 @@ table opps
 				        {"trueai_owner_id_rule", Int64.Type},
 				        {"trueai_pipeline_name", type text},
 				        {"trueai_prob_of_win", type number},
-				        {"trueai_qual_bucket", type text},
-				        {"trueai_qual_bucket_num", Int64.Type},
+				        {"trueai_propensity", type text},
+				        {"trueai_propensity_num", Int64.Type},
 				        {"trueai_renewal_amt", type number},
 				        {"trueai_sale_type", type text},
 				        {"trueai_sale_type_conf", type number},

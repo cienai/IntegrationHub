@@ -2,7 +2,11 @@
 table report_versions
 	lineageTag: feead5d3-417c-4a86-b923-ee3151b279d1
 
-	/// Measure meas.report_versions_current_ver.
+	/// Purpose: Report Versions Current Ver.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.report_versions_current_ver' = maxx(topn(1, report_versions, report_versions[release_date] ,DESC), [version])
 		lineageTag: a7f6e283-43c0-4471-a500-586962b4bf1e
 
@@ -38,8 +42,8 @@ table report_versions
 				let
 				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMtEz0DM2VtJRMjTSN9U3MjAyVoqNBQA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [version = _t, release_date = _t]),
 				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"version", type text}, {"release_date", type date}}),
-				    #"Replaced Value" = Table.ReplaceValue(#"Changed Type","4.0.33","4.3.3",Replacer.ReplaceText,{"version"}),
-				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value",#date(2023, 12, 5),#date(2025, 02, 18),Replacer.ReplaceValue,{"release_date"})
+				    #"Replaced Value" = Table.ReplaceValue(#"Changed Type","4.0.33","4.3.4",Replacer.ReplaceText,{"version"}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value",#date(2023, 12, 5),#date(2025, 02, 24),Replacer.ReplaceValue,{"release_date"})
 				in
 				    #"Replaced Value1"
 

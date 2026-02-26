@@ -1,10 +1,13 @@
 /// CRM entity for contact records enriched with TrueAI predictive insights.
 table contacts
-	description: "One row per contact record. Source fields include CRM, System, TrueAI prefixes. Related to LocalDateTable_b796b35a-1fcc-44c3-a1fe-8b7945a74123 (_sys_filt_end_date -> Date), LocalDateTable_4a533cf9-0999-4765-b7bb-cf37ad970107 (crm_last_act_time -> Date), users (crm_owner_id -> _sys_doc_id). Supports measures such as meas.contact_trueai_completeness_improvement."
 	lineageTag: e95d03ab-d655-415d-b942-9545f293c54c
 
-	/// Measure meas.contact_trueai_completeness_improvement.
-	measure 'meas.contact_trueai_completeness_improvement' = ```
+	/// Purpose: Contact Trueai Completeness Improvement.
+	/// Logic: VAR blocks define intermediate values (crmval, aival, impro, res) used later in the expression.
+	/// Dependencies: Measures: [crm_complt], [trueai_complt].
+	/// Context: Uses IF for conditional branching.
+	/// Output: Percentage
+	measure 'meas.contact_trueai_completeness_improvement' = 
 			
 			var crmval = CALCULATE(AVERAGE([crm_complt]))
 			var aival = CALCULATE(AVERAGE([trueai_complt]))
@@ -12,15 +15,12 @@ table contacts
 			var res = If(impro > 0, "+" & FORMAT( impro, "###%"),  "No change")
 			return res 
 			
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: 0 %
 		displayFolder: _needs_atte
 		lineageTag: b5bae688-efc8-42ef-bd98-83c8994f8390
 
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
-		description: "System: Identifier for ssr."
 		dataType: string
 		lineageTag: ce00c989-b987-4057-9275-2b06ded62fec
 		summarizeBy: none
@@ -30,7 +30,6 @@ table contacts
 
 	/// Link to the contact in the remote system (such as Salesforce)
 	column crm_deep_link
-		description: "CRM: Text label for deep link."
 		dataType: string
 		lineageTag: ecc627c3-8216-45c0-931a-3b90054bc6a7
 		summarizeBy: none
@@ -40,7 +39,6 @@ table contacts
 
 	/// Contact's first name
 	column crm_first_name
-		description: "CRM: Text label for first name."
 		dataType: string
 		lineageTag: 331f0bd3-79bf-4c77-88a9-14cd089d67ea
 		summarizeBy: none
@@ -50,7 +48,6 @@ table contacts
 
 	/// Contact's last name
 	column crm_last_name
-		description: "CRM: Text label for last name."
 		dataType: string
 		lineageTag: 71934ea8-1719-47de-acc5-f22bfd20f488
 		summarizeBy: none
@@ -60,7 +57,6 @@ table contacts
 
 	/// Contact's phone number
 	column crm_phone
-		description: "CRM: Text label for phone."
 		dataType: string
 		lineageTag: a14b43e4-ae67-4ddb-abd3-23218d4aa329
 		summarizeBy: none
@@ -70,7 +66,6 @@ table contacts
 
 	/// Contact's email
 	column crm_email
-		description: "CRM: Text label for email."
 		dataType: string
 		lineageTag: 8805688c-9279-4004-a151-c795d388a821
 		summarizeBy: none
@@ -80,7 +75,6 @@ table contacts
 
 	/// Contact's title in the CRM
 	column crm_title
-		description: "CRM: Text label for title."
 		dataType: string
 		lineageTag: 8a159f8e-b947-410b-bbac-9c3f6e95a548
 		summarizeBy: none
@@ -90,7 +84,6 @@ table contacts
 
 	/// Contact's salutation in the CRM
 	column crm_salutation
-		description: "CRM: Text label for salutation."
 		dataType: string
 		lineageTag: 5bd4478f-1699-4ffa-8e2e-da0e6f6af6b6
 		summarizeBy: none
@@ -100,7 +93,6 @@ table contacts
 
 	/// Contact's lead source in the CRM
 	column crm_leadsource
-		description: "CRM: Text label for leadsource."
 		dataType: string
 		lineageTag: 0d1acf56-24a6-4cc8-808e-4119ddf4d3e4
 		summarizeBy: none
@@ -110,7 +102,6 @@ table contacts
 
 	/// Contact's standardized lead source
 	column trueai_leadsource
-		description: "TrueAI: Text label for leadsource."
 		dataType: string
 		lineageTag: bba276f8-ee32-441e-bbf3-c617db0efac4
 		summarizeBy: none
@@ -120,7 +111,6 @@ table contacts
 
 	/// Contact's standardized lead source prediction rule
 	column trueai_leadsource_rule
-		description: "TrueAI: Numeric value for leadsource rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: ad8db5db-5a21-43be-8fdb-c0293e39846b
@@ -131,7 +121,6 @@ table contacts
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: b98893c9-8572-40e0-ae85-a2b8fef87943
 		summarizeBy: none
@@ -141,7 +130,6 @@ table contacts
 
 	/// The end date of the record, stripped of time
 	column _sys_filt_end_date
-		description: "System: Date/time when filt end date."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 816c4a85-6786-4c2e-8223-669954dd09ff
@@ -159,7 +147,6 @@ table contacts
 
 	/// The start date of the record, stripped of time
 	column _sys_filt_start_date
-		description: "System: Date/time when filt start date."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: 445aef34-4960-4923-bac9-cd37c986334f
@@ -172,7 +159,6 @@ table contacts
 
 	/// CRM account id of the contact
 	column crm_account_id
-		description: "CRM: Identifier for account."
 		dataType: string
 		lineageTag: d4112359-7b7e-4762-ab60-17fb7bb71def
 		summarizeBy: none
@@ -182,7 +168,6 @@ table contacts
 
 	/// Contact's city in the CRM
 	column crm_addr_city
-		description: "CRM: Text label for addr city."
 		dataType: string
 		lineageTag: baec63ca-c2ec-460e-bd37-cf3ab417620b
 		summarizeBy: none
@@ -192,7 +177,6 @@ table contacts
 
 	/// Contact's country in the CRM
 	column crm_addr_country
-		description: "CRM: Count of addr country."
 		dataType: string
 		lineageTag: 91c07c5b-9b59-47dc-a209-2d8625de40f7
 		summarizeBy: none
@@ -202,7 +186,6 @@ table contacts
 
 	/// Contact's postal code in the CRM
 	column crm_addr_postal_code
-		description: "CRM: Text label for addr postal code."
 		dataType: string
 		lineageTag: c191c6ea-9672-42a9-ab60-72d8e2723ee0
 		summarizeBy: none
@@ -212,7 +195,6 @@ table contacts
 
 	/// Contact's state in the CRM
 	column crm_addr_state
-		description: "CRM: Text label for addr state."
 		dataType: string
 		lineageTag: 95f9f35e-52f5-46a0-85b3-b412eb9d93bb
 		summarizeBy: none
@@ -222,7 +204,6 @@ table contacts
 
 	/// Contact's street in the CRM
 	column crm_addr_street
-		description: "CRM: Text label for addr street."
 		dataType: string
 		lineageTag: 211e9794-9a76-4dd3-b077-e09c08fbff4c
 		summarizeBy: none
@@ -232,7 +213,6 @@ table contacts
 
 	/// Contact's completeness score based on the CRM data
 	column crm_complt
-		description: "CRM: Numeric value for complt."
 		dataType: double
 		lineageTag: a350d20f-26e9-448b-84cf-4a659dba24c1
 		summarizeBy: sum
@@ -244,7 +224,6 @@ table contacts
 
 	/// Contact's contact information completeness score based on the CRM data
 	column crm_complt_contact
-		description: "CRM: Numeric value for complt contact."
 		dataType: double
 		lineageTag: 974eb3ba-2242-4da7-bc1d-53a68913520b
 		summarizeBy: sum
@@ -256,7 +235,6 @@ table contacts
 
 	/// Contact's contact method completeness score based on the CRM data
 	column crm_complt_contact_method
-		description: "CRM: Numeric value for complt contact method."
 		dataType: double
 		lineageTag: 5ef751b0-d288-45a0-92b6-fc163659f91e
 		summarizeBy: sum
@@ -268,7 +246,6 @@ table contacts
 
 	/// Contact's location completeness score based on the CRM data
 	column crm_complt_geo
-		description: "CRM: Numeric value for complt geo."
 		dataType: double
 		lineageTag: 4a9eacaf-c681-45ab-83f5-4cc24dd1b54d
 		summarizeBy: sum
@@ -280,7 +257,6 @@ table contacts
 
 	/// Contact's marketing completeness score based on the CRM data
 	column crm_complt_marketing
-		description: "CRM: Numeric value for complt marketing."
 		dataType: double
 		lineageTag: 4302ba42-f7ec-4ebb-bd52-89217c495d8a
 		summarizeBy: sum
@@ -292,7 +268,6 @@ table contacts
 
 	/// Contact creator's id in the CRM
 	column crm_creator_id
-		description: "CRM: Identifier for creator."
 		dataType: string
 		lineageTag: 05aa60af-817a-4984-acd8-4dfa513ce371
 		summarizeBy: none
@@ -302,7 +277,6 @@ table contacts
 
 	/// Contact's last activity time in the CRM
 	column crm_last_act_time
-		description: "CRM: Date/time when last act time."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 25d495b2-faf9-4b1e-94ba-171811168aa2
@@ -318,7 +292,6 @@ table contacts
 
 	/// Contact owner's id in the CRM
 	column crm_owner_id
-		description: "CRM: Identifier for owner."
 		dataType: string
 		lineageTag: a726c901-0d28-4fbf-b930-0683c0b089e4
 		summarizeBy: none
@@ -328,7 +301,6 @@ table contacts
 
 	/// Contact's city
 	column trueai_addr_city
-		description: "TrueAI: Text label for addr city."
 		dataType: string
 		lineageTag: a996bf99-b305-4456-a459-32192dd8626a
 		summarizeBy: none
@@ -338,7 +310,6 @@ table contacts
 
 	/// Contact's country
 	column trueai_addr_country
-		description: "TrueAI: Count of addr country."
 		dataType: string
 		lineageTag: 16253b95-cdd9-4c41-9e77-ca383bc681fc
 		summarizeBy: none
@@ -348,7 +319,6 @@ table contacts
 
 	/// Contact's postal code
 	column trueai_addr_postal_code
-		description: "TrueAI: Text label for addr postal code."
 		dataType: string
 		lineageTag: 895c1991-201a-4b96-b263-078ce52ce9da
 		summarizeBy: none
@@ -358,7 +328,6 @@ table contacts
 
 	/// Contact's address prediction rule
 	column trueai_addr_rule
-		description: "TrueAI: Numeric value for addr rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: ecab651f-1073-4858-a7f3-f56116cd5976
@@ -369,7 +338,6 @@ table contacts
 
 	/// Contact's state
 	column trueai_addr_state
-		description: "TrueAI: Text label for addr state."
 		dataType: string
 		lineageTag: 31c370f4-e853-43ff-af7d-52fbfe3aaeac
 		summarizeBy: none
@@ -379,7 +347,6 @@ table contacts
 
 	/// Contact's street
 	column trueai_addr_street
-		description: "TrueAI: Text label for addr street."
 		dataType: string
 		lineageTag: 03e52dc4-d6fc-41aa-9fb2-d0d1d3c77cb9
 		summarizeBy: none
@@ -389,7 +356,6 @@ table contacts
 
 	/// Completeness score of the contact based on the standardized data
 	column trueai_complt
-		description: "TrueAI: Numeric value for complt."
 		dataType: double
 		lineageTag: 1b21281e-3a05-4145-8e26-202f6548042a
 		summarizeBy: sum
@@ -401,7 +367,6 @@ table contacts
 
 	/// Contact information completeness score of the contact based on the standardized data
 	column trueai_complt_contact
-		description: "TrueAI: Numeric value for complt contact."
 		dataType: double
 		lineageTag: db37d6a5-7540-45e9-997f-2d8b51321d0b
 		summarizeBy: sum
@@ -413,7 +378,6 @@ table contacts
 
 	/// Contact method completeness score of the contact based on the standardized data
 	column trueai_complt_contact_method
-		description: "TrueAI: Numeric value for complt contact method."
 		dataType: double
 		lineageTag: 1ab35eaf-6213-4fa7-89e7-1ec42e998f62
 		summarizeBy: sum
@@ -425,7 +389,6 @@ table contacts
 
 	/// Location completeness score of the contact based on the standardized data
 	column trueai_complt_geo
-		description: "TrueAI: Numeric value for complt geo."
 		dataType: double
 		lineageTag: ed517df7-df1d-4058-b5f0-e8f269e0cb9f
 		summarizeBy: sum
@@ -437,7 +400,6 @@ table contacts
 
 	/// Marketing completeness score of the contact based on the standardized data
 	column trueai_complt_marketing
-		description: "TrueAI: Numeric value for complt marketing."
 		dataType: double
 		lineageTag: 78f7e7ee-acc7-4095-bd9c-dbc9fcf77b8e
 		summarizeBy: sum
@@ -449,7 +411,6 @@ table contacts
 
 	/// Contact creator's id
 	column trueai_creator_id
-		description: "TrueAI: Identifier for creator."
 		dataType: string
 		lineageTag: 6d864b18-5883-4b35-a982-b77bb7045957
 		summarizeBy: none
@@ -459,7 +420,6 @@ table contacts
 
 	/// Contact's standardized lead source prediction confidence
 	column trueai_leadsource_conf
-		description: "TrueAI: Numeric value for leadsource conf."
 		dataType: double
 		lineageTag: a0907482-bfae-43ca-a5c4-dddadfbbc8b0
 		summarizeBy: sum
@@ -471,7 +431,6 @@ table contacts
 
 	/// Contact owner's id
 	column trueai_owner_id
-		description: "TrueAI: Identifier for owner."
 		dataType: string
 		lineageTag: 78479c90-af82-4ff9-97ed-6d5754adbe5e
 		summarizeBy: none
@@ -481,7 +440,6 @@ table contacts
 
 	/// Contact's standardized seniority
 	column trueai_title_seniority
-		description: "TrueAI: Text label for title seniority."
 		dataType: string
 		lineageTag: ada25ab0-9820-4e7b-8cf6-b8412d772fe7
 		summarizeBy: none
@@ -491,7 +449,6 @@ table contacts
 
 	/// Contact's standardized seniority prediction confidence
 	column trueai_title_seniority_conf
-		description: "TrueAI: Numeric value for title seniority conf."
 		dataType: double
 		lineageTag: 219c071b-ed64-451c-b5e8-7fbbf202303a
 		summarizeBy: sum
@@ -503,7 +460,6 @@ table contacts
 
 	/// Column 'col.expected_usefulness' = ```.
 	column 'col.expected_usefulness' = ```
-			description: "Numeric value for col expected usefulness."
 			
 			// var asof = contacts[_sys_as_of]
 			// var days_since_edit =  asof - contacts[crm_created_on]
@@ -530,7 +486,6 @@ table contacts
 
 	/// Contact's latitude
 	column trueai_addr_lat
-		description: "TrueAI: Numeric value for addr lat."
 		dataType: double
 		lineageTag: c08c2c48-038f-4d33-be0b-29510fba893c
 		summarizeBy: sum
@@ -542,7 +497,6 @@ table contacts
 
 	/// Contact's longitude
 	column trueai_addr_long
-		description: "TrueAI: Numeric value for addr long."
 		dataType: double
 		lineageTag: a5854470-9e0f-4a05-833f-8c5c15694142
 		summarizeBy: sum
@@ -554,7 +508,6 @@ table contacts
 
 	/// The date of the last data request from the platform
 	column _sys_as_of
-		description: "System: Date/time when as of."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 0a360da9-a9ea-421c-82c8-4fe45c00b1b6
@@ -570,7 +523,6 @@ table contacts
 
 	/// The date of the last data modification in the platform
 	column _sys_last_modified_on
-		description: "System: Date/time when last modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: c5892cf6-2754-413d-9617-34c7c64c4168
@@ -586,7 +538,6 @@ table contacts
 
 	/// Contact creation date in the CRM
 	column crm_created_on
-		description: "CRM: Date/time when created on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: a4b91601-e02f-43ad-9860-8236ac6dd77f
@@ -602,7 +553,6 @@ table contacts
 
 	/// Contact modified on date in the CRM
 	column crm_modified_on
-		description: "CRM: Date/time when modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: e193f3a6-2a72-4f01-996e-2b9017c0d80c
@@ -618,7 +568,6 @@ table contacts
 
 	/// Contact creation date
 	column trueai_created_on
-		description: "TrueAI: Date/time when created on."
 		dataType: dateTime
 		formatString: Long Date
 		lineageTag: e35f9a7a-f7c8-44bd-9d48-3d1e8013ee4f
@@ -636,7 +585,6 @@ table contacts
 
 	/// Test model
 	column trueai_test
-		description: "TrueAI: Text label for test."
 		dataType: string
 		lineageTag: 50b2341c-31e9-4938-b6a7-c1695cd3c38a
 		summarizeBy: none
@@ -646,7 +594,6 @@ table contacts
 
 	/// Test model confidence
 	column trueai_test_conf
-		description: "TrueAI: Numeric value for test conf."
 		dataType: double
 		lineageTag: 7a9dc1c4-9289-4abb-ae89-2d5e322dfdc3
 		summarizeBy: sum
@@ -658,7 +605,6 @@ table contacts
 
 	/// Test model rule
 	column trueai_test_rule
-		description: "TrueAI: Text label for test rule."
 		dataType: string
 		lineageTag: 54e48af1-eb30-4bbe-a2b2-4771f9e07657
 		summarizeBy: none
@@ -668,7 +614,6 @@ table contacts
 
 	/// Test model debug information
 	column trueai_test_debug
-		description: "TrueAI: Text label for test debug."
 		dataType: string
 		lineageTag: e6c1e9d8-668c-4177-aed7-a00711b7b550
 		summarizeBy: none
@@ -678,7 +623,6 @@ table contacts
 
 	/// cust_text1
 	column cust_text1
-		description: "Text label for cust text1."
 		dataType: string
 		lineageTag: bc16dec5-5cc2-419f-bd32-42165236f556
 		summarizeBy: none
@@ -688,7 +632,6 @@ table contacts
 
 	/// cust_text2
 	column cust_text2
-		description: "Text label for cust text2."
 		dataType: string
 		lineageTag: 9928d585-abcb-44e9-ab34-4e5ee7c1c7b2
 		summarizeBy: none
@@ -698,7 +641,6 @@ table contacts
 
 	/// cust_text3
 	column cust_text3
-		description: "Text label for cust text3."
 		dataType: string
 		lineageTag: 2c120d05-533a-4cf1-9f88-872bd301621a
 		summarizeBy: none
@@ -708,7 +650,6 @@ table contacts
 
 	/// cust_text4
 	column cust_text4
-		description: "Text label for cust text4."
 		dataType: string
 		lineageTag: 739d4f4e-96bf-43e3-aae5-b2fce0cbb10f
 		summarizeBy: none
@@ -718,7 +659,6 @@ table contacts
 
 	/// cust_text5
 	column cust_text5
-		description: "Text label for cust text5."
 		dataType: string
 		lineageTag: eb2582f0-cfcc-40b0-93e2-82a25cb19246
 		summarizeBy: none
@@ -728,7 +668,6 @@ table contacts
 
 	/// cust_num1
 	column cust_num1
-		description: "Count of cust num1."
 		dataType: double
 		lineageTag: ed1a0f0e-a392-4bbd-b64d-8479e198aa99
 		summarizeBy: sum
@@ -740,7 +679,6 @@ table contacts
 
 	/// cust_num2
 	column cust_num2
-		description: "Count of cust num2."
 		dataType: double
 		lineageTag: 27747d37-0d4a-4f08-8a8c-78ccea89a269
 		summarizeBy: sum
@@ -752,7 +690,6 @@ table contacts
 
 	/// cust_num3
 	column cust_num3
-		description: "Count of cust num3."
 		dataType: double
 		lineageTag: 9d0b34e2-49bc-4cfa-a9c7-d4f20f996e5e
 		summarizeBy: sum
@@ -764,7 +701,6 @@ table contacts
 
 	/// cust_num4
 	column cust_num4
-		description: "Count of cust num4."
 		dataType: double
 		lineageTag: 87901ffd-756d-47bd-a58d-664ed4e33d08
 		summarizeBy: sum
@@ -776,7 +712,6 @@ table contacts
 
 	/// cust_num5
 	column cust_num5
-		description: "Count of cust num5."
 		dataType: double
 		lineageTag: a94dd129-f63e-47d2-9686-15055085a15d
 		summarizeBy: sum
@@ -788,7 +723,6 @@ table contacts
 
 	/// cust_num6
 	column cust_num6
-		description: "Count of cust num6."
 		dataType: double
 		lineageTag: 456972e2-69ef-423c-bd45-59d2c6270c2a
 		summarizeBy: sum
@@ -800,7 +734,6 @@ table contacts
 
 	/// cust_num7
 	column cust_num7
-		description: "Count of cust num7."
 		dataType: double
 		lineageTag: c2197821-9a6f-4cbd-b95f-eda5e0ea4419
 		summarizeBy: sum
@@ -812,7 +745,6 @@ table contacts
 
 	/// cust_bool1
 	column cust_bool1
-		description: "Indicates whether cust bool1."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 6f9be1db-58cb-4926-b34e-9182c903a807
@@ -823,7 +755,6 @@ table contacts
 
 	/// cust_bool2
 	column cust_bool2
-		description: "Indicates whether cust bool2."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 351df501-7a93-46a3-9bfe-aef550fcb915
@@ -834,7 +765,6 @@ table contacts
 
 	/// Contact's standardized department
 	column trueai_title_department
-		description: "TrueAI: Text label for title department."
 		dataType: string
 		lineageTag: a5ed7e63-6839-4d6b-a60e-e60a7094e348
 		summarizeBy: none
@@ -844,7 +774,6 @@ table contacts
 
 	/// Contact's standardized department prediction confidence
 	column trueai_title_department_conf
-		description: "TrueAI: Numeric value for title department conf."
 		dataType: double
 		lineageTag: b8578ec5-562b-47e6-871c-5c291c4403f1
 		summarizeBy: sum
@@ -939,7 +868,7 @@ table contacts
 				in
 				dbTableTyped
 
-	annotation PBI_ResultType = Table
+	annotation PBI_ResultType = Exception
 
 	annotation PBI_NavigationStepName = Navigation
 

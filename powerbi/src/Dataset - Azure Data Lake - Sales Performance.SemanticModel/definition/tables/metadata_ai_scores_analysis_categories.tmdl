@@ -1,26 +1,23 @@
 /// Reference list for high-level AI score groupings (e.g., Momentum, Risk) used in reporting dashboards.
 table metadata_ai_scores_analysis_categories
-	description: "One row per metadata_ai_scores_analysis_category record. Source fields include System prefixes. Related to LocalDateTable_848334f2-7363-498f-99e2-531cd4676b50 (_sys_modified_on -> Date). Supports measures such as meas.analysis_cat_weighted_avg."
 	lineageTag: 2a9487c6-d810-48ea-ac55-50ee75f3d4b8
 
-	/// Measure meas.analysis_cat_weighted_avg.
-	measure 'meas.analysis_cat_weighted_avg' = ```
+	/// Purpose: Analysis Cat Weighted Avg.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Whole number
+	measure 'meas.analysis_cat_weighted_avg' = 
 			
 			var sum_prod = SUMX(
-			    metadata_ai_scores,
-			    [meas.ai_score] * [meas.metadata_score_weighting_pct]
-			) // get teh sum product of the weighting and the score
+			metadata_ai_scores,			[meas.ai_score] * [meas.metadata_score_weighting_pct]			) // get teh sum product of the weighting and the score
 			var sum_weights = SUMX(
-			    metadata_ai_scores,
-			     [meas.metadata_score_weighting_pct]
-			) // get the sum of weighting
+			metadata_ai_scores,			[meas.metadata_score_weighting_pct]			) // get the sum of weighting
 			var res = DIVIDE( sum_prod, sum_weights)
 			
 			return res
 			
 			
-			```
-			description: "Ratio measure. Respects the current filter context."
 		formatString: 0
 		lineageTag: 9c3ab88f-1120-4e1e-8193-01bbd2fc7a88
 
@@ -28,7 +25,6 @@ table metadata_ai_scores_analysis_categories
 
 	/// Unique AI score identifier
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 5742a150-e24a-4953-909b-bc950f37c3a2
 		summarizeBy: none
@@ -38,7 +34,6 @@ table metadata_ai_scores_analysis_categories
 
 	/// Is Active
 	column _sys_is_active
-		description: "System: Indicates whether is active."
 		dataType: string
 		lineageTag: e2eaa130-5b11-481d-b866-fbdd3c13d589
 		summarizeBy: none
@@ -48,7 +43,6 @@ table metadata_ai_scores_analysis_categories
 
 	/// Modified On Date
 	column _sys_modified_on
-		description: "System: Date/time when modified on."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 61f0b517-3109-4e17-b7b6-49f5c75bf372
@@ -64,7 +58,6 @@ table metadata_ai_scores_analysis_categories
 
 	/// Category Name
 	column category_name
-		description: "Text label for category name."
 		dataType: string
 		lineageTag: 9ec99825-cecd-48e6-a9e7-1a2b29bd08f1
 		summarizeBy: none
@@ -74,7 +67,6 @@ table metadata_ai_scores_analysis_categories
 
 	/// Description
 	column description
-		description: "Text label for description."
 		dataType: string
 		lineageTag: 7b6718be-dd28-460a-b722-e5c0fe4461ea
 		summarizeBy: none
@@ -84,7 +76,6 @@ table metadata_ai_scores_analysis_categories
 
 	/// Sort Order
 	column sort_order
-		description: "Numeric value for sort order."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1d85e3c5-f341-4183-b510-a8e243d4793e

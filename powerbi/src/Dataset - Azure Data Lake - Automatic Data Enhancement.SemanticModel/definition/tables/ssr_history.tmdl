@@ -1,56 +1,60 @@
 /// Derived entity for the chronological log of transitions through the Single Sales Record (SSR) lifecycle. Sequence: Lead Gen -> Untouched -> Prospecting -> New Logo -> Post-Sales Support -> Existing Customer Selling.
 table ssr_history
-	description: "One row per ssr_history record. Source fields include System prefixes. Related to LocalDateTable_acf5c056-7dbf-4af9-b3b1-f5cd7a9dbce5 (opp_late_date -> Date), LocalDateTable_5d931608-5e0e-476a-ad83-2e4a7aeba3ea (opp_mid_date -> Date), LocalDateTable_2720c721-e2f2-4d36-a491-4a5c0ee8b2b6 (step_end_date -> Date). Supports measures such as meas.ssr_history_success_count, meas.ssr_history_success_rate."
 	lineageTag: c2ee1095-155a-44f5-a5af-efb2bc2dc2c5
 
-	/// Measure meas.ssr_history_success_count.
-	measure 'meas.ssr_history_success_count' = ```
+	/// Purpose: Ssr History Success Count.
+	/// Logic: No VAR blocks.
+	/// Dependencies: Columns: ssr_history[_sys_doc_id], ssr_history[step_success].
+	/// Context: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Output: Whole number
+	measure 'meas.ssr_history_success_count' = 
 			CALCULATE(count(ssr_history[_sys_doc_id]),ssr_history[step_success] = true)  
-			```
-			description: "Count of ssr_history[_sys_doc_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ssr_history_analyis
 		lineageTag: fbf78099-2fdd-4373-9016-2af11cc5f240
 
-	/// Measure meas.ssr_history_success_rate.
+	/// Purpose: Ssr History Success Rate.
+	/// Logic: No VAR blocks.
+	/// Dependencies: Columns: ssr_history[_sys_doc_id] | Measures: [meas.ssr_history_success_count].
+	/// Context: No explicit conditional branching detected.
+	/// Output: Percentage
 	measure 'meas.ssr_history_success_rate' = DIVIDE([meas.ssr_history_success_count], count(ssr_history[_sys_doc_id]))
-		description: "Ratio based on ssr_history[_sys_doc_id]. Respects the current filter context."
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _ssr_history_analyis
 		lineageTag: cda20e0e-69cf-402d-9516-347d9e518aa3
 
-	/// Measure meas.ssr_history_step_summary.
-	measure 'meas.ssr_history_step_summary' = ```
+	/// Purpose: Ssr History Step Summary.
+	/// Logic: No VAR blocks.
+	/// Dependencies: Columns: ssr_history[step_owner_user_role].
+	/// Context: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Output: Decimal
+	measure 'meas.ssr_history_step_summary' = 
 			// get the step owner user role
 			CALCULATE(MAX(ssr_history[step_owner_user_role])) 
-			```
-			description: "Ratio based on ssr_history[step_owner_user_role]. Respects the current filter context."
 		displayFolder: _ssr_history_analyis
 		lineageTag: 6abc5488-273b-4e5d-b362-1ba28618566c
 
-	/// Measure meas.ssr_history_touched_accounts.
+	/// Purpose: Ssr History Touched Accounts.
+	/// Logic: No VAR blocks.
+	/// Dependencies: Columns: ssr_history[_sys_ssr_id], ssr_history[step_name].
+	/// Context: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Output: Whole number
 	measure 'meas.ssr_history_touched_accounts' = CALCULATE(DISTINCTCOUNT(ssr_history[_sys_ssr_id]), ssr_history[step_name] ="Prospecting")
-		description: "Distinct count of ssr_history[_sys_ssr_id]. Respects the current filter context."
 		formatString: 0
 		displayFolder: _ssr_history_analyis
 		lineageTag: 3ed7eb07-019d-4902-b108-7fddffd138fd
 
-	/// Measure meas.ssr_history_adj_dur_conf.
+	/// Purpose: Ssr History Adj Dur Conf.
+	/// Logic: No VAR blocks.
+	/// Dependencies: No explicit column or measure references detected..
+	/// Context: No explicit conditional branching detected.
+	/// Output: Decimal
 	measure 'meas.ssr_history_adj_dur_conf' =
-			description: "TODO: provide business definition for this measure."
 			// this comment is for check the github  version check
 			
 			VAR temp_tbl = CALCULATETABLE(ssr_history, ssr_history[step_name] in {"Prospecing", "New Logo Selling", "Post-Sales Support","Existing Customer Selling"}) // Get the current table context but exclude the unthcouded stage etc
 			VAR res = AVERAGEX(
-			    temp_tbl,
-			    SWITCH(
-			        ssr_history[stkhlds_all_adj_dur_rule],
-			        "116022", 0.3,  // 116022 is industry avg, not reliable
-			        "116021", 0.6,   // 116021 is peer avg, okay
-			        "116023", 0.9,   // 116023 is the best info from the owner
-			        "116024", 0.8    // 116024 is good data but not from the primary owner
-			    )
-			)
+			temp_tbl,			SWITCH(			ssr_history[stkhlds_all_adj_dur_rule],			"116022", 0.3,  // 116022 is industry avg, not reliable			"116021", 0.6,   // 116021 is peer avg, okay			"116023", 0.9,   // 116023 is the best info from the owner			"116024", 0.8    // 116024 is good data but not from the primary owner			)			)
 			RETURN res  // Return the result
 		formatString: 0.00
 		displayFolder: _tl_analysis
@@ -58,7 +62,6 @@ table ssr_history
 
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
-		description: "System: Identifier for ssr."
 		dataType: string
 		lineageTag: 5dab0112-202e-4780-9aad-25b2f42a82d8
 		summarizeBy: none
@@ -68,7 +71,6 @@ table ssr_history
 
 	/// Opportunity id on selling steps, first opportunity id on steps prior to that, last opportunity id on post-sales support steps
 	column entity_opp_id
-		description: "Identifier for entity opp."
 		dataType: string
 		lineageTag: b951ec4a-2cb6-4841-8e1d-4af168b4dbc3
 		summarizeBy: none
@@ -77,18 +79,16 @@ table ssr_history
 		annotation SummarizationSetBy = Automatic
 
 	/// Quality bucket based on the probability of success
-	column entity_qual_bucket
-		description: "Text label for entity qual bucket."
+	column entity_propensity
 		dataType: string
 		lineageTag: 579230fa-0af4-417b-8716-1fe876b243f7
 		summarizeBy: none
-		sourceColumn: entity_qual_bucket
+		sourceColumn: entity_propensity
 
 		annotation SummarizationSetBy = Automatic
 
 	/// Opportunity's current normalized stage, present in selling steps
 	column opp_final_stage
-		description: "Text label for opp final stage."
 		dataType: string
 		lineageTag: 24f7cb62-2901-4a1a-9ebf-b4819c07a601
 		summarizeBy: none
@@ -98,7 +98,6 @@ table ssr_history
 
 	/// Date when the opportunity entered the late stage, present in selling steps
 	column opp_late_date
-		description: "Date/time when opp late date."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: f2803e7d-3dac-4f6a-b087-23324f73c630
@@ -114,7 +113,6 @@ table ssr_history
 
 	/// Date when the opportunity entered the middle stage, present in selling steps
 	column opp_mid_date
-		description: "Date/time when opp mid date."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 498cc59b-fe65-4c19-9cde-c7bed977ee34
@@ -130,7 +128,6 @@ table ssr_history
 
 	/// End date of the step
 	column step_end_date
-		description: "Date/time when step end date."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: a9a6219e-126e-43f8-b744-594d761f0672
@@ -146,7 +143,6 @@ table ssr_history
 
 	/// Rule used to determine the end date of the step
 	column step_end_rule
-		description: "Numeric value for step end rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: d53dfdac-41ed-49c3-92ad-edcdc273fbe0
@@ -157,7 +153,6 @@ table ssr_history
 
 	/// Id of the step, specific to every step name
 	column step_id
-		description: "Identifier for step."
 		dataType: string
 		lineageTag: ee7f53b4-2284-45c0-ab85-a00c96e0e966
 		summarizeBy: none
@@ -167,7 +162,6 @@ table ssr_history
 
 	/// Number of days from the step start date to end date
 	column step_length_in_days
-		description: "Numeric value for step length in days."
 		dataType: int64
 		formatString: 0
 		lineageTag: 7eba4b01-d3d5-4128-a557-fbe339f5bf8a
@@ -178,7 +172,6 @@ table ssr_history
 
 	/// Name of the step
 	column step_name
-		description: "Text label for step name."
 		dataType: string
 		lineageTag: 40c49999-5de7-4f44-8aa7-dc1baddec394
 		summarizeBy: none
@@ -188,7 +181,6 @@ table ssr_history
 
 	/// Outcome of the step, if end date present
 	column step_outcome
-		description: "Text label for step outcome."
 		dataType: string
 		lineageTag: 27b46a21-ec44-44a3-bab7-da6b81d3866b
 		summarizeBy: none
@@ -198,7 +190,6 @@ table ssr_history
 
 	/// Rule used to determine the outcome of the step, if end date present
 	column step_outcome_rule
-		description: "Numeric value for step outcome rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: eba6e07a-0c95-4ba8-9071-c9a58c6c8682
@@ -209,7 +200,6 @@ table ssr_history
 
 	/// Prep factor of the owner of the step
 	column step_owner_prep_factor
-		description: "Numeric value for step owner prep factor."
 		dataType: double
 		lineageTag: 70517a6e-8e13-4364-9085-23194faa46d2
 		summarizeBy: sum
@@ -221,7 +211,6 @@ table ssr_history
 
 	/// Rule used to determine the owner of the step
 	column step_owner_rule
-		description: "Numeric value for step owner rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: fce5c0af-3fda-41de-9300-65438c9c995d
@@ -232,7 +221,6 @@ table ssr_history
 
 	/// User role of the owner of the step
 	column step_owner_user_role
-		description: "Text label for step owner user role."
 		dataType: string
 		lineageTag: b2930202-3eb6-4436-8753-05be01b7abd1
 		summarizeBy: none
@@ -242,7 +230,6 @@ table ssr_history
 
 	/// Ordinal number based on the position of the step in the sequence
 	column step_sequence
-		description: "Numeric value for step sequence."
 		dataType: int64
 		formatString: 0
 		lineageTag: 74a06d8a-95fb-4cf4-b1cb-62d8161026cc
@@ -253,7 +240,6 @@ table ssr_history
 
 	/// Start date of the step
 	column step_start_date
-		description: "Date/time when step start date."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: dfa5e53d-58fa-4db7-bf27-0e618ddac181
@@ -269,7 +255,6 @@ table ssr_history
 
 	/// Probability of successful outcome of the step
 	column step_success_prob
-		description: "Numeric value for step success prob."
 		dataType: double
 		formatString: 0%;-0%;0%
 		lineageTag: 76c30b2c-598d-4c21-8110-04190102d95e
@@ -280,7 +265,6 @@ table ssr_history
 
 	/// Boolean flag that indicates whether the outcome of the step was successful
 	column step_success
-		description: "Indicates whether step success."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: c6d1fb0a-d3e0-4f18-9ea2-58e469ae45ad
@@ -291,7 +275,6 @@ table ssr_history
 
 	/// Value created during the step
 	column vi_value_created
-		description: "Amount for vi value created."
 		dataType: double
 		lineageTag: 30322891-c9f1-4b88-b781-315e5687ad84
 		summarizeBy: sum
@@ -303,7 +286,6 @@ table ssr_history
 
 	/// Value delivered at the end of the step
 	column vi_value_delivered
-		description: "Amount for vi value delivered."
 		dataType: double
 		lineageTag: 7debbe86-1dbe-4d14-bffb-dc0aacd2e2b3
 		summarizeBy: sum
@@ -315,7 +297,6 @@ table ssr_history
 
 	/// Column 'col.simplified_outcome' =.
 	column 'col.simplified_outcome' =
-			description: "Unclear: Value for col simplified outcome."
 			if(ssr_history[step_success],
 			
 			    SWITCH(ssr_history[step_name], "Lead Gen", "Unique SSR Accounts Generated", "Untouched", "Touched", "Prospecting", "Converted", "New Logo Selling", "Won", "Post-Sales Support", "Supported",  "Existing Customer Selling", "Upsold/Renewed")
@@ -329,7 +310,6 @@ table ssr_history
 
 	/// Column 'col.step_name_outcome' = ```.
 	column 'col.step_name_outcome' = ```
-			description: "Unclear: Value for col step name outcome."
 			
 			var concat_str = (ssr_history[step_name] & "_" &  if(or(ISBLANK(ssr_history[step_outcome]),ssr_history[step_outcome] = "" ) , "ongoing", ssr_history[step_outcome]))
 			var clean_str = SUBSTITUTE(lower(concat_str), " ", "_")
@@ -343,7 +323,6 @@ table ssr_history
 
 	/// Column 'col.time_line_summary' = ```.
 	column 'col.time_line_summary' = ```
-			description: "Date/time when col time line summary."
 			
 			var space_char = "_" //" " // uses special space char " " instead of reg space
 			var line_len = 35
@@ -390,7 +369,6 @@ table ssr_history
 
 	/// Opportunity's close date in the first opportunity history entry, present in selling steps
 	column opp_initial_close_date
-		description: "Date/time when opp initial close date."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: da6d505c-7027-42cf-a0b6-f73e1e7bd0e7
@@ -406,7 +384,6 @@ table ssr_history
 
 	/// Opportunity's sale type, present in selling steps
 	column opp_sale_type
-		description: "Text label for opp sale type."
 		dataType: string
 		lineageTag: 5d5f0842-add2-4c1d-8663-3e097b3f93e1
 		summarizeBy: none
@@ -416,7 +393,6 @@ table ssr_history
 
 	/// Opportunity's current CRM stage name, present in selling steps
 	column opp_crm_stage
-		description: "Text label for opp crm stage."
 		dataType: string
 		lineageTag: 1259d0d4-9d4e-4dce-be0b-73586a253504
 		summarizeBy: none
@@ -426,7 +402,6 @@ table ssr_history
 
 	/// Entity of the primary object related to the step
 	column entity_primary
-		description: "Text label for entity primary."
 		dataType: string
 		lineageTag: 1a34793c-6549-4cf5-a521-2d600811b983
 		summarizeBy: none
@@ -436,7 +411,6 @@ table ssr_history
 
 	/// Account id, if account already exists
 	column entity_account_id
-		description: "Identifier for entity account."
 		dataType: string
 		lineageTag: 569cdd75-7a8c-4381-9284-ad2f4abad3f7
 		summarizeBy: none
@@ -446,7 +420,6 @@ table ssr_history
 
 	/// Lead id, if the prospecting object is a lead
 	column entity_lead_id
-		description: "Identifier for entity lead."
 		dataType: string
 		lineageTag: 9eff1ee5-775b-4c76-9999-c7d94e76ae4c
 		summarizeBy: none
@@ -456,7 +429,6 @@ table ssr_history
 
 	/// Custom categorical variable
 	column entity_crm_custom_value_1
-		description: "Amount for entity crm custom value 1."
 		dataType: string
 		lineageTag: 07a5f813-78db-47f8-9792-43fd553e2bb5
 		summarizeBy: none
@@ -466,7 +438,6 @@ table ssr_history
 
 	/// Custom categorical variable
 	column entity_crm_custom_value_2
-		description: "Amount for entity crm custom value 2."
 		dataType: string
 		lineageTag: d075f504-804f-473a-b75f-edb9d7b78e38
 		summarizeBy: none
@@ -476,7 +447,6 @@ table ssr_history
 
 	/// Custom categorical variable
 	column entity_crm_custom_value_3
-		description: "Amount for entity crm custom value 3."
 		dataType: string
 		lineageTag: 283e37f4-4f46-498f-a876-b433532c3088
 		summarizeBy: none
@@ -486,7 +456,6 @@ table ssr_history
 
 	/// Opportunity's last normalized stage, before it was lost
 	column opp_lost_stage
-		description: "Text label for opp lost stage."
 		dataType: string
 		lineageTag: 7db7d08d-50d1-47f0-84c5-3cc69919a8d1
 		summarizeBy: none
@@ -496,7 +465,6 @@ table ssr_history
 
 	/// Opportunity's CRM type, present in selling steps
 	column opp_crm_type
-		description: "Text label for opp crm type."
 		dataType: string
 		lineageTag: 322fa32e-00ae-43b1-82e9-c253df6a3257
 		summarizeBy: none
@@ -506,7 +474,6 @@ table ssr_history
 
 	/// Probability of successful outcome of the step
 	column step_next_success_prob
-		description: "Numeric value for step next success prob."
 		dataType: double
 		lineageTag: c0536ef9-11f7-4630-838f-a8a2e2eed88a
 		summarizeBy: sum
@@ -518,7 +485,6 @@ table ssr_history
 
 	/// Id of the owner of the step
 	column step_owner_id
-		description: "Identifier for step owner."
 		dataType: string
 		lineageTag: 2b87f9a1-d041-42d5-84e5-f10769aaeae3
 		summarizeBy: none
@@ -528,7 +494,6 @@ table ssr_history
 
 	/// Number of activities performed by the owner of the step
 	column step_owner_act
-		description: "Numeric value for step owner act."
 		dataType: double
 		lineageTag: cd8ca7b2-0015-4d08-8ecb-90ed24996507
 		summarizeBy: sum
@@ -540,7 +505,6 @@ table ssr_history
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
-		description: "System: Identifier for doc."
 		dataType: string
 		lineageTag: 018ce634-26b5-4f20-8a34-713a7c2f3205
 		summarizeBy: none
@@ -550,7 +514,6 @@ table ssr_history
 
 	/// The end date of the record, stripped of time
 	column _sys_filt_end_date
-		description: "System: Date/time when filt end date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: c1e3d606-2ba1-49ff-ae1e-9cc683770d15
@@ -570,7 +533,6 @@ table ssr_history
 
 	/// The start date of the record, stripped of time
 	column _sys_filt_start_date
-		description: "System: Date/time when filt start date."
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 7d88bde0-f009-4b9d-8000-c788e3c33da3
@@ -585,7 +547,6 @@ table ssr_history
 
 	/// Completeness score of the account based on the CRM data
 	column entity_primary_crm_complt
-		description: "Numeric value for entity primary crm complt."
 		dataType: double
 		lineageTag: f0b557b7-37f1-4af3-b4e4-3a5ca2d53ca8
 		summarizeBy: sum
@@ -597,7 +558,6 @@ table ssr_history
 
 	/// Unique record identifier of the primary object related to the step, based on the ID of the document in the remote system (such as Salesforce ID)
 	column entity_primary_doc_id
-		description: "Identifier for entity primary doc."
 		dataType: string
 		lineageTag: 0d0089cd-8162-4af0-befa-1c2d3ce10da0
 		summarizeBy: none
@@ -607,7 +567,6 @@ table ssr_history
 
 	/// Completeness score of the account based on the standardized data
 	column entity_primary_trueai_complt
-		description: "Numeric value for entity primary trueai complt."
 		dataType: double
 		lineageTag: ad2129d7-0236-4602-a862-af62cb2a9c53
 		summarizeBy: sum
@@ -619,7 +578,6 @@ table ssr_history
 
 	/// Opportunity's booking amount
 	column opp_booking_amt
-		description: "Amount for opp booking amt."
 		dataType: double
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: 3dd48081-1cf7-458d-93a2-cf461dc58120
@@ -632,7 +590,6 @@ table ssr_history
 
 	/// Opportunity's booking amount in the first opportunity history entry, present in selling steps
 	column opp_initial_amt
-		description: "Amount for opp initial amt."
 		dataType: double
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: df730a7a-f07b-4b2c-b334-7474cb5989f7
@@ -645,7 +602,6 @@ table ssr_history
 
 	/// Pipeline amount created in step
 	column opp_pipeline_amt
-		description: "Amount for opp pipeline amt."
 		dataType: double
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: b9cae793-2a9d-40d6-937d-a2f211da06d8
@@ -658,7 +614,6 @@ table ssr_history
 
 	/// Opportunity's value when closed, present in closed selling steps
 	column opp_won_amt
-		description: "Amount for opp won amt."
 		dataType: double
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: 99521d04-d411-492d-911b-fca3dbc75502
@@ -671,7 +626,6 @@ table ssr_history
 
 	/// Act_capture_level score of the owner of the step
 	column step_owner_act_capt_lvl
-		description: "Numeric value for step owner act capt lvl."
 		dataType: double
 		lineageTag: 9614c784-7091-4c3a-9242-09c40fcfcf3a
 		summarizeBy: sum
@@ -683,7 +637,6 @@ table ssr_history
 
 	/// Duration of activities performed by the owner of the step
 	column step_owner_dur
-		description: "Numeric value for step owner dur."
 		dataType: double
 		lineageTag: 05268cea-c546-4cae-851a-0212317f8e34
 		summarizeBy: sum
@@ -695,7 +648,6 @@ table ssr_history
 
 	/// Number of users involved in the step, based on activities and ownership
 	column step_users_tot
-		description: "Numeric value for step users tot."
 		dataType: int64
 		formatString: 0
 		lineageTag: 8a4ea1da-8bff-4680-8c05-be48aa29a352
@@ -706,7 +658,6 @@ table ssr_history
 
 	/// Number of activities performed during the step
 	column stkhlds_all_act_count
-		description: "Count of stkhlds all act count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 6aa4eb3c-7d71-45c7-b3cc-ec8e56622f24
@@ -717,7 +668,6 @@ table ssr_history
 
 	/// Number of engaged activities performed during the step
 	column stkhlds_all_act_eng_count
-		description: "Count of stkhlds all act eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 9c3bfe63-40d7-4a22-9107-62cf2c6389c7
@@ -728,7 +678,6 @@ table ssr_history
 
 	/// Adjusted duration of activities performed during the step
 	column stkhlds_all_adj_dur
-		description: "Numeric value for stkhlds all adj dur."
 		dataType: double
 		lineageTag: 28adabf3-b34e-4df2-a9b1-a69d28d75868
 		summarizeBy: sum
@@ -740,7 +689,6 @@ table ssr_history
 
 	/// Number of contacts involved in the step
 	column stkhlds_all_contacts_count
-		description: "Count of stkhlds all contacts count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 08394454-2e84-40f2-94e9-cc95fb8517a2
@@ -751,7 +699,6 @@ table ssr_history
 
 	/// Duration of activities performed during the step
 	column stkhlds_all_dur
-		description: "Numeric value for stkhlds all dur."
 		dataType: double
 		lineageTag: 3ff4076a-2c04-4e9c-95b7-21ed12c223fd
 		summarizeBy: sum
@@ -763,7 +710,6 @@ table ssr_history
 
 	/// Duration of activities performed during the step
 	column stkhlds_all_dur_eng
-		description: "Numeric value for stkhlds all dur eng."
 		dataType: double
 		lineageTag: 65aa4895-3235-43f9-8fd0-8304bf6c8257
 		summarizeBy: sum
@@ -775,7 +721,6 @@ table ssr_history
 
 	/// Date when the first activity was performed during the step
 	column stkhlds_all_first_act
-		description: "Date/time when stkhlds all first act."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: c5738db0-b550-4b4c-ad34-598cb728a0ca
@@ -791,7 +736,6 @@ table ssr_history
 
 	/// Date when the last activity was performed during the step
 	column stkhlds_all_last_act
-		description: "Date/time when stkhlds all last act."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 80fd2fbb-2e22-48b2-94a3-589d86e9754c
@@ -807,7 +751,6 @@ table ssr_history
 
 	/// Highest seniority amongst all contacts of the step
 	column stkhlds_all_max_title_seniority
-		description: "Text label for stkhlds all max title seniority."
 		dataType: string
 		lineageTag: e7f92078-7399-4542-bd83-6dc26d447015
 		summarizeBy: none
@@ -817,7 +760,6 @@ table ssr_history
 
 	/// Most common seniority amongst all contacts of the step
 	column stkhlds_all_most_common_title_seniority
-		description: "Text label for stkhlds all most common title seniority."
 		dataType: string
 		lineageTag: 12945aed-c7e6-48b9-847c-7c6e71bfa788
 		summarizeBy: none
@@ -827,7 +769,6 @@ table ssr_history
 
 	/// Unique departments amongst all contacts of the step
 	column stkhlds_all_unique_title_depts
-		description: "Numeric value for stkhlds all unique title depts."
 		dataType: int64
 		formatString: 0
 		lineageTag: 9fbc2ee3-c590-4296-beae-239b2113d417
@@ -838,7 +779,6 @@ table ssr_history
 
 	/// Unique seniority in all contacts of the step
 	column stkhlds_all_unique_title_seniorities
-		description: "Numeric value for stkhlds all unique title seniorities."
 		dataType: int64
 		formatString: 0
 		lineageTag: 71b13f22-afdb-4864-abcc-be344ff0c614
@@ -849,7 +789,6 @@ table ssr_history
 
 	/// Number of activities performed by the primary stakeholder during the step
 	column stkhlds_primary_contact_act_count
-		description: "Count of stkhlds primary contact act count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1e7a1b3c-a292-4317-bb1b-0387f14e2a68
@@ -860,7 +799,6 @@ table ssr_history
 
 	/// Number of engaged activities performed by the primary stakeholder during the step
 	column stkhlds_primary_contact_act_eng_count
-		description: "Count of stkhlds primary contact act eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 054ea16c-2a15-4797-b3e1-80920b075305
@@ -871,7 +809,6 @@ table ssr_history
 
 	/// Duration of activities performed by the primary contact of the step during the step
 	column stkhlds_primary_contact_dur
-		description: "Numeric value for stkhlds primary contact dur."
 		dataType: double
 		lineageTag: 80274285-40ba-4a38-836b-a98e716ae548
 		summarizeBy: sum
@@ -883,7 +820,6 @@ table ssr_history
 
 	/// Duration of activities performed by the primary contact of the step during the step
 	column stkhlds_primary_contact_eng_dur
-		description: "Numeric value for stkhlds primary contact eng dur."
 		dataType: double
 		lineageTag: 2310887f-e11d-4201-ae02-a7b864e8e8db
 		summarizeBy: sum
@@ -895,7 +831,6 @@ table ssr_history
 
 	/// Date when the first activity by the primary contact was performed during the step
 	column stkhlds_primary_contact_first_act
-		description: "Date/time when stkhlds primary contact first act."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: f9924bc4-ff26-45e7-9b29-133d670dc38f
@@ -911,7 +846,6 @@ table ssr_history
 
 	/// Date when the last activity by the primary contact was performed during the step
 	column stkhlds_primary_contact_last_act
-		description: "Date/time when stkhlds primary contact last act."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: bb0a525f-a1e3-41c3-a88e-0215f67f1494
@@ -927,7 +861,6 @@ table ssr_history
 
 	/// Seniority of the primary contact of the step
 	column stkhlds_primary_contact_title_seniority
-		description: "Text label for stkhlds primary contact title seniority."
 		dataType: string
 		lineageTag: 0de8069b-6adb-4215-82ad-8f577d0858d4
 		summarizeBy: none
@@ -937,7 +870,6 @@ table ssr_history
 
 	/// Id of the primary contact of the step
 	column stkhlds_primary_entity_id
-		description: "Identifier for stkhlds primary entity."
 		dataType: string
 		lineageTag: e4a8eee2-6394-4f9d-83e9-5d8968fcf80b
 		summarizeBy: none
@@ -947,7 +879,6 @@ table ssr_history
 
 	/// Number of activities performed by the secondary stakeholder during the step
 	column stkhlds_secondary_contact_act_count
-		description: "Count of stkhlds secondary contact act count."
 		dataType: int64
 		formatString: 0
 		lineageTag: a82ba3b6-64b9-4fa9-b1aa-6aa2274a5eeb
@@ -958,7 +889,6 @@ table ssr_history
 
 	/// Number of engaged activities performed by the secondary stakeholder during the step
 	column stkhlds_secondary_contact_act_eng_count
-		description: "Count of stkhlds secondary contact act eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: f34a3806-f454-42f5-9fc0-7e202563e21e
@@ -969,7 +899,6 @@ table ssr_history
 
 	/// Duration of activities performed by the secondary contact of the step during the step
 	column stkhlds_secondary_contact_dur
-		description: "Numeric value for stkhlds secondary contact dur."
 		dataType: double
 		lineageTag: 00233e00-4f96-4ecf-bda9-1912be8d7614
 		summarizeBy: sum
@@ -981,7 +910,6 @@ table ssr_history
 
 	/// Duration of activities performed by the secondary contact of the step during the step
 	column stkhlds_secondary_contact_eng_dur
-		description: "Numeric value for stkhlds secondary contact eng dur."
 		dataType: double
 		lineageTag: 9f6552bc-68b2-4f13-ade1-ca3f2fbc88c2
 		summarizeBy: sum
@@ -993,7 +921,6 @@ table ssr_history
 
 	/// Date when the first activity by the secondary contact was performed during the step
 	column stkhlds_secondary_contact_first_act
-		description: "Date/time when stkhlds secondary contact first act."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 3f7ff395-efd6-46db-af7e-86faab1ac829
@@ -1009,7 +936,6 @@ table ssr_history
 
 	/// Date when the last activity by the secondary contact was performed during the step
 	column stkhlds_secondary_contact_last_act
-		description: "Date/time when stkhlds secondary contact last act."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 99de9706-4419-4591-bcbb-e9beb1e6a207
@@ -1025,7 +951,6 @@ table ssr_history
 
 	/// Seniority of the secondary contact of the step
 	column stkhlds_secondary_contact_title_seniority
-		description: "Text label for stkhlds secondary contact title seniority."
 		dataType: string
 		lineageTag: 71c2cef7-737a-40b0-9fed-27d28c71e4e2
 		summarizeBy: none
@@ -1035,7 +960,6 @@ table ssr_history
 
 	/// Id of the secondary contact of the step
 	column stkhlds_secondary_entity_id
-		description: "Identifier for stkhlds secondary entity."
 		dataType: string
 		lineageTag: b5e6b2a1-f84b-4412-83ae-6d9839ea940d
 		summarizeBy: none
@@ -1045,7 +969,6 @@ table ssr_history
 
 	/// Custom categorical variable on the account
 	column account_crm_custom_value_1
-		description: "Count of account crm custom value 1."
 		dataType: string
 		lineageTag: 3a8f92c0-681c-493f-9165-9aa4f7192b1f
 		summarizeBy: none
@@ -1055,7 +978,6 @@ table ssr_history
 
 	/// Custom categorical variable on the account
 	column account_crm_custom_value_2
-		description: "Count of account crm custom value 2."
 		dataType: string
 		lineageTag: eea5afa9-4519-4a0c-91f7-f1472a86811b
 		summarizeBy: none
@@ -1065,7 +987,6 @@ table ssr_history
 
 	/// Custom categorical variable on the account
 	column account_crm_custom_value_3
-		description: "Count of account crm custom value 3."
 		dataType: string
 		lineageTag: e1fc1091-d4ed-43eb-bfa4-2d575ade9ca2
 		summarizeBy: none
@@ -1075,7 +996,6 @@ table ssr_history
 
 	/// Rule used to determine the adjusted duration of activities performed during the step
 	column stkhlds_all_adj_dur_rule
-		description: "Numeric value for stkhlds all adj dur rule."
 		dataType: int64
 		formatString: 0
 		lineageTag: 33b5ab94-7969-4bfe-b5a2-1b70f747abde
@@ -1085,19 +1005,17 @@ table ssr_history
 		annotation SummarizationSetBy = Automatic
 
 	/// Quality bucket expressed as an integer from 1 to 5 based on the probability of success
-	column entity_qual_bucket_num
-		description: "Count of entity qual bucket num."
+	column entity_propensity_num
 		dataType: int64
 		formatString: 0
 		lineageTag: 8626ffcc-0d1c-4378-a127-f5a2c4a95bd4
 		summarizeBy: sum
-		sourceColumn: entity_qual_bucket_num
+		sourceColumn: entity_propensity_num
 
 		annotation SummarizationSetBy = Automatic
 
 	/// Repeat value of the step
 	column vi_value_repeat
-		description: "Amount for vi value repeat."
 		dataType: double
 		lineageTag: f16cec7e-11f1-4dc7-836c-eb0ad3fd0b4c
 		summarizeBy: sum
@@ -1109,7 +1027,6 @@ table ssr_history
 
 	/// ID of the user the step was received from
 	column step_received_from_id
-		description: "Identifier for step received from."
 		dataType: string
 		lineageTag: 282ce57e-072a-4023-889c-fd7b55042439
 		summarizeBy: none
@@ -1119,7 +1036,6 @@ table ssr_history
 
 	/// ID of the users the step was handed off to
 	column step_handed_off_to_id
-		description: "Identifier for step handed off to."
 		dataType: string
 		lineageTag: 54553a3f-296e-4e39-930c-2516653abdb4
 		summarizeBy: none
@@ -1129,7 +1045,6 @@ table ssr_history
 
 	/// Entity of the primary contact of the step: lead or contact
 	column stkhlds_primary_entity_type
-		description: "Text label for stkhlds primary entity type."
 		dataType: string
 		lineageTag: 40fd26a0-77f9-4761-93aa-922bac32872a
 		summarizeBy: none
@@ -1139,7 +1054,6 @@ table ssr_history
 
 	/// The date of the last data request from the platform
 	column _sys_as_of
-		description: "System: Date/time when as of."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: b5cba2dc-8b13-46c6-8c93-18ab7cf79407
@@ -1155,7 +1069,6 @@ table ssr_history
 
 	/// Number of activities performed during the step by a manager
 	column step_mgr_act
-		description: "Numeric value for step mgr act."
 		dataType: int64
 		formatString: 0
 		lineageTag: 2b218344-241f-4bea-8ca9-133b0bc70f09
@@ -1166,7 +1079,6 @@ table ssr_history
 
 	/// Expected duration of activities performed by the owner of the step
 	column step_owner_expected_dur
-		description: "Numeric value for step owner expected dur."
 		dataType: double
 		lineageTag: 1e039b32-21ed-468e-8f19-a36b6a418cc1
 		summarizeBy: sum
@@ -1178,7 +1090,6 @@ table ssr_history
 
 	/// Number of automated emails performed during the step
 	column stkhlds_all_act_type_auto_email_count
-		description: "Count of stkhlds all act type auto email count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 3afd745e-36ba-426f-bf24-1989563f7ead
@@ -1189,7 +1100,6 @@ table ssr_history
 
 	/// Number of engaged automated emails performed during the step
 	column stkhlds_all_act_type_auto_email_eng_count
-		description: "Count of stkhlds all act type auto email eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: c2f68411-9f8c-409c-9e76-eb150c15e0d3
@@ -1200,7 +1110,6 @@ table ssr_history
 
 	/// Number of emails performed during the step
 	column stkhlds_all_act_type_email_count
-		description: "Count of stkhlds all act type email count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 03a4147f-2e18-4847-b29b-781ee143c805
@@ -1211,7 +1120,6 @@ table ssr_history
 
 	/// Number of engaged emails performed during the step
 	column stkhlds_all_act_type_email_eng_count
-		description: "Count of stkhlds all act type email eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 0ec34fa8-bad3-4022-b070-885cc3e9ffde
@@ -1222,7 +1130,6 @@ table ssr_history
 
 	/// Date when the first engaged activity was performed during the step
 	column stkhlds_all_first_eng
-		description: "Date/time when stkhlds all first eng."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 9dd4e78d-b6da-4839-bdf6-632ff27ad7c2
@@ -1238,7 +1145,6 @@ table ssr_history
 
 	/// Date when the last engaged activity was performed during the step
 	column stkhlds_all_last_eng
-		description: "Date/time when stkhlds all last eng."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: f6bef698-11c0-47c0-aa61-1fa08a897f1b
@@ -1254,7 +1160,6 @@ table ssr_history
 
 	/// Number of meetings performed during the step
 	column stkhlds_all_act_type_meeting_count
-		description: "Count of stkhlds all act type meeting count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 30a29ca0-f3fa-479d-8bc2-4512f7bbac67
@@ -1265,7 +1170,6 @@ table ssr_history
 
 	/// Number of engaged meetings performed during the step
 	column stkhlds_all_act_type_meeting_eng_count
-		description: "Count of stkhlds all act type meeting eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 4bb79649-2324-481c-a3f6-9a9f5a6eeb32
@@ -1276,7 +1180,6 @@ table ssr_history
 
 	/// Number of activities with unknown type performed during the step
 	column stkhlds_all_act_type_nd_count
-		description: "Count of stkhlds all act type nd count."
 		dataType: int64
 		formatString: 0
 		lineageTag: a45d0e3a-e7ec-49dd-93ae-f20f752fa51a
@@ -1287,7 +1190,6 @@ table ssr_history
 
 	/// Number of engaged activities with unknown type performed during the step
 	column stkhlds_all_act_type_nd_eng_count
-		description: "Count of stkhlds all act type nd eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: cd73a8c7-3147-4635-a5b3-36eb2eeeb527
@@ -1298,7 +1200,6 @@ table ssr_history
 
 	/// Number of activities with no customer interaction performed during the step
 	column stkhlds_all_act_type_no_interaction_count
-		description: "Count of stkhlds all act type no interaction count."
 		dataType: int64
 		formatString: 0
 		lineageTag: bc42ae9d-a99a-4386-8817-9af8f3cb2053
@@ -1309,7 +1210,6 @@ table ssr_history
 
 	/// Number of engaged activities with no customer interaction performed during the step
 	column stkhlds_all_act_type_no_interaction_eng_count
-		description: "Count of stkhlds all act type no interaction eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 1a4824e9-22b4-4ad0-a447-6c79d54cc645
@@ -1320,7 +1220,6 @@ table ssr_history
 
 	/// Number of calls performed during the step
 	column stkhlds_all_act_type_call_count
-		description: "Count of stkhlds all act type call count."
 		dataType: int64
 		formatString: 0
 		lineageTag: b07e31c9-d28d-42bc-9954-bed0ff7eff43
@@ -1331,7 +1230,6 @@ table ssr_history
 
 	/// Number of engaged calls performed during the step
 	column stkhlds_all_act_type_call_eng_count
-		description: "Count of stkhlds all act type call eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: 8c4de7f1-aec8-4ec6-8460-56a762b07642
@@ -1342,7 +1240,6 @@ table ssr_history
 
 	/// Number of social media activities performed during the step
 	column stkhlds_all_act_type_social_count
-		description: "Count of stkhlds all act type social count."
 		dataType: int64
 		formatString: 0
 		lineageTag: ad1aaa8d-e289-4864-8055-42a777530399
@@ -1353,7 +1250,6 @@ table ssr_history
 
 	/// Number of engaged social media activities performed during the step
 	column stkhlds_all_act_type_social_eng_count
-		description: "Count of stkhlds all act type social eng count."
 		dataType: int64
 		formatString: 0
 		lineageTag: ee205821-9e28-4e7d-9821-4fdd91b16fd6
@@ -1364,7 +1260,6 @@ table ssr_history
 
 	/// Date when the first engaged activity by the primary contact was performed during the step
 	column stkhlds_primary_contact_first_eng
-		description: "Date/time when stkhlds primary contact first eng."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 17d044f8-bbd3-41ee-b564-40a782ad40a2
@@ -1380,7 +1275,6 @@ table ssr_history
 
 	/// Date when the last engaged activity by the primary contact was performed during the step
 	column stkhlds_primary_contact_last_eng
-		description: "Date/time when stkhlds primary contact last eng."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: b0814d1e-f3d1-471e-8a1d-1bffd96afb5e
@@ -1396,7 +1290,6 @@ table ssr_history
 
 	/// Date when the first engaged activity by the secondary contact was performed during the step
 	column stkhlds_secondary_contact_first_eng
-		description: "Date/time when stkhlds secondary contact first eng."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: 3ad3cda2-fc64-4278-962a-b79ea7e23be6
@@ -1412,7 +1305,6 @@ table ssr_history
 
 	/// Date when the last engaged activity by the secondary contact was performed during the step
 	column stkhlds_secondary_contact_last_eng
-		description: "Date/time when stkhlds secondary contact last eng."
 		dataType: dateTime
 		formatString: General Date
 		lineageTag: b4947fdd-7376-4fa4-9190-65c635e067a4
@@ -1428,7 +1320,6 @@ table ssr_history
 
 	/// Entity of the secondary contact of the step: lead or contact
 	column stkhlds_secondary_entity_type
-		description: "Text label for stkhlds secondary entity type."
 		dataType: string
 		lineageTag: aa566fa5-a547-4f3c-aea5-4c4453d54c05
 		summarizeBy: none
@@ -1438,7 +1329,6 @@ table ssr_history
 
 	/// Sub type of the step
 	column step_sub_type
-		description: "Text label for step sub type."
 		dataType: string
 		lineageTag: ca816189-0b3f-4294-a06e-e77e84d933e8
 		summarizeBy: none
@@ -1448,7 +1338,6 @@ table ssr_history
 
 	/// Adjusted duration of engaged activities performed during the step
 	column stkhlds_all_adj_eng_dur
-		description: "Numeric value for stkhlds all adj eng dur."
 		dataType: double
 		lineageTag: 709f1924-b0dd-4549-8a4a-2fd760792c00
 		summarizeBy: sum
@@ -1460,7 +1349,6 @@ table ssr_history
 
 	/// Confidence in the adjusted duration of activities performed during the step
 	column stkhlds_all_adj_dur_conf
-		description: "Numeric value for stkhlds all adj dur conf."
 		dataType: double
 		lineageTag: 79550477-a40d-4d07-861e-9dba80dadfd8
 		summarizeBy: sum
@@ -1472,7 +1360,6 @@ table ssr_history
 
 	/// Boolean flag that indicates whether the current step is expansion
 	column opp_existing_customer_selling_expansion
-		description: "Indicates whether opp existing customer selling expansion."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 2888f796-24fc-43fd-92ba-7f34e3cefd2c
@@ -1483,7 +1370,6 @@ table ssr_history
 
 	/// Boolean flag that indicates whether the current step is downgrade
 	column opp_existing_customer_selling_downgrade
-		description: "Indicates whether opp existing customer selling downgrade."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 8de8eb2e-eab3-4131-b2e8-a6c372a5e227
@@ -1494,7 +1380,6 @@ table ssr_history
 
 	/// Boolean flag that indicates whether the current step is cross-sale
 	column opp_existing_customer_selling_cross_sale
-		description: "Indicates whether opp existing customer selling cross sale."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: d3ae902c-0a52-45ce-8bc6-68b699f6b80b
@@ -1505,7 +1390,6 @@ table ssr_history
 
 	/// Boolean flag that indicates whether the current step is renewal
 	column opp_existing_customer_selling_renewal
-		description: "Indicates whether opp existing customer selling renewal."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 385c7834-d8e8-4f0b-8010-40ff245fb601
@@ -1516,7 +1400,6 @@ table ssr_history
 
 	/// Boolean flag that indicates whether the current step is combination
 	column opp_existing_customer_selling_combination
-		description: "Indicates whether opp existing customer selling combination."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: b40f41c4-ea1f-4c48-b01b-aa07ba20b7d6
@@ -1527,7 +1410,6 @@ table ssr_history
 
 	/// Boolean flag that indicates whether the current step is based on an ERP order
 	column opp_erp
-		description: "Indicates whether opp erp."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 40a1fcd8-d396-4fd5-979e-a48987d41a96
@@ -1538,7 +1420,6 @@ table ssr_history
 
 	/// CRM pipeline name
 	column opp_crm_pipeline_name
-		description: "Text label for opp crm pipeline name."
 		dataType: string
 		lineageTag: 38775ec1-43a6-405f-bc1f-ba4f77f51048
 		summarizeBy: none
@@ -1548,7 +1429,6 @@ table ssr_history
 
 	/// Opportunity's stage name
 	column opp_stage
-		description: "Text label for opp stage."
 		dataType: string
 		lineageTag: d8dce5d2-187b-4ced-a612-c518a6b6904d
 		summarizeBy: none
@@ -1558,7 +1438,6 @@ table ssr_history
 
 	/// Pipeline name of the opportunity
 	column opp_pipeline_name
-		description: "Text label for opp pipeline name."
 		dataType: string
 		lineageTag: f94818b2-7847-4b10-98ab-426f3d2250d3
 		summarizeBy: none
@@ -1568,7 +1447,6 @@ table ssr_history
 
 	/// Opportunity's last crm stage, before it was lost
 	column opp_lost_crm_stage
-		description: "Text label for opp lost crm stage."
 		dataType: string
 		lineageTag: 2bcb6912-c563-4bbb-a421-3c5295e2e702
 		summarizeBy: none
@@ -1578,7 +1456,6 @@ table ssr_history
 
 	/// Expected number of days from the step start date to end date
 	column step_expected_length_in_days
-		description: "Numeric value for step expected length in days."
 		dataType: int64
 		formatString: 0
 		lineageTag: 24ce0e29-0bf2-4eeb-8c52-233f962c580e
@@ -1589,7 +1466,6 @@ table ssr_history
 
 	/// Difference in days between the step length and expected step length
 	column step_days_pushed_pulled
-		description: "Numeric value for step days pushed pulled."
 		dataType: int64
 		formatString: 0
 		lineageTag: 9285a308-3b54-4d4f-b464-11c31b3ba4b6
@@ -1599,29 +1475,26 @@ table ssr_history
 		annotation SummarizationSetBy = Automatic
 
 	/// Quality bucket of the next step based on the probability of success
-	column step_next_qual_bucket
-		description: "Text label for step next qual bucket."
+	column step_next_propensity
 		dataType: string
 		lineageTag: 2e92057e-6c79-4ee3-bdff-ef287c8bd150
 		summarizeBy: none
-		sourceColumn: step_next_qual_bucket
+		sourceColumn: step_next_propensity
 
 		annotation SummarizationSetBy = Automatic
 
 	/// Quality bucket of the next step expressed as an integer from 1 to 5 based on the probability of success
-	column step_next_qual_bucket_num
-		description: "Count of step next qual bucket num."
+	column step_next_propensity_num
 		dataType: int64
 		formatString: 0
 		lineageTag: ce97e64b-420a-4bb8-9c8e-4a6bf252a822
 		summarizeBy: sum
-		sourceColumn: step_next_qual_bucket_num
+		sourceColumn: step_next_propensity_num
 
 		annotation SummarizationSetBy = Automatic
 
 	/// Adjusted duration of activities performed during the prior step
 	column stkhlds_all_adj_dur_prior_step
-		description: "Numeric value for stkhlds all adj dur prior step."
 		dataType: double
 		lineageTag: ab1338aa-8d63-43bf-99fd-a4fc587a912e
 		summarizeBy: sum
@@ -1633,7 +1506,6 @@ table ssr_history
 
 	/// Opportunity's NNB amount
 	column opp_nnb_amt
-		description: "Amount for opp nnb amt."
 		dataType: double
 		lineageTag: a49dccfb-583f-4fbe-9b4b-762aa2fba06c
 		summarizeBy: sum
@@ -1645,7 +1517,6 @@ table ssr_history
 
 	/// Opportunity's downgrade amount
 	column opp_downgrade_amt
-		description: "Amount for opp downgrade amt."
 		dataType: double
 		lineageTag: 35a389fb-2973-4238-953e-a2028e0f1d6e
 		summarizeBy: sum
@@ -1657,7 +1528,6 @@ table ssr_history
 
 	/// Opportunity's cross-sale amount
 	column opp_cross_sale_amt
-		description: "Amount for opp cross sale amt."
 		dataType: double
 		lineageTag: 7496080a-d1f0-4b37-a248-dadf54c570b8
 		summarizeBy: sum
@@ -1669,7 +1539,6 @@ table ssr_history
 
 	/// Opportunity's renewal amount
 	column opp_renewal_amt
-		description: "Amount for opp renewal amt."
 		dataType: double
 		lineageTag: f797c296-d4f0-4ea6-b384-3edd8c5a4a1c
 		summarizeBy: sum
@@ -1681,7 +1550,6 @@ table ssr_history
 
 	/// Opportunity's expansion amount
 	column opp_expansion_amt
-		description: "Amount for opp expansion amt."
 		dataType: double
 		lineageTag: 5b95f7d2-e75b-4dd7-ad9d-47dcd8ccc274
 		summarizeBy: sum
@@ -1693,7 +1561,6 @@ table ssr_history
 
 	/// Opportunity's one time amount
 	column opp_one_time_amt
-		description: "Date/time when opp one time amt."
 		dataType: double
 		lineageTag: a2660d1a-4879-45e6-b4e5-00f6dc295c79
 		summarizeBy: sum
@@ -1705,7 +1572,6 @@ table ssr_history
 
 	/// Opportunity's ND amount
 	column opp_nd_amt
-		description: "Amount for opp nd amt."
 		dataType: double
 		lineageTag: 5e868727-29d6-4b1b-a36e-72403ef1e555
 		summarizeBy: sum
@@ -1717,7 +1583,6 @@ table ssr_history
 
 	/// Opportunity's ARR amount
 	column opp_arr_amt
-		description: "Amount for opp arr amt."
 		dataType: double
 		lineageTag: a2557989-d833-4ed8-9c6d-5cd01f8b5006
 		summarizeBy: sum
@@ -1729,7 +1594,6 @@ table ssr_history
 
 	/// Column entity_prospecting_recycled.
 	column entity_prospecting_recycled
-		description: "Indicates whether entity prospecting recycled."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 8a71f1ee-da88-4608-8d0a-0083218e1a6d
@@ -1740,7 +1604,6 @@ table ssr_history
 
 	/// Column entity_prospecting_winback.
 	column entity_prospecting_winback
-		description: "Indicates whether entity prospecting winback."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 59ecfd4f-1aa6-4ed5-b181-5edd5adad173
@@ -1751,7 +1614,6 @@ table ssr_history
 
 	/// Column opp_initial_subscription_amt.
 	column opp_initial_subscription_amt
-		description: "Amount for opp initial subscription amt."
 		dataType: double
 		lineageTag: 41822a70-c608-4663-aaef-bd48dc4eff9d
 		summarizeBy: sum
@@ -1763,7 +1625,6 @@ table ssr_history
 
 	/// Column opp_existing_customer_selling_one_time.
 	column opp_existing_customer_selling_one_time
-		description: "Indicates whether opp existing customer selling one time."
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		lineageTag: 9f783165-3f33-4df9-b1b3-ce26030ac68e
@@ -1774,7 +1635,6 @@ table ssr_history
 
 	/// Most common department amongst all contacts of the step
 	column stkhlds_all_most_common_title_department
-		description: "Text label for stkhlds all most common title department."
 		dataType: string
 		lineageTag: 169b8c4d-bbb7-4886-8bee-4c01274760d9
 		summarizeBy: none
@@ -1784,7 +1644,6 @@ table ssr_history
 
 	/// Department of the primary contact of the step
 	column stkhlds_primary_contact_title_department
-		description: "Text label for stkhlds primary contact title department."
 		dataType: string
 		lineageTag: ac0c3d67-76ed-4145-8b4f-d35e40b014de
 		summarizeBy: none
@@ -1794,7 +1653,6 @@ table ssr_history
 
 	/// Department of the secondary contact of the step
 	column stkhlds_secondary_contact_title_department
-		description: "Text label for stkhlds secondary contact title department."
 		dataType: string
 		lineageTag: ae427279-3dcd-4168-b17b-45c40d454c60
 		summarizeBy: none
@@ -1804,7 +1662,6 @@ table ssr_history
 
 	/// Column entity_prospecting_restarted.
 	column entity_prospecting_restarted
-		description: "Text label for entity prospecting restarted."
 		dataType: string
 		lineageTag: 4573b2a8-20fd-4a69-b465-ef02678c754d
 		summarizeBy: none
@@ -1814,7 +1671,6 @@ table ssr_history
 
 	/// Boolean flag indicating whether a manager was involved in the step, either as the owner of the step or as the owner of activities related to the step.
 	column step_mgr_involved
-		description: "Text label for step mgr involved."
 		dataType: string
 		lineageTag: 8233a89d-48d9-4dad-aac0-4670fc8557e9
 		summarizeBy: none
@@ -1824,7 +1680,6 @@ table ssr_history
 
 	/// Boolean flag indicating whether a sales engineer was involved in the step, either as the owner of the step or as the owner of activities related to the step.
 	column step_sales_engineer_involved
-		description: "Text label for step sales engineer involved."
 		dataType: string
 		lineageTag: 766a6142-5395-4034-bb63-67f661868179
 		summarizeBy: none
@@ -1834,7 +1689,6 @@ table ssr_history
 
 	/// Count of sales development representatives (SDRs) involved in the step as the owner of activities related to the step.
 	column step_sdr_count_involved
-		description: "Count of step sdr count involved."
 		dataType: string
 		lineageTag: 52e3ebf3-08ef-4d12-b92f-774ce8e21e82
 		summarizeBy: none
@@ -1844,7 +1698,6 @@ table ssr_history
 
 	/// Count of account executives (AEs) involved in the step as the owner of activities related to the step.
 	column step_ae_count_involved
-		description: "Count of step ae count involved."
 		dataType: string
 		lineageTag: 012802a0-8e95-424f-b929-7b0d535d90ca
 		summarizeBy: none
@@ -1854,7 +1707,6 @@ table ssr_history
 
 	/// Count of account managers (AMs) involved in the step as the owner of activities related to the step.
 	column step_am_count_involved
-		description: "Count of step am count involved."
 		dataType: string
 		lineageTag: f7571070-31bf-42c9-9947-83b8a4dfa5e8
 		summarizeBy: none
@@ -1864,7 +1716,6 @@ table ssr_history
 
 	/// Count of marketing (MKT) users involved in the step as the owner of activities related to the step.
 	column step_mkt_count_involved
-		description: "Count of step mkt count involved."
 		dataType: string
 		lineageTag: 0266dec2-519d-42fd-bd9e-bd87a2ea0318
 		summarizeBy: none
@@ -1874,7 +1725,6 @@ table ssr_history
 
 	/// Count of other users involved in the step as the owner of activities related to the step.
 	column step_other_count_involved
-		description: "Count of step other count involved."
 		dataType: string
 		lineageTag: caef4c42-a393-4904-b45a-85ee354c7ac6
 		summarizeBy: none
@@ -1884,11 +1734,42 @@ table ssr_history
 
 	/// Count of management (MGMT) users involved in the step as the owner of activities related to the step.
 	column step_mgmt_count_involved
-		description: "Count of step mgmt count involved."
 		dataType: string
 		lineageTag: 06c48c83-7bfb-431b-8ce3-93926b5c993f
 		summarizeBy: none
 		sourceColumn: step_mgmt_count_involved
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_pred_booking_amt
+		dataType: string
+		lineageTag: 46f02f41-d0e0-470d-9728-cda2d02ae10c
+		summarizeBy: none
+		sourceColumn: step_pred_booking_amt
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_pred_close_date
+		dataType: string
+		lineageTag: 339cf4a7-895c-45e1-ae16-45e1f78ee01c
+		summarizeBy: none
+		sourceColumn: step_pred_close_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_pred_close_date_if_won
+		dataType: string
+		lineageTag: 9d49be0a-29a6-4332-a7e1-0db7af257707
+		summarizeBy: none
+		sourceColumn: step_pred_close_date_if_won
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_pred_close_date_if_lost
+		dataType: string
+		lineageTag: e9f10be5-073a-4cfa-8903-b889467ef04a
+		summarizeBy: none
+		sourceColumn: step_pred_close_date_if_lost
 
 		annotation SummarizationSetBy = Automatic
 
@@ -1919,8 +1800,8 @@ table ssr_history
 				{"entity_primary_trueai_complt", type number},
 				{"entity_prospecting_recycled", type logical},
 				{"entity_prospecting_winback", type logical},
-				{"entity_qual_bucket", type text},
-				{"entity_qual_bucket_num", Int64.Type},
+				{"entity_propensity", type text},
+				{"entity_propensity_num", Int64.Type},
 				{"opp_arr_amt", type number},
 				{"opp_booking_amt", type number},
 				{"opp_crm_pipeline_name", type text},
@@ -1962,8 +1843,8 @@ table ssr_history
 				{"step_length_in_days", Int64.Type},
 				{"step_mgr_act", Int64.Type},
 				{"step_name", type text},
-				{"step_next_qual_bucket", type text},
-				{"step_next_qual_bucket_num", Int64.Type},
+				{"step_next_propensity", type text},
+				{"step_next_propensity_num", Int64.Type},
 				{"step_next_success_prob", type number},
 				{"step_outcome", type text},
 				{"step_outcome_rule", Int64.Type},

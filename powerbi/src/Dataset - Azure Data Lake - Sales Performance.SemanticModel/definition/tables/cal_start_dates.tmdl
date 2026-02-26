@@ -1,38 +1,33 @@
 /// Table cal_start_dates.
 table cal_start_dates
-	description: "TODO: provide business definition for this table. Related to LocalDateTable_64251fda-5098-4d5c-a76a-3f9e72cb0712 (Date -> Date), LocalDateTable_f6b32d38-f776-4a05-bf96-8d6746a94ef1 (first_of_week_date -> Date), LocalDateTable_cd821b5b-2623-43e4-b67f-57d579fc400e (first_of_month_date -> Date). Supports measures such as meas.last_selected_date, meas.sel_date."
 	lineageTag: ae9642a0-a112-45e3-b507-ecb9caa9b8db
 
-	/// Measure meas.last_selected_date.
-	/// Purpose: Returns the last selected date from cal_start_dates[Date].
-	/// Calculation Logic: Uses CALCULATE with MAX and ALLSELECTED.
-	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies context with ALLSELECTED(cal_start_dates[Date]) and responds to filters on cal_start_dates[Date].
-	/// Format/Type: Short Date
+	/// Purpose: Last Selected Date.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
 	measure 'meas.last_selected_date' = CALCULATE(MAX(cal_start_dates[Date]), ALLSELECTED(cal_start_dates[Date]))
-		description: "TODO: provide business definition for this measure."
 		formatString: Short Date
 		lineageTag: 3ad297b1-22f7-40a4-8425-5df3ba7e89dd
 
-	/// Measure meas.sel_date.
-	/// Purpose: Returns the selected start date as the max of cal_start_dates[Date] in ALLSELECTED.
-	/// Calculation Logic: Uses VAR/RETURN with CALCULATETABLE, ALLSELECTED, and MAXX.
-	/// Dynamic Behavior: Respects current filter context; CALCULATETABLE/ALLSELECTED adjusts context and responds to filters on cal_start_dates[Date].
-	/// Format/Type: General Date
-	measure 'meas.sel_date' = ```
+	/// Purpose: Sel Date.
+	/// Logic: Derived from referenced measures and columns.
+	/// Dependencies: See model references.
+	/// Context: Evaluated in current filter context unless overridden in DAX.
+	/// Output: Decimal
+	measure 'meas.sel_date' = 
 			
 			
 			VAR res = MAXX (CALCULATETABLE(ALLSELECTED ( cal_start_dates )), cal_start_dates[Date]) // get the selected start dagte
 			Return res
 			
 			
-			```
-			description: "Ratio based on cal_start_dates[Date]. Respects the current filter context."
 		formatString: General Date
 		lineageTag: 5d852ccf-922b-4cb7-be6a-ebb1a108c831
 
 	/// Column Date.
 	column Date
-		description: "Unclear: Value for date."
 		formatString: General Date
 		lineageTag: e292d391-2e45-4024-8177-05337f8ae572
 		summarizeBy: none
@@ -48,7 +43,6 @@ table cal_start_dates
 
 	/// Column date_as_integer.
 	column date_as_integer
-		description: "Date/time when date as integer."
 		lineageTag: 74ea12fb-7a88-4d81-84ab-406dab2550b7
 		summarizeBy: none
 		isNameInferred
@@ -58,7 +52,6 @@ table cal_start_dates
 
 	/// Column year.
 	column year
-		description: "Unclear: Value for year."
 		formatString: 0
 		lineageTag: b6d1fe74-c00d-4760-8a77-3d543dfeaef6
 		summarizeBy: sum
@@ -69,7 +62,6 @@ table cal_start_dates
 
 	/// Column month_number.
 	column month_number
-		description: "Count of month number."
 		lineageTag: 7aae1aef-b3c3-4261-a414-08e0a5c6c3f1
 		summarizeBy: none
 		isNameInferred
@@ -79,7 +71,6 @@ table cal_start_dates
 
 	/// Column year_month_number.
 	column year_month_number
-		description: "Count of year month number."
 		lineageTag: cd8e6483-b0c9-4dca-93b8-b69bebc22cf0
 		summarizeBy: none
 		isNameInferred
@@ -89,7 +80,6 @@ table cal_start_dates
 
 	/// Column year_week_number.
 	column year_week_number
-		description: "Count of year week number."
 		lineageTag: cabfaa9d-1640-416a-9095-35b5d107ca0b
 		summarizeBy: none
 		isNameInferred
@@ -99,7 +89,6 @@ table cal_start_dates
 
 	/// Column year_day_number.
 	column year_day_number
-		description: "Count of year day number."
 		lineageTag: 56cdd24a-08ff-4f26-8376-aea2a7895e6d
 		summarizeBy: none
 		isNameInferred
@@ -109,7 +98,6 @@ table cal_start_dates
 
 	/// Column year_month_short.
 	column year_month_short
-		description: "Unclear: Value for year month short."
 		lineageTag: a35c3b85-1140-4f81-99fb-f6fb209636e5
 		summarizeBy: none
 		isNameInferred
@@ -119,7 +107,6 @@ table cal_start_dates
 
 	/// Column month_name_short.
 	column month_name_short
-		description: "Unclear: Value for month name short."
 		lineageTag: e3058241-2980-4b0f-8ac4-9c8510eb86ea
 		summarizeBy: none
 		isNameInferred
@@ -129,7 +116,6 @@ table cal_start_dates
 
 	/// Column month_name_long.
 	column month_name_long
-		description: "Unclear: Value for month name long."
 		lineageTag: fcd56e2b-1a9e-4cfd-b883-9a1d442801df
 		summarizeBy: none
 		isNameInferred
@@ -139,7 +125,6 @@ table cal_start_dates
 
 	/// Column day_of_week_number.
 	column day_of_week_number
-		description: "Count of day of week number."
 		formatString: 0
 		lineageTag: 2c589fec-a119-4348-8eef-3644c518ff2c
 		summarizeBy: sum
@@ -150,7 +135,6 @@ table cal_start_dates
 
 	/// Column day_of_week.
 	column day_of_week
-		description: "Unclear: Value for day of week."
 		lineageTag: 3712e823-bcac-42b6-8682-8038fd18af7b
 		summarizeBy: none
 		isNameInferred
@@ -160,7 +144,6 @@ table cal_start_dates
 
 	/// Column day_of_week_short.
 	column day_of_week_short
-		description: "Unclear: Value for day of week short."
 		lineageTag: 2831509d-9ec3-41d5-946a-8db0c72976e7
 		summarizeBy: none
 		isNameInferred
@@ -170,7 +153,6 @@ table cal_start_dates
 
 	/// Column quarter.
 	column quarter
-		description: "Unclear: Value for quarter."
 		lineageTag: 4419e8dc-318f-4d24-bcc6-3afc57c46623
 		summarizeBy: none
 		isNameInferred
@@ -180,7 +162,6 @@ table cal_start_dates
 
 	/// Column year_quarter.
 	column year_quarter
-		description: "Unclear: Value for year quarter."
 		lineageTag: 8eda9987-ce6d-4648-9d19-581757f18461
 		summarizeBy: none
 		isNameInferred
@@ -190,7 +171,6 @@ table cal_start_dates
 
 	/// Column first_of_week_date.
 	column first_of_week_date
-		description: "Date/time when first of week date."
 		formatString: General Date
 		lineageTag: 1b2e2619-219a-4072-80a2-186a18557e65
 		summarizeBy: none
@@ -206,7 +186,6 @@ table cal_start_dates
 
 	/// Column first_of_month_date.
 	column first_of_month_date
-		description: "Date/time when first of month date."
 		formatString: General Date
 		lineageTag: 5fc2e463-5686-439a-bbcb-db1866d7db4e
 		summarizeBy: none
@@ -222,7 +201,6 @@ table cal_start_dates
 
 	/// Column first_of_qtr_date.
 	column first_of_qtr_date
-		description: "Date/time when first of qtr date."
 		formatString: General Date
 		lineageTag: 9edd31e2-5101-4a05-8b66-645cba8c5eed
 		summarizeBy: none
@@ -238,7 +216,6 @@ table cal_start_dates
 
 	/// Column first_of_year_date.
 	column first_of_year_date
-		description: "Date/time when first of year date."
 		formatString: General Date
 		lineageTag: b99342a4-79b7-4c56-a387-f77b1438d71e
 		summarizeBy: none
