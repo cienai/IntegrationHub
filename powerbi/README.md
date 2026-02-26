@@ -71,3 +71,16 @@ Cien is frequently improving its platform and reports. When a new build is avail
 **Deploying Across your PBI organization:** 
 
 To publish your staging workspace reports across your different customer workspaces, you will use the scripts in the GitHub integration hub /pbi\_deploy folder. Find instructions for configuring and running deployment script in the associated README.md file. The script will copy the current staging workspace report set to an unlimited number of workspaces and automatically refresh with the appropriate datasource.
+
+## Measure Description Scoring
+
+Run the scoring script from the repo root:
+
+```bash
+python powerbi/tools/score_measure_descriptions.py
+```
+
+Outputs:
+- `powerbi/measure_description_scores.csv`
+- `powerbi/measure_description_scores_summary.md`
+
