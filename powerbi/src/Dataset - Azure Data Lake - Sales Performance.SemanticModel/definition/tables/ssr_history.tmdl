@@ -3225,7 +3225,7 @@ table ssr_history
 			var all_dates_tbl = CALCULATETABLE(ssr_history, cal_end_dates[Date] > date(1900,1,1) && cal_end_dates[Date] < date(2100,1,2)) -- override the normal date filter and get current filters through calc table
 			var filt_tbl = FILTER(all_dates_tbl,ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}  && ssr_history[_sys_filt_end_date] >= end_date &&  ssr_history[_sys_filt_start_date] < end_date) -- apply the right steps and filter dates
 			
-			var res = AVERAGEX(filt_tbl, [trueai_days_pushed_pulled])
+			var res = AVERAGEX(filt_tbl, ssr_history[step_length_in_days] - ssr_history[step_expected_length_in_days])
 			
 			return res
 			
@@ -3357,7 +3357,7 @@ table ssr_history
 			var all_dates_tbl = CALCULATETABLE(ssr_history, cal_end_dates[Date] > date(1900,1,1) && cal_end_dates[Date] < date(2100,1,2)) -- override the normal date filter and get current filters through calc table
 			var filt_tbl = FILTER(all_dates_tbl,ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}  && ssr_history[_sys_filt_end_date] >= end_date &&  ssr_history[_sys_filt_start_date] < end_date) -- apply the right steps and filter dates
 			
-			var res = AVERAGEX(filt_tbl, [trueai_days_pushed_pulled])
+			var res = AVERAGEX(filt_tbl, ssr_history[step_length_in_days] - ssr_history[step_expected_length_in_days])
 			
 			return res
 			
@@ -4507,7 +4507,7 @@ table ssr_history
 			    AVERAGEX(
 			        FILTER(
 			            ssr_history,
-			            ssr_history[step_owner_user_role]=user_role && ssr_history[col.step_owner_group]=user_group && ssr_history[step_success] = true && ssr_history[step_name] in{"Existing Customer Selling", "New Logo Selling"}
+			            ssr_history[step_owner_user_role]=user_role && users[trueai_group]=user_group && ssr_history[step_success] = true && ssr_history[step_name] in{"Existing Customer Selling", "New Logo Selling"}
 			        )
 			        , ssr_history[opp_booking_amt]), 
 			    ALL())
@@ -4559,7 +4559,7 @@ table ssr_history
 			            ssr_history,
 			            ssr_history[_sys_filt_end_date] >=  start_date_mtd &&  ssr_history[_sys_filt_end_date] <= end_date && 
 			            ssr_history[step_success] = true && ssr_history[step_name] in{"Existing Customer Selling", "New Logo Selling"} &&
-			            ssr_history[step_owner_user_role]=user_role_aliased && ssr_history[col.step_owner_group]=user_group
+			            ssr_history[step_owner_user_role]=user_role_aliased && users[trueai_group]=user_group
 			        ),
 			        ssr_history[opp_booking_amt]
 			    ),
@@ -4618,7 +4618,7 @@ table ssr_history
 			            ssr_history,
 			            ssr_history[_sys_filt_end_date] >=  start_date_qtd &&  ssr_history[_sys_filt_end_date] <= end_date && 
 			            ssr_history[step_success] = true && ssr_history[step_name] in{"Existing Customer Selling", "New Logo Selling"} &&
-			            ssr_history[step_owner_user_role]=user_role_aliased && ssr_history[col.step_owner_group]=user_group
+			            ssr_history[step_owner_user_role]=user_role_aliased && users[trueai_group]=user_group
 			        ),
 			        ssr_history[opp_booking_amt]
 			    ),
@@ -4677,7 +4677,7 @@ table ssr_history
 			            ssr_history,
 			            ssr_history[_sys_filt_end_date] >=  start_date_ytd &&  ssr_history[_sys_filt_end_date] <= end_date && 
 			            ssr_history[step_success] = true && ssr_history[step_name] in{"Existing Customer Selling", "New Logo Selling"} &&
-			            ssr_history[step_owner_user_role]=user_role_aliased && ssr_history[col.step_owner_group]=user_group
+			            ssr_history[step_owner_user_role]=user_role_aliased && users[trueai_group]=user_group
 			        ),
 			        ssr_history[opp_booking_amt]
 			    ),
@@ -4735,7 +4735,7 @@ table ssr_history
 			            ssr_history,
 			            ssr_history[_sys_filt_end_date] >=  start_date_mtd &&  ssr_history[_sys_filt_end_date] <= end_date && 
 			            ssr_history[step_success] = true && ssr_history[step_name] in{"Prospecting", "Post-Sales Support"} &&
-			            ssr_history[step_owner_user_role]=user_role_aliased && ssr_history[col.step_owner_group]=user_group
+			            ssr_history[step_owner_user_role]=user_role_aliased && users[trueai_group]=user_group
 			        ),
 			        ssr_history[opp_pipeline_amt]
 			    ),
@@ -4793,7 +4793,7 @@ table ssr_history
 			            ssr_history,
 			            ssr_history[_sys_filt_end_date] >=  start_date_qtd &&  ssr_history[_sys_filt_end_date] <= end_date && 
 			            ssr_history[step_success] = true && ssr_history[step_name] in{"Prospecting", "Post-Sales Support"} &&
-			            ssr_history[step_owner_user_role]=user_role_aliased && ssr_history[col.step_owner_group]=user_group
+			            ssr_history[step_owner_user_role]=user_role_aliased && users[trueai_group]=user_group
 			        ),
 			        ssr_history[opp_pipeline_amt]
 			    ),
@@ -4851,7 +4851,7 @@ table ssr_history
 			            ssr_history,
 			            ssr_history[_sys_filt_end_date] >=  start_date_ytd &&  ssr_history[_sys_filt_end_date] <= end_date && 
 			            ssr_history[step_success] = true && ssr_history[step_name] in{"Prospecting", "Post-Sales Support"} &&
-			            ssr_history[step_owner_user_role]=user_role_aliased && ssr_history[col.step_owner_group]=user_group
+			            ssr_history[step_owner_user_role]=user_role_aliased && users[trueai_group]=user_group
 			        ),
 			        ssr_history[opp_pipeline_amt]
 			    ),
@@ -9913,7 +9913,7 @@ table ssr_history
 	/// Format/Type: Unspecified
 	measure 'meas.opps_closed_date' =
 			
-			var days = CALCULATE(MAX(ssr_history[trueai_days_pushed_pulled]))
+			var days = CALCULATE(MAXX(ssr_history, ssr_history[step_length_in_days] - ssr_history[step_expected_length_in_days]))
 			RETURN
 			IF( days > 0, "+" & days & " days", days & " days")
 		displayFolder: _opps_detail
@@ -9981,7 +9981,7 @@ table ssr_history
 			
 			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
 			var res = CALCULATE(
-			    Max(ssr_history[col.step_owner_group]),
+			    Max(users[trueai_group]),
 			    ssr_history[step_sequence] = _max_step_id           // get the most recent reps role
 			)
 			
@@ -10011,7 +10011,7 @@ table ssr_history
 			
 			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
 			var res = CALCULATE(
-			    Max(ssr_history[trueai_user_role_alias]),
+			    Max(users[trueai_user_role_alias]),
 			    ssr_history[step_sequence] = _max_step_id           // get the most recent reps role
 			)
 			
@@ -10240,7 +10240,7 @@ table ssr_history
 	/// Calculation Logic: Direct expression without VAR/RETURN.
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: #,##0" days"
-	measure 'meas.tot_pushed_pulled_close_date' = CALCULATE(MAX(ssr_history[trueai_days_pushed_pulled]))
+	measure 'meas.tot_pushed_pulled_close_date' = CALCULATE(MAXX(ssr_history, ssr_history[step_length_in_days] - ssr_history[step_expected_length_in_days]))
 		formatString: #,##0" days"
 		displayFolder: _opps_detail
 		lineageTag: b8de82b1-9edc-44a0-81da-1a92719d5d82
@@ -11760,7 +11760,7 @@ table ssr_history
 	/// Format/Type: """+""# ""days"";""-""# ""days"";""0 days"""
 	measure 'meas.ssr_history_avg_pushed_pulled_days' =
 			
-			var res = AVERAGE( ssr_history[trueai_days_pushed_pulled] )
+			var res = AVERAGEX(ssr_history, ssr_history[step_length_in_days] - ssr_history[step_expected_length_in_days])
 			
 			RETURN
 			res
@@ -15940,10 +15940,11 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.step_owner_group' = RELATED(users[trueai_group]).
+	/// Deprecated (Pass 1). Visuals and measures repointed to users[trueai_group]. Candidate for deletion in Pass 2.
 	column 'col.step_owner_group' = RELATED(users[trueai_group])
 		lineageTag: 1ed75141-e3bf-4135-8e4f-2e70619ab61f
 		summarizeBy: none
+		isHidden: true
 
 		annotation SummarizationSetBy = Automatic
 
@@ -16476,7 +16477,7 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column trueai_days_pushed_pulled = [step_length_in_days]-  [step_expected_length_in_days].
+	/// Deprecated (Pass 1). Measures no longer depend on this column (logic inlined from step_length_in_days and step_expected_length_in_days). This column is temporarily retained because it is used as a detail field in table visuals. Candidate for removal in Pass 2 once those visuals are repointed.
 	column trueai_days_pushed_pulled = [step_length_in_days]-  [step_expected_length_in_days]
 		dataType: int64
 		formatString: """+""#"" days"";""-""#"" days"";""-"""
@@ -16892,7 +16893,7 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.sales_steps_opp_id' = ```.
+	/// DO NOT TOUCH. Relationship key to opps[_sys_doc_id].
 	column 'col.sales_steps_opp_id' = ```
 			
 			var res = IF(ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}, [entity_opp_id], BLANK())     // only include for steps specified that tied to opps table 
@@ -16943,7 +16944,7 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.step_outcome_sort' = ```.
+	/// DO NOT TOUCH. Sort-by for col.step_outcome.
 	column 'col.step_outcome_sort' = ```
 			
 			var _outcome = IF(
@@ -16972,7 +16973,7 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.step_outcome_new' = ```.
+	/// Semantic label for 'Latest Outcome' used in Management Report slicers/pie categories and a table column. Logic: when step_outcome is blank, fall back to step_name; includes special-casing for Untouched/Prospecting. Prefer col.step_outcome (sorted by col.step_outcome_sort) for standard outcome reporting; use this only when the fallback behavior is required.
 	column 'col.step_outcome_new' = ```
 			
 			var _step_name = IF(ISBLANK(ssr_history[step_outcome]),[step_name], BLANK())                // get the step_name where don't have any outcome
@@ -17075,7 +17076,7 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.opp_acv_classification' = ```.
+	/// Deprecated (Pass 1). No direct report visual usage found in repo scan. Candidate for deletion in Pass 2 after smoke test.
 	column 'col.opp_acv_classification' = ```
 			
 			var is_new1 = if(ssr_history[step_name] = "New Logo Selling" , true, False) // new regular
@@ -17090,12 +17091,13 @@ table ssr_history
 			var res = If(is_new, "New ACV", If(is_existing_customer_selling, "Existing Customer Selling ACV", blank())) 
 			return res  
 			```
+		isHidden
 		lineageTag: e0885800-4e74-4383-acab-efd6398a3bbb
 		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.step_name_outcome' = ```.
+	/// Deprecated (Pass 1). No direct report visual usage found in repo scan. Candidate for deletion in Pass 2 after smoke test.
 	column 'col.step_name_outcome' = ```
 			
 			var concat_str = (ssr_history[step_name] & "_" &  if(or(ISBLANK(ssr_history[step_outcome]),ssr_history[step_outcome] = "" ) , "ongoing", ssr_history[step_outcome]))
@@ -17103,6 +17105,7 @@ table ssr_history
 			return clean_str
 			 
 			```
+		isHidden
 		lineageTag: 06868129-81a9-4439-b279-c55beb1b5b6c
 		summarizeBy: none
 
@@ -17122,7 +17125,7 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.outcome_str' = ```.
+	/// Deprecated (Pass 1). No direct report visual usage found in repo scan. Candidate for deletion in Pass 2 after smoke test.
 	column 'col.outcome_str' = ```
 			
 			
@@ -17135,6 +17138,7 @@ table ssr_history
 			  var res =  SUMX(filt_tbl, ssr_history[step_success_prob]) 
 			  return res 
 			```
+		isHidden
 		lineageTag: b4eeed89-562f-455b-b649-53ff4da3384d
 		summarizeBy: sum
 
@@ -17142,8 +17146,9 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Column trueai_user_role_alias = RELATED(users[trueai_user_role_alias]).
+	/// Deprecated (Pass 1). Mirror of users[trueai_user_role_alias]. Prefer using users[trueai_user_role_alias]. Candidate for deletion in Pass 2.
 	column trueai_user_role_alias = RELATED(users[trueai_user_role_alias])
+		isHidden
 		lineageTag: 7bcb8244-c31e-4cef-ae43-204e115d0461
 		summarizeBy: none
 
@@ -17594,4 +17599,3 @@ table ssr_history
 	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navigation
-
