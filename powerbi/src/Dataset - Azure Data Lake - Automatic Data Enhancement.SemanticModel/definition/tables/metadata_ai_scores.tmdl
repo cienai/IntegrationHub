@@ -2955,10 +2955,228 @@ table metadata_ai_scores
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
+	/// Shim for Peek Inside conditional formatting (Pass 1). Utility Box report references meas.ai_scores_values; implemented as alias of meas.ai_score.
+	measure 'meas.ai_scores_values' = ```
+			
+			[meas.ai_score]
+			```
+		formatString: 0
+
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
+	/// Copied from Sales Performance for Peek Inside pages (Pass 1).
+	measure 'meas.ai_score_measure_name' = ```
+			
+			var score_name = MAX(metadata_ai_scores[score_name])
+			
+			var res = SWITCH(
+			    score_name,
+			    "Prospecting Success Predictions", "meas.ai_scores_pred_prospecting",   
+			    "New Logo Selling Success Predictions", "meas.ai_scores_pred_new_logo_selling",    // score_id 2
+			    "Post-Sales Support Success Predictions", "meas.ai_scores_pred_post_sales_support",    // score_id 3
+			    "Existing Customer Selling Success Predictions", "meas.ai_scores_pred_existing_customer_selling",    // score_id 4
+			    "Success Factor Analysis", "meas.ai_scores_factor_analysis",                      // score id 5
+			    "Potential ACV", "meas.ai_scores_potential_acv",                      // score id 6
+			    "List Price", "meas.ai_scores_all_list_price",                      // score id 7
+			    "Line Item Products", "meas.ai_scores_line_items_products",                      // score id 8
+			    "Accounts Industry Consolidation", "meas.ai_scores_accts_industry",                // score id 9 
+			    "Accounts Lead Source Consolidation", "meas.ai_scores_accts_leadsource",                // score id 10 
+			    "Leads Industry Consolidation", "meas.ai_scores_leads_industry",                // score id 11 
+			    "Leads Lead Source Consolidation", "meas.ai_scores_leads_leadsource",                // score id 12 
+			    "Opps Industry Consolidation", "meas.ai_scores_opps_industry",                // score id 13 
+			    "Opps Lead Source Consolidation", "meas.ai_scores_opps_leadsource",                // score id 14 
+			    "SSR Industry Consolidation", "meas.ai_scores_ssr_industry",                // score id 15 
+			    "SSR Lead Source Consolidation", "meas.ai_scores_ssr_leadsource",                // score id 16 
+			    "Opportunities History", "meas.ai_scores_opps_history",                // score id 17 
+			    "Leads & Accounts Completeness  Data Present","meas.ai_scores_general_score",
+			    "Activity Capture Level", "meas.ai_scores_ci_act_capt_lvl",                // score id 18 
+			    "Time Allocation", "meas.ai_scores_ci_time_alloc",                // score id 19 
+			    "Adjusted Duration", "meas.ai_scores_adj_duration",                // score id 20 
+			    "Closing Ability", "meas.ai_scores_ci_closing_ability",                  // score_id 21 
+			    "Discovery Skill", "meas.ai_scores_ci_discovery_skill",               // score_id 22 
+			    "Engagement Ability", "meas.ai_scores_ci_engagement_ability",                      // score_id 23 
+			    "Work Effort", "meas.ai_scores_ci_work_effort",                      // score_id 24 
+			    "Deal Maximizing", "meas.ai_scores_ci_deal_maxing",                        // score_id 25 
+			    "Performance Tiers", "meas.ai_scores_performance_tiers",                            // score_id 26 
+			    "Ramping Success", "meas.ai_scores_ramping",                                  // score_id 27 
+			    "Time Management", "meas.ai_scores_ci_time_management",                // score_id 28 
+			    "VI Amount", "meas.ai_scores_vi",               // score_id 24 
+			    "Rep Organization Calibration", "meas.ai_scores_rep_org_calibration",
+			    "Bookings Calibration", "meas.ai_scores_booking_calibration",
+			    "Revenue Calibration", "meas.ai_scores_revenue_calibration",
+			    BLANK()
+			)
+			RETURN
+			res
+			```
+		lineageTag: c8ba0855-de67-44fd-a49b-64d5bee7ddc8
+
+	/// Measure meas.ai_scores_factor1_name.
+	/// Purpose: Returns a value derived from metadata_ai_scores[factor_1_name].
+	/// Calculation Logic: Uses VAR/RETURN, MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_ai_scores[factor_1_name].
+	/// Format/Type: Unspecified
+
+	/// Copied from Sales Performance for Peek Inside pages (Pass 1).
+	measure 'meas.ai_scores_factor1_name' =
+			
+			var factor_name = MAX(metadata_ai_scores[factor_1_name])
+			RETURN factor_name
+		lineageTag: b59e2b3c-8a05-46b9-96ad-9ebdb059374c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.ai_scores_factor1_value.
+	/// Purpose: Returns a value derived from metadata_ai_scores[score_name].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, SWITCH.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_ai_scores[score_name].
+	/// Format/Type: 0.00
+
+	/// Copied from Sales Performance for Peek Inside pages (Pass 1).
+	measure 'meas.ai_scores_factor1_value' = ```
+			
+			var score_name = MAX(metadata_ai_scores[score_name])
+			
+			var res = SWITCH(
+			    score_name,
+			    "Prospecting Success Predictions", [meas.ai_scores_prospecting_factor1_value],    // score_id 1
+			    "New Logo Selling Success Predictions", [meas.ai_scores_new_logo_selling_factor1_value],    // score_id 2
+			    "Post-Sales Support Success Predictions", [meas.ai_scores_post_sales_support_factor1_value],    // score_id 3
+			    "Existing Customer Selling Success Predictions", [meas.ai_scores_existing_customer_selling_factor1_value],    // score_id 4
+			    "Success Factor Analysis", [meas.ai_scores_success_factor_analysis_factor1_value],                      // score id 5
+			    "Potential ACV", [meas.ai_scores_potential_acv_factor1_value],                      // score id 6
+			    "List Price", [meas.ai_scores_list_price_items_factor1_value],                      // score id 7
+			    "Line Item Products", [meas.ai_scores_line_items_products_factor1_value],                      // score id 8
+			    "Opportunities History", [meas.ai_scores_opps_history_factor1_value],
+			    "Accounts Industry Consolidation", [meas.ai_scores_accts_industry_factor1_value],                // score id 9 
+			    "Accounts Lead Source Consolidation", [meas.ai_scores_accts_leadsource_factor1_value],                // score id 10 
+			    "Leads Industry Consolidation", [meas.ai_scores_leads_industry_factor1_value],                // score id 11 
+			    "Leads Lead Source Consolidation", [meas.ai_scores_leads_leadsource_factor1_value],                // score id 12 
+			    "Opps Industry Consolidation", [meas.ai_scores_opps_industry_factor1_value],                // score id 13 
+			    "Opps Lead Source Consolidation", [meas.ai_scores_opps_leadsource_factor1_value],                // score id 14 
+			    "SSR Industry Consolidation", [meas.ai_scores_ssr_industry_factor1_value],                // score id 15 
+			    "SSR Lead Source Consolidation", [meas.ai_scores_ssr_leadsource_factor1_value],                // score id 16 
+			    "Activity Capture Level", FORMAT([meas.ai_scores_ci_act_capt_lvl_factor1_value],"0.00"),                // score  18 
+			    "Activity Capture Level Confidence", [meas.ai_scores_ci_act_capt_lvl_conf_factor1_value],
+			    "Time Allocation", FORMAT([meas.ai_scores_ci_time_allocation_factor1_value],"#,0"),                // score id 19 
+			    "Adjusted Duration", FORMAT([meas.ai_scores_adj_duration_factor1_value],"0.00"),                // score id 20 
+			    "Closing Ability", [meas.ai_scores_ci_closing_ability_factor1_value],                  // score_id 21 
+			    "Discovery Skill", [meas.ai_scores_ci_discovery_skill_factor1_value],               // score_id 22 
+			    "Engagement Ability", [meas.ai_scores_ci_engagement_ability_factor1_value],                      // score_id 23 
+			    "Work Effort", [meas.ai_scores_ci_work_effort_factor1_value],                      // score_id 24 
+			    "Deal Maximizing", [meas.ai_scores_ci_deal_maxing_factor1_value],                        // score_id 25 
+			    "Performance Tiers", [meas.ai_scores_performance_tiers_factor1_value],                            // score_id 26 
+			    "Ramping Success", [meas.ai_scores_ramping_count_rate_factor1_value],                                  // score_id 27 
+			    "Time Management", [meas.ai_scores_ci_time_management_factor1_value],                // score_id 28 
+			    "VI Amount", [meas.ai_scores_vi_step_diff_factor1_value],               // score_id 24 
+			    "Rep Organization Calibration", FORMAT([meas.ai_scores_rep_org_calibration_factor1_value],"#,0"),
+			    "Bookings Calibration", FORMAT([meas.ai_scores_booking_calibration_factor1_value],"$#,0"),
+			    "Revenue Calibration", FORMAT([meas.ai_scores_revenue_calibration_factor1_value],"$#,0"),
+			    "Leads & Accounts Completeness  Data Present", [meas.ai_scores_general_score_factor1_value]
+			    
+			)
+			
+			RETURN
+			res
+			```
+		formatString: 0.00
+		lineageTag: 822233b1-79ae-4d66-b6a1-307424c79baf
+
+	/// Measure meas.ai_scores_factor2_name.
+	/// Purpose: Returns a value derived from metadata_ai_scores[factor_2_name].
+	/// Calculation Logic: Uses VAR/RETURN, MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_ai_scores[factor_2_name].
+	/// Format/Type: Unspecified
+
+	/// Copied from Sales Performance for Peek Inside pages (Pass 1).
+	measure 'meas.ai_scores_factor2_name' =
+			
+			var factor_name = MAX(metadata_ai_scores[factor_2_name])
+			RETURN factor_name
+		lineageTag: 0f4f2c54-fdd9-493c-a042-f0fbf0f14a03
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.ai_scores_factor2_value.
+	/// Purpose: Returns a value derived from metadata_ai_scores[score_name].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, SWITCH.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_ai_scores[score_name].
+	/// Format/Type: 0.00
+
+	/// Copied from Sales Performance for Peek Inside pages (Pass 1).
+	measure 'meas.ai_scores_factor2_value' = ```
+			
+			var score_name = MAX(metadata_ai_scores[score_name])
+			
+			var res = SWITCH(
+			    score_name,
+			    "Prospecting Success Predictions", [meas.ai_scores_prospecting_factor2_value],    // score_id 1
+			    "New Logo Selling Success Predictions", [meas.ai_scores_new_logo_selling_factor2_value],    // score_id 2
+			    "Post-Sales Support Success Predictions", [meas.ai_scores_post_sales_support_factor2_value],    // score_id 3
+			    "Existing Customer Selling Success Predictions", [meas.ai_scores_existing_customer_selling_factor2_value],    // score_id 4
+			    "Success Factor Analysis", [meas.ai_scores_success_factor_analysis_factor2_value],                      // score id 5
+			    "List Price", [meas.ai_scores_list_price_items_non_default_factor2_value],                      // score id 7
+			    "Line Item Products", [meas.ai_scores_line_items_products_factor2_value],                      // score id 8
+			    "Opportunities History", [meas.ai_scores_opps_history_factor2_value],
+			    "Time Allocation", FORMAT([meas.ai_scores_ci_time_allocation_factor2_value],"#,0"),                // score id 19  
+			    "Ramping Success", [meas.ai_scores_ramping_perf_conf_factor2_value],                                  // score_id 27 
+			    "VI Amount", [meas.ai_scores_vi_tuning_share_diff_factor2],               // score_id 24 
+			    "Rep Organization Calibration", [meas.ai_scores_rep_org_calibration_factor2_value],
+			    "Bookings Calibration", FORMAT([meas.ai_scores_booking_calibration_factor2_value], "$#,0"),
+			    "Revenue Calibration", FORMAT([meas.ai_scores_revenue_calibration_factor2_value], "$#,0")
+			    
+			)
+			
+			RETURN
+			res
+			```
+		formatString: 0.00
+		lineageTag: dbbfb553-82bb-444e-b9f9-7523d6960fe1
+
+	/// Measure meas.ai_scores_factor3_name.
+	/// Purpose: Returns a value derived from metadata_ai_scores[factor_3_name].
+	/// Calculation Logic: Uses VAR/RETURN, MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_ai_scores[factor_3_name].
+	/// Format/Type: Unspecified
+
+	/// Copied from Sales Performance for Peek Inside pages (Pass 1).
+	measure 'meas.ai_scores_factor3_name' =
+			
+			var factor_name = MAX(metadata_ai_scores[factor_3_name])
+			RETURN factor_name
+		lineageTag: 2a2a1c88-f694-4c0e-9a4d-141ad9979f50
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.ai_scores_factor3_value.
+	/// Purpose: Returns a value derived from metadata_ai_scores[score_name].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, SWITCH.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_ai_scores[score_name].
+	/// Format/Type: Unspecified
+
+	/// Copied from Sales Performance for Peek Inside pages (Pass 1).
+	measure 'meas.ai_scores_factor3_value' = ```
+			
+			var score_name = MAX(metadata_ai_scores[score_name])
+			
+			var res = SWITCH(
+			    score_name,
+			    "Rep Organization Calibration", FORMAT([meas.ai_scores_rep_org_calibration_factor3_value],"#,0")
+			    
+			)
+			
+			RETURN
+			res
+			```
+		lineageTag: a87d35b5-2f1a-49fd-bfbb-73176fec4bcf
+
+	/// Measure meas.ai_scores_text.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
 	measure 'meas.average_ai_score' =
 			
 			var avg_score =
