@@ -612,7 +612,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_ci_closing_ability_factor1_value' =
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_closing_ability_conf]),        // get the avg closing ability conf
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_closing_ability_conf]), BLANK())),        // get the avg closing ability conf
 			    users[trueai_user_role_function] in {"AE", "AM"}
 			)
 			RETURN
@@ -629,7 +629,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_ci_deal_maxing_factor1_value' =
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_deal_maxing_conf])        // get the avg deal maximizing conf
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_deal_maxing_conf]), BLANK()))        // get the avg deal maximizing conf
 			)
 			RETURN
 			_avg+0
@@ -645,7 +645,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_ci_discovery_skill_factor1_value' =
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_discov_skills_conf]),        // get the avg discovery skill conf
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_discov_skills_conf]), BLANK())),        // get the avg discovery skill conf
 			    users[trueai_user_role_function] in {"AE", "AM", "SDR"}
 			)
 			RETURN
@@ -662,7 +662,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_ci_engagement_ability_factor1_value' =
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_engmt_ability_conf]),        // get the avg engagement ability conf
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_engmt_ability_conf]), BLANK())),        // get the avg engagement ability conf
 			    users[trueai_user_role_function] in  {"AE", "AM", "SDR"}
 			)
 			RETURN
@@ -706,7 +706,7 @@ table metadata_ai_scores
 			
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_time_mgmt_conf])      // get the avg time mgmt conf
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_time_mgmt_conf]), BLANK()))      // get the avg time mgmt conf
 			)
 			
 			
@@ -724,7 +724,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_ci_work_effort_factor1_value' =
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_work_effort_conf]),        // get the avg work effort conf for AE, AM and SDR role
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_work_effort_conf]), BLANK())),        // get the avg work effort conf for AE, AM and SDR role
 			    users[trueai_user_role_function] in {"AE", "AM", "SDR"}
 			)
 			
@@ -862,7 +862,7 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_performance_tiers_factor1_value' =
 			
-			var perf_avg = CALCULATE(AVERAGE(users_history[ci_perf_qtly_performance_tier_conf]))        // get the avg performance tier conf
+			var perf_avg = CALCULATE(AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_perf_qtly_performance_tier_conf]), BLANK())))        // get the avg performance tier conf
 			RETURN
 			perf_avg
 		formatString: 0
@@ -1164,7 +1164,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_ramping_perf_conf_factor2_value' =
 			
 			var _perf = CALCULATE(
-			    AVERAGE(users_history[ci_perf_qtly_performance_tier_conf]),       // get the avg perf conf
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_perf_qtly_performance_tier_conf]), BLANK())),       // get the avg perf conf
 			    users_history[ci_perf_ramping_status] ="Ramping"
 			)
 			RETURN
@@ -1509,7 +1509,7 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_closing_ability' = ```
 			
-			var _avg = AVERAGE(users_history[ci_sb_closing_ability_num])     // get the avg closing ability conf
+			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_closing_ability_num]), BLANK()))     // get the avg closing ability conf
 			var boost_expo = 0.90
 			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be  
 			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
@@ -1556,7 +1556,7 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_deal_maxing' = ```
 			
-			var _avg = AVERAGE(users_history[ci_sb_deal_maxing_num])     // get the avg deal maximizing conf
+			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_deal_maxing_num]), BLANK()))     // get the avg deal maximizing conf
 			var boost_expo = 0.90           // exponent value 
 			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
 			var _conf = ROUND(_avg,2)*100  // round the number and for integar value
@@ -1599,7 +1599,7 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_ci_discovery_skill' = ```
 			
-			var _avg = AVERAGE(users_history[ci_sb_disc_skills_num])     // get the avg discovery skill conf
+			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_disc_skills_num]), BLANK()))     // get the avg discovery skill conf
 			var boost_expo = 0.90
 			var _new_avg = (ABS(_avg))^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
 			var _conf = ROUND(_avg*100 ,0) // round the number and for integar value
@@ -1645,7 +1645,7 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_ci_engagement_ability' = ```
 			
-			var _avg = AVERAGE(users_history[ci_sb_engmt_ability_num])     // get the avg engagement ability conf
+			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_engmt_ability_num]), BLANK()))     // get the avg engagement ability conf
 			var boost_expo = 0.90           // exponent value 
 			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
 			var _conf = ROUND(_avg,2)*100  // round the number and for integar value
@@ -1741,7 +1741,7 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_time_management' = ```
 			
-			var _avg = AVERAGE(users_history[ci_sb_time_mgmt_num])
+			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_time_mgmt_num]), BLANK()))
 			var boost_expo = 0.90
 			var _new_avg = (_avg)^ boost_expo   // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
 			var _conf = ROUND(_new_avg*100,0)  // round the number and for integar value
@@ -1784,7 +1784,7 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_ci_work_effort' = ```
 			
-			var _avg = AVERAGE(users_history[ci_sb_work_effort_num])     // get the factor1
+			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_work_effort_num]), BLANK()))     // get the factor1
 			var boost_expo = 0.90           // exponent value 
 			var _new_avg = (_avg)^ boost_expo               // get the expo value to enhance output
 			var _conf = ROUND(_avg,2)*100  // round the number and for integar value
@@ -2248,7 +2248,7 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_performance_tiers' =
 			
-			var score =  CALCULATE(AVERAGE(users_history[ci_perf_qtly_performance_tier_conf]))        // get the avg performance tier conf
+			var score =  CALCULATE(AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_perf_qtly_performance_tier_conf]), BLANK())))        // get the avg performance tier conf
 			var res = ROUND(score*100, 0)       // get the int number
 			RETURN
 			res
@@ -2546,7 +2546,7 @@ table metadata_ai_scores
 			var ramp_rate  = MIN(_cnt/3, 1)       // get the minimum if there is no ramping reps 
 			
 			var perf_score =  CALCULATE(
-			    AVERAGE(users_history[ci_perf_qtly_performance_tier_conf]),       // get the avg perf conf
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_perf_qtly_performance_tier_conf]), BLANK())),       // get the avg perf conf
 			    users_history[ci_perf_ramping_status] ="Ramping"
 			)
 			var boost_expo = 0.5            // we use this to get the closer one value
