@@ -8,13 +8,33 @@ table metadata_ai_scores_category_links
 	/// Format/Type: Not specified.
 	measure 'meas.metadata_score_weighting_pct' =
 			
-			var curr_weight = CALCULATE(SUM(metadata_ai_scores_category_links[weighting]))
-			var all_weights = CALCULATE(SUM(metadata_ai_scores_category_links[weighting]), metadata_ai_scores[score_name] <> "" )
-			var res = DIVIDE(curr_weight, all_weights)
-			return res
+			var curr_weight = SUM(metadata_ai_scores_category_links[weighting])
+			var category_id = SELECTEDVALUE(metadata_ai_scores_category_links[analysis_category_id])
+			var all_weights =
+			    CALCULATE(
+			        SUM(metadata_ai_scores_category_links[weighting]),
+			        ALL(metadata_ai_scores_category_links),
+			        metadata_ai_scores_category_links[analysis_category_id] = category_id
+			    )
+			return
+			IF(
+			    ISBLANK(category_id),
+			    BLANK(),
+			    DIVIDE(curr_weight, all_weights)
+			)
 		lineageTag: 298a2a88-bc40-4700-a0d9-133df54e53ac
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
+		formatString: 0%
+
+	measure 'meas._validate_weight_sum_pct' =
+		CALCULATE(
+			SUMX(
+				VALUES(metadata_ai_scores_category_links[score_id]),
+				[meas.metadata_score_weighting_pct]
+			),
+			REMOVEFILTERS(metadata_ai_scores_category_links[score_id])
+		)
+		formatString: 0%
 
 	/// Unique AI score identifier
 	column _sys_doc_id
