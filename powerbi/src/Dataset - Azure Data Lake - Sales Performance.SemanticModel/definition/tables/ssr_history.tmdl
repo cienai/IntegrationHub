@@ -9685,16 +9685,17 @@ table ssr_history
 	/// Calculation Logic: Uses CALCULATE, DISTINCTCOUNT.
 	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr_history[_sys_ssr_id].
 	/// Format/Type: #,0
-	measure 'meas.ssr_history_mkt_leads_inbound' = ```
+	measure 'meas.ssr_history_mkt_leads_inbound' =
 			
-			var res = CALCULATE(
-			    distinctcount(ssr_history[_sys_ssr_id]), 
-			    ssr_history[step_name] = "Lead Gen",  
-			    ssr[trueai_leadsource_is_inbound] = true,    // get the mkt inbound leads 
-			    users[trueai_user_role_department]="MKT"
-			) 
-			return COALESCE ( res, 0 )
-			```
+			var res =
+			    calculate(
+			        distinctcount(ssr_history[_sys_ssr_id]),
+			        ssr_history[step_name] = "Lead Gen",
+			        ssr[trueai_leadsource_is_inbound] = true,
+			        users[trueai_user_role_department] = "mkt"
+			    )
+			return
+			    coalesce(res, 0)
 		formatString: #,0
 		displayFolder: _lead_analysis
 		lineageTag: 3cd764ac-d38c-48c4-b4e5-58ed5cc8642e
@@ -9800,18 +9801,31 @@ table ssr_history
 	measure 'meas.ssr_history_inbound_leads_touched_avg_days' =
 			
 			var start_date = [meas.filter_date_min]
-			var end_date =[meas.filter_date_max]
-			var filt_ssr = CALCULATETABLE(ssr, cal_end_dates[Date] > date(1900,1,1) && cal_end_dates[Date] < date(2100,1,1)) // get rid of date context
+			var end_date = [meas.filter_date_max]
 			
-			--var filt_ssr_hist = Filter(filt_ssr, ssr[_sys_doc_id] in SELECTColumn([_sys_ssr_id], inbound_leads)
-			var test_tbl = filter(filt_ssr, ssr[trueai_first_touch] >=  start_date &&  ssr[trueai_first_touch] < end_date && ssr[trueai_leadsource_is_inbound]=true ) // get the new date range
-			var avg_days = AVERAGEX(test_tbl, ssr[trueai_first_touch] -ssr[trueai_added_on]  )
-			var res = avg_days
-			RETURN
-			 res
-		formatString: 0
+			var tbl =
+			    calculatetable(
+			        filter(
+			            ssr,
+			            ssr[trueai_leadsource_is_inbound] = true &&
+			            not isblank(ssr[trueai_first_touch]) &&
+			            ssr[trueai_first_touch] >= start_date &&
+			            ssr[trueai_first_touch] < end_date &&
+			            datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) >= 0 &&
+			            datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) <= 21
+			        ),
+			        users[trueai_user_role_department] = "mkt"
+			    )
+			
+			return
+			    averagex(
+			        tbl,
+			        datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day)
+			    )
 		displayFolder: _lead_analysis
 		lineageTag: d22be261-5984-4eab-96d7-dbf311852981
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Purpose: Returns the measure value derived from the DAX expression.
 	/// Calculation Logic: Uses CALCULATE.
@@ -14871,34 +14885,26 @@ table ssr_history
 	/// Calculation Logic: Uses CALCULATETABLE, CALCULATE, COUNTROWS, FILTER, DATE.
 	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on cal_end_dates[Date].
 	/// Format/Type: #,0
-	measure 'meas.ssr_history_mkt_inbound_leads_with_first_touch' = ```
+	measure 'meas.ssr_history_mkt_inbound_leads_with_first_touch' =
 			
 			var start_date = [meas.filter_date_min]
-			var end_date =[meas.filter_date_max]
-			var filt_ssr = CALCULATETABLE(ssr, cal_end_dates[Date] > date(1900,1,1) && cal_end_dates[Date] < date(2100,1,1)) // get rid of date context
+			var end_date = [meas.filter_date_max]
 			
-			--var filt_ssr_hist = Filter(filt_ssr, ssr[_sys_doc_id] in SELECTColumn([_sys_ssr_id], inbound_leads)
-			var test_tbl = filter(filt_ssr, ssr[trueai_first_touch] >=  start_date &&  ssr[trueai_first_touch] < end_date) // get the new date range
-			var touch_cnt = CALCULATE(
-			    COUNTROWS(DISTINCT(SELECTCOLUMNS(test_tbl, "doc_id", ssr[_sys_doc_id]))),
-			    ssr[trueai_leadsource_is_inbound] = true,
-			    users[trueai_user_role_department]="MKT"
-			)
-			var res = CALCULATE(
-			    [meas.ssr_history_mkt_leads_inbound],
-			    ssr[trueai_first_touch] >=  start_date &&  ssr[trueai_first_touch] < end_date
-			)
+			var res =
+			    calculate(
+			        distinctcount(ssr_history[_sys_ssr_id]),
+			        ssr_history[step_name] = "Lead Gen",
+			        ssr[trueai_leadsource_is_inbound] = true,
+			        users[trueai_user_role_department] = "mkt",
+			        not isblank(ssr[trueai_first_touch]),
+			        ssr[trueai_first_touch] >= start_date &&
+			        ssr[trueai_first_touch] < end_date,
+			        datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) >= 0,
+			        datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) <= 21
+			    )
 			
-			return 
-			COALESCE ( res, 0 )
-			
-			
-			// CALCULATE(
-			//     [meas.ssr_history_leads_w_first_touch],
-			//     ssr[trueai_leadsource_is_inbound] = true, 
-			//     users[trueai_user_role_department]="MKT"
-			// )
-			```
+			return
+			    coalesce(res, 0)
 		formatString: #,0
 		displayFolder: _lead_analysis
 		lineageTag: 08b16d75-78d5-470d-b17e-5d7d264fec8b
@@ -14907,12 +14913,27 @@ table ssr_history
 	/// Calculation Logic: Uses CALCULATE, COUNT, RETURN.
 	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr_history[_sys_doc_id].
 	/// Format/Type: Unspecified
-	measure 'meas.ssr_history_success_count_mkt_prospecting_inbound' = ```
+	measure 'meas.ssr_history_success_count_mkt_prospecting_inbound' =
 			
-			var res = CALCULATE(count(ssr_history[_sys_doc_id]),ssr_history[step_name]= "Prospecting" && ssr_history[step_success] = true)  
-			RETURN
-			res+0
-			```
+			var start_date = [meas.filter_date_min]
+			var end_date = [meas.filter_date_max]
+			
+			var res =
+			    calculate(
+			        distinctcount(ssr_history[_sys_ssr_id]),
+			        ssr_history[step_name] = "Prospecting",
+			        ssr_history[step_success] = true,
+			        ssr[trueai_leadsource_is_inbound] = true,
+			        users[trueai_user_role_department] = "mkt",
+			        not isblank(ssr[trueai_first_touch]),
+			        ssr[trueai_first_touch] >= start_date &&
+			        ssr[trueai_first_touch] < end_date,
+			        datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) >= 0,
+			        datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) <= 21
+			    )
+			
+			return
+			    coalesce(res, 0)
 		displayFolder: _lead_analysis
 		lineageTag: d737c4ab-36bf-4374-83ce-1c4b04b767a6
 
@@ -14922,18 +14943,13 @@ table ssr_history
 	/// Calculation Logic: Uses DIVIDE.
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: 0%;-0%;0%
-	measure 'meas.ssr_history_inbound_mkt_leads_touched_ratio' = ```
+	measure 'meas.ssr_history_inbound_mkt_leads_touched_ratio' =
 			
 			var _mkt_inbound_leads = [meas.ssr_history_mkt_leads_inbound]
 			var _touched_leads = [meas.ssr_history_mkt_inbound_leads_with_first_touch]
-			var res = DIVIDE(
-			    _touched_leads,
-			    _mkt_inbound_leads,
-			    0
-			)
-			return 
-			res
-			```
+			
+			return
+			    divide(_touched_leads, _mkt_inbound_leads, 0)
 		formatString: 0%;-0%;0%
 		displayFolder: _lead_analysis
 		lineageTag: 0c6f1490-f449-46aa-ba57-b84ecdd6506b
@@ -14944,10 +14960,11 @@ table ssr_history
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.ssr_history_success_rate_mkt_prospecting_inbound' =
 			
-			var tot_count = CALCULATE(COUNT(ssr_history[_sys_doc_id]), ssr_history[step_name] = "Prospecting")
-			var success_count = CALCULATE(COUNT(ssr_history[_sys_doc_id]), ssr_history[step_name] = "Prospecting" && ssr_history[step_success] = true)
-			var rate = DIVIDE(success_count , tot_count )
-			return rate+0
+			divide(
+			    [meas.ssr_history_success_count_mkt_prospecting_inbound],
+			    [meas.ssr_history_mkt_inbound_leads_with_first_touch],
+			    0
+			)
 		formatString: 0%;-0%;0%
 		displayFolder: _lead_analysis
 		lineageTag: 4779ab77-ee8f-48ff-bc2f-354d833babe9
@@ -15490,8 +15507,6 @@ table ssr_history
 			SELECTEDVALUE( metadata_performance_metrics_old[sys_doc_id], "NO SELECTION" )
 		lineageTag: c8216aa7-dbf6-413d-b072-ff3e2d7fcbb8
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	/// Purpose: Returns the measure value derived from the DAX expression.
 	/// Calculation Logic: Uses IF, VAR, RETURN.
 	/// Dynamic Behavior: Respects current filter context and responds to filters on metadata_performance_metrics_old[metric_name].
@@ -15576,6 +15591,80 @@ table ssr_history
 	measure 'meas.pipeline_amt_sum' = CALCULATE(SUM(ssr_history[opp_pipeline_amt]))
 		displayFolder: _opps_detail
 		lineageTag: cc399fbf-d2d3-4e9f-9d53-e08c135fc8e0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Purpose: Debug measure for prospecting success count.
+	/// Calculation Logic: Uses CALCULATE with DISTINCTCOUNT and filters on step name and success flag.
+	/// Dynamic Behavior: Respects current filter context and applies the specified filters.
+	/// Format/Type: #,0
+	measure dbg_any_success =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(ssr_history[_sys_doc_id]),
+			    ssr_history[step_name] = "Prospecting",
+			    ssr_history[step_success] = true
+			)
+		formatString: #,0
+		lineageTag: 3e9cefd8-8820-49ae-8233-c49006ae7396
+
+	/// Purpose: Debug measure that surfaces the inbound leads with first touch measure.
+	/// Calculation Logic: Direct reference.
+	/// Dynamic Behavior: Inherits behavior from referenced measure.
+	/// Format/Type: #,0
+	measure dbg_cohort =
+			
+			[meas.ssr_history_mkt_inbound_leads_with_first_touch]
+		formatString: #,0
+		lineageTag: 3116e0ef-9efa-4c51-8fb0-b50f7efdfb0c
+
+	/// Purpose: Debug measure for prospecting success count without date filters.
+	/// Calculation Logic: Uses CALCULATE with DISTINCTCOUNT, removes date filters, and applies step filters.
+	/// Dynamic Behavior: Ignores filters from cal_end_dates; respects other filters.
+	/// Format/Type: #,0
+	measure dbg_any_success_no_date =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(ssr_history[_sys_doc_id]),
+			    REMOVEFILTERS(cal_end_dates),
+			    ssr_history[step_name] = "Prospecting",
+			    ssr_history[step_success] = true
+			)
+		formatString: #,0
+		lineageTag: f93bed6d-6d4d-4822-a248-55532d4d10d4
+
+	/// Purpose: Debug measure for cohort-success intersection count.
+	/// Calculation Logic: Builds cohort and success ID tables, then counts intersection.
+	/// Dynamic Behavior: Respects current filter context; uses filter date bounds from measures.
+	/// Format/Type: #,0
+	measure 'dbg.cohort_success_intersection' =
+			
+			var start_date = [meas.filter_date_min]
+			var end_date = [meas.filter_date_max]
+			
+			var cohort =
+			    CALCULATETABLE(
+			        VALUES(ssr[_sys_doc_id]),
+			        ssr[trueai_leadsource_is_inbound] = true,
+			        users[trueai_user_role_department] = "mkt",
+			        NOT ISBLANK(ssr[trueai_first_touch]),
+			        ssr[trueai_first_touch] >= start_date &&
+			        ssr[trueai_first_touch] < end_date,
+			        DATEDIFF(ssr[trueai_added_on], ssr[trueai_first_touch], day) >= 0,
+			        DATEDIFF(ssr[trueai_added_on], ssr[trueai_first_touch], day) <= 21
+			    )
+			
+			var success_ids =
+			    CALCULATE(
+			        VALUES(ssr_history[_sys_doc_id]),
+			        ssr_history[step_name] = "prospecting",
+			        ssr_history[step_success] = true
+			    )
+			
+			RETURN
+			COUNTROWS(INTERSECT(cohort, success_ids))
+		formatString: #,0
+		lineageTag: 6bbf67ff-dcee-4043-b129-9c48f2bf44dd
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -15942,9 +16031,9 @@ table ssr_history
 
 	/// Deprecated (Pass 1). Visuals and measures repointed to users[trueai_group]. Candidate for deletion in Pass 2.
 	column 'col.step_owner_group' = RELATED(users[trueai_group])
+		isHidden
 		lineageTag: 1ed75141-e3bf-4135-8e4f-2e70619ab61f
 		summarizeBy: none
-		isHidden: true
 
 		annotation SummarizationSetBy = Automatic
 
@@ -17599,3 +17688,4 @@ table ssr_history
 	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navigation
+
