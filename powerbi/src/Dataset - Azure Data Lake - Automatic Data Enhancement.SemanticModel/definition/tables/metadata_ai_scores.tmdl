@@ -552,20 +552,29 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_adj_duration_factor1_value' = ```
 			
-			VAR _tbl = CALCULATETABLE(ssr_history, ssr_history[step_name] in {"Prospecting", "New Logo Selling", "Post-Sales Support","Existing Customer Selling"}) // Get the current table context but exclude the unthcouded stage etc
-			VAR res = AVERAGEX(
-			    _tbl,
-			     SWITCH(
-			        FORMAT(ssr_history[stkhlds_all_adj_dur_rule], "0"),
-			        "133002", 0.4,  // 133002 is industry avg, not reliable
-			        "133001", 0.7,   // 133001 is peer avg, okay
-			        "133003", 0.97,   // 133003 is the best info from the owner
-			        "133004", 0.86    // 133004 is good data but not from the primary owner
+			VAR _tbl =
+			    CALCULATETABLE(
+			        ssr_history,
+			        ssr_history[step_name] IN {
+			            "Prospecting",
+			            "New Logo Selling",
+			            "Post-Sales Support",
+			            "Existing Customer Selling"
+			        }
 			    )
-			)
-			
-			RETURN 
-			res
+			VAR res =
+			    AVERAGEX(
+			        _tbl,
+			        SWITCH(
+			            VALUE(ssr_history[stkhlds_all_adj_dur_rule]),
+			            133002, 0.4,
+			            133001, 0.7,
+			            133003, 0.97,
+			            133004, 0.86
+			        )
+			    )
+			RETURN res
+
 			```
 		displayFolder: _factor_value1
 		lineageTag: 89c72c3a-71ab-4f1e-beb2-abbc13189977
@@ -1337,23 +1346,16 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses SWITCH for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_adj_duration' = ```
-						
-						VAR _tbl = CALCULATETABLE(ssr_history, ssr_history[step_name] in {"Prospecting", "New Logo Selling", "Post-Sales Support","Existing Customer Selling"}) // Get the current table context but exclude the unthcouded stage etc
-						VAR _avg = AVERAGEX(
-						    _tbl,
-						     SWITCH(
-						        FORMAT(ssr_history[stkhlds_all_adj_dur_rule], "0"),
-						        "133002", 0.4,  // 133002 is industry avg, not reliable
-						        "133001", 0.7,   // 133001 is peer avg, okay
-						        "133003", 0.97,   // 133003 is the best info from the owner
-						        "133004", 0.86    // 133004 is good data but not from the primary owner
-						    )
-						)
-						
-						var boost_expo = 0.90           // exponent value 
-						var _new_avg = (_avg)^ boost_expo               // get the expo value to enhance output
-						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+			
+			VAR score01 = [meas.ai_scores_adj_duration_factor1_value]
+			VAR score100 = score01 * 100
+			RETURN
+			    IF(
+			        ISBLANK(score01),
+			        BLANK(),
+			        MIN(100, MAX(0, score100))
+			    )
+		
 			```
 		displayFolder: _ai_scores
 		lineageTag: 49e180a0-27b1-4d09-a630-a4364e278ddb
@@ -2025,7 +2027,7 @@ table metadata_ai_scores
 			        BLANK(),
 			        MIN(100, MAX(0, score100))
 			    )
-
+			
 			```
 		displayFolder: _ai_scores
 		lineageTag: 3bc9c490-ebb5-4202-9843-34faa6c4904b
@@ -2398,19 +2400,20 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_pred_post_sales_support' = ```
-						
-						var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
-						var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_post_sales_auc]), 0)     // get the latest auc for existing customer
-						var factor2 = COALESCE(MAXX(latest_row, companies_history[di_pred_post_sales_r2]), 0)     // get the latest r2
-						
-						var boost_expo = 0.65 // to get closer to one if good score after the score has been calcualted
-						var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
-						var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
-						
-						var score  = ((normalized_factor2 + factor1)/2) ^ boost_expo  // avg of both normalized score + boosting
-						var _conf = round(score * 100 ,0) // make it an integer score
-						
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+		
+		    VAR factor1 = COALESCE([meas.ai_scores_post_sales_support_factor1_value], 0)
+		    VAR factor2 = COALESCE([meas.ai_scores_post_sales_support_factor2_value], 0)
+		    VAR normalized_factor1 = (MAX((factor1-0.5),0)) + 0.5
+		    VAR normalized_factor2 = MAX(factor2, 0)
+		    VAR score01 = ((normalized_factor2 + factor1) / 2)
+		    VAR score100 = score01 * 100
+		    RETURN
+		        IF(
+		            ISBLANK(score01),
+		            BLANK(),
+		            MIN(100, MAX(0, score100))
+		        )
+		
 			```
 		displayFolder: _ai_scores
 		lineageTag: c95df0f5-d150-4b05-8f21-68a783ddd579
@@ -3248,48 +3251,6 @@ table metadata_ai_scores
 	measure 'meas.__compile_probe' = 1
 		lineageTag: 4490d946-e5a0-44ed-9d66-d17e168a7a2f
 
-	measure 'meas.__dbg_opps_hist_factor1' = [meas.ai_scores_opps_history_factor1_value]
-		lineageTag: e610141e-966e-479b-93a2-71edf9b25ec3
-
-	measure 'meas.__dbg_opps_hist_factor2' = [meas.ai_scores_opps_history_factor2_value]
-		lineageTag: 44cd97de-4eda-423d-9be7-38808dc3d826
-
-	measure 'meas.__dbg_opps_hist_ratio_raw' =
-			DIVIDE(
-			    [meas.ai_scores_opps_history_factor1_value],
-			    [meas.ai_scores_opps_history_factor2_value],
-			    BLANK()
-			)
-		lineageTag: 8918b588-855a-4bfd-8aa1-7d80fda231bc
-
-	measure 'meas.__dbg_line_items_rows' = COUNTROWS(opp_line_items)
-		lineageTag: 017e43fa-2eb4-4b22-9db8-632c1f9b7e7a
-
-	measure 'meas.__dbg_line_items_distinct_products' = DISTINCTCOUNT(opp_line_items[product_id])
-		lineageTag: d1907af1-5536-45eb-ab4d-c4a5d93f5ca1
-
-	measure 'meas.__dbg_line_items_distinct_opps' = DISTINCTCOUNT(opp_line_items[opportunity_id])
-		lineageTag: d3c37c5f-a983-48ad-84c2-1838f76a06c6
-
-	measure 'meas.__dbg_line_items_won_factor_raw' = [meas.ai_scores_line_items_products_factor1_value]
-		lineageTag: 755473e4-bb9d-4323-97aa-a465e207910e
-
-	measure 'meas.__dbg_line_items_lost_factor_raw' = [meas.ai_scores_line_items_products_factor2_value]
-		lineageTag: 3935ae91-298a-4691-a9cd-6e6829cb2266
-
-	measure 'meas.__dbg_line_items_opp_id_match_rate' =
-			
-			VAR opp_ids = VALUES(opps[_sys_docid])
-			VAR matched_line_items =
-			    CALCULATE(
-			        DISTINCTCOUNT(opp_line_items[crm_opp_id]),
-			        TREATAS(opp_ids, opp_line_items[crm_opp_id])
-			    )
-			VAR opp_count = COUNTROWS(opp_ids)
-			RETURN
-			    DIVIDE(matched_line_items, opp_count, BLANK())
-		lineageTag: 5b491295-6e0f-4b23-80b7-db125a3bc299
-
 	measure 'meas.readiness_ai_scores_opps_history_factor1_value' =
 			
 			VAR won_opps =
@@ -3434,93 +3395,6 @@ table metadata_ai_scores
 			IF(ISBLANK(result), BLANK(), MIN(MAX(result,0),100))
 		formatString: 0
 		lineageTag: e888156c-3b86-4145-afc1-99c3c9628ddb
-
-	measure 'meas.__dbg_opp_hist_old_vs_new' =
-			VAR old = [meas.ai_scores_opps_history]
-			VAR new = [meas.readiness_ai_scores_opps_history]
-			RETURN
-			"old=" & FORMAT(old, "0.00") & " | new=" & FORMAT(new, "0.00")
-		lineageTag: 366bfd8d-0f38-4e75-99a9-f2f1d66e47ca
-
-	measure 'meas.__dbg_score_name' = MAX(metadata_ai_scores[score_name])
-		lineageTag: fc66e3f0-9f21-47aa-a0c6-beef9e33c3a6
-
-	measure 'meas.__dbg_opp_hist_new_factors' =
-			
-			VAR f1 = [meas.readiness_ai_scores_opps_history_factor1_value]
-			VAR f2 = [meas.readiness_ai_scores_opps_history_factor2_value]
-			VAR r01 = DIVIDE(f1, f2, BLANK())
-			
-			RETURN
-			    "f1=" & FORMAT(f1, "0.00")
-			    & " | f2=" & FORMAT(f2, "0.00")
-			    & " | r=" & FORMAT(r01, "0.000")
-		lineageTag: f3ece36d-7798-4dc3-8970-1194fb44062a
-
-	measure 'meas.__dbg_oh_won_opps_cnt' =
-			
-			CALCULATE(
-			    DISTINCTCOUNT(opps[_sys_docid]),
-			    opps[trueai_is_won] = TRUE()
-			)
-		lineageTag: 2fb8e914-61f7-4dbb-bbe2-61b233fae954
-
-	measure 'meas.__dbg_oh_hist_rows_for_won_opps' =
-			
-			VAR won_opps =
-			    CALCULATETABLE(
-			        VALUES(opps[_sys_docid]),
-			        opps[trueai_is_won] = TRUE()
-			    )
-			RETURN
-			    CALCULATE(
-			        COUNTROWS(opps_histories),
-			        TREATAS(won_opps, opps_histories[crm_opp_id])
-			    )
-		lineageTag: 7600d778-26d5-40f1-b61b-9858cf2dcb05
-
-	measure 'meas.__dbg_oh_pct_won_opps_with_gt1_stage' =
-		
-		VAR won_opps =
-		    CALCULATETABLE(
-		        VALUES(opps[_sys_docid]),
-		        opps[trueai_is_won] = TRUE()
-		    )
-		VAR per_opp =
-		    ADDCOLUMNS(
-		        SUMMARIZE(
-		            CALCULATETABLE(opps_histories, TREATAS(won_opps, opps_histories[crm_opp_id])),
-		            opps_histories[crm_opp_id]
-		        ),
-		        "stage_cnt", CALCULATE(DISTINCTCOUNT(opps_histories[trueai_stage_id]))
-		    )
-		VAR denom = COUNTROWS(per_opp)
-		VAR numer = COUNTROWS(FILTER(per_opp, [stage_cnt] > 1))
-		
-		RETURN
-		    DIVIDE(numer, denom, BLANK())
-
-	measure 'meas.__dbg_list_price_factors' =
-		
-		VAR total =
-		    COUNT(opp_line_items[trueai_list_price])
-		VAR non_default =
-		    CALCULATE(
-		        COUNT(opp_line_items[trueai_list_price]),
-		        opp_line_items[trueai_list_price_rule] <> 103007
-		    )
-		VAR default_cnt =
-		    total - non_default
-		VAR score01 =
-		    DIVIDE(non_default, total) * 0.49
-		    + DIVIDE(default_cnt, total)
-		RETURN
-		"total=" & FORMAT(total, "0")
-		& " | nondef=" & FORMAT(non_default, "0")
-		& " | def=" & FORMAT(default_cnt, "0")
-		& " | score=" & FORMAT(score01*100, "0.00")
-			lineageTag: 9e3f1403-6aec-40d2-a570-c3bcb5253191
-		lineageTag: 353a94a8-e0d1-41fc-b850-fca9cabd8e4e
 
 	/// Category
 	/// Category
