@@ -3268,69 +3268,80 @@ table metadata_ai_scores
 		lineageTag: 3935ae91-298a-4691-a9cd-6e6829cb2266
 
 	measure 'meas.__dbg_line_items_opp_id_match_rate' =
-		
-		VAR opp_ids = VALUES(opps[_sys_docid])
-		VAR matched_line_items =
-		    CALCULATE(
-		        DISTINCTCOUNT(opp_line_items[crm_opp_id]),
-		        TREATAS(opp_ids, opp_line_items[crm_opp_id])
-		    )
-		VAR opp_count = COUNTROWS(opp_ids)
-		RETURN
-		    DIVIDE(matched_line_items, opp_count, BLANK())
-
-	measure 'meas.__dbg_opp_hist_old_vs_new' =
-		VAR old = [meas.ai_scores_opps_history]
-		VAR new = [meas.readiness_ai_scores_opps_history]
-		RETURN
-		"old=" & FORMAT(old, "0.00") & " | new=" & FORMAT(new, "0.00")
-
-	measure 'meas.__dbg_score_name' =
-		MAX(metadata_ai_scores[score_name])
-		lineageTag: 1b659ad8-ea05-4b81-b0eb-c65e460fae52
+			
+			VAR opp_ids = VALUES(opps[_sys_docid])
+			VAR matched_line_items =
+			    CALCULATE(
+			        DISTINCTCOUNT(opp_line_items[crm_opp_id]),
+			        TREATAS(opp_ids, opp_line_items[crm_opp_id])
+			    )
+			VAR opp_count = COUNTROWS(opp_ids)
+			RETURN
+			    DIVIDE(matched_line_items, opp_count, BLANK())
+		lineageTag: 5b491295-6e0f-4b23-80b7-db125a3bc299
 
 	measure 'meas.readiness_ai_scores_opps_history_factor1_value' =
 			
-			VAR tbl_won =
-			    FILTER(
-			        opps_histories,
-			        opps_histories[trueai_is_won] = TRUE()
-			            && NOT ISBLANK(opps_histories[crm_opp_id])
+			VAR won_opps =
+			    CALCULATETABLE(
+			        VALUES(opps[_sys_docid]),
+			        opps[trueai_is_won] = TRUE()
 			    )
-			VAR tbl_summarized =
+			
+			VAR tbl_won =
+			    CALCULATETABLE(
+			        opps_histories,
+			        NOT ISBLANK(opps_histories[crm_opp_id]),
+			        TREATAS(won_opps, opps_histories[crm_opp_id])
+			    )
+			VAR tbl_summarized_raw =
 			    SUMMARIZE(
 			        tbl_won,
 			        opps_histories[crm_opp_id],
-			        "unique_trueai_stage_id",
-			            DISTINCTCOUNT(opps_histories[trueai_stage_id])
+			        "stage_cnt_raw", DISTINCTCOUNT(opps_histories[trueai_stage_id])
+			    )
+			VAR tbl_summarized =
+			    ADDCOLUMNS(
+			        tbl_summarized_raw,
+			        "stage_cnt_capped", MIN([stage_cnt_raw], 6)
 			    )
 			RETURN
-			    AVERAGEX(tbl_summarized, [unique_trueai_stage_id])
-		lineageTag: e7322f55-fb2a-44e6-9b27-f11009971f11
+			    AVERAGEX(tbl_summarized, [stage_cnt_capped])
+		lineageTag: 855166ce-1c77-4914-b513-ea11788f0945
 
 	measure 'meas.readiness_ai_scores_opps_history_factor2_value' =
 			
-			VAR tbl_won =
-			    FILTER(
-			        opps_histories,
-			        opps_histories[trueai_is_won] = TRUE()
-			            && NOT ISBLANK(opps_histories[crm_opp_id])
+			VAR won_opps =
+			    CALCULATETABLE(
+			        VALUES(opps[_sys_docid]),
+			        opps[trueai_is_won] = TRUE()
 			    )
-			VAR tbl_summarized =
+			
+			VAR tbl_won =
+			    CALCULATETABLE(
+			        opps_histories,
+			        NOT ISBLANK(opps_histories[crm_opp_id]),
+			        TREATAS(won_opps, opps_histories[crm_opp_id])
+			    )
+			VAR tbl_summarized_raw =
 			    SUMMARIZE(
 			        tbl_won,
 			        opps_histories[crm_opp_id],
-			        "unique_trueai_stage_ids",
-			            DISTINCTCOUNT(opps_histories[trueai_stage_id])
+			        "stage_cnt_raw", DISTINCTCOUNT(opps_histories[trueai_stage_id])
+			    )
+			VAR tbl_summarized =
+			    ADDCOLUMNS(
+			        tbl_summarized_raw,
+			        "stage_cnt_capped", MIN([stage_cnt_raw], 6)
 			    )
 			VAR count_sum_tbl = COUNTROWS(tbl_summarized)
 			VAR the_20_pct_ordinal = ROUND(count_sum_tbl * 0.8, 0)
 			VAR top_tbl_summarized =
-			    TOPN(the_20_pct_ordinal, tbl_summarized, [unique_trueai_stage_ids], ASC)
-			VAR top_stage_count = MAXX(top_tbl_summarized, [unique_trueai_stage_ids])
+			    TOPN(the_20_pct_ordinal, tbl_summarized, [stage_cnt_capped], ASC)
+			VAR top_stage_count = MAXX(top_tbl_summarized, [stage_cnt_capped])
 			RETURN
 			    MAX(top_stage_count, 3)
-		lineageTag: f14bf85d-7f87-4cdd-898d-ea487e92a681
+		lineageTag: f341495d-c49d-46ef-977e-753e3ab9eea9
 
 	measure 'meas.readiness_ai_scores_opps_history' =
 			
@@ -3413,6 +3424,73 @@ table metadata_ai_scores
 			IF(ISBLANK(result), BLANK(), MIN(MAX(result,0),100))
 		formatString: 0
 		lineageTag: e888156c-3b86-4145-afc1-99c3c9628ddb
+
+	measure 'meas.__dbg_opp_hist_old_vs_new' =
+			VAR old = [meas.ai_scores_opps_history]
+			VAR new = [meas.readiness_ai_scores_opps_history]
+			RETURN
+			"old=" & FORMAT(old, "0.00") & " | new=" & FORMAT(new, "0.00")
+		lineageTag: 366bfd8d-0f38-4e75-99a9-f2f1d66e47ca
+
+	measure 'meas.__dbg_score_name' = MAX(metadata_ai_scores[score_name])
+		lineageTag: fc66e3f0-9f21-47aa-a0c6-beef9e33c3a6
+
+	measure 'meas.__dbg_opp_hist_new_factors' =
+			
+			VAR f1 = [meas.readiness_ai_scores_opps_history_factor1_value]
+			VAR f2 = [meas.readiness_ai_scores_opps_history_factor2_value]
+			VAR r01 = DIVIDE(f1, f2, BLANK())
+			
+			RETURN
+			    "f1=" & FORMAT(f1, "0.00")
+			    & " | f2=" & FORMAT(f2, "0.00")
+			    & " | r=" & FORMAT(r01, "0.000")
+		lineageTag: f3ece36d-7798-4dc3-8970-1194fb44062a
+
+	measure 'meas.__dbg_oh_won_opps_cnt' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(opps[_sys_docid]),
+			    opps[trueai_is_won] = TRUE()
+			)
+		lineageTag: 2fb8e914-61f7-4dbb-bbe2-61b233fae954
+
+	measure 'meas.__dbg_oh_hist_rows_for_won_opps' =
+			
+			VAR won_opps =
+			    CALCULATETABLE(
+			        VALUES(opps[_sys_docid]),
+			        opps[trueai_is_won] = TRUE()
+			    )
+			RETURN
+			    CALCULATE(
+			        COUNTROWS(opps_histories),
+			        TREATAS(won_opps, opps_histories[crm_opp_id])
+			    )
+		lineageTag: 7600d778-26d5-40f1-b61b-9858cf2dcb05
+
+	measure 'meas.__dbg_oh_pct_won_opps_with_gt1_stage' =
+			
+			VAR won_opps =
+			    CALCULATETABLE(
+			        VALUES(opps[_sys_docid]),
+			        opps[trueai_is_won] = TRUE()
+			    )
+			VAR per_opp =
+			    ADDCOLUMNS(
+			        SUMMARIZE(
+			            CALCULATETABLE(opps_histories, TREATAS(won_opps, opps_histories[crm_opp_id])),
+			            opps_histories[crm_opp_id]
+			        ),
+			        "stage_cnt", CALCULATE(DISTINCTCOUNT(opps_histories[trueai_stage_id]))
+			    )
+			VAR denom = COUNTROWS(per_opp)
+			VAR numer = COUNTROWS(FILTER(per_opp, [stage_cnt] > 1))
+			
+			RETURN
+			    DIVIDE(numer, denom, BLANK())
+			lineageTag: 9e3f1403-6aec-40d2-a570-c3bcb5253191
+		lineageTag: 353a94a8-e0d1-41fc-b850-fca9cabd8e4e
 
 	/// Category
 	/// Category
