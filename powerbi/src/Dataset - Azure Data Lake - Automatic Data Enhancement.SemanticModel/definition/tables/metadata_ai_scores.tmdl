@@ -2000,22 +2000,32 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_list_price' = ```
 			
-			var factor1 = CALCULATE(count(opp_line_items[trueai_list_price]))      // get all the list_price count 
-			var factor2 = CALCULATE(
-			    count(opp_line_items[trueai_list_price]),      // non default list price items count
-			    FORMAT(opp_line_items[trueai_list_price_rule], "0") <> "103007"
-			)
+			VAR total_list_items =
+			    COUNT(opp_line_items[trueai_list_price])
 			
-			VAR score =
-			    IF(
-			        factor2 = 0,
-			        0.49,  // Force fixed score to show 49 if there is no non default count
-			        ( factor2 * 0.49 + (factor2 - factor1) * 1 ) / factor1
+			VAR total_list_items_non_default =
+			    CALCULATE(
+			        COUNT(opp_line_items[trueai_list_price]),
+			        opp_line_items[trueai_list_price_rule] <> 103007
 			    )
 			
-			var res = MIN(MAX(ROUND(score*100, 0),0),100)           // get the rounded value not less then 0 and not greater then 100
+			VAR total_list_items_default =
+			    total_list_items - total_list_items_non_default
+			
+			VAR score01 =
+			    DIVIDE(total_list_items_non_default, total_list_items) * 0.49
+			    + DIVIDE(total_list_items_default, total_list_items)
+			
+			VAR score100 =
+			    score01 * 100
+			
 			RETURN
-			res
+			    IF(
+			        ISBLANK(score01),
+			        BLANK(),
+			        MIN(100, MAX(0, score100))
+			    )
+
 			```
 		displayFolder: _ai_scores
 		lineageTag: 3bc9c490-ebb5-4202-9843-34faa6c4904b
@@ -3470,25 +3480,45 @@ table metadata_ai_scores
 		lineageTag: 7600d778-26d5-40f1-b61b-9858cf2dcb05
 
 	measure 'meas.__dbg_oh_pct_won_opps_with_gt1_stage' =
-			
-			VAR won_opps =
-			    CALCULATETABLE(
-			        VALUES(opps[_sys_docid]),
-			        opps[trueai_is_won] = TRUE()
-			    )
-			VAR per_opp =
-			    ADDCOLUMNS(
-			        SUMMARIZE(
-			            CALCULATETABLE(opps_histories, TREATAS(won_opps, opps_histories[crm_opp_id])),
-			            opps_histories[crm_opp_id]
-			        ),
-			        "stage_cnt", CALCULATE(DISTINCTCOUNT(opps_histories[trueai_stage_id]))
-			    )
-			VAR denom = COUNTROWS(per_opp)
-			VAR numer = COUNTROWS(FILTER(per_opp, [stage_cnt] > 1))
-			
-			RETURN
-			    DIVIDE(numer, denom, BLANK())
+		
+		VAR won_opps =
+		    CALCULATETABLE(
+		        VALUES(opps[_sys_docid]),
+		        opps[trueai_is_won] = TRUE()
+		    )
+		VAR per_opp =
+		    ADDCOLUMNS(
+		        SUMMARIZE(
+		            CALCULATETABLE(opps_histories, TREATAS(won_opps, opps_histories[crm_opp_id])),
+		            opps_histories[crm_opp_id]
+		        ),
+		        "stage_cnt", CALCULATE(DISTINCTCOUNT(opps_histories[trueai_stage_id]))
+		    )
+		VAR denom = COUNTROWS(per_opp)
+		VAR numer = COUNTROWS(FILTER(per_opp, [stage_cnt] > 1))
+		
+		RETURN
+		    DIVIDE(numer, denom, BLANK())
+
+	measure 'meas.__dbg_list_price_factors' =
+		
+		VAR total =
+		    COUNT(opp_line_items[trueai_list_price])
+		VAR non_default =
+		    CALCULATE(
+		        COUNT(opp_line_items[trueai_list_price]),
+		        opp_line_items[trueai_list_price_rule] <> 103007
+		    )
+		VAR default_cnt =
+		    total - non_default
+		VAR score01 =
+		    DIVIDE(non_default, total) * 0.49
+		    + DIVIDE(default_cnt, total)
+		RETURN
+		"total=" & FORMAT(total, "0")
+		& " | nondef=" & FORMAT(non_default, "0")
+		& " | def=" & FORMAT(default_cnt, "0")
+		& " | score=" & FORMAT(score01*100, "0.00")
 			lineageTag: 9e3f1403-6aec-40d2-a570-c3bcb5253191
 		lineageTag: 353a94a8-e0d1-41fc-b850-fca9cabd8e4e
 
