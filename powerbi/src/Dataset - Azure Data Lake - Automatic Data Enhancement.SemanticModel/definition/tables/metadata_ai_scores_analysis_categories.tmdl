@@ -8,19 +8,185 @@ table metadata_ai_scores_analysis_categories
 	/// Format/Type: Not specified.
 	measure 'meas.analysis_cat_weighted_avg' =
 			
-			var sum_prod = SUMX(
-			    metadata_ai_scores,
-			    [meas.ai_score] * [meas.metadata_score_weighting_pct]
-			) // get teh sum product of the weighting and the score
-			var sum_weights = SUMX(
-			    metadata_ai_scores,
-			     [meas.metadata_score_weighting_pct]
-			) // get the sum of weighting
-			var res = DIVIDE( sum_prod, sum_weights)
-			return res
+			VAR category_id =
+			    SELECTEDVALUE(metadata_ai_scores_analysis_categories[_sys_doc_id])
+			
+			VAR filtered_scores =
+			    FILTER(
+			        metadata_ai_scores,
+			        [meas.ai_score_is_in_selected_category] = 1
+			    )
+			
+			VAR numerator =
+			    SUMX(
+			        filtered_scores,
+			        VAR score_val = [meas.ai_score]
+			        VAR sid_num =
+			            VAR sid_txt = metadata_ai_scores[_sys_doc_id]
+			            RETURN IF(sid_txt = BLANK() || sid_txt = "", BLANK(), VALUE(sid_txt))
+			        VAR wraw =
+			            IF(
+			                ISBLANK(sid_num),
+			                BLANK(),
+			                CALCULATE(
+			                    SELECTEDVALUE(metadata_ai_scores_category_links[weighting]),
+			                    metadata_ai_scores_category_links[analysis_category_id] = category_id,
+			                    TREATAS( ROW("score_id", sid_num), metadata_ai_scores_category_links[score_id] )
+			                )
+			            )
+			        VAR w =
+			            IF(
+			                ISBLANK(wraw),
+			                BLANK(),
+			                IF(wraw > 1, DIVIDE(wraw, 100), wraw)
+			            )
+			        RETURN
+			            IF(
+			                ISBLANK(score_val) || ISBLANK(w),
+			                BLANK(),
+			                score_val * w
+			            )
+			    )
+			
+			VAR denominator =
+			    SUMX(
+			        filtered_scores,
+			        VAR score_val = [meas.ai_score]
+			        VAR sid_num =
+			            VAR sid_txt = metadata_ai_scores[_sys_doc_id]
+			            RETURN IF(sid_txt = BLANK() || sid_txt = "", BLANK(), VALUE(sid_txt))
+			        VAR wraw =
+			            IF(
+			                ISBLANK(sid_num),
+			                BLANK(),
+			                CALCULATE(
+			                    SELECTEDVALUE(metadata_ai_scores_category_links[weighting]),
+			                    metadata_ai_scores_category_links[analysis_category_id] = category_id,
+			                    TREATAS( ROW("score_id", sid_num), metadata_ai_scores_category_links[score_id] )
+			                )
+			            )
+			        VAR w =
+			            IF(
+			                ISBLANK(wraw),
+			                BLANK(),
+			                IF(wraw > 1, DIVIDE(wraw, 100), wraw)
+			            )
+			        RETURN
+			            IF(
+			                ISBLANK(score_val) || ISBLANK(w),
+			                BLANK(),
+			                w
+			            )
+			    )
+			
+			VAR fallback_avg =
+			    AVERAGEX(
+			        FILTER(filtered_scores, NOT ISBLANK([meas.ai_score])),
+			        [meas.ai_score]
+			    )
+			
+			VAR res =
+			    IF(
+			        NOT ISBLANK(denominator) && denominator > 0,
+			        DIVIDE(numerator, denominator),
+			        fallback_avg
+			    )
+			
+			RETURN
+			    IF(ISBLANK(res), BLANK(), MIN(MAX(res, 0), 100))
 		lineageTag: cbe9e9f8-ca6c-4058-bc0c-e15a4a8fe77f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.readiness_analysis_cat_weighted_avg' =
+			
+			VAR category_id =
+			    SELECTEDVALUE(metadata_ai_scores_analysis_categories[_sys_doc_id])
+			
+			VAR filtered_scores =
+			    FILTER(
+			        metadata_ai_scores,
+			        [meas.ai_score_is_in_selected_category] = 1
+			    )
+			
+			VAR numerator =
+			    SUMX(
+			        filtered_scores,
+			        VAR score_val = [meas.readiness_ai_score]
+			        VAR sid_num =
+			            VAR sid_txt = metadata_ai_scores[_sys_doc_id]
+			            RETURN IF(sid_txt = BLANK() || sid_txt = "", BLANK(), VALUE(sid_txt))
+			        VAR wraw =
+			            IF(
+			                ISBLANK(sid_num),
+			                BLANK(),
+			                CALCULATE(
+			                    SELECTEDVALUE(metadata_ai_scores_category_links[weighting]),
+			                    metadata_ai_scores_category_links[analysis_category_id] = category_id,
+			                    TREATAS( ROW("score_id", sid_num), metadata_ai_scores_category_links[score_id] )
+			                )
+			            )
+			        VAR w =
+			            IF(
+			                ISBLANK(wraw),
+			                BLANK(),
+			                IF(wraw > 1, DIVIDE(wraw, 100), wraw)
+			            )
+			        RETURN
+			            IF(
+			                ISBLANK(score_val) || ISBLANK(w),
+			                BLANK(),
+			                score_val * w
+			            )
+			    )
+			
+			VAR denominator =
+			    SUMX(
+			        filtered_scores,
+			        VAR score_val = [meas.readiness_ai_score]
+			        VAR sid_num =
+			            VAR sid_txt = metadata_ai_scores[_sys_doc_id]
+			            RETURN IF(sid_txt = BLANK() || sid_txt = "", BLANK(), VALUE(sid_txt))
+			        VAR wraw =
+			            IF(
+			                ISBLANK(sid_num),
+			                BLANK(),
+			                CALCULATE(
+			                    SELECTEDVALUE(metadata_ai_scores_category_links[weighting]),
+			                    metadata_ai_scores_category_links[analysis_category_id] = category_id,
+			                    TREATAS( ROW("score_id", sid_num), metadata_ai_scores_category_links[score_id] )
+			                )
+			            )
+			        VAR w =
+			            IF(
+			                ISBLANK(wraw),
+			                BLANK(),
+			                IF(wraw > 1, DIVIDE(wraw, 100), wraw)
+			            )
+			        RETURN
+			            IF(
+			                ISBLANK(score_val) || ISBLANK(w),
+			                BLANK(),
+			                w
+			            )
+			    )
+			
+			VAR fallback_avg =
+			    AVERAGEX(
+			        FILTER(filtered_scores, NOT ISBLANK([meas.readiness_ai_score])),
+			        [meas.readiness_ai_score]
+			    )
+			
+			VAR res =
+			    IF(
+			        NOT ISBLANK(denominator) && denominator > 0,
+			        DIVIDE(numerator, denominator),
+			        fallback_avg
+			    )
+			
+			RETURN
+			    IF(ISBLANK(res), BLANK(), MIN(MAX(res, 0), 100))
+		lineageTag: d090465a-3704-41d5-9291-fa707a409734
 
 	/// Unique AI score identifier
 	column _sys_doc_id

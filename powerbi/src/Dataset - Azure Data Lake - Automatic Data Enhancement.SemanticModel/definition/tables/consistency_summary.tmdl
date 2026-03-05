@@ -343,7 +343,10 @@ table consistency_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: Measures: [meas.crm_consistency_score].
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
-	measure 'meas.crm_consistency_score_display' = [meas.crm_consistency_score] * 100
+	measure 'meas.crm_consistency_score_display' =
+			
+			VAR res = [meas.crm_consistency_score] * 100
+			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		formatString: 0
 		displayFolder: _consistancy_score
 		lineageTag: fc3025a8-9bfe-4359-a717-d8a1e1cdb3fa
@@ -365,8 +368,7 @@ table consistency_summary
 			    _after_score
 			)
 			
-			RETURN
-			res
+			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		formatString: 0
 		displayFolder: _consistancy_score
 		lineageTag: 8a469cd2-ac3f-4681-a7a4-74cf02b78697

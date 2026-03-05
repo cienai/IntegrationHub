@@ -9,7 +9,7 @@ table sales_process_summary
 	measure 'meas.crm_sales_process_score_display' =
 			
 			var res = round([meas.crm_sales_process_score]  * 100,0)  // just multiply by 100 and remove decimals
-			return res
+			return IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		formatString: 0
 		displayFolder: _sales_process_score
 		lineageTag: 262b5f13-1cf6-4906-8892-f31e7c0461db
@@ -47,8 +47,7 @@ table sales_process_summary
 			    _after
 			)
 			
-			RETURN
-			res
+			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		formatString: 0
 		displayFolder: _sales_process_score
 		lineageTag: 1021f740-fe87-4306-8ad1-a0d7b8ce2b29

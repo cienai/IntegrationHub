@@ -170,7 +170,7 @@ table act_capture_level_summary
 			
 			var crm_capture_level = [meas.act_capture]
 			var res  = round(crm_capture_level * 100,0)
-			return res
+			return IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		formatString: 0
 		displayFolder: _acl_scores
 		lineageTag: 4afafcb3-593b-4adb-8956-99da37a8f1f6
@@ -200,7 +200,7 @@ table act_capture_level_summary
 	/// Calculation Logic: VAR blocks define intermediate values (_before, temp_tbl, score_res, _after, res) used later in the expression. Dependencies: Columns: ssr_history[step_name], ssr_history[stkhlds_all_adj_dur_rule] | Measures: [meas.crm_act_capt_score].
 	/// Dynamic Behavior: Uses SWITCH for conditional branching. Uses IF for conditional branching.
 	/// Format/Type: 0
-	measure 'meas.trueai_act_capt_score' = ```
+	measure 'meas.trueai_act_capt_score' =
 			
 			VAR _before = [meas.crm_act_capt_score]
 			VAR temp_tbl =
@@ -226,9 +226,7 @@ table act_capture_level_summary
 			    )
 			VAR _after = ROUND(score_res * 100, 0)
 			VAR res = IF(_after < _before, _before, _after)
-			RETURN res
-			
-			```
+			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		formatString: 0
 		displayFolder: _acl_scores
 		lineageTag: fbbac8e0-05bb-41a5-8e39-2343fc1b4f37

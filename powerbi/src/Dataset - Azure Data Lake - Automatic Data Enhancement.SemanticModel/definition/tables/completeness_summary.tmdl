@@ -6,7 +6,10 @@ table completeness_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: Measures: [crm_completeness].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
-	measure 'meas.crm_completeness_score_display' = CALCULATE(AVERAGE([crm_completeness])  * 100)
+	measure 'meas.crm_completeness_score_display' =
+			
+			VAR res = CALCULATE(AVERAGE([crm_completeness])  * 100)
+			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		formatString: 0
 		displayFolder: _completeness_score
 		lineageTag: 25d350dc-3b66-4cb2-83ae-59852cd3198b
@@ -26,8 +29,7 @@ table completeness_summary
 			    _after_score
 			)
 			
-			RETURN
-			res
+			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		formatString: 0
 		displayFolder: _completeness_score
 		lineageTag: 220faaec-56c9-48ef-870f-4244580439c6

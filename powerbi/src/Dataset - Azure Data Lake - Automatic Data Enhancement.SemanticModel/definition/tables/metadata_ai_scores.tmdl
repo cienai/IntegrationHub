@@ -8,11 +8,10 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
 	measure 'meas.ai_scores_accts_industry' = ```
-			
-			var _avg = AVERAGE(accounts[trueai_industry_conf])      // get the avg accts industry conf
-			var _conf = ROUND(_avg,2)*100    
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGE(accounts[trueai_industry_conf])      // get the avg accts industry conf
+						var _conf = ROUND(_avg,2)*100    
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: aed2cc30-bc21-47ae-a2f9-a543931093ae
@@ -812,7 +811,7 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_opps_history_factor1_value' =
 			
-			var res = CALCULATE(COUNT(ssr_history[entity_opp_id]))         // get the count of the opp id
+			var res = CALCULATE(DISTINCTCOUNT(ssr_history[entity_opp_id]))         // get the count of the opp id
 			
 			RETURN
 			res
@@ -1215,26 +1214,22 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_line_items_products_factor2_value' = ```
 			
-			
-			var lost_opps =
+			VAR lost_opps =
 			    CALCULATETABLE(
 			        VALUES(opps[_sys_docid]),
-			        opps[trueai_is_won] = False
+			        opps[trueai_is_won] = FALSE()
 			    )
-			var lost_deals = COUNTROWS(lost_opps)                // lost opps count
-			
-			
-			var _lost_deals_w_line =
-			    CALCULATE(
-			        DISTINCTCOUNT(opp_line_items[crm_opp_id]),
-			        TREATAS(lost_opps, opp_line_items[crm_opp_id]),
-			        FILTER(opp_line_items, NOT(ISBLANK(opp_line_items[crm_opp_id])))
+			VAR lost_deals = COUNTROWS(lost_opps)
+			VAR opps_with_line_items =
+			    CALCULATETABLE(
+			        VALUES(opp_line_items[crm_opp_id]),
+			        FILTER(opp_line_items, NOT ISBLANK(opp_line_items[crm_opp_id]))
 			    )
+			VAR lost_with_line_items =
+			    COUNTROWS(INTERSECT(lost_opps, opps_with_line_items))
+			RETURN
+			    DIVIDE(lost_with_line_items, lost_deals, BLANK())
 			
-			var _lost_ratio = DIVIDE(_lost_deals_w_line, lost_deals, 0)          // lost ratio
-				
-				RETURN
-				_lost_ratio
 			```
 		displayFolder: _factor_value2
 		lineageTag: 5b7eb313-9450-4a50-8103-51c7e5223bca
@@ -1302,11 +1297,10 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_accts_leadsource' = ```
-			
-			var _avg = AVERAGE(accounts[trueai_leadsource_conf])        // get the accounts average leadsource conf
-			var _conf = ROUND(_avg,2)*100    
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGE(accounts[trueai_leadsource_conf])        // get the accounts average leadsource conf
+						var _conf = ROUND(_avg,2)*100    
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 6d30d622-6257-40c9-9e50-3ebc395db0b3
@@ -1343,24 +1337,23 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses SWITCH for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_adj_duration' = ```
-			
-			VAR _tbl = CALCULATETABLE(ssr_history, ssr_history[step_name] in {"Prospecting", "New Logo Selling", "Post-Sales Support","Existing Customer Selling"}) // Get the current table context but exclude the unthcouded stage etc
-			VAR _avg = AVERAGEX(
-			    _tbl,
-			     SWITCH(
-			        FORMAT(ssr_history[stkhlds_all_adj_dur_rule], "0"),
-			        "133002", 0.4,  // 133002 is industry avg, not reliable
-			        "133001", 0.7,   // 133001 is peer avg, okay
-			        "133003", 0.97,   // 133003 is the best info from the owner
-			        "133004", 0.86    // 133004 is good data but not from the primary owner
-			    )
-			)
-			
-			var boost_expo = 0.90           // exponent value 
-			var _new_avg = (_avg)^ boost_expo               // get the expo value to enhance output
-			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
-			RETURN 
-			_conf
+						
+						VAR _tbl = CALCULATETABLE(ssr_history, ssr_history[step_name] in {"Prospecting", "New Logo Selling", "Post-Sales Support","Existing Customer Selling"}) // Get the current table context but exclude the unthcouded stage etc
+						VAR _avg = AVERAGEX(
+						    _tbl,
+						     SWITCH(
+						        FORMAT(ssr_history[stkhlds_all_adj_dur_rule], "0"),
+						        "133002", 0.4,  // 133002 is industry avg, not reliable
+						        "133001", 0.7,   // 133001 is peer avg, okay
+						        "133003", 0.97,   // 133003 is the best info from the owner
+						        "133004", 0.86    // 133004 is good data but not from the primary owner
+						    )
+						)
+						
+						var boost_expo = 0.90           // exponent value 
+						var _new_avg = (_avg)^ boost_expo               // get the expo value to enhance output
+						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 49e180a0-27b1-4d09-a630-a4364e278ddb
@@ -1398,20 +1391,19 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_booking_calibration' = ```
-			
-			var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC))  
-			var factor1 = VALUE(MAXX(latest_table,companies_history[ttm_ref_date_bookings])) 
-			VAR factor2 = VALUE(MAXX(latest_table,companies_history[di_amt_won_last12months]))
-			var score = (factor1 - ABS(factor1 - factor2))/factor1
-			
-			var res = IF(
-			    factor1=BLANK() || factor1=0,
-			    0,
-			    ROUND(score*100, 0)
-			)
-			
-			RETURN
-			res
+						
+						var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC))  
+						var factor1 = VALUE(MAXX(latest_table,companies_history[ttm_ref_date_bookings])) 
+						VAR factor2 = VALUE(MAXX(latest_table,companies_history[di_amt_won_last12months]))
+						var score = (factor1 - ABS(factor1 - factor2))/factor1
+						
+						var res = IF(
+						    factor1=BLANK() || factor1=0,
+						    0,
+						    ROUND(score*100, 0)
+						)
+						
+						RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: af2b1434-c9e7-4dd2-9db5-88b5bc48a445
@@ -1449,15 +1441,14 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_act_capt_lvl_conf' = ```
-			
-			var _avg = CALCULATE(
-			           AVERAGE(users_history[ci_act_capt_lvl_conf])// get the users_history average ci_act_capt_lvl conf
-			)
-			var boost_expo = 0.90           // exponent value 
-			var _boosted_avg = (_avg)^ boost_expo     // pushes up the score slightly 
-			var _conf = ROUND(_boosted_avg*100,0)  // round the number and for integar value  
-			RETURN 
-			_conf
+						
+						var _avg = CALCULATE(
+						           AVERAGE(users_history[ci_act_capt_lvl_conf])// get the users_history average ci_act_capt_lvl conf
+						)
+						var boost_expo = 0.90           // exponent value 
+						var _boosted_avg = (_avg)^ boost_expo     // pushes up the score slightly 
+						var _conf = ROUND(_boosted_avg*100,0)  // round the number and for integar value  
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 1304c12c-11cf-4104-99d4-6658051d65d9
@@ -1494,13 +1485,12 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_closing_ability' = ```
-			
-			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_closing_ability_num]), BLANK()))     // get the avg closing ability conf
-			var boost_expo = 0.90
-			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be  
-			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_closing_ability_num]), BLANK()))     // get the avg closing ability conf
+						var boost_expo = 0.90
+						var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be  
+						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: a9f5237d-77e1-41ad-b86d-1c1fd0bf3f09
@@ -1541,14 +1531,13 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_deal_maxing' = ```
-			
-			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_deal_maxing_num]), BLANK()))     // get the avg deal maximizing conf
-			var boost_expo = 0.90           // exponent value 
-			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-			var _conf = ROUND(_avg,2)*100  // round the number and for integar value
-			
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_deal_maxing_num]), BLANK()))     // get the avg deal maximizing conf
+						var boost_expo = 0.90           // exponent value 
+						var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						var _conf = ROUND(_avg,2)*100  // round the number and for integar value
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 08c67e59-0757-41d3-9f44-0f03abf71aad
@@ -1584,13 +1573,12 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
 	measure 'meas.ai_scores_ci_discovery_skill' = ```
-			
-			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_discov_skills_num]), BLANK()))     // get the avg discovery skill conf
-			var boost_expo = 0.90
-			var _new_avg = (ABS(_avg))^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-			var _conf = ROUND(_avg*100 ,0) // round the number and for integar value
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_discov_skills_num]), BLANK()))     // get the avg discovery skill conf
+						var boost_expo = 0.90
+						var _new_avg = (ABS(_avg))^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						var _conf = ROUND(_avg*100 ,0) // round the number and for integar value
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 06e29052-44f1-4661-93dc-60f70765c604
@@ -1629,13 +1617,12 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
 	measure 'meas.ai_scores_ci_engagement_ability' = ```
-			
-			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_engmt_ability_num]), BLANK()))     // get the avg engagement ability conf
-			var boost_expo = 0.90           // exponent value 
-			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-			var _conf = ROUND(_avg,2)*100  // round the number and for integar value
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_engmt_ability_num]), BLANK()))     // get the avg engagement ability conf
+						var boost_expo = 0.90           // exponent value 
+						var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						var _conf = ROUND(_avg,2)*100  // round the number and for integar value
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 1db68818-c9df-41e2-aa60-93b218e74c1a
@@ -1670,24 +1657,23 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_time_alloc' = ```
-			
-			var fromDate =MIN('cal_end_dates'[date]) 
-			var toDate = MAX('cal_end_dates'[date])
-			
-			var applicable_rows_tbl = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-			var active_users_tbl =  filter(applicable_rows_tbl, IFERROR(DATEVALUE([trueai_hire_date]), date(1900,1,1)) <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),IFERROR(DATEVALUE(users_history[trueai_termination_date]), date(2100,1,1))) >=  toDate && users_history[ci_time_alloc_tot] >0 ) // make sure we only include reps that are in the active  and user having time allocation greater than 0
-			var reps_w_ta = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
-			
-			var applicable_rows = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-			var active_users =  filter(applicable_rows, IFERROR(DATEVALUE([trueai_hire_date]), date(1900,1,1)) <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),IFERROR(DATEVALUE(users_history[trueai_termination_date]), date(2100,1,1))) >=  toDate) // make sure we only include reps that are in the active 
-			var reps_tot = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users, [_sys_user_id]))) // get a disctinct count of users from that filter context 
-			
-			var _avg =DIVIDE(reps_w_ta, reps_tot)        // get the % of reps w TA
-			var boost_expo = 0.90           // exponent value 
-			var _new_avg = (_avg)*boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value  
-			RETURN 
-			_conf
+						
+						var fromDate =MIN('cal_end_dates'[date]) 
+						var toDate = MAX('cal_end_dates'[date])
+						
+						var applicable_rows_tbl = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
+						var active_users_tbl =  filter(applicable_rows_tbl, IFERROR(DATEVALUE([trueai_hire_date]), date(1900,1,1)) <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),IFERROR(DATEVALUE(users_history[trueai_termination_date]), date(2100,1,1))) >=  toDate && users_history[ci_time_alloc_tot] >0 ) // make sure we only include reps that are in the active  and user having time allocation greater than 0
+						var reps_w_ta = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
+						
+						var applicable_rows = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
+						var active_users =  filter(applicable_rows, IFERROR(DATEVALUE([trueai_hire_date]), date(1900,1,1)) <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),IFERROR(DATEVALUE(users_history[trueai_termination_date]), date(2100,1,1))) >=  toDate) // make sure we only include reps that are in the active 
+						var reps_tot = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users, [_sys_user_id]))) // get a disctinct count of users from that filter context 
+						
+						var _avg =DIVIDE(reps_w_ta, reps_tot)        // get the % of reps w TA
+						var boost_expo = 0.90           // exponent value 
+						var _new_avg = (_avg)*boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value  
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 93cd381a-97c6-4745-8641-c996cd9af450
@@ -1724,13 +1710,12 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_time_management' = ```
-			
-			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_time_management_num]), BLANK()))
-			var boost_expo = 0.90
-			var _new_avg = (_avg)^ boost_expo   // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-			var _conf = ROUND(_new_avg*100,0)  // round the number and for integar value
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_time_management_num]), BLANK()))
+						var boost_expo = 0.90
+						var _new_avg = (_avg)^ boost_expo   // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						var _conf = ROUND(_new_avg*100,0)  // round the number and for integar value
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 8a06eae1-71ea-4598-8063-b5c1b9a5f2bf
@@ -1767,13 +1752,12 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
 	measure 'meas.ai_scores_ci_work_effort' = ```
-			
-			var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_work_effort_num]), BLANK()))     // get the factor1
-			var boost_expo = 0.90           // exponent value 
-			var _new_avg = (_avg)^ boost_expo               // get the expo value to enhance output
-			var _conf = ROUND(_avg,2)*100  // round the number and for integar value
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_work_effort_num]), BLANK()))     // get the factor1
+						var boost_expo = 0.90           // exponent value 
+						var _new_avg = (_avg)^ boost_expo               // get the expo value to enhance output
+						var _conf = ROUND(_avg,2)*100  // round the number and for integar value
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: bc9b6b1f-7821-4538-9845-b8964c41f8ee
@@ -1812,8 +1796,7 @@ table metadata_ai_scores
 			
 			var factor1 = 1.0            // get the factor value 1
 			var res = ROUND(factor1*100,0)
-			RETURN
-			res
+			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		displayFolder: _ai_scores
 		lineageTag: 82032e23-2dfc-46db-8391-56e05ab0c676
 
@@ -1852,11 +1835,10 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_leads_industry' = ```
-			
-			var _avg = AVERAGE(leads[trueai_industry_conf])         // get the leads average leadsource conf
-			var _conf = ROUND(_avg,2)*100    
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGE(leads[trueai_industry_conf])         // get the leads average leadsource conf
+						var _conf = ROUND(_avg,2)*100    
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 6ef0fdcc-e12e-4c29-b699-140f2bfacb81
@@ -1892,11 +1874,10 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_leads_leadsource' = ```
-			
-			var _avg = AVERAGE(leads[trueai_leadsource_conf])        // get the leads average lead source conf
-			var _conf = ROUND(_avg,2)*100    
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGE(leads[trueai_leadsource_conf])        // get the leads average lead source conf
+						var _conf = ROUND(_avg,2)*100    
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: ba1939ac-dad5-4b53-bf04-1f87a98828cf
@@ -1944,7 +1925,12 @@ table metadata_ai_scores
 			var _lost_weight = 0.30         // lost deals ratio
 			
 			var score = (_won_ratio * _won_weight) + (_lost_ratio * _lost_weight)
-			var res = MIN(MAX(score, 0), 1)
+			var res =
+			    IF(
+			        ISBLANK(score),
+			        BLANK(),
+			        MIN(100, MAX(0, score * 100))
+			    )
 			
 			RETURN
 			res
@@ -1959,28 +1945,22 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_line_items_products_factor1_value' = ```
 			
-			var won_opps =
+			VAR won_opps =
 			    CALCULATETABLE(
 			        VALUES(opps[_sys_docid]),
-			        opps[trueai_is_won] = True
+			        opps[trueai_is_won] = TRUE()
 			    )
-			var won_deals = COUNTROWS(won_opps)                // won opps count
-			
-			VAR _won_deals_w_line =
-			    CALCULATE(
-			        DISTINCTCOUNT(opp_line_items[crm_opp_id]),
-			        TREATAS(won_opps, opp_line_items[crm_opp_id]),
-			        FILTER(opp_line_items, NOT(ISBLANK(opp_line_items[crm_opp_id])))
+			VAR won_deals = COUNTROWS(won_opps)
+			VAR opps_with_line_items =
+			    CALCULATETABLE(
+			        VALUES(opp_line_items[crm_opp_id]),
+			        FILTER(opp_line_items, NOT ISBLANK(opp_line_items[crm_opp_id]))
 			    )
+			VAR won_with_line_items =
+			    COUNTROWS(INTERSECT(won_opps, opps_with_line_items))
+			RETURN
+			    DIVIDE(won_with_line_items, won_deals, BLANK())
 			
-			var _won_ratio = DIVIDE(_won_deals_w_line, won_deals, 0)         // won ratio
-				
-				// var _won_weight = 0.70           // won weight
-				// var _lost_weight = 0.30         // lost deals ratio
-				
-				
-				RETURN
-				_won_ratio
 			```
 		displayFolder: _factor_value1
 		lineageTag: 2d1f8053-c685-415a-bf0b-77fc6299b82a
@@ -2103,17 +2083,15 @@ table metadata_ai_scores
 	/// Calculation Logic: VAR blocks define intermediate values (factor1, factor2, _conf, res) used later in the expression. Dependencies: Columns: opps_histories[crm_opp_id], ssr_history[entity_opp_id].
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: Not specified.
-	measure 'meas.ai_scores_opps_history' = ```
+	measure 'meas.ai_scores_opps_history' =
 			
-			var factor1 = CALCULATE(COUNT(ssr_history[entity_opp_id]))         // get the count of the opp id
-			var factor2 = CALCULATE(DISTINCTCOUNT(opps_histories[crm_opp_id]))         // get the opps with Opp history
-			var _conf = DIVIDE(factor2, factor1,0)
-			var score_pct = MIN(1, MAX(0, _conf)) * 100
-			var res = ROUND(score_pct,0)
-			RETURN 
-			res
-			```
-		formatString: 0
+			VAR factor1 = [meas.ai_scores_opps_history_factor1_value]
+			VAR factor2 = [meas.ai_scores_opps_history_factor2_value]
+			
+			VAR ratio_raw = DIVIDE(factor1, factor2, BLANK())
+			VAR res = MIN(100, MAX(0, ratio_raw * 100))
+			
+			RETURN IF(ISBLANK(ratio_raw), BLANK(), res)
 		displayFolder: _ai_scores
 		lineageTag: f214dba1-0a42-4c29-9898-0d3dbd51cbe1
 
@@ -2148,11 +2126,10 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_opps_industry' = ```
-			
-			var _avg =  AVERAGE(opps[trueai_industry_conf])         // get the opps average industry conf
-			var _conf = ROUND(_avg,2)*100    
-			RETURN 
-			_conf
+						
+						var _avg =  AVERAGE(opps[trueai_industry_conf])         // get the opps average industry conf
+						var _conf = ROUND(_avg,2)*100    
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 8da4b17b-a8dd-4bf3-acf2-b6bbbd975a7c
@@ -2189,11 +2166,10 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_opps_leadsource' = ```
-			
-			var _avg =  AVERAGE(opps[trueai_leadsource_conf])         // get the opps average industry conf
-			var _conf = ROUND(_avg,2)*100    
-			RETURN 
-			_conf
+						
+						var _avg =  AVERAGE(opps[trueai_leadsource_conf])         // get the opps average industry conf
+						var _conf = ROUND(_avg,2)*100    
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 82bde667-3bb7-4ca6-9d2d-166956b0290c
@@ -2234,8 +2210,7 @@ table metadata_ai_scores
 			
 			var score =  CALCULATE(AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_perf_qtly_performance_tier_conf]), BLANK())))        // get the avg performance tier conf
 			var res = ROUND(score*100, 0)       // get the int number
-			RETURN
-			res
+			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		displayFolder: _ai_scores
 		lineageTag: c16b7bdb-464c-42fd-a18d-da6af2ac402e
 
@@ -2269,14 +2244,13 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_potential_acv' = ```
-			
-			// as we don't have some field to calculate the factor I am using here temporary variable for visualization purpose. need to apply the actual field while available
-			var temp = 0.80     // temp value for factor analysis
-			var boost_expo = 0.9            // we uyse this to get the closer one value
-			var score = temp^boost_expo     // boosting the actual 
-			var res = ROUND(score*100, 0)
-			RETURN
-			res
+						
+						// as we don't have some field to calculate the factor I am using here temporary variable for visualization purpose. need to apply the actual field while available
+						var temp = 0.80     // temp value for factor analysis
+						var boost_expo = 0.9            // we uyse this to get the closer one value
+						var score = temp^boost_expo     // boosting the actual 
+						var res = ROUND(score*100, 0)
+						RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: dc351db3-95f5-4491-a907-7447411d654f
@@ -2316,19 +2290,18 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_pred_existing_customer_selling' = ```
-			
-			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
-			var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_existing_customer_selling_auc]), 0)     // get the latest auc for existing customer
-			var factor2 = COALESCE(MAXX(latest_row, companies_history[di_pred_existing_customer_selling_r2]), 0)     // get the latest r2
-			var boost_expo = 0.65 // to get closer to one if good score after the score has been calcualted
-			var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
-			var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
-			
-			var score  = ((normalized_factor2 + factor1)/2) ^ boost_expo  // avg of both normalized score + boosting
-			var _conf = round(score * 100 ,0) // make it an integer score
-			
-			RETURN 
-			_conf
+						
+						var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
+						var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_existing_customer_selling_auc]), 0)     // get the latest auc for existing customer
+						var factor2 = COALESCE(MAXX(latest_row, companies_history[di_pred_existing_customer_selling_r2]), 0)     // get the latest r2
+						var boost_expo = 0.65 // to get closer to one if good score after the score has been calcualted
+						var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
+						var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
+						
+						var score  = ((normalized_factor2 + factor1)/2) ^ boost_expo  // avg of both normalized score + boosting
+						var _conf = round(score * 100 ,0) // make it an integer score
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 06489173-1c0d-4369-b961-33a5e09b27ac
@@ -2366,20 +2339,19 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_pred_new_logo_selling' = ```
-			
-			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
-			var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_new_logo_auc]), 0)     // get the latest auc for existing customer
-			var factor2 = COALESCE(MAXX(latest_row, companies_history[di_pred_new_logo_r2]), 0)     // get the latest r2
-			
-			var boost_expo = 0.65 // to get closer to one if good score after the score has been calcualted
-			var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
-			var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
-			
-			var score  = ((normalized_factor2 + factor1)/2) ^ boost_expo  // avg of both normalized score + boosting
-			var _conf = round(score * 100 ,0) // make it an integer score
-			
-			RETURN 
-			_conf
+						
+						var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
+						var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_new_logo_auc]), 0)     // get the latest auc for existing customer
+						var factor2 = COALESCE(MAXX(latest_row, companies_history[di_pred_new_logo_r2]), 0)     // get the latest r2
+						
+						var boost_expo = 0.65 // to get closer to one if good score after the score has been calcualted
+						var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
+						var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
+						
+						var score  = ((normalized_factor2 + factor1)/2) ^ boost_expo  // avg of both normalized score + boosting
+						var _conf = round(score * 100 ,0) // make it an integer score
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 1addb1e4-af83-4bdf-a923-b0622aca39cd
@@ -2416,20 +2388,19 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_pred_post_sales_support' = ```
-			
-			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
-			var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_post_sales_auc]), 0)     // get the latest auc for existing customer
-			var factor2 = COALESCE(MAXX(latest_row, companies_history[di_pred_post_sales_r2]), 0)     // get the latest r2
-			
-			var boost_expo = 0.65 // to get closer to one if good score after the score has been calcualted
-			var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
-			var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
-			
-			var score  = ((normalized_factor2 + factor1)/2) ^ boost_expo  // avg of both normalized score + boosting
-			var _conf = round(score * 100 ,0) // make it an integer score
-			
-			RETURN 
-			_conf
+						
+						var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
+						var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_post_sales_auc]), 0)     // get the latest auc for existing customer
+						var factor2 = COALESCE(MAXX(latest_row, companies_history[di_pred_post_sales_r2]), 0)     // get the latest r2
+						
+						var boost_expo = 0.65 // to get closer to one if good score after the score has been calcualted
+						var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
+						var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
+						
+						var score  = ((normalized_factor2 + factor1)/2) ^ boost_expo  // avg of both normalized score + boosting
+						var _conf = round(score * 100 ,0) // make it an integer score
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: c95df0f5-d150-4b05-8f21-68a783ddd579
@@ -2466,20 +2437,19 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_pred_prospecting' = ```
-			
-			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
-			var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_prospecting_auc]), 0)     // get the latest auc for existing customer
-			var factor2 = COALESCE(MAXX(latest_row, companies_history[di_pred_prospecting_r2]), 0)     // get the latest r2
-			
-			var boost_expo = 0.65 // to get closer to one if good score after the scor has been calcualted
-			var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
-			var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
-			
-			var score  = ((normalized_factor2 + factor1)/2) ^ boost_expo  // avg of both normalized score + boosting
-			var _conf = round(score * 100 ,0) // make it an integer score
-			
-			RETURN 
-			_conf
+						
+						var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
+						var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_prospecting_auc]), 0)     // get the latest auc for existing customer
+						var factor2 = COALESCE(MAXX(latest_row, companies_history[di_pred_prospecting_r2]), 0)     // get the latest r2
+						
+						var boost_expo = 0.65 // to get closer to one if good score after the scor has been calcualted
+						var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
+						var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
+						
+						var score  = ((normalized_factor2 + factor1)/2) ^ boost_expo  // avg of both normalized score + boosting
+						var _conf = round(score * 100 ,0) // make it an integer score
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 25abb222-376b-4d2f-90ec-7ce8fb199f7b
@@ -2516,27 +2486,26 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ramping' = ```
-			
-			var fromDate = MIN('cal_end_dates'[date]) 
-			var toDate = MAX('cal_end_dates'[date])
-			
-			var applicable_rows_tbl = CALCULATETABLE(users_history, users_history[ci_perf_ramping_status] ="Ramping" ,  LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-			
-			var active_users_tbl =  filter(applicable_rows_tbl, IFERROR(DATEVALUE([trueai_hire_date]), date(1900,1,1)) <  toDate   && if(isblank([trueai_termination_date]), date(2100,1,1),IFERROR(DATEVALUE([trueai_termination_date]), date(2100,1,1))) >=  toDate) // make sure we only include reps that are in the active 
-			
-			var _cnt = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, users_history[_sys_user_id]))) // get a disctinct count of users from that filter context 
-			
-			var ramp_rate  = MIN(_cnt/3, 1)       // get the minimum if there is no ramping reps 
-			
-			var perf_score =  CALCULATE(
-			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_perf_qtly_performance_tier_conf]), BLANK())),       // get the avg perf conf
-			    users_history[ci_perf_ramping_status] ="Ramping"
-			)
-			var boost_expo = 0.5            // we use this to get the closer one value
-			var score = (ramp_rate * perf_score)^boost_expo     // boosting the actual 
-			var res = ROUND(score*100, 0)+0
-			RETURN
-			res
+						
+						var fromDate = MIN('cal_end_dates'[date]) 
+						var toDate = MAX('cal_end_dates'[date])
+						
+						var applicable_rows_tbl = CALCULATETABLE(users_history, users_history[ci_perf_ramping_status] ="Ramping" ,  LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
+						
+						var active_users_tbl =  filter(applicable_rows_tbl, IFERROR(DATEVALUE([trueai_hire_date]), date(1900,1,1)) <  toDate   && if(isblank([trueai_termination_date]), date(2100,1,1),IFERROR(DATEVALUE([trueai_termination_date]), date(2100,1,1))) >=  toDate) // make sure we only include reps that are in the active 
+						
+						var _cnt = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, users_history[_sys_user_id]))) // get a disctinct count of users from that filter context 
+						
+						var ramp_rate  = MIN(_cnt/3, 1)       // get the minimum if there is no ramping reps 
+						
+						var perf_score =  CALCULATE(
+						    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_perf_qtly_performance_tier_conf]), BLANK())),       // get the avg perf conf
+						    users_history[ci_perf_ramping_status] ="Ramping"
+						)
+						var boost_expo = 0.5            // we use this to get the closer one value
+						var score = (ramp_rate * perf_score)^boost_expo     // boosting the actual 
+						var res = ROUND(score*100, 0)+0
+						RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 6be9ea40-9799-4e02-bc1e-2a56961b27c5
@@ -2650,20 +2619,19 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_revenue_calibration' = ```
-			
-			var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC)) 
-			var factor1 = VALUE(MAXX(latest_table,companies_history[ttm_ref_date_revenue])) 
-			
-			var factor2 = VALUE(MAXX(latest_table,companies_history[di_amt_won_last12months])) 
-			
-			var score = (factor1 - ABS(factor1 - factor2))/factor1
-			var res = IF(
-			    factor1=BLANK() || factor1=0,
-			    0,
-			    ROUND(score*100, 0)
-			)
-			RETURN
-			res
+						
+						var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC)) 
+						var factor1 = VALUE(MAXX(latest_table,companies_history[ttm_ref_date_revenue])) 
+						
+						var factor2 = VALUE(MAXX(latest_table,companies_history[di_amt_won_last12months])) 
+						
+						var score = (factor1 - ABS(factor1 - factor2))/factor1
+						var res = IF(
+						    factor1=BLANK() || factor1=0,
+						    0,
+						    ROUND(score*100, 0)
+						)
+						RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 344f767a-2690-4e3b-ab4e-12741f7f149e
@@ -2700,28 +2668,28 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_sales_process' = ```
-			
-			var _count = CALCULATE(count(ssr_history[_sys_doc_id]) )
-			var total_rules_applied=  If(IsBlank(_count), 0,_count)
-			
-			var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
-			//var dd = COUNTROWS(tbl_crm_rules) // check the count
-			var filt = filter(ssr_history, 
-			 (
-			     ssr_history[step_owner_rule] & "" IN tbl_crm_rules  &&  
-			     ssr_history[step_outcome_rule] & "" IN tbl_crm_rules &&   
-			      ssr_history[step_end_rule] & "" IN tbl_crm_rules  
-			) 
-			) // look for NONE crm rules and exclude lead gen 
-			var sdt_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
-			
-			
-			var avg_conf_non_crm = .85  // get the avg non crm conf
-			var diff = (total_rules_applied - sdt_rules_applied  ) * avg_conf_non_crm  // create a diff model
-			var adjusted_ratio= divide (sdt_rules_applied +diff ,  total_rules_applied) // add the diff for the new ratio
-			// return as an int between 0-100
-			var res = ROUND(adjusted_ratio*100, 0)
-			return res
+						
+						var _count = CALCULATE(count(ssr_history[_sys_doc_id]) )
+						var total_rules_applied=  If(IsBlank(_count), 0,_count)
+						
+						var tbl_crm_rules = calculateTable(SELECTCOLUMNS(filter(metadata_rule_list, metadata_rule_list[col.rule_is_std_crm] = true), "_sys_doc_id]", "" & [_sys_doc_id])) // get a list of just the CRM rules
+						//var dd = COUNTROWS(tbl_crm_rules) // check the count
+						var filt = filter(ssr_history, 
+						 (
+						     ssr_history[step_owner_rule] & "" IN tbl_crm_rules  &&  
+						     ssr_history[step_outcome_rule] & "" IN tbl_crm_rules &&   
+						      ssr_history[step_end_rule] & "" IN tbl_crm_rules  
+						) 
+						) // look for NONE crm rules and exclude lead gen 
+						var sdt_rules_applied =  CALCULATE(count(ssr_history[_sys_doc_id]) , filt) // get the count based on correct filter
+						
+						
+						var avg_conf_non_crm = .85  // get the avg non crm conf
+						var diff = (total_rules_applied - sdt_rules_applied  ) * avg_conf_non_crm  // create a diff model
+						var adjusted_ratio= divide (sdt_rules_applied +diff ,  total_rules_applied) // add the diff for the new ratio
+						// return as an int between 0-100
+						var res = ROUND(adjusted_ratio*100, 0)
+						RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 5f7a6047-4cdb-43a1-8ced-98f74bed7b05
@@ -2763,11 +2731,10 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ssr_industry' = ```
-			
-			var _avg = AVERAGE(ssr[trueai_industry_conf])         // get the ssr average industry conf
-			var _conf = ROUND(_avg,2)*100    
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGE(ssr[trueai_industry_conf])         // get the ssr average industry conf
+						var _conf = ROUND(_avg,2)*100    
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: df8f40e1-a92e-4c7b-a0b5-4dd5b855744a
@@ -2803,11 +2770,10 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ssr_leadsource' = ```
-			
-			var _avg = AVERAGE(ssr[trueai_leadsource_conf])        // get the ssr average lead source conf
-			var _conf = ROUND(_avg*100,0)
-			RETURN 
-			_conf
+						
+						var _avg = AVERAGE(ssr[trueai_leadsource_conf])        // get the ssr average lead source conf
+						var _conf = ROUND(_avg*100,0)
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: fd163dcf-c88e-4da1-8ec2-0f3e7f4d41cd
@@ -2854,8 +2820,7 @@ table metadata_ai_scores
 			var score  = ((train_score_norm + validation_score_norm)/2) ^ boost_expo  // avg of both normalized score + boosting
 			var _conf = round(score * 100 ,0) // make it an integer score
 			
-			RETURN
-			_conf
+			RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 		displayFolder: _ai_scores
 		lineageTag: 32c41762-b2f6-4a2f-ae3a-f33a5ac33bad
 
@@ -2927,11 +2892,12 @@ table metadata_ai_scores
 			    "Rep Organization Calibration", [meas.ai_scores_rep_org_calibration],
 			    "Bookings Calibration", [meas.ai_scores_booking_calibration],
 			    "Revenue Calibration", [meas.ai_scores_revenue_calibration],
-			    "Leads & Accounts Completeness  Data Present",[meas.ai_scores_general_score],
+			    "Leads & Accounts Completeness Data Present",[meas.ai_scores_general_score],
 			    BLANK()
 			)
+			VAR out = IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 			RETURN
-			res+0
+			out
 			```
 		formatString: 0
 		lineageTag: 432d9e8d-81a5-4998-8f5c-3588b6380807
@@ -2945,18 +2911,28 @@ table metadata_ai_scores
 	/// Format/Type: Unspecified
 	measure 'meas.average_ai_score' =
 			
-			var score_result =
+			VAR cats =
+			    VALUES(metadata_ai_scores_analysis_categories[_sys_doc_id])
+			
+			VAR result =
 			    IF(
 			        HASONEVALUE(metadata_ai_scores_analysis_categories[_sys_doc_id]),
 			        [meas.analysis_cat_weighted_avg],
-			        AVERAGEX(
-			            VALUES(metadata_ai_scores_analysis_categories[_sys_doc_id]),
-			            CALCULATE([meas.analysis_cat_weighted_avg])
+			        IF(
+			            COUNTROWS(cats) = 0,
+			            AVERAGEX(
+			                ALL(metadata_ai_scores_analysis_categories[_sys_doc_id]),
+			                CALCULATE([meas.analysis_cat_weighted_avg])
+			            ),
+			            AVERAGEX(
+			                cats,
+			                CALCULATE([meas.analysis_cat_weighted_avg])
+			            )
 			        )
 			    )
 			
 			RETURN
-			MIN(MAX(score_result,0),100)
+			IF(ISBLANK(result), BLANK(), MIN(MAX(result,0),100))
 		formatString: 0
 		lineageTag: b12cdcbf-d399-4855-b356-3f9402c5215c
 
@@ -2967,15 +2943,14 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_act_capt_lvl' = ```
-			
-			var _avg = CALCULATE(
-			           AVERAGE(users_history[ci_act_capt_lvl])// get the users_history average ci_act_capt_lvl
-			)
-			var boost_expo = 0.90           // exponent value 
-			var _boosted_avg = (_avg)^ boost_expo     // pushes up the score slightly 
-			var _conf = ROUND(_boosted_avg*100,0)  // round the number and for integar value  
-			RETURN 
-			_conf
+						
+						var _avg = CALCULATE(
+						           AVERAGE(users_history[ci_act_capt_lvl])// get the users_history average ci_act_capt_lvl
+						)
+						var boost_expo = 0.90           // exponent value 
+						var _boosted_avg = (_avg)^ boost_expo     // pushes up the score slightly 
+						var _conf = ROUND(_boosted_avg*100,0)  // round the number and for integar value  
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 85b91857-4258-4858-ab3e-caab92d02dc5
@@ -3042,7 +3017,7 @@ table metadata_ai_scores
 			    "SSR Industry Consolidation", "meas.ai_scores_ssr_industry",                // score id 15 
 			    "SSR Lead Source Consolidation", "meas.ai_scores_ssr_leadsource",                // score id 16 
 			    "Opportunities History", "meas.ai_scores_opps_history",                // score id 17 
-			    "Leads & Accounts Completeness  Data Present","meas.ai_scores_general_score",
+			    "Leads & Accounts Completeness Data Present","meas.ai_scores_general_score",
 			    "Activity Capture Level", "meas.ai_scores_ci_act_capt_lvl",                // score id 18 
 			    "Time Allocation", "meas.ai_scores_ci_time_alloc",                // score id 19 
 			    "Adjusted Duration", "meas.ai_scores_adj_duration",                // score id 20 
@@ -3123,7 +3098,7 @@ table metadata_ai_scores
 			    "Rep Organization Calibration", IFERROR(FORMAT([meas.ai_scores_rep_org_calibration_factor1_value],"#,0"), BLANK()),
 			    "Bookings Calibration", IFERROR(FORMAT([meas.ai_scores_booking_calibration_factor1_value],"$#,0"), BLANK()),
 			    "Revenue Calibration", IFERROR(FORMAT([meas.ai_scores_revenue_calibration_factor1_value],"$#,0"), BLANK()),
-			    "Leads & Accounts Completeness  Data Present", IFERROR([meas.ai_scores_general_score_factor1_value], BLANK()),
+			    "Leads & Accounts Completeness Data Present", IFERROR([meas.ai_scores_general_score_factor1_value], BLANK()),
 			    BLANK()
 				    
 			), BLANK())
@@ -3231,6 +3206,213 @@ table metadata_ai_scores
 			_avg
 		displayFolder: _factor1_value
 		lineageTag: a74ee032-d271-4caa-8059-cb32dde336dc
+
+	/// Purpose: Return 1 when the current score belongs to the selected analysis category (for visual filtering).
+	/// Calculation Logic: Uses VAR/RETURN with TREATAS to map category selections to score IDs.
+	/// Dynamic Behavior: Respects category filter context when present.
+	/// Format/Type: 0/1 flag
+	measure 'meas.ai_score_is_in_selected_category' =
+			
+			VAR hasCat =
+			    ISFILTERED(metadata_ai_scores_analysis_categories[category_name]) ||
+			    ISFILTERED(metadata_ai_scores_analysis_categories[_sys_doc_id])
+			
+			VAR currScoreNum =
+			    IFERROR(VALUE(SELECTEDVALUE(metadata_ai_scores[_sys_doc_id])), BLANK())
+			
+			VAR selectedCats =
+			    VALUES(metadata_ai_scores_analysis_categories[_sys_doc_id])
+			
+			VAR isMember =
+			    NOT ISBLANK(currScoreNum) &&
+			    CALCULATE(
+			        COUNTROWS(metadata_ai_scores_category_links),
+			        TREATAS(selectedCats, metadata_ai_scores_category_links[analysis_category_id]),
+			        metadata_ai_scores_category_links[score_id] = currScoreNum
+			    ) > 0
+			
+			RETURN
+			IF(NOT hasCat, 1, IF(isMember, 1, 0))
+		lineageTag: 0f42b23e-6e60-4c76-9a0a-2a24fbf4cafd
+
+	measure 'meas.__compile_probe' = 1
+		lineageTag: 4490d946-e5a0-44ed-9d66-d17e168a7a2f
+
+	measure 'meas.__dbg_opps_hist_factor1' = [meas.ai_scores_opps_history_factor1_value]
+		lineageTag: e610141e-966e-479b-93a2-71edf9b25ec3
+
+	measure 'meas.__dbg_opps_hist_factor2' = [meas.ai_scores_opps_history_factor2_value]
+		lineageTag: 44cd97de-4eda-423d-9be7-38808dc3d826
+
+	measure 'meas.__dbg_opps_hist_ratio_raw' =
+			DIVIDE(
+			    [meas.ai_scores_opps_history_factor1_value],
+			    [meas.ai_scores_opps_history_factor2_value],
+			    BLANK()
+			)
+		lineageTag: 8918b588-855a-4bfd-8aa1-7d80fda231bc
+
+	measure 'meas.__dbg_line_items_rows' = COUNTROWS(opp_line_items)
+		lineageTag: 017e43fa-2eb4-4b22-9db8-632c1f9b7e7a
+
+	measure 'meas.__dbg_line_items_distinct_products' = DISTINCTCOUNT(opp_line_items[product_id])
+		lineageTag: d1907af1-5536-45eb-ab4d-c4a5d93f5ca1
+
+	measure 'meas.__dbg_line_items_distinct_opps' = DISTINCTCOUNT(opp_line_items[opportunity_id])
+		lineageTag: d3c37c5f-a983-48ad-84c2-1838f76a06c6
+
+	measure 'meas.__dbg_line_items_won_factor_raw' = [meas.ai_scores_line_items_products_factor1_value]
+		lineageTag: 755473e4-bb9d-4323-97aa-a465e207910e
+
+	measure 'meas.__dbg_line_items_lost_factor_raw' = [meas.ai_scores_line_items_products_factor2_value]
+		lineageTag: 3935ae91-298a-4691-a9cd-6e6829cb2266
+
+	measure 'meas.__dbg_line_items_opp_id_match_rate' =
+		
+		VAR opp_ids = VALUES(opps[_sys_docid])
+		VAR matched_line_items =
+		    CALCULATE(
+		        DISTINCTCOUNT(opp_line_items[crm_opp_id]),
+		        TREATAS(opp_ids, opp_line_items[crm_opp_id])
+		    )
+		VAR opp_count = COUNTROWS(opp_ids)
+		RETURN
+		    DIVIDE(matched_line_items, opp_count, BLANK())
+
+	measure 'meas.__dbg_opp_hist_old_vs_new' =
+		VAR old = [meas.ai_scores_opps_history]
+		VAR new = [meas.readiness_ai_scores_opps_history]
+		RETURN
+		"old=" & FORMAT(old, "0.00") & " | new=" & FORMAT(new, "0.00")
+
+	measure 'meas.__dbg_score_name' =
+		MAX(metadata_ai_scores[score_name])
+		lineageTag: 1b659ad8-ea05-4b81-b0eb-c65e460fae52
+
+	measure 'meas.readiness_ai_scores_opps_history_factor1_value' =
+			
+			VAR tbl_won =
+			    FILTER(
+			        opps_histories,
+			        opps_histories[trueai_is_won] = TRUE()
+			            && NOT ISBLANK(opps_histories[crm_opp_id])
+			    )
+			VAR tbl_summarized =
+			    SUMMARIZE(
+			        tbl_won,
+			        opps_histories[crm_opp_id],
+			        "unique_trueai_stage_id",
+			            DISTINCTCOUNT(opps_histories[trueai_stage_id])
+			    )
+			RETURN
+			    AVERAGEX(tbl_summarized, [unique_trueai_stage_id])
+		lineageTag: e7322f55-fb2a-44e6-9b27-f11009971f11
+
+	measure 'meas.readiness_ai_scores_opps_history_factor2_value' =
+			
+			VAR tbl_won =
+			    FILTER(
+			        opps_histories,
+			        opps_histories[trueai_is_won] = TRUE()
+			            && NOT ISBLANK(opps_histories[crm_opp_id])
+			    )
+			VAR tbl_summarized =
+			    SUMMARIZE(
+			        tbl_won,
+			        opps_histories[crm_opp_id],
+			        "unique_trueai_stage_ids",
+			            DISTINCTCOUNT(opps_histories[trueai_stage_id])
+			    )
+			VAR count_sum_tbl = COUNTROWS(tbl_summarized)
+			VAR the_20_pct_ordinal = ROUND(count_sum_tbl * 0.8, 0)
+			VAR top_tbl_summarized =
+			    TOPN(the_20_pct_ordinal, tbl_summarized, [unique_trueai_stage_ids], ASC)
+			VAR top_stage_count = MAXX(top_tbl_summarized, [unique_trueai_stage_ids])
+			RETURN
+			    MAX(top_stage_count, 3)
+		lineageTag: f14bf85d-7f87-4cdd-898d-ea487e92a681
+
+	measure 'meas.readiness_ai_scores_opps_history' =
+			
+			VAR factor1 = [meas.readiness_ai_scores_opps_history_factor1_value]
+			VAR factor2 = [meas.readiness_ai_scores_opps_history_factor2_value]
+			VAR ratio01 = MIN(DIVIDE(factor1, factor2, BLANK()), 1)
+			RETURN
+			    IF(ISBLANK(ratio01), BLANK(), MIN(100, MAX(0, ratio01 * 100)))
+		lineageTag: 0d744cb9-13bf-476b-84f6-844acdaaa6ff
+
+	measure 'meas.readiness_ai_score' =
+			
+			var score_name = MAX(metadata_ai_scores[score_name])
+			
+			var res = SWITCH(
+			    score_name,
+			    "Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],    // score_id 1
+			    "New Logo Selling Success Predictions", [meas.ai_scores_pred_new_logo_selling],    // score_id 2
+			    "Post-Sales Support Success Predictions", [meas.ai_scores_pred_post_sales_support],    // score_id 3
+			    "Existing Customer Selling Success Predictions", [meas.ai_scores_pred_existing_customer_selling],    // score_id 4
+			    "Success Factor Analysis", [meas.ai_scores_success_factor_analysis],                      // score id 5
+			    "Potential ACV", [meas.ai_scores_potential_acv],                      // score id 6
+			    "List Price", [meas.ai_scores_list_price],                      // score id 7
+			    "Line Item Products", [meas.ai_scores_line_items_products],                      // score id 8
+			    "Accounts Industry Consolidation", [meas.ai_scores_accts_industry],                // score id 9
+			    "Accounts Lead Source Consolidation", [meas.ai_scores_accts_leadsource],                // score id 10
+			    "Leads Industry Consolidation", [meas.ai_scores_leads_industry],                // score id 11
+			    "Leads Lead Source Consolidation", [meas.ai_scores_leads_leadsource],                // score id 12
+			    "Opps Industry Consolidation", [meas.ai_scores_opps_industry],                // score id 13
+			    "Opps Lead Source Consolidation", [meas.ai_scores_opps_leadsource],                // score id 14
+			    "SSR Industry Consolidation", [meas.ai_scores_ssr_industry],                // score id 15
+			    "SSR Lead Source Consolidation", [meas.ai_scores_ssr_leadsource],                // score id 16
+			    "Opportunities History", [meas.readiness_ai_scores_opps_history],                // score id 17
+			    "Activity Capture Level", [meas.ai_scores_ci_act_capt_lvl],                // score id 18
+			    "Activity Capture Level Confidence", [meas.ai_scores_ci_act_capt_lvl_conf],
+			    "Time Allocation", [meas.ai_scores_ci_time_alloc],                // score id 19
+			    "Adjusted Duration", [meas.ai_scores_adj_duration],                // score id 20
+			    "Closing Ability", [meas.ai_scores_ci_closing_ability],                  // score_id 21
+			    "Discovery Skill", [meas.ai_scores_ci_discovery_skill],               // score_id 22
+			    "Engagement Ability", [meas.ai_scores_ci_engagement_ability],                      // score_id 23
+			    "Work Effort", [meas.ai_scores_ci_work_effort],                      // score_id 24
+			    "Deal Maximizing", [meas.ai_scores_ci_deal_maxing],                        // score_id 25
+			    "Performance Tiers", [meas.ai_scores_performance_tiers],                            // score_id 26
+			    "Ramping Success", [meas.ai_scores_ramping],                                  // score_id 27
+			    "Time Management", [meas.ai_scores_ci_time_management],                // score_id 28
+			    "Rep Organization Calibration", [meas.ai_scores_rep_org_calibration],
+			    "Bookings Calibration", [meas.ai_scores_booking_calibration],
+			    "Revenue Calibration", [meas.ai_scores_revenue_calibration],
+			    "Leads & Accounts Completeness Data Present",[meas.ai_scores_general_score],
+			    BLANK()
+			)
+			VAR out = IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
+			RETURN
+			out
+		lineageTag: ffef63ec-4858-4976-8798-0fb002bdba60
+
+	measure 'meas.readiness_average_ai_score' =
+			
+			VAR cats =
+			    VALUES(metadata_ai_scores_analysis_categories[_sys_doc_id])
+			
+			VAR result =
+			    IF(
+			        HASONEVALUE(metadata_ai_scores_analysis_categories[_sys_doc_id]),
+			        [meas.readiness_analysis_cat_weighted_avg],
+			        IF(
+			            COUNTROWS(cats) = 0,
+			            AVERAGEX(
+			                ALL(metadata_ai_scores_analysis_categories[_sys_doc_id]),
+			                CALCULATE([meas.readiness_analysis_cat_weighted_avg])
+			            ),
+			            AVERAGEX(
+			                cats,
+			                CALCULATE([meas.readiness_analysis_cat_weighted_avg])
+			            )
+			        )
+			    )
+			
+			RETURN
+			IF(ISBLANK(result), BLANK(), MIN(MAX(result,0),100))
+		formatString: 0
+		lineageTag: e888156c-3b86-4145-afc1-99c3c9628ddb
 
 	/// Category
 	/// Category
