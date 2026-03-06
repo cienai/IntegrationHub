@@ -96,6 +96,130 @@ table cal_end_dates
 		displayFolder: _filt_helpers
 		lineageTag: 57062494-3508-4371-b498-92dfb39f703e
 
+	measure 'meas.filter_string_v2' =
+			
+			VAR max_filters = 3
+			
+			VAR from_date =
+			    MIN('cal_end_dates'[Date])
+			
+			VAR to_date =
+			    MAX('cal_end_dates'[Date])
+			
+			VAR date_str =
+			    "Date: "
+			        & FORMAT(from_date, "m/d/yyyy")
+			        & " - "
+			        & FORMAT(to_date, "m/d/yyyy")
+			
+			VAR user_role_str =
+			    IF(
+			        ISFILTERED(users[trueai_user_role]),
+			        VAR ___f = FILTERS(users[trueai_user_role])
+			        VAR ___r = COUNTROWS(___f)
+			        VAR ___t = TOPN(max_filters, ___f, users[trueai_user_role])
+			        VAR ___d = CONCATENATEX(___t, users[trueai_user_role], ", ")
+			        VAR ___x =
+			            "Role: "
+			                & ___d
+			                & IF(___r > max_filters, ", ... [" & ___r & " items selected]")
+			        RETURN ___x,
+			        "Role: All"
+			    )
+			
+			VAR group_str =
+			    IF(
+			        ISFILTERED(users[trueai_group]),
+			        VAR ___f = FILTERS(users[trueai_group])
+			        VAR ___r = COUNTROWS(___f)
+			        VAR ___t = TOPN(max_filters, ___f, users[trueai_group])
+			        VAR ___d = CONCATENATEX(___t, users[trueai_group], ", ")
+			        VAR ___x =
+			            "Group: "
+			                & ___d
+			                & IF(___r > max_filters, ", ... [" & ___r & " items selected]")
+			        RETURN ___x,
+			        "Group: All"
+			    )
+			
+			RETURN
+			    date_str & " | " & user_role_str & " | " & group_str
+		lineageTag: 3563cd8c-bcd7-4de6-9ae7-a18bbd038e9d
+
+	measure 'meas.filter_string_v3' =
+			
+			VAR max_filters = 3
+			
+			VAR criteria_from =
+			    MIN('cal_end_dates'[Date])
+			
+			VAR criteria_to =
+			    MAX('cal_end_dates'[Date])
+			
+			VAR selected_year =
+			    SELECTEDVALUE('cal_end_dates'[Year])
+			
+			VAR year_from =
+			    IF(
+			        NOT ISBLANK(selected_year),
+			        DATE(selected_year, 1, 1),
+			        criteria_from
+			    )
+			
+			VAR year_to =
+			    IF(
+			        NOT ISBLANK(selected_year),
+			        DATE(selected_year, 12, 31),
+			        criteria_to
+			    )
+			
+			VAR final_from =
+			    MAX(criteria_from, year_from)
+			
+			VAR final_to =
+			    MIN(criteria_to, year_to)
+			
+			VAR date_str =
+			    "Date: "
+			        & FORMAT(final_from, "m/d/yyyy")
+			        & " - "
+			        & FORMAT(final_to, "m/d/yyyy")
+			
+			VAR user_role_str =
+			    IF(
+			        ISFILTERED(users[trueai_user_role]),
+			        VAR ___f = FILTERS(users[trueai_user_role])
+			        VAR ___r = COUNTROWS(___f)
+			        VAR ___t = TOPN(max_filters, ___f, users[trueai_user_role])
+			        VAR ___d = CONCATENATEX(___t, users[trueai_user_role], ", ")
+			        VAR ___x =
+			            "Role: "
+			                & ___d
+			                & IF(___r > max_filters, ", ... [" & ___r & " items selected]")
+			        RETURN ___x,
+			        "Role: All"
+			    )
+			
+			VAR group_str =
+			    IF(
+			        ISFILTERED(users[trueai_group]),
+			        VAR ___f = FILTERS(users[trueai_group])
+			        VAR ___r = COUNTROWS(___f)
+			        VAR ___t = TOPN(max_filters, ___f, users[trueai_group])
+			        VAR ___d = CONCATENATEX(___t, users[trueai_group], ", ")
+			        VAR ___x =
+			            "Group: "
+			                & ___d
+			                & IF(___r > max_filters, ", ... [" & ___r & " items selected]")
+			        RETURN ___x,
+			        "Group: All"
+			    )
+			
+			RETURN
+			    date_str & " | " & user_role_str & " | " & group_str
+			lineageTag: 8a838db4-e76e-4ed7-97cf-bb8549fb93a2
+		lineageTag: ae18b217-8c6b-4f68-9b07-06678e6a6a5f
+
 	/// Column date.
 	column date
 		formatString: Short Date

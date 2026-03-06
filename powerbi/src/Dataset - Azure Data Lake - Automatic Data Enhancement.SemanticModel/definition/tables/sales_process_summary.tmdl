@@ -115,7 +115,7 @@ table sales_process_summary
 			+ consistency_summary[meas.trueai_consistency_score_display] 
 			+ sales_process_summary[meas.trueai_sales_process_score_display]
 			+ act_capture_level_summary[meas.trueai_act_capt_score]
-			+ ai_conf_pred_qual_summary[meas.ai_conf_overall_score]
+			+ metadata_ai_scores[meas.summary_last_full_year_insights_readiness]
 			) / 6 
 			
 			var res = round(score, 0)
@@ -136,11 +136,13 @@ table sales_process_summary
 	/// Format/Type: +#%;-#%;0%
 	measure 'meas.trueai_all_ade_score_improvement' = ```
 			
-			var trueai_score = ROUND([meas.trueai_all_ade_score_display],2)
-			var crm_score = ROUND([meas.crm_all_ade_score_display],2)
-			var imp = divide(trueai_score - crm_score,  crm_score, 0)
-			var res = imp
-			return res
+			VAR trueai_score = [meas.trueai_all_ade_score_display]
+			VAR crm_score = [meas.crm_all_ade_score_display]
+			
+			VAR improvement =
+			    DIVIDE(trueai_score - crm_score, crm_score)
+			
+			RETURN improvement
 			
 			
 			```
