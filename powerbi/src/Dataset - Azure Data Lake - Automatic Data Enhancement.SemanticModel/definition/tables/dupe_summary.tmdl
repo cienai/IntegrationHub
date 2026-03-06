@@ -65,7 +65,7 @@ table dupe_summary
 			var all_recs =  [meas.crm_records]
 			var prob_recs =  [meas.crm_dupe_problem_records] // get the problematic records
 			var non_prob_recs = all_recs - prob_recs  // get the ok records
-			var avg_conf = CALCULATE(AVERAGE(dupe_summary[dupe_conf])) // get the avg confidence for corrected records 
+			var avg_conf = CALCULATE(AVERAGEX(dupe_summary, IFERROR(VALUE(dupe_summary[dupe_conf]), BLANK()))) // get the avg confidence for corrected records 
 			var res = Divide((non_prob_recs * 1 ) +  (prob_recs * avg_conf) , all_recs) // dedeuct by conf for corrected recrods 
 			return 
 			IF(
@@ -185,7 +185,10 @@ table dupe_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: Measures: [meas.crm_dupe_score].
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
-	measure 'meas.crm_dupe_score_display' = [meas.crm_dupe_score] * 100
+	measure 'meas.crm_dupe_score_display' =
+			
+			VAR res = [meas.crm_dupe_score] * 100
+			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		formatString: 0
 		displayFolder: _dupe_score
 		lineageTag: 416329b6-8580-4f7c-94e5-3487ae032aaf
@@ -206,8 +209,7 @@ table dupe_summary
 			    _crm_score,                     // condiotinl for score not to show score less then before
 			    _trueai_score
 			)
-			RETURN
-			res
+			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		formatString: 0
 		displayFolder: _dupe_score
 		lineageTag: 4c30b04e-8de3-42c0-bd5d-9a83a64c5853

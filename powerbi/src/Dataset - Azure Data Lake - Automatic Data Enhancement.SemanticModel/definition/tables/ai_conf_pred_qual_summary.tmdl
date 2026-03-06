@@ -23,15 +23,7 @@ table ai_conf_pred_qual_summary
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: 0
-	measure 'meas.ai_conf_overall_score_instry_avg' =
-			//87
-			var _score = CALCULATE(
-			    MAX(metadata_reference_values[value]),
-			    metadata_reference_values[_sys_doc_id]="aipred6"
-			)
-			
-			RETURN
-			_score
+	measure 'meas.ai_conf_overall_score_instry_avg' = 78
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 7616300d-cae6-467a-8352-84608e038164
@@ -81,7 +73,12 @@ table ai_conf_pred_qual_summary
 	/// Format/Type: 0
 	measure 'meas.pred_qual_trueai_score' =
 			
-			AVERAGE(ai_conf_pred_qual_summary[pred_qual_score]) * 100
+			VAR res =
+			    AVERAGEX(
+			        ai_conf_pred_qual_summary,
+			        IFERROR( VALUE(ai_conf_pred_qual_summary[pred_qual_score]), BLANK() )
+			    ) * 100
+			RETURN IF( ISBLANK(res), BLANK(), MIN(MAX(res,0),100) )
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 7483542d-1a68-4c60-a713-ed796df5673b

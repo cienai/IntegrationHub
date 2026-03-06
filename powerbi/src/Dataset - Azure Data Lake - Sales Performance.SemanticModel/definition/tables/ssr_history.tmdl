@@ -14915,21 +14915,13 @@ table ssr_history
 	/// Format/Type: Unspecified
 	measure 'meas.ssr_history_success_count_mkt_prospecting_inbound' =
 			
-			var start_date = [meas.filter_date_min]
-			var end_date = [meas.filter_date_max]
-			
 			var res =
 			    calculate(
 			        distinctcount(ssr_history[_sys_ssr_id]),
-			        ssr_history[step_name] = "Prospecting",
+			        ssr_history[step_name] = "New Logo Selling",
 			        ssr_history[step_success] = true,
 			        ssr[trueai_leadsource_is_inbound] = true,
-			        users[trueai_user_role_department] = "mkt",
-			        not isblank(ssr[trueai_first_touch]),
-			        ssr[trueai_first_touch] >= start_date &&
-			        ssr[trueai_first_touch] < end_date,
-			        datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) >= 0,
-			        datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) <= 21
+			        users[trueai_user_role_department] = "mkt"
 			    )
 			
 			return
@@ -14962,7 +14954,7 @@ table ssr_history
 			
 			divide(
 			    [meas.ssr_history_success_count_mkt_prospecting_inbound],
-			    [meas.ssr_history_mkt_inbound_leads_with_first_touch],
+			    [meas.ssr_history_mkt_leads_inbound],
 			    0
 			)
 		formatString: 0%;-0%;0%
