@@ -574,7 +574,7 @@ table metadata_ai_scores
 			        )
 			    )
 			RETURN res
-
+			
 			```
 		displayFolder: _factor_value1
 		lineageTag: 89c72c3a-71ab-4f1e-beb2-abbc13189977
@@ -1355,7 +1355,7 @@ table metadata_ai_scores
 			        BLANK(),
 			        MIN(100, MAX(0, score100))
 			    )
-		
+			
 			```
 		displayFolder: _ai_scores
 		lineageTag: 49e180a0-27b1-4d09-a630-a4364e278ddb
@@ -1488,11 +1488,16 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_closing_ability' = ```
 						
-						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_closing_ability_num]), BLANK()))     // get the avg closing ability conf
-						var boost_expo = 0.90
-						var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be  
-						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						VAR score01 =
+						    CALCULATE(
+						        AVERAGEX(
+						            users_history,
+						            IFERROR(VALUE(users_history[ci_sb_closing_ability_conf]), BLANK())
+						        ),
+						        users[trueai_user_role_function] IN {"AM","AE"}
+						    )
+						VAR score100 = score01 * 100
+						RETURN IF(ISBLANK(score01), BLANK(), MIN(100, MAX(0, score100)))
 			```
 		displayFolder: _ai_scores
 		lineageTag: a9f5237d-77e1-41ad-b86d-1c1fd0bf3f09
@@ -1576,11 +1581,16 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_ci_discovery_skill' = ```
 						
-						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_discov_skills_num]), BLANK()))     // get the avg discovery skill conf
-						var boost_expo = 0.90
-						var _new_avg = (ABS(_avg))^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-						var _conf = ROUND(_avg*100 ,0) // round the number and for integar value
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						VAR score01 =
+						    CALCULATE(
+						        AVERAGEX(
+						            users_history,
+						            IFERROR(VALUE(users_history[ci_sb_discov_skills_conf]), BLANK())
+						        ),
+						        users[trueai_user_role_function] IN {"AM","AE","SDR"}
+						    )
+						VAR score100 = score01 * 100
+						RETURN IF(ISBLANK(score01), BLANK(), MIN(100, MAX(0, score100)))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 06e29052-44f1-4661-93dc-60f70765c604
@@ -1615,16 +1625,21 @@ table metadata_ai_scores
 		lineageTag: a8afd11f-8977-465e-8002-3a0235bda026
 
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (_avg, boost_expo, _new_avg, _conf) used later in the expression. Dependencies: Columns: users_history[ci_sb_engmt_ability_num].
-	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Calculation Logic: VAR blocks define intermediate values (score01, score100) used later in the expression. Dependencies: Columns: users_history[ci_sb_engmt_ability_num], users[trueai_user_role_function].
+	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: 0
 	measure 'meas.ai_scores_ci_engagement_ability' = ```
 						
-						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_engmt_ability_num]), BLANK()))     // get the avg engagement ability conf
-						var boost_expo = 0.90           // exponent value 
-						var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-						var _conf = ROUND(_avg,2)*100  // round the number and for integar value
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						VAR score01 =
+						    CALCULATE(
+						        AVERAGEX(
+						            users_history,
+						            IFERROR(VALUE(users_history[ci_sb_engmt_ability_conf]), BLANK())
+						        ),
+						        users[trueai_user_role_function] IN {"AM","AE","SDR"}
+						    )
+						VAR score100 = score01 * 100
+						RETURN IF(ISBLANK(score01), BLANK(), MIN(100, MAX(0, score100)))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 1db68818-c9df-41e2-aa60-93b218e74c1a
@@ -1660,22 +1675,20 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_time_alloc' = ```
 						
-						var fromDate =MIN('cal_end_dates'[date]) 
-						var toDate = MAX('cal_end_dates'[date])
+						VAR score01 =
+						    CALCULATE(
+						        AVERAGE(users_history[ci_time_alloc_conf]),
+						        users[trueai_user_role_function] IN {"AM","AE","SDR"}
+						    )
 						
-						var applicable_rows_tbl = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-						var active_users_tbl =  filter(applicable_rows_tbl, IFERROR(DATEVALUE([trueai_hire_date]), date(1900,1,1)) <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),IFERROR(DATEVALUE(users_history[trueai_termination_date]), date(2100,1,1))) >=  toDate && users_history[ci_time_alloc_tot] >0 ) // make sure we only include reps that are in the active  and user having time allocation greater than 0
-						var reps_w_ta = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users_tbl, [_sys_user_id]))) // get a disctinct count of users from that filter context 
+						VAR score100 = score01 * 100
 						
-						var applicable_rows = CALCULATETABLE(users_history, LASTNONBLANK(users_history[_sys_filt_start_date],users_history[_sys_filt_start_date]))  // get only the last entry in each filter context period (e.g. a year)
-						var active_users =  filter(applicable_rows, IFERROR(DATEVALUE([trueai_hire_date]), date(1900,1,1)) <=  toDate   && if(isblank(users_history[trueai_termination_date]), date(2100,1,1),IFERROR(DATEVALUE(users_history[trueai_termination_date]), date(2100,1,1))) >=  toDate) // make sure we only include reps that are in the active 
-						var reps_tot = COUNTROWS(DISTINCT(SELECTCOLUMNS(active_users, [_sys_user_id]))) // get a disctinct count of users from that filter context 
-						
-						var _avg =DIVIDE(reps_w_ta, reps_tot)        // get the % of reps w TA
-						var boost_expo = 0.90           // exponent value 
-						var _new_avg = (_avg)*boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value  
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						RETURN
+						    IF(
+						        ISBLANK(score01),
+						        BLANK(),
+						        MIN(100, MAX(0, score100))
+						    )
 			```
 		displayFolder: _ai_scores
 		lineageTag: 93cd381a-97c6-4745-8641-c996cd9af450
@@ -1755,11 +1768,16 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_ci_work_effort' = ```
 						
-						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_work_effort_num]), BLANK()))     // get the factor1
-						var boost_expo = 0.90           // exponent value 
-						var _new_avg = (_avg)^ boost_expo               // get the expo value to enhance output
-						var _conf = ROUND(_avg,2)*100  // round the number and for integar value
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						VAR score01 =
+						    CALCULATE(
+						        AVERAGEX(
+						            users_history,
+						            IFERROR(VALUE(users_history[ci_sb_work_effort_conf]), BLANK())
+						        ),
+						        users[trueai_user_role_function] IN {"AM","AE","SDR"}
+						    )
+						VAR score100 = score01 * 100
+						RETURN IF(ISBLANK(score01), BLANK(), MIN(100, MAX(0, score100)))
 			```
 		displayFolder: _ai_scores
 		lineageTag: bc9b6b1f-7821-4538-9845-b8964c41f8ee
@@ -2400,20 +2418,20 @@ table metadata_ai_scores
 	/// Dynamic Behavior: Uses IF for conditional branching.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_pred_post_sales_support' = ```
-		
-		    VAR factor1 = COALESCE([meas.ai_scores_post_sales_support_factor1_value], 0)
-		    VAR factor2 = COALESCE([meas.ai_scores_post_sales_support_factor2_value], 0)
-		    VAR normalized_factor1 = (MAX((factor1-0.5),0)) + 0.5
-		    VAR normalized_factor2 = MAX(factor2, 0)
-		    VAR score01 = ((normalized_factor2 + factor1) / 2)
-		    VAR score100 = score01 * 100
-		    RETURN
-		        IF(
-		            ISBLANK(score01),
-		            BLANK(),
-		            MIN(100, MAX(0, score100))
-		        )
-		
+			
+			    VAR factor1 = COALESCE([meas.ai_scores_post_sales_support_factor1_value], 0)
+			    VAR factor2 = COALESCE([meas.ai_scores_post_sales_support_factor2_value], 0)
+			    VAR normalized_factor1 = (MAX((factor1-0.5),0)) + 0.5
+			    VAR normalized_factor2 = MAX(factor2, 0)
+			    VAR score01 = ((normalized_factor2 + factor1) / 2)
+			    VAR score100 = score01 * 100
+			    RETURN
+			        IF(
+			            ISBLANK(score01),
+			            BLANK(),
+			            MIN(100, MAX(0, score100))
+			        )
+			
 			```
 		displayFolder: _ai_scores
 		lineageTag: c95df0f5-d150-4b05-8f21-68a783ddd579
@@ -2957,13 +2975,20 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_act_capt_lvl' = ```
 						
-						var _avg = CALCULATE(
-						           AVERAGE(users_history[ci_act_capt_lvl])// get the users_history average ci_act_capt_lvl
-						)
-						var boost_expo = 0.90           // exponent value 
-						var _boosted_avg = (_avg)^ boost_expo     // pushes up the score slightly 
-						var _conf = ROUND(_boosted_avg*100,0)  // round the number and for integar value  
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						VAR score01 =
+						    CALCULATE(
+						        AVERAGE(users_history[ci_act_capt_lvl]),
+						        users[trueai_user_role_function] IN {"AM","AE","SDR"}
+						    )
+						
+						VAR score100 = score01 * 100
+						
+						RETURN
+						    IF(
+						        ISBLANK(score01),
+						        BLANK(),
+						        MIN(100, MAX(0, score100))
+						    )
 			```
 		displayFolder: _ai_scores
 		lineageTag: 85b91857-4258-4858-ab3e-caab92d02dc5
@@ -3396,6 +3421,90 @@ table metadata_ai_scores
 		formatString: 0
 		lineageTag: e888156c-3b86-4145-afc1-99c3c9628ddb
 
+	/// Debug: total users_history rows in current context.
+	measure 'meas.__dbg_users_hist_all' =
+			COUNTROWS(users_history)
+			displayFolder: _debug
+		lineageTag: b5fd5002-5038-49b6-8c8e-6373de6a9085
+
+	/// Debug: users_history rows filtered by sales role function.
+	measure 'meas.__dbg_users_hist_sales_roles' =
+			CALCULATE(
+			    COUNTROWS(users_history),
+			    users[trueai_user_role_function] IN {"AM","AE","SDR"}
+			)
+			displayFolder: _debug
+		lineageTag: 8ffbde9e-93a3-461e-96c1-53fe792e3edc
+
+	/// Debug: distinct users in users_history in current context.
+	measure 'meas.__dbg_distinct_users_all' =
+			DISTINCTCOUNT(users_history[_sys_user_id])
+			displayFolder: _debug
+		lineageTag: fd3311a9-9512-44d8-bedf-01f2b7ce8aef
+
+	/// Debug: distinct users in users_history filtered by sales role function.
+	measure 'meas.__dbg_distinct_users_sales_roles' =
+			CALCULATE(
+			    DISTINCTCOUNT(users_history[_sys_user_id]),
+			    users[trueai_user_role_function] IN {"AM","AE","SDR"}
+			)
+			displayFolder: _debug
+		lineageTag: 318740a9-7775-470b-93f8-e96dee687fb1
+
+	measure 'meas.__dbg_ci_work_effort_num_avg' =
+			CALCULATE(
+			    AVERAGEX(
+			        users_history,
+			        IFERROR(VALUE(users_history[ci_sb_work_effort_num]), BLANK())
+			    ),
+			    users[trueai_user_role_function] IN {"AM","AE","SDR"}
+			)
+		lineageTag: 62ee2e1a-8bd3-45dc-8146-ae7e6e40a7d5
+
+	measure 'meas.__dbg_ci_engagement_num_avg' =
+			CALCULATE(
+			    AVERAGEX(
+			        users_history,
+			        IFERROR(VALUE(users_history[ci_sb_engmt_ability_num]), BLANK())
+			    ),
+			    users[trueai_user_role_function] IN {"AM","AE","SDR"}
+			)
+		lineageTag: fa428d3e-8982-499e-838e-36a9c1580b5a
+
+	measure 'meas.__dbg_ci_closing_num_avg' =
+			CALCULATE(
+			    AVERAGEX(
+			        users_history,
+			        IFERROR(VALUE(users_history[ci_sb_closing_ability_num]), BLANK())
+			    ),
+			    users[trueai_user_role_function] IN {"AM","AE"}
+			)
+		lineageTag: 07622899-5543-4817-aa03-922131fdbbbe
+
+	measure 'meas.__dbg_ci_discovery_num_avg' =
+			CALCULATE(
+			    AVERAGEX(
+			        users_history,
+			        IFERROR(VALUE(users_history[ci_sb_discov_skills_num]), BLANK())
+			    ),
+			    users[trueai_user_role_function] IN {"AM","AE","SDR"}
+			)
+		lineageTag: 2085ba40-12f8-4c9c-9c61-fc8433097061
+
+	measure 'meas.__dbg_ci_act_capt_avg' =
+			CALCULATE(
+			    AVERAGE(users_history[ci_act_capt_lvl]),
+			    users[trueai_user_role_function] IN {"AM","AE","SDR"}
+			)
+		lineageTag: c50e03f9-152a-42b3-bc3b-428e66bfdf6e
+
+	measure 'meas.__dbg_ci_time_alloc_conf_avg' =
+			CALCULATE(
+			    AVERAGE(users_history[ci_time_alloc_conf]),
+			    users[trueai_user_role_function] IN {"AM","AE","SDR"}
+			)
+		lineageTag: 1d6b5ce8-c8a5-45cf-ae17-72937803af6c
+
 	/// Category
 	/// Category
 	column category
@@ -3535,8 +3644,6 @@ table metadata_ai_scores
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	partition metadata_ai_scores = m
 		mode: import
 		source =
@@ -3563,4 +3670,6 @@ table metadata_ai_scores
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
+
+	annotation PBI_FormatHint = {"isGeneralNumber":true}
 
