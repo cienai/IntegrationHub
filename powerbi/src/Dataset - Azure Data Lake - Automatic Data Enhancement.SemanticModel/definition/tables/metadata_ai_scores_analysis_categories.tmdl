@@ -42,7 +42,7 @@ table metadata_ai_scores_analysis_categories
 			            )
 			        RETURN
 			            IF(
-			                ISBLANK(score_val) || ISBLANK(w),
+			                ISBLANK(w),
 			                BLANK(),
 			                score_val * w
 			            )
@@ -73,7 +73,7 @@ table metadata_ai_scores_analysis_categories
 			            )
 			        RETURN
 			            IF(
-			                ISBLANK(score_val) || ISBLANK(w),
+			                ISBLANK(w),
 			                BLANK(),
 			                w
 			            )
@@ -93,7 +93,7 @@ table metadata_ai_scores_analysis_categories
 			    )
 			
 			RETURN
-			    IF(ISBLANK(res), BLANK(), MIN(MAX(res, 0), 100))
+			    COALESCE(MIN(MAX(res, 0), 100), 0)
 		lineageTag: cbe9e9f8-ca6c-4058-bc0c-e15a4a8fe77f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -112,7 +112,6 @@ table metadata_ai_scores_analysis_categories
 			VAR numerator =
 			    SUMX(
 			        filtered_scores,
-			        VAR score_val = [meas.readiness_ai_score]
 			        VAR sid_num =
 			            VAR sid_txt = metadata_ai_scores[_sys_doc_id]
 			            RETURN IF(sid_txt = BLANK() || sid_txt = "", BLANK(), VALUE(sid_txt))
@@ -134,7 +133,7 @@ table metadata_ai_scores_analysis_categories
 			            )
 			        RETURN
 			            IF(
-			                ISBLANK(score_val) || ISBLANK(w),
+			                ISBLANK(w),
 			                BLANK(),
 			                score_val * w
 			            )
@@ -143,7 +142,6 @@ table metadata_ai_scores_analysis_categories
 			VAR denominator =
 			    SUMX(
 			        filtered_scores,
-			        VAR score_val = [meas.readiness_ai_score]
 			        VAR sid_num =
 			            VAR sid_txt = metadata_ai_scores[_sys_doc_id]
 			            RETURN IF(sid_txt = BLANK() || sid_txt = "", BLANK(), VALUE(sid_txt))
@@ -165,7 +163,7 @@ table metadata_ai_scores_analysis_categories
 			            )
 			        RETURN
 			            IF(
-			                ISBLANK(score_val) || ISBLANK(w),
+			                ISBLANK(w),
 			                BLANK(),
 			                w
 			            )
@@ -173,8 +171,8 @@ table metadata_ai_scores_analysis_categories
 			
 			VAR fallback_avg =
 			    AVERAGEX(
-			        FILTER(filtered_scores, NOT ISBLANK([meas.readiness_ai_score])),
-			        [meas.readiness_ai_score]
+			        filtered_scores,
+			        COALESCE([meas.readiness_ai_score], 0)
 			    )
 			
 			VAR res =
@@ -185,7 +183,7 @@ table metadata_ai_scores_analysis_categories
 			    )
 			
 			RETURN
-			    IF(ISBLANK(res), BLANK(), MIN(MAX(res, 0), 100))
+			    COALESCE(MIN(MAX(res, 0), 100), 0)
 		lineageTag: d090465a-3704-41d5-9291-fa707a409734
 
 	/// Unique AI score identifier
@@ -268,4 +266,3 @@ table metadata_ai_scores_analysis_categories
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
-

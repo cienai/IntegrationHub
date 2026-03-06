@@ -3345,7 +3345,7 @@ table metadata_ai_scores
 			VAR factor2 = [meas.readiness_ai_scores_opps_history_factor2_value]
 			VAR ratio01 = MIN(DIVIDE(factor1, factor2, BLANK()), 1)
 			RETURN
-			    IF(ISBLANK(ratio01), BLANK(), MIN(100, MAX(0, ratio01 * 100)))
+			    COALESCE(IF(ISBLANK(ratio01), BLANK(), MIN(100, MAX(0, ratio01 * 100))), 0)
 		lineageTag: 0d744cb9-13bf-476b-84f6-844acdaaa6ff
 
 	measure 'meas.readiness_ai_score' =
@@ -3391,7 +3391,7 @@ table metadata_ai_scores
 			)
 			VAR out = IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 			RETURN
-			out
+			COALESCE(out, 0)
 		lineageTag: ffef63ec-4858-4976-8798-0fb002bdba60
 
 	measure 'meas.readiness_average_ai_score' =
@@ -3402,22 +3402,22 @@ table metadata_ai_scores
 			VAR result =
 			    IF(
 			        HASONEVALUE(metadata_ai_scores_analysis_categories[_sys_doc_id]),
-			        [meas.readiness_analysis_cat_weighted_avg],
+			        COALESCE([meas.readiness_analysis_cat_weighted_avg], 0),
 			        IF(
 			            COUNTROWS(cats) = 0,
 			            AVERAGEX(
 			                ALL(metadata_ai_scores_analysis_categories[_sys_doc_id]),
-			                CALCULATE([meas.readiness_analysis_cat_weighted_avg])
+			                COALESCE(CALCULATE([meas.readiness_analysis_cat_weighted_avg]), 0)
 			            ),
 			            AVERAGEX(
 			                cats,
-			                CALCULATE([meas.readiness_analysis_cat_weighted_avg])
+			                COALESCE(CALCULATE([meas.readiness_analysis_cat_weighted_avg]), 0)
 			            )
 			        )
 			    )
 			
 			RETURN
-			IF(ISBLANK(result), BLANK(), MIN(MAX(result,0),100))
+			COALESCE(MIN(MAX(result,0),100), 0)
 		formatString: 0
 		lineageTag: e888156c-3b86-4145-afc1-99c3c9628ddb
 
@@ -3694,4 +3694,3 @@ table metadata_ai_scores
 	annotation PBI_ResultType = Table
 
 	annotation PBI_FormatHint = {"isGeneralNumber":true}
-
