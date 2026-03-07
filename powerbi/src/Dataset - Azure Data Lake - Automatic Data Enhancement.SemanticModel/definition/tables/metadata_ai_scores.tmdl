@@ -636,7 +636,8 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_ci_deal_maxing_factor1_value' =
 			
 			var _avg = CALCULATE(
-			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_deal_maxing_conf]), BLANK()))        // get the avg deal maximizing conf
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_deal_maxing_conf]), BLANK())),        // get the avg deal maximizing conf
+			    users[trueai_user_role_function] in {"AM", "AE"}
 			)
 			RETURN
 			_avg+0
@@ -1539,9 +1540,7 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_deal_maxing' = ```
 						
-						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_deal_maxing_num]), BLANK()))     // get the avg deal maximizing conf
-						var boost_expo = 0.90           // exponent value 
-						var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						var _avg = [meas.ai_scores_ci_deal_maxing_factor1_value]
 						var _conf = ROUND(_avg,2)*100  // round the number and for integar value
 						
 						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
