@@ -866,7 +866,10 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_performance_tiers_factor1_value' =
 			
-			var perf_avg = CALCULATE(AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_perf_qtly_performance_tier_conf]), BLANK())))        // get the avg performance tier conf
+			var perf_avg = CALCULATE(
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_perf_qtly_performance_tier_conf]), BLANK())),        // get the avg performance tier conf
+			    users[trueai_user_role_function] in {"AM", "AE", "SDR"}
+			)
 			RETURN
 			perf_avg
 		displayFolder: _factor_value1
@@ -893,8 +896,7 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_potential_acv_factor1_value' =
 			
-			// as we don't have some field to calculate the factor I am using here temporary variable for visualization purpose. need to apply the actual field while available
-			var temp = 0.80     // temp value for factor analysis
+			var temp = CALCULATE(AVERAGE(ssr[trueai_complt_all]))
 			RETURN
 			temp
 		displayFolder: _factor_value1
@@ -2237,7 +2239,7 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_performance_tiers' =
 			
-			var score =  CALCULATE(AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_perf_qtly_performance_tier_conf]), BLANK())))        // get the avg performance tier conf
+			var score = [meas.ai_scores_performance_tiers_factor1_value]
 			var res = ROUND(score*100, 0)       // get the int number
 			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		displayFolder: _ai_scores
@@ -2274,11 +2276,8 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_potential_acv' = ```
 						
-						// as we don't have some field to calculate the factor I am using here temporary variable for visualization purpose. need to apply the actual field while available
-						var temp = 0.80     // temp value for factor analysis
-						var boost_expo = 0.9            // we uyse this to get the closer one value
-						var score = temp^boost_expo     // boosting the actual 
-						var res = ROUND(score*100, 0)
+						var _avg = [meas.ai_scores_potential_acv_factor1_value]
+						var res = ROUND(_avg,2)*100
 						RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 			```
 		displayFolder: _ai_scores
