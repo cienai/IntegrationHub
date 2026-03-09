@@ -896,7 +896,12 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_potential_acv_factor1_value' =
 			
-			var temp = CALCULATE(AVERAGE(ssr[trueai_complt_all]))
+			var temp =
+			    CALCULATE(
+			        AVERAGE(ssr[trueai_complt_all]),
+			        CROSSFILTER(ssr_history[_sys_filt_start_date], cal_end_dates[date], NONE),
+			        TREATAS(VALUES(cal_end_dates[date]), ssr_history[_sys_filt_end_date])
+			    )
 			RETURN
 			temp
 		displayFolder: _factor_value1
@@ -960,7 +965,7 @@ table metadata_ai_scores
 			IF(
 			    users_hr_file = 0 || ISBLANK(users_hr_file),
 			    BLANK(),
-			    DIVIDE(users_match_hr_id, users_hr_file, 0)
+			    users_match_hr_id + 0
 			)
 		displayFolder: _factor_value1
 		lineageTag: 3c7f413e-82d5-4d38-b67f-3e6c0ff288e7
@@ -1004,7 +1009,9 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_ssr_industry_factor1_value' =
 			
 			var _avg = CALCULATE(
-			    AVERAGE(ssr[trueai_industry_conf])         // get the ssr average industry conf
+			    AVERAGE(ssr[trueai_industry_conf]),         // get the ssr average industry conf
+			    CROSSFILTER(ssr_history[_sys_filt_start_date], cal_end_dates[date], NONE),
+			    TREATAS(VALUES(cal_end_dates[date]), ssr_history[_sys_filt_end_date])
 			)
 			RETURN
 			_avg
@@ -1020,7 +1027,9 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_ssr_leadsource_factor1_value' =
 			
 			var _avg = CALCULATE(
-			    AVERAGE(ssr[trueai_leadsource_conf])         // get the ssr average leadsource conf
+			    AVERAGE(ssr[trueai_leadsource_conf]),         // get the ssr average leadsource conf
+			    CROSSFILTER(ssr_history[_sys_filt_start_date], cal_end_dates[date], NONE),
+			    TREATAS(VALUES(cal_end_dates[date]), ssr_history[_sys_filt_end_date])
 			)
 			RETURN
 			_avg
@@ -1181,7 +1190,6 @@ table metadata_ai_scores
 			    )
 			
 			VAR _hr_file = MAXX(latest_table, companies_history[users_hr_file])
-			VAR _total_users = MAXX(latest_table, companies_history[users_sales])
 			VAR _non_match_won = MAXX(latest_table, companies_history[users_non_match_hr_id_won_deals])
 			VAR _non_match_pipe = MAXX(latest_table, companies_history[users_non_match_hr_id_pipeline])
 			VAR _bad_users = _non_match_won + _non_match_pipe
@@ -1190,9 +1198,7 @@ table metadata_ai_scores
 			IF(
 			    _hr_file = 0 || ISBLANK(_hr_file),
 			    BLANK(),
-			    VAR _safe_total = MAX(_total_users, 1)
-			    VAR score = 1 - DIVIDE(_bad_users, _safe_total * 2, 0)
-			    RETURN MIN(MAX(score, 0), 1)
+			    _bad_users + 0
 			)
 		displayFolder: _factor_value2
 		lineageTag: b339b57d-14e1-434e-9716-bd91dc0823a4
@@ -2579,9 +2585,36 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_rep_org_calibration' = ```
 			
-				VAR factor1 = [meas.ai_scores_rep_org_calibration_factor1_value]
-				VAR factor2 = [meas.ai_scores_rep_org_calibration_factor2_value]
-				VAR factor3 = [meas.ai_scores_rep_org_calibration_factor3_value]
+				VAR latest_table =
+				    CALCULATETABLE(
+				        TOPN(1, companies_history, companies_history[_sys_processed_as_of], DESC),
+				        ALL(companies_history)
+				    )
+				VAR users_hr_file = MAXX(latest_table, companies_history[users_hr_file])
+				VAR total_users = MAXX(latest_table, companies_history[users_sales])
+				
+				VAR factor1_raw = [meas.ai_scores_rep_org_calibration_factor1_value]
+				VAR factor2_raw = [meas.ai_scores_rep_org_calibration_factor2_value]
+				VAR factor3_raw = [meas.ai_scores_rep_org_calibration_factor3_value]
+				
+				VAR factor1 =
+				    IF(
+				        users_hr_file = 0 || ISBLANK(users_hr_file) || ISBLANK(factor1_raw),
+				        BLANK(),
+				        DIVIDE(factor1_raw, users_hr_file, 0)
+				    )
+				VAR factor2 =
+				    IF(
+				        total_users = 0 || ISBLANK(total_users) || ISBLANK(factor2_raw),
+				        BLANK(),
+				        MIN(MAX(1 - DIVIDE(factor2_raw, total_users * 2, 0), 0), 1)
+				    )
+				VAR factor3 =
+				    IF(
+				        total_users = 0 || ISBLANK(total_users) || ISBLANK(factor3_raw),
+				        BLANK(),
+				        MIN(MAX(1 - DIVIDE(factor3_raw, total_users * 2, 0), 0), 1)
+				    )
 				
 				VAR w = 2
 				VAR temp_tbl =
@@ -3080,7 +3113,13 @@ table metadata_ai_scores
 	/// Copied from Sales Performance for Peek Inside pages (Pass 1).
 	measure 'meas.ai_scores_factor1_name' =
 			
-			var factor_name = MAX(metadata_ai_scores[factor_1_name])
+			var score_name = MAX(metadata_ai_scores[score_name])
+			var factor_name =
+			    SWITCH(
+			        score_name,
+			        "Rep Organization Calibration", "Matched reps in HR file",
+			        MAX(metadata_ai_scores[factor_1_name])
+			    )
 			RETURN factor_name
 		lineageTag: b59e2b3c-8a05-46b9-96ad-9ebdb059374c
 
@@ -3148,7 +3187,13 @@ table metadata_ai_scores
 	/// Copied from Sales Performance for Peek Inside pages (Pass 1).
 	measure 'meas.ai_scores_factor2_name' =
 			
-			var factor_name = MAX(metadata_ai_scores[factor_2_name])
+			var score_name = MAX(metadata_ai_scores[score_name])
+			var factor_name =
+			    SWITCH(
+			        score_name,
+			        "Rep Organization Calibration", "Non-match won/pipeline reps",
+			        MAX(metadata_ai_scores[factor_2_name])
+			    )
 			RETURN factor_name
 		lineageTag: 0f4f2c54-fdd9-493c-a042-f0fbf0f14a03
 
@@ -3176,7 +3221,7 @@ table metadata_ai_scores
 			    "Opportunities History", IFERROR([meas.ai_scores_opps_history_factor2_value], BLANK()),
 			    "Time Allocation", IFERROR(FORMAT([meas.ai_scores_ci_time_allocation_factor2_value],"#,0"), BLANK()),                // score id 19  
 			    "Ramping Success", IFERROR([meas.ai_scores_ramping_perf_conf_factor2_value], BLANK()),                                  // score_id 27 
-			    "Rep Organization Calibration", IFERROR([meas.ai_scores_rep_org_calibration_factor2_value], BLANK()),
+			    "Rep Organization Calibration", IFERROR(FORMAT([meas.ai_scores_rep_org_calibration_factor2_value], "#,0"), BLANK()),
 			    "Bookings Calibration", IFERROR(FORMAT([meas.ai_scores_booking_calibration_factor2_value], "$#,0"), BLANK()),
 			    "Revenue Calibration", IFERROR(FORMAT([meas.ai_scores_revenue_calibration_factor2_value], "$#,0"), BLANK()),
 			    BLANK()
@@ -3196,7 +3241,13 @@ table metadata_ai_scores
 	/// Copied from Sales Performance for Peek Inside pages (Pass 1).
 	measure 'meas.ai_scores_factor3_name' =
 			
-			var factor_name = MAX(metadata_ai_scores[factor_3_name])
+			var score_name = MAX(metadata_ai_scores[score_name])
+			var factor_name =
+			    SWITCH(
+			        score_name,
+			        "Rep Organization Calibration", "Matched reps missing role/group",
+			        MAX(metadata_ai_scores[factor_3_name])
+			    )
 			RETURN factor_name
 		lineageTag: 2a2a1c88-f694-4c0e-9a4d-141ad9979f50
 
@@ -3214,7 +3265,7 @@ table metadata_ai_scores
 					
 			var res = IFERROR(SWITCH(
 			    score_name,
-			    "", BLANK(),
+			    "Rep Organization Calibration", IFERROR(FORMAT([meas.ai_scores_rep_org_calibration_factor3_value],"#,0"), BLANK()),
 			    BLANK()
 				    
 			), BLANK())
@@ -3528,12 +3579,17 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_rep_org_calibration_factor3_value' =
 			
-			var latest_table = CALCULATETABLE(TOPN(1,companies_history,companies_history[_sys_processed_as_of],DESC))
-			VAR total_users = MAXX(latest_table, companies_history[users_sales]) +0
-			var users_match_hr_id_nd_role = MAXX(latest_table, companies_history[users_match_hr_id_nd_role]) +0
-			var users_match_hr_id_nd_group = MAXX(latest_table, companies_history[users_non_match_hr_id_nd_group]) +0
-			var res = 1-DIVIDE(users_match_hr_id_nd_role + users_match_hr_id_nd_group, total_users * 2 )
-			RETURN res
+			VAR latest_table =
+			    CALCULATETABLE(
+			        TOPN(1, companies_history, companies_history[_sys_processed_as_of], DESC),
+			        ALL(companies_history)
+			    )
+			VAR total_users = MAXX(latest_table, companies_history[users_sales]) + 0
+			VAR users_match_hr_id_nd_role = MAXX(latest_table, companies_history[users_match_hr_id_nd_role]) + 0
+			VAR users_non_match_hr_id_nd_group = MAXX(latest_table, companies_history[users_non_match_hr_id_nd_group]) + 0
+			VAR res = users_match_hr_id_nd_role + users_non_match_hr_id_nd_group
+			RETURN
+			IF(total_users = 0 || ISBLANK(total_users), BLANK(), res)
 		displayFolder: _factor_value3
 		lineageTag: 9d7f0f35-ef8e-4d4a-bd23-c8c3d4ef6c61
 
