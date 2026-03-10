@@ -2938,8 +2938,27 @@ table metadata_ai_scores
 			    "Activity Capture Level", [meas.ai_scores_ci_act_capt_lvl],                // score id 18 
 			    "Activity Capture Level Confidence", [meas.ai_scores_ci_act_capt_lvl_conf],
 			    "Time Allocation", [meas.ai_scores_ci_time_alloc],                // score id 19 
-			    "Adjusted Duration", [meas.ai_scores_adj_duration],                // score id 20 
-			    "Closing Ability", [meas.ai_scores_ci_closing_ability],                  // score_id 21 
+			    "Adjusted Duration",
+			        VAR raw_val = [meas.ai_scores_adj_duration_factor1_value]
+			        VAR pre_boost_val =
+			            VAR n = VALUE(raw_val)
+			            RETURN IF(ISNUMBER(n), n, 0)
+			        VAR boost_raw = MAX(metadata_ai_scores[boost_expo])
+			        VAR boost = IF(ISNUMBER(boost_raw), boost_raw, 1)
+			        VAR boost_is_fraction = boost <> INT(boost)
+			        VAR safe_post_boost_val =
+			            IF(
+			                pre_boost_val <= 0 && boost_is_fraction,
+			                pre_boost_val,
+			                POWER(ABS(pre_boost_val), boost)
+			            )
+			        RETURN
+			            IF(
+			                ISBLANK(raw_val),
+			                BLANK(),
+			                MIN(MAX(safe_post_boost_val * 100, 0), 100)
+			            ),                // score id 20
+			    "Closing Ability", [meas.ai_scores_ci_closing_ability],                  // score_id 21
 			    "Discovery Skill", [meas.ai_scores_ci_discovery_skill],               // score_id 22 
 			    "Engagement Ability", [meas.ai_scores_ci_engagement_ability],                      // score_id 23 
 			    "Work Effort", [meas.ai_scores_ci_work_effort],                      // score_id 24 
