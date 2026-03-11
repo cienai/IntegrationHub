@@ -3120,7 +3120,7 @@ table metadata_ai_scores
 			    "Leads & Accounts Completeness Data Present",[meas.ai_scores_general_score],
 			    BLANK()
 			)
-			VAR out = IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
+			VAR out = COALESCE(MIN(MAX(res,0),100), 0)
 			RETURN
 			out
 			```
@@ -3871,7 +3871,7 @@ table metadata_ai_scores
 			    "Leads & Accounts Completeness Data Present",[meas.ai_scores_general_score],
 			    BLANK()
 			)
-			VAR out = IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
+			VAR out = COALESCE(MIN(MAX(res,0),100), 0)
 			RETURN
 			out
 		lineageTag: ffef63ec-4858-4976-8798-0fb002bdba60
@@ -4036,16 +4036,25 @@ table metadata_ai_scores
 
 	measure 'meas.summary_last_full_year_insights_readiness' =
 			
-			VAR _last_processed_date =
+			VAR _latest_filt_end_date =
 			    CALCULATE(
-			        MAX(companies_history[_sys_processed_as_of]),
+			        MAX(companies_history[_sys_filt_end_date]),
 			        REMOVEFILTERS(cal_end_dates)
 			    )
 			VAR _last_full_year =
-			    YEAR(_last_processed_date) - 1
+			    IF(
+			        ISBLANK(_latest_filt_end_date),
+			        BLANK(),
+			        YEAR(_latest_filt_end_date)
+			            - IF(
+			                _latest_filt_end_date < DATE(YEAR(_latest_filt_end_date), 12, 31),
+			                1,
+			                0
+			            )
+			    )
 			RETURN
 			    IF(
-			        ISBLANK(_last_processed_date),
+			        ISBLANK(_last_full_year),
 			        BLANK(),
 			        CALCULATE(
 			            [meas.readiness_average_ai_score],
