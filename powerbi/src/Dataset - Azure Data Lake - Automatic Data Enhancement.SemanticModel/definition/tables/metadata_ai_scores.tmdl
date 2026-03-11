@@ -1367,13 +1367,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_adj_duration' = ```
 			
 			VAR score01 = [meas.ai_scores_adj_duration_factor1_value]
-			VAR score100 = score01 * 100
-			RETURN
-			    IF(
-			        ISBLANK(score01),
-			        BLANK(),
-			        MIN(100, MAX(0, score100))
-			    )
+			RETURN score01
 			
 			```
 		displayFolder: _ai_scores
@@ -1466,10 +1460,7 @@ table metadata_ai_scores
 						var _avg = CALCULATE(
 						           AVERAGE(users_history[ci_act_capt_lvl_conf])// get the users_history average ci_act_capt_lvl conf
 						)
-						var boost_expo = 0.90           // exponent value 
-						var _boosted_avg = (_avg)^ boost_expo     // pushes up the score slightly 
-						var _conf = ROUND(_boosted_avg*100,0)  // round the number and for integar value  
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						RETURN _avg
 			```
 		displayFolder: _ai_scores
 		lineageTag: 1304c12c-11cf-4104-99d4-6658051d65d9
@@ -1515,8 +1506,7 @@ table metadata_ai_scores
 						        ),
 						        users[trueai_user_role_function] IN {"AM","AE"}
 						    )
-						VAR score100 = score01 * 100
-						RETURN IF(ISBLANK(score01), BLANK(), MIN(100, MAX(0, score100)))
+						RETURN score01
 			```
 		displayFolder: _ai_scores
 		lineageTag: a9f5237d-77e1-41ad-b86d-1c1fd0bf3f09
@@ -1559,9 +1549,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_ci_deal_maxing' = ```
 						
 						var _avg = [meas.ai_scores_ci_deal_maxing_factor1_value]
-						var _conf = ROUND(_avg,2)*100  // round the number and for integar value
-						
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						RETURN _avg
 			```
 		displayFolder: _ai_scores
 		lineageTag: 08c67e59-0757-41d3-9f44-0f03abf71aad
@@ -1606,8 +1594,7 @@ table metadata_ai_scores
 						        ),
 						        users[trueai_user_role_function] IN {"AM","AE","SDR"}
 						    )
-						VAR score100 = score01 * 100
-						RETURN IF(ISBLANK(score01), BLANK(), MIN(100, MAX(0, score100)))
+						RETURN score01
 			```
 		displayFolder: _ai_scores
 		lineageTag: 06e29052-44f1-4661-93dc-60f70765c604
@@ -1655,8 +1642,7 @@ table metadata_ai_scores
 						        ),
 						        users[trueai_user_role_function] IN {"AM","AE","SDR"}
 						    )
-						VAR score100 = score01 * 100
-						RETURN IF(ISBLANK(score01), BLANK(), MIN(100, MAX(0, score100)))
+						RETURN score01
 			```
 		displayFolder: _ai_scores
 		lineageTag: 1db68818-c9df-41e2-aa60-93b218e74c1a
@@ -1698,14 +1684,7 @@ table metadata_ai_scores
 						        users[trueai_user_role_function] IN {"AM","AE","SDR"}
 						    )
 						
-						VAR score100 = score01 * 100
-						
-						RETURN
-						    IF(
-						        ISBLANK(score01),
-						        BLANK(),
-						        MIN(100, MAX(0, score100))
-						    )
+						RETURN score01
 			```
 		displayFolder: _ai_scores
 		lineageTag: 93cd381a-97c6-4745-8641-c996cd9af450
@@ -1744,10 +1723,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_ci_time_management' = ```
 						
 						var _avg = AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_time_management_num]), BLANK()))
-						var boost_expo = 0.90
-						var _new_avg = (_avg)^ boost_expo   // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-						var _conf = ROUND(_new_avg*100,0)  // round the number and for integar value
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						RETURN _avg
 			```
 		displayFolder: _ai_scores
 		lineageTag: 8a06eae1-71ea-4598-8063-b5c1b9a5f2bf
@@ -1793,8 +1769,7 @@ table metadata_ai_scores
 						        ),
 						        users[trueai_user_role_function] IN {"AM","AE","SDR"}
 						    )
-						VAR score100 = score01 * 100
-						RETURN IF(ISBLANK(score01), BLANK(), MIN(100, MAX(0, score100)))
+						RETURN score01
 			```
 		displayFolder: _ai_scores
 		lineageTag: bc9b6b1f-7821-4538-9845-b8964c41f8ee
@@ -2256,8 +2231,7 @@ table metadata_ai_scores
 	measure 'meas.ai_scores_performance_tiers' =
 			
 			var score = [meas.ai_scores_performance_tiers_factor1_value]
-			var res = ROUND(score*100, 0)       // get the int number
-			RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
+			RETURN score
 		displayFolder: _ai_scores
 		lineageTag: c16b7bdb-464c-42fd-a18d-da6af2ac402e
 
@@ -2546,10 +2520,9 @@ table metadata_ai_scores
 						    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_perf_qtly_performance_tier_conf]), BLANK())),       // get the avg perf conf
 						    users_history[ci_perf_ramping_status] ="Ramping"
 						)
-						var boost_expo = 0.5            // we use this to get the closer one value
-						var score = (ramp_rate * perf_score)^boost_expo     // boosting the actual 
-						var res = ROUND(score*100, 0)+0
-						RETURN IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
+						var score = (ramp_rate * perf_score)
+						var res = score
+						RETURN res
 			```
 		displayFolder: _ai_scores
 		lineageTag: 6be9ea40-9799-4e02-bc1e-2a56961b27c5
@@ -3107,14 +3080,7 @@ table metadata_ai_scores
 						        users[trueai_user_role_function] IN {"AM","AE","SDR"}
 						    )
 						
-						VAR score100 = score01 * 100
-						
-						RETURN
-						    IF(
-						        ISBLANK(score01),
-						        BLANK(),
-						        MIN(100, MAX(0, score100))
-						    )
+						RETURN score01
 			```
 		displayFolder: _ai_scores
 		lineageTag: 85b91857-4258-4858-ab3e-caab92d02dc5
