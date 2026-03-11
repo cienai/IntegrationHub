@@ -2438,12 +2438,11 @@ table metadata_ai_scores
 			    VAR normalized_factor1 = (MAX((factor1-0.5),0)) + 0.5
 			    VAR normalized_factor2 = MAX(factor2, 0)
 			    VAR score01 = ((normalized_factor2 + factor1) / 2)
-			    VAR score100 = score01 * 100
 			    RETURN
 			        IF(
 			            ISBLANK(score01),
 			            BLANK(),
-			            MIN(100, MAX(0, score100))
+			            score01
 			        )
 			
 			```
@@ -3626,10 +3625,10 @@ table metadata_ai_scores
 			                BLANK(),
 			                MIN(MAX(safe_post_boost_val * 100, 0), 100)
 			            ),                // score id 20
-			    "Closing Ability", [meas.pi_score_ci_closing_ability],                  // score_id 21
-			    "Discovery Skill", [meas.pi_score_ci_discovery_skill],               // score_id 22
-			    "Engagement Ability", [meas.pi_score_ci_engagement_ability],                      // score_id 23
-			    "Work Effort", [meas.pi_score_ci_work_effort],                      // score_id 24
+			    "Closing Ability", [meas.ai_scores_ci_closing_ability],                  // score_id 21
+			    "Discovery Skill", [meas.ai_scores_ci_discovery_skill],               // score_id 22
+			    "Engagement Ability", [meas.ai_scores_ci_engagement_ability],                      // score_id 23
+			    "Work Effort", [meas.ai_scores_ci_work_effort],                      // score_id 24
 			    "Deal Maximizing", [meas.pi_score_ci_deal_maxing],                        // score_id 25
 			    "Performance Tiers", [meas.ai_scores_performance_tiers],                            // score_id 26
 			    "Ramping Success", [meas.ai_scores_ramping],                                  // score_id 27
@@ -3756,12 +3755,12 @@ table metadata_ai_scores
 			)
 		lineageTag: 1d6b5ce8-c8a5-45cf-ae17-72937803af6c
 
-	measure 'meas.summary_last_full_year_insights_readiness' = ai_conf_pred_qual_summary[meas.ai_conf_overall_score_instry_avg]
+	measure 'meas.summary_insights_readiness_score' = ai_conf_pred_qual_summary[meas.ai_conf_overall_score]
 		lineageTag: 4f95c64b-53a0-437d-80d0-a81cca0c1750
 
-	measure 'meas.summary_last_full_year_insights_readiness_text' =
+	measure 'meas.summary_insights_readiness_score_text' =
 			
-			var _conf = [meas.summary_last_full_year_insights_readiness]
+			var _conf = [meas.summary_insights_readiness_score]
 			
 			var _status_ = IF(
 			    _conf > 94, "Excellent",
@@ -3798,6 +3797,31 @@ table metadata_ai_scores
 			IF(total_users = 0 || ISBLANK(total_users), BLANK(), res)
 		displayFolder: _factor_value3
 		lineageTag: 9d7f0f35-ef8e-4d4a-bd23-c8c3d4ef6c61
+
+	measure 'meas.client_average_insights_readiness' = ai_conf_pred_qual_summary[meas.ai_conf_overall_score_instry_avg]
+		formatString: 0
+		lineageTag: 2bf7534d-7cc6-42f5-bfca-c3fd6165612b
+
+	measure 'meas.summary_last_full_year_insights_readiness' =
+			
+			VAR _last_processed_date =
+			    CALCULATE(
+			        MAX(companies_history[_sys_processed_as_of]),
+			        REMOVEFILTERS(cal_end_dates)
+			    )
+			VAR _last_full_year =
+			    YEAR(_last_processed_date) - 1
+			RETURN
+			    IF(
+			        ISBLANK(_last_processed_date),
+			        BLANK(),
+			        CALCULATE(
+			            [meas.readiness_average_ai_score],
+			            REMOVEFILTERS(cal_end_dates),
+			            KEEPFILTERS(cal_end_dates[year] = _last_full_year)
+			        )
+			    )
+		lineageTag: 96f6c316-05ed-4e1b-a662-7540bb5c55f9
 
 	/// Category
 	/// Category
