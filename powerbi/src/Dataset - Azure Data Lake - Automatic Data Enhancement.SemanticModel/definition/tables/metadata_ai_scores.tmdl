@@ -3802,7 +3802,25 @@ table metadata_ai_scores
 		formatString: 0
 		lineageTag: 2bf7534d-7cc6-42f5-bfca-c3fd6165612b
 
-	measure 'meas.summary_last_full_year_insights_readiness' = [meas.summary_insights_readiness_score]
+	measure 'meas.summary_last_full_year_insights_readiness' =
+			
+			VAR _last_processed_date =
+			    CALCULATE(
+			        MAX(companies_history[_sys_processed_as_of]),
+			        REMOVEFILTERS(cal_end_dates)
+			    )
+			VAR _last_full_year =
+			    YEAR(_last_processed_date) - 1
+			RETURN
+			    IF(
+			        ISBLANK(_last_processed_date),
+			        BLANK(),
+			        CALCULATE(
+			            [meas.readiness_average_ai_score],
+			            REMOVEFILTERS(cal_end_dates),
+			            KEEPFILTERS(cal_end_dates[year] = _last_full_year)
+			        )
+			    )
 		lineageTag: 96f6c316-05ed-4e1b-a662-7540bb5c55f9
 
 	/// Category
