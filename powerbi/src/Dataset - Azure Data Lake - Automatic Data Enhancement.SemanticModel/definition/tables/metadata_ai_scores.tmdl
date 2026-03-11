@@ -2956,7 +2956,26 @@ table metadata_ai_scores
 			        RETURN MIN(MAX(safe_post_boost_val * 100, 0), 100),    // score_id 3
 			    "Existing Customer Selling Success Predictions", [meas.ai_scores_pred_existing_customer_selling],    // score_id 4
 			    "Success Factor Analysis", [meas.ai_scores_success_factor_analysis],                      // score id 5
-			    "Potential ACV", [meas.ai_scores_potential_acv],                      // score id 6
+			    "Potential ACV",
+			        VAR raw_val = [meas.ai_scores_potential_acv]
+			        VAR pre_boost_val =
+			            VAR n = VALUE(raw_val)
+			            RETURN IF(ISNUMBER(n), n, 0)
+			        VAR boost_raw = MAX(metadata_ai_scores[boost_expo])
+			        VAR boost = IF(ISNUMBER(boost_raw), boost_raw, 1)
+			        VAR boost_is_fraction = boost <> INT(boost)
+			        VAR safe_post_boost_val =
+			            IF(
+			                pre_boost_val <= 0 && boost_is_fraction,
+			                pre_boost_val,
+			                POWER(ABS(pre_boost_val), boost)
+			            )
+			        RETURN
+			            IF(
+			                ISBLANK(raw_val),
+			                BLANK(),
+			                MIN(MAX(safe_post_boost_val * 100, 0), 100)
+			            ),                      // score id 6
 			    "List Price", [meas.ai_scores_list_price],                      // score id 7
 			    "Line Item Products", [meas.ai_scores_line_items_products],                      // score id 8
 			    "Accounts Industry Consolidation", [meas.ai_scores_accts_industry],                // score id 9 
@@ -3626,9 +3645,66 @@ table metadata_ai_scores
 			                MIN(MAX(safe_post_boost_val * 100, 0), 100)
 			            ),                // score id 20
 			    "Closing Ability", [meas.ai_scores_ci_closing_ability],                  // score_id 21
-			    "Discovery Skill", [meas.ai_scores_ci_discovery_skill],               // score_id 22
-			    "Engagement Ability", [meas.ai_scores_ci_engagement_ability],                      // score_id 23
-			    "Work Effort", [meas.ai_scores_ci_work_effort],                      // score_id 24
+			    "Discovery Skill",
+			        VAR raw_val = [meas.ai_scores_ci_discovery_skill]
+			        VAR pre_boost_val =
+			            VAR n = VALUE(raw_val)
+			            RETURN IF(ISNUMBER(n), n, 0)
+			        VAR boost_raw = MAX(metadata_ai_scores[boost_expo])
+			        VAR boost = IF(ISNUMBER(boost_raw), boost_raw, 1)
+			        VAR boost_is_fraction = boost <> INT(boost)
+			        VAR safe_post_boost_val =
+			            IF(
+			                pre_boost_val <= 0 && boost_is_fraction,
+			                pre_boost_val,
+			                POWER(ABS(pre_boost_val), boost)
+			            )
+			        RETURN
+			            IF(
+			                ISBLANK(raw_val),
+			                BLANK(),
+			                MIN(MAX(safe_post_boost_val * 100, 0), 100)
+			            ),               // score_id 22
+			    "Engagement Ability",
+			        VAR raw_val = [meas.ai_scores_ci_engagement_ability]
+			        VAR pre_boost_val =
+			            VAR n = VALUE(raw_val)
+			            RETURN IF(ISNUMBER(n), n, 0)
+			        VAR boost_raw = MAX(metadata_ai_scores[boost_expo])
+			        VAR boost = IF(ISNUMBER(boost_raw), boost_raw, 1)
+			        VAR boost_is_fraction = boost <> INT(boost)
+			        VAR safe_post_boost_val =
+			            IF(
+			                pre_boost_val <= 0 && boost_is_fraction,
+			                pre_boost_val,
+			                POWER(ABS(pre_boost_val), boost)
+			            )
+			        RETURN
+			            IF(
+			                ISBLANK(raw_val),
+			                BLANK(),
+			                MIN(MAX(safe_post_boost_val * 100, 0), 100)
+			            ),                      // score_id 23
+			    "Work Effort",
+			        VAR raw_val = [meas.ai_scores_ci_work_effort]
+			        VAR pre_boost_val =
+			            VAR n = VALUE(raw_val)
+			            RETURN IF(ISNUMBER(n), n, 0)
+			        VAR boost_raw = MAX(metadata_ai_scores[boost_expo])
+			        VAR boost = IF(ISNUMBER(boost_raw), boost_raw, 1)
+			        VAR boost_is_fraction = boost <> INT(boost)
+			        VAR safe_post_boost_val =
+			            IF(
+			                pre_boost_val <= 0 && boost_is_fraction,
+			                pre_boost_val,
+			                POWER(ABS(pre_boost_val), boost)
+			            )
+			        RETURN
+			            IF(
+			                ISBLANK(raw_val),
+			                BLANK(),
+			                MIN(MAX(safe_post_boost_val * 100, 0), 100)
+			            ),                      // score_id 24
 			    "Deal Maximizing", [meas.pi_score_ci_deal_maxing],                        // score_id 25
 			    "Performance Tiers", [meas.ai_scores_performance_tiers],                            // score_id 26
 			    "Ramping Success", [meas.ai_scores_ramping],                                  // score_id 27
