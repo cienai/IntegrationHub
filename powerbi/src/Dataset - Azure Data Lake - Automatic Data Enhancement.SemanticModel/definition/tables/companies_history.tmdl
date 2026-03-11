@@ -139,6 +139,7 @@ table companies_history
 		displayFolder: _co_info
 		lineageTag: a296e835-1103-44d7-aff5-1b360278389c
 
+	/// Copied from Sales Performance for Peek Inside pages (Pass 1).
 	measure 'meas.company_history_partnerLogo'
 		displayFolder: _co_info
 		lineageTag: d5ecc212-61c6-4e31-8884-683fa15bd2c1
@@ -338,26 +339,25 @@ table companies_history
 	/// Dynamic Behavior: Uses SWITCH for conditional branching.
 	/// Format/Type: 0
 	measure 'meas.pi_score_adj_duration' = ```
-			
-			VAR _tbl = CALCULATETABLE(ssr_history, ssr_history[step_name] in {"Prospecing", "New Logo Selling", "Post-Sales Support","Existing Customer Selling"}) // Get the current table context but exclude the unthcouded stage etc
-			VAR res = AVERAGEX(
-			    _tbl,
-			     SWITCH(
-			        ssr_history[stkhlds_all_adj_dur_rule],
-			        "133002", 0.4,  // 133002 is industry avg, not reliable
-			        "133001", 0.7,   // 133001 is peer avg, okay
-			        "133003", 0.97,   // 133003 is the best info from the owner
-			        "133004", 0.86    // 133004 is good data but not from the primary owner
-			    )
-			)
-			
-			var boost_expo = 0.90           // exponent value 
-			var _new_avg = (res)^ boost_expo               // get the expo value to enhance output
-			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
-			
-			
-			RETURN 
-			_conf
+						
+						VAR _tbl = CALCULATETABLE(ssr_history, ssr_history[step_name] in {"Prospecing", "New Logo Selling", "Post-Sales Support","Existing Customer Selling"}) // Get the current table context but exclude the unthcouded stage etc
+						VAR res = AVERAGEX(
+						    _tbl,
+						     SWITCH(
+						        ssr_history[stkhlds_all_adj_dur_rule],
+						        "133002", 0.4,  // 133002 is industry avg, not reliable
+						        "133001", 0.7,   // 133001 is peer avg, okay
+						        "133003", 0.97,   // 133003 is the best info from the owner
+						        "133004", 0.86    // 133004 is good data but not from the primary owner
+						    )
+						)
+						
+						var boost_expo = 0.90           // exponent value 
+						var _new_avg = (res)^ boost_expo               // get the expo value to enhance output
+						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
+						
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -429,17 +429,16 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_score_ci_act_capt_lvl' = ```
-			
-			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_act_capt_lvl_conf])         // get the users_history average ci_act_capt_lvl conf
-			)
-			var boost_expo = 0.90           // exponent value 
-			var _new_avg = (_avg)^ boost_expo     // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-			
-			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value  
-			
-			RETURN 
-			_conf
+						
+						var _avg = CALCULATE(
+						    AVERAGE(users_history[ci_act_capt_lvl_conf])         // get the users_history average ci_act_capt_lvl conf
+						)
+						var boost_expo = 0.90           // exponent value 
+						var _new_avg = (_avg)^ boost_expo     // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						
+						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value  
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -479,18 +478,17 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_score_ci_closing_ability' = ```
-			
-			
-			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_closing_ability_conf])         
-			)
-			var boost_expo = 0.90
-			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be  
-			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
-			
-			
-			RETURN 
-			_conf
+						
+						
+						var _avg = CALCULATE(
+						    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_closing_ability_conf]), BLANK()))         
+						)
+						var boost_expo = 0.90
+						var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be  
+						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
+						
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -504,7 +502,7 @@ table companies_history
 			
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_closing_ability_conf])         
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_closing_ability_conf]), BLANK()))         
 			)
 			var boost_expo = 0.90
 			var _new_avg = (_avg)^ boost_expo   // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
@@ -531,17 +529,16 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_score_ci_deal_maxing' = ```
-			
-			
-			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_deal_maxing_conf])      // get the avg deal mxing conf
-			)
-			var boost_expo = 0.90           // exponent value 
-			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
-			
-			RETURN 
-			_conf
+						
+						
+						var _avg = CALCULATE(
+						    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_deal_maxing_conf]), BLANK()))      // get the avg deal mxing conf
+						)
+						var boost_expo = 0.90           // exponent value 
+						var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -555,7 +552,7 @@ table companies_history
 			
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_deal_maxing_conf])      // get the avg deal mxing conf
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_deal_maxing_conf]), BLANK()))      // get the avg deal mxing conf
 			)
 			var boost_expo = 0.90           // exponent value 
 			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
@@ -582,18 +579,17 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_score_ci_discovery_skill' = ```
-			
-			
-			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_discov_skills_conf])         
-			)
-			var boost_expo = 0.90
-			var _new_avg = (ABS(_avg))^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
-			
-			
-			RETURN 
-			_conf
+						
+						
+						var _avg = CALCULATE(
+						    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_discov_skills_conf]), BLANK()))         
+						)
+						var boost_expo = 0.90
+						var _new_avg = (ABS(_avg))^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
+						
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -607,7 +603,7 @@ table companies_history
 			
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_discov_skills_conf])         
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_discov_skills_conf]), BLANK()))         
 			)
 			var boost_expo = 0.90
 			var _new_avg = (ABS(_avg))^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
@@ -634,17 +630,16 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_score_ci_engagement_ability' = ```
-			
-			
-			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_engmt_ability_conf])         
-			)
-			var boost_expo = 0.90           // exponent value 
-			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
-			
-			RETURN 
-			_conf
+						
+						
+						var _avg = CALCULATE(
+						    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_engmt_ability_conf]), BLANK()))         
+						)
+						var boost_expo = 0.90           // exponent value 
+						var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -658,7 +653,7 @@ table companies_history
 			
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_engmt_ability_conf])         
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_engmt_ability_conf]), BLANK()))         
 			)
 			var boost_expo = 0.90           // exponent value 
 			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
@@ -686,17 +681,16 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_score_ci_time_management' = ```
-			
-			
-			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_time_mgmt_conf])      // get the avg time mgmt conf
-			)
-			var boost_expo = 0.90
-			var _new_avg = (_avg)^ boost_expo   // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
-			
-			RETURN 
-			_conf
+						
+						
+						var _avg = CALCULATE(
+						    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_time_mgmt_conf]), BLANK()))      // get the avg time mgmt conf
+						)
+						var boost_expo = 0.90
+						var _new_avg = (_avg)^ boost_expo   // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -710,7 +704,7 @@ table companies_history
 			
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_time_mgmt_conf])      // get the avg time mgmt conf
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_time_mgmt_conf]), BLANK()))      // get the avg time mgmt conf
 			)
 			var boost_expo = 0.90
 			var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
@@ -738,17 +732,16 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_score_ci_work_effort' = ```
-			
-			
-			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_work_effort_conf])      // get the work effort avg conf
-			)
-			var boost_expo = 0.90           // exponent value 
-			var _new_avg = (_avg)^ boost_expo               // get the expo value to enhance output
-			var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
-			
-			RETURN 
-			_conf
+						
+						
+						var _avg = CALCULATE(
+						    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_work_effort_conf]), BLANK()))      // get the work effort avg conf
+						)
+						var boost_expo = 0.90           // exponent value 
+						var _new_avg = (_avg)^ boost_expo               // get the expo value to enhance output
+						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -762,7 +755,7 @@ table companies_history
 			
 			
 			var _avg = CALCULATE(
-			    AVERAGE(users_history[ci_sb_work_effort_conf])      // get the work effort avg conf
+			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_work_effort_conf]), BLANK()))      // get the work effort avg conf
 			)
 			var boost_expo = 0.90           // exponent value 
 			var _new_avg = (_avg)^ boost_expo               // get the expo value to enhance output
@@ -812,17 +805,16 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_scores_accts_industry' = ```
-			
-			var _avg = CALCULATE(
-			    AVERAGE(accounts[trueai_industry_conf])         // get the accounts average industry conf
-			)
-			
-			var _conf = ROUND(_avg,2)*100    
-			
-			
-			
-			RETURN 
-			_conf
+						
+						var _avg = CALCULATE(
+						    AVERAGE(accounts[trueai_industry_conf])         // get the accounts average industry conf
+						)
+						
+						var _conf = ROUND(_avg,2)*100    
+						
+						
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -862,15 +854,14 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: Not specified.
 	measure 'meas.pi_scores_accts_leadsource' = ```
-			
-			var _avg = CALCULATE(
-			    AVERAGE(accounts[trueai_leadsource_conf])         // get the accounts average leadsource conf
-			)
-			
-			var _conf = ROUND(_avg,2)*100    
-			
-			RETURN 
-			_conf
+						
+						var _avg = CALCULATE(
+						    AVERAGE(accounts[trueai_leadsource_conf])         // get the accounts average leadsource conf
+						)
+						
+						var _conf = ROUND(_avg,2)*100    
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		displayFolder: _peek_inside
 		lineageTag: 866858e7-4af6-4eea-8185-cada6370de7d
@@ -911,15 +902,14 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_scores_leads_industry' = ```
-			
-			
-			var _avg = CALCULATE(
-			    AVERAGE(leads[trueai_industry_conf])         // get the leads average industry conf
-			)
-			var _conf = ROUND(_avg,2)*100    
-			
-			RETURN 
-			_conf
+						
+						
+						var _avg = CALCULATE(
+						    AVERAGE(leads[trueai_industry_conf])         // get the leads average industry conf
+						)
+						var _conf = ROUND(_avg,2)*100    
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -958,15 +948,14 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_scores_leads_leadsource' = ```
-			
-			
-			var _avg = CALCULATE(
-			    AVERAGE(leads[trueai_leadsource_conf])         // get the leads average lead source conf
-			)
-			var _conf = ROUND(_avg,2)*100    
-			
-			RETURN 
-			_conf
+						
+						
+						var _avg = CALCULATE(
+						    AVERAGE(leads[trueai_leadsource_conf])         // get the leads average lead source conf
+						)
+						var _conf = ROUND(_avg,2)*100    
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -1005,15 +994,14 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_scores_opps_industry' = ```
-			
-			var _avg = CALCULATE(
-			    AVERAGE(opps[trueai_industry_conf])         // get the opps average industry conf
-			)
-			var _conf = ROUND(_avg,2)*100    
-			
-			
-			RETURN 
-			_conf
+						
+						var _avg = CALCULATE(
+						    AVERAGE(opps[trueai_industry_conf])         // get the opps average industry conf
+						)
+						var _conf = ROUND(_avg,2)*100    
+						
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -1052,16 +1040,15 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_scores_opps_leadsource' = ```
-			
-			
-			var _avg = CALCULATE(
-			    AVERAGE(opps[trueai_leadsource_conf])         // get the opps average lead source conf
-			)
-			var _conf = ROUND(_avg,2)*100    
-			
-			
-			RETURN 
-			_conf
+						
+						
+						var _avg = CALCULATE(
+						    AVERAGE(opps[trueai_leadsource_conf])         // get the opps average lead source conf
+						)
+						var _conf = ROUND(_avg,2)*100    
+						
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -1101,16 +1088,15 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_scores_ssr_industry' = ```
-			
-			
-			var _avg = CALCULATE(
-			    AVERAGE(ssr[trueai_industry_conf])         // get the ssr average industry conf
-			)
-			var _conf = ROUND(_avg,2)*100    
-			
-			
-			RETURN 
-			_conf
+						
+						
+						var _avg = CALCULATE(
+						    AVERAGE(ssr[trueai_industry_conf])         // get the ssr average industry conf
+						)
+						var _conf = ROUND(_avg,2)*100    
+						
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -1149,15 +1135,14 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_scores_ssr_leadsource' = ```
-			
-			
-			var _avg = CALCULATE(
-			    AVERAGE(ssr[trueai_leadsource_conf])         // get the ssr average lead source conf
-			)
-			var _conf = ROUND(_avg,2)*100    
-			
-			RETURN 
-			_conf
+						
+						
+						var _avg = CALCULATE(
+						    AVERAGE(ssr[trueai_leadsource_conf])         // get the ssr average lead source conf
+						)
+						var _conf = ROUND(_avg,2)*100    
+						
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
 		formatString: 0
 		displayFolder: _peek_inside
@@ -1207,8 +1192,7 @@ table companies_history
 			var score  = ((rs_norm + auc_norm)/2) ^ boost_expo  // avg of both normalized score + boosting
 			var _conf = round(score * 100 ,0) // make it an integer score
 			
-			RETURN
-			_conf
+			RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 		formatString: 0
 		displayFolder: _peek_inside
 		lineageTag: 0bfefd31-db20-42b9-ac86-665d4c06dfec
@@ -2852,6 +2836,14 @@ table companies_history
 		lineageTag: fdec4535-7881-4d53-b981-7cfa67f02170
 		summarizeBy: none
 		sourceColumn: di_pred_close_date_if_lost_test_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column storage_used_gb
+		dataType: string
+		lineageTag: 401639e9-ad50-4349-b991-fb99f05f843a
+		summarizeBy: none
+		sourceColumn: storage_used_gb
 
 		annotation SummarizationSetBy = Automatic
 

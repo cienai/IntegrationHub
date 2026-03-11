@@ -106,7 +106,7 @@ table ai_conf_skills_summary
 	/// Format/Type: #,##0 %
 	measure 'meas.skills_reps_avg_confidence' =
 			
-			var cnt = CALCULATE(AVERAGE(ai_conf_skills_summary[skill_confidence]),ai_conf_skills_summary[is_applicable]= true && ai_conf_skills_summary[skill_confidence] <> 0)
+			var cnt = CALCULATE(AVERAGEX(ai_conf_skills_summary, IFERROR(VALUE(ai_conf_skills_summary[skill_confidence]), BLANK())),ai_conf_skills_summary[is_applicable]= true && ai_conf_skills_summary[skill_confidence] <> 0)
 			var res = cnt
 			return res
 		formatString: #,##0 %
@@ -120,7 +120,7 @@ table ai_conf_skills_summary
 	measure 'meas.skills_score' =
 			
 			var res = ai_conf_skills_summary[meas.skills_reps_avg_confidence] * 100
-			return res
+			return IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 		formatString: 0
 		displayFolder: _skills_analysis
 		lineageTag: af4590d2-d509-4f80-b59e-27c5e9b5d673
