@@ -8,9 +8,6 @@ table metadata_ai_scores_analysis_categories
 	/// Format/Type: Not specified.
 	measure 'meas.analysis_cat_weighted_avg' =
 			
-			VAR category_id =
-			    SELECTEDVALUE(metadata_ai_scores_analysis_categories[_sys_doc_id])
-			
 			VAR filtered_scores =
 			    FILTER(
 			        metadata_ai_scores,
@@ -20,77 +17,16 @@ table metadata_ai_scores_analysis_categories
 			VAR numerator =
 			    SUMX(
 			        filtered_scores,
-			        VAR score_val = [meas.ai_score]
-			        VAR sid_num =
-			            VAR sid_txt = metadata_ai_scores[_sys_doc_id]
-			            RETURN IF(sid_txt = BLANK() || sid_txt = "", BLANK(), VALUE(sid_txt))
-			        VAR wraw =
-			            IF(
-			                ISBLANK(sid_num),
-			                BLANK(),
-			                CALCULATE(
-			                    SELECTEDVALUE(metadata_ai_scores_category_links[weighting]),
-			                    metadata_ai_scores_category_links[analysis_category_id] = category_id,
-			                    TREATAS( ROW("score_id", sid_num), metadata_ai_scores_category_links[score_id] )
-			                )
-			            )
-			        VAR w =
-			            IF(
-			                ISBLANK(wraw),
-			                BLANK(),
-			                IF(wraw > 1, DIVIDE(wraw, 100), wraw)
-			            )
-			        RETURN
-			            IF(
-			                ISBLANK(w),
-			                BLANK(),
-			                score_val * w
-			            )
+			        COALESCE([meas.ai_score], 0) * COALESCE(CALCULATE([meas.metadata_score_weighting_pct]), 0)
 			    )
 			
 			VAR denominator =
 			    SUMX(
 			        filtered_scores,
-			        VAR score_val = [meas.ai_score]
-			        VAR sid_num =
-			            VAR sid_txt = metadata_ai_scores[_sys_doc_id]
-			            RETURN IF(sid_txt = BLANK() || sid_txt = "", BLANK(), VALUE(sid_txt))
-			        VAR wraw =
-			            IF(
-			                ISBLANK(sid_num),
-			                BLANK(),
-			                CALCULATE(
-			                    SELECTEDVALUE(metadata_ai_scores_category_links[weighting]),
-			                    metadata_ai_scores_category_links[analysis_category_id] = category_id,
-			                    TREATAS( ROW("score_id", sid_num), metadata_ai_scores_category_links[score_id] )
-			                )
-			            )
-			        VAR w =
-			            IF(
-			                ISBLANK(wraw),
-			                BLANK(),
-			                IF(wraw > 1, DIVIDE(wraw, 100), wraw)
-			            )
-			        RETURN
-			            IF(
-			                ISBLANK(w),
-			                BLANK(),
-			                w
-			            )
+			        COALESCE(CALCULATE([meas.metadata_score_weighting_pct]), 0)
 			    )
 			
-			VAR fallback_avg =
-			    AVERAGEX(
-			        FILTER(filtered_scores, NOT ISBLANK([meas.ai_score])),
-			        [meas.ai_score]
-			    )
-			
-			VAR res =
-			    IF(
-			        NOT ISBLANK(denominator) && denominator > 0,
-			        DIVIDE(numerator, denominator),
-			        fallback_avg
-			    )
+			VAR res = DIVIDE(numerator, denominator)
 			
 			RETURN
 			    COALESCE(MIN(MAX(res, 0), 100), 0)
@@ -100,9 +36,6 @@ table metadata_ai_scores_analysis_categories
 
 	measure 'meas.readiness_analysis_cat_weighted_avg' =
 			
-			VAR category_id =
-			    SELECTEDVALUE(metadata_ai_scores_analysis_categories[_sys_doc_id])
-			
 			VAR filtered_scores =
 			    FILTER(
 			        metadata_ai_scores,
@@ -112,76 +45,16 @@ table metadata_ai_scores_analysis_categories
 			VAR numerator =
 			    SUMX(
 			        filtered_scores,
-			        VAR score_val = COALESCE([meas.readiness_ai_score], 0)
-			        VAR sid_num =
-			            VAR sid_txt = metadata_ai_scores[_sys_doc_id]
-			            RETURN IF(sid_txt = BLANK() || sid_txt = "", BLANK(), VALUE(sid_txt))
-			        VAR wraw =
-			            IF(
-			                ISBLANK(sid_num),
-			                BLANK(),
-			                CALCULATE(
-			                    SELECTEDVALUE(metadata_ai_scores_category_links[weighting]),
-			                    metadata_ai_scores_category_links[analysis_category_id] = category_id,
-			                    TREATAS( ROW("score_id", sid_num), metadata_ai_scores_category_links[score_id] )
-			                )
-			            )
-			        VAR w =
-			            IF(
-			                ISBLANK(wraw),
-			                BLANK(),
-			                IF(wraw > 1, DIVIDE(wraw, 100), wraw)
-			            )
-			        RETURN
-			            IF(
-			                ISBLANK(w),
-			                BLANK(),
-			                score_val * w
-			            )
+			        COALESCE([meas.readiness_ai_score], 0) * COALESCE(CALCULATE([meas.metadata_score_weighting_pct]), 0)
 			    )
 			
 			VAR denominator =
 			    SUMX(
 			        filtered_scores,
-			        VAR sid_num =
-			            VAR sid_txt = metadata_ai_scores[_sys_doc_id]
-			            RETURN IF(sid_txt = BLANK() || sid_txt = "", BLANK(), VALUE(sid_txt))
-			        VAR wraw =
-			            IF(
-			                ISBLANK(sid_num),
-			                BLANK(),
-			                CALCULATE(
-			                    SELECTEDVALUE(metadata_ai_scores_category_links[weighting]),
-			                    metadata_ai_scores_category_links[analysis_category_id] = category_id,
-			                    TREATAS( ROW("score_id", sid_num), metadata_ai_scores_category_links[score_id] )
-			                )
-			            )
-			        VAR w =
-			            IF(
-			                ISBLANK(wraw),
-			                BLANK(),
-			                IF(wraw > 1, DIVIDE(wraw, 100), wraw)
-			            )
-			        RETURN
-			            IF(
-			                ISBLANK(w),
-			                BLANK(),
-			                w
-			            )
+			        COALESCE(CALCULATE([meas.metadata_score_weighting_pct]), 0)
 			    )
 			
-			VAR fallback_avg =
-			    AVERAGEX(
-			        filtered_scores,
-			        COALESCE([meas.readiness_ai_score], 0)
-			    )
-			
-			VAR res =
-			    IF(
-			        NOT ISBLANK(denominator) && denominator > 0,
-			        DIVIDE(numerator, denominator),
-			        fallback_avg
-			    )
+			VAR res = DIVIDE(numerator, denominator)
 			
 			RETURN
 			    COALESCE(MIN(MAX(res, 0), 100), 0)
