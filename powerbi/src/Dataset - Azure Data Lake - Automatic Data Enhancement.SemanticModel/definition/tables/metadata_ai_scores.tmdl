@@ -3120,7 +3120,7 @@ table metadata_ai_scores
 			    "Leads & Accounts Completeness Data Present",[meas.ai_scores_general_score],
 			    BLANK()
 			)
-			VAR out = COALESCE(MIN(MAX(res,0),100), 0)
+			VAR out = IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 			RETURN
 			out
 			```
@@ -3871,7 +3871,7 @@ table metadata_ai_scores
 			    "Leads & Accounts Completeness Data Present",[meas.ai_scores_general_score],
 			    BLANK()
 			)
-			VAR out = COALESCE(MIN(MAX(res,0),100), 0)
+			VAR out = IF(ISBLANK(res), BLANK(), MIN(MAX(res,0),100))
 			RETURN
 			out
 		lineageTag: ffef63ec-4858-4976-8798-0fb002bdba60
@@ -4063,6 +4063,16 @@ table metadata_ai_scores
 			        )
 			    )
 		lineageTag: 96f6c316-05ed-4e1b-a662-7540bb5c55f9
+
+	measure 'meas.readiness_ai_score_display' =
+			
+			IF(
+			    [meas.ai_score_is_in_selected_category] = 1,
+			    COALESCE([meas.readiness_ai_score], 0),
+			    BLANK()
+			)
+		formatString: 0
+		lineageTag: 5d85f2b5-783c-432f-8c14-cad5bc0c2460
 
 	/// Category
 	/// Category
