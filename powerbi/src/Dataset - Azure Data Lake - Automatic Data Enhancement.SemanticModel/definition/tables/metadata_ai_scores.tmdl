@@ -3987,7 +3987,7 @@ table metadata_ai_scores
 			)
 		lineageTag: 1d6b5ce8-c8a5-45cf-ae17-72937803af6c
 
-	measure 'meas.summary_insights_readiness_score' = ai_conf_pred_qual_summary[meas.ai_conf_overall_score]
+	measure 'meas.summary_insights_readiness_score' = [meas.summary_last_full_year_insights_readiness]
 		lineageTag: 4f95c64b-53a0-437d-80d0-a81cca0c1750
 
 	measure 'meas.summary_insights_readiness_score_text' =
@@ -4039,7 +4039,8 @@ table metadata_ai_scores
 			VAR _latest_filt_end_date =
 			    CALCULATE(
 			        MAX(companies_history[_sys_filt_end_date]),
-			        REMOVEFILTERS(cal_end_dates)
+			        REMOVEFILTERS(cal_end_dates),
+			        REMOVEFILTERS(ai_conf_skills_summary)
 			    )
 			VAR _last_full_year =
 			    IF(
@@ -4059,6 +4060,11 @@ table metadata_ai_scores
 			        CALCULATE(
 			            [meas.readiness_average_ai_score],
 			            REMOVEFILTERS(cal_end_dates),
+			            REMOVEFILTERS(ai_conf_skills_summary),
+			            FILTER(
+			                ALL(metadata_ai_scores_analysis_categories[category_name]),
+			                metadata_ai_scores_analysis_categories[category_name] <> "Calibration Level"
+			            ),
 			            KEEPFILTERS(cal_end_dates[year] = _last_full_year)
 			        )
 			    )
