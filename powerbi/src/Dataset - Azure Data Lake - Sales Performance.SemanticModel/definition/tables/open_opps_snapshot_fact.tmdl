@@ -1,0 +1,1029 @@
+/// Canonical historical snapshot fact for Open Opportunities page visuals.
+table open_opps_snapshot_fact
+	lineageTag: 1f4ef8a3-8df2-4d6a-9ce0-cf8ef4a4b0ae
+
+	/// Returns 1 when the current snapshot row is valid and open for the selected date.
+	measure 'meas.open_opps_snapshot_fact_include' =
+			
+			VAR sel_date = [meas.cal_end_sel_date]
+			VAR drill_opp_id =
+			    COALESCE(
+			        SELECTEDVALUE(ssr_history[entity_opp_id]),
+			        SELECTEDVALUE(opps[_sys_doc_id]),
+			        SELECTEDVALUE(open_pipeline[crm_opp_id])
+			    )
+			VAR current_opp_id = MAX(open_opps_snapshot_fact[entity_opp_id])
+			VAR is_closed_stage =
+			    MAXX(
+			        open_opps_snapshot_fact,
+			        IF(open_opps_snapshot_fact[is_closed_stage], 1, 0)
+			    )
+			RETURN
+			IF(
+			    MAX(open_opps_snapshot_fact[valid_from]) <= sel_date
+			        && MAX(open_opps_snapshot_fact[valid_to]) > sel_date
+			        && is_closed_stage = 0
+			        && (ISBLANK(drill_opp_id) || current_opp_id = drill_opp_id),
+			    1,
+			    0
+			)
+		formatString: 0
+		displayFolder: _open_opps_snapshot_fact
+		lineageTag: 0dbc1028-9bc3-4a91-bd60-6d0f0dd0d8fd
+
+	/// Counts open opportunities from the canonical snapshot fact.
+	measure 'meas.open_opps_snapshot_fact_count' =
+			
+			VAR sel_date = [meas.cal_end_sel_date]
+			VAR drill_opp_id =
+			    COALESCE(
+			        SELECTEDVALUE(ssr_history[entity_opp_id]),
+			        SELECTEDVALUE(opps[_sys_doc_id]),
+			        SELECTEDVALUE(open_pipeline[crm_opp_id])
+			    )
+			RETURN
+			CALCULATE(
+			    DISTINCTCOUNT(open_opps_snapshot_fact[entity_opp_id]),
+			    FILTER(
+			        open_opps_snapshot_fact,
+			        open_opps_snapshot_fact[valid_from] <= sel_date
+			            && open_opps_snapshot_fact[valid_to] > sel_date
+			            && open_opps_snapshot_fact[is_closed_stage] = FALSE()
+			            && (ISBLANK(drill_opp_id) || open_opps_snapshot_fact[entity_opp_id] = drill_opp_id)
+			    )
+			)
+		formatString: #,0
+		displayFolder: _open_opps_snapshot_fact
+		lineageTag: 1dd58db4-c469-48fd-aee0-3b6c3c892f6d
+
+	/// Sums canonical snapshot booking amount.
+	measure 'meas.open_opps_snapshot_fact_amount' =
+			
+			VAR sel_date = [meas.cal_end_sel_date]
+			VAR drill_opp_id =
+			    COALESCE(
+			        SELECTEDVALUE(ssr_history[entity_opp_id]),
+			        SELECTEDVALUE(opps[_sys_doc_id]),
+			        SELECTEDVALUE(open_pipeline[crm_opp_id])
+			    )
+			RETURN
+			CALCULATE(
+			    SUM(open_opps_snapshot_fact[amount]),
+			    FILTER(
+			        open_opps_snapshot_fact,
+			        open_opps_snapshot_fact[valid_from] <= sel_date
+			            && open_opps_snapshot_fact[valid_to] > sel_date
+			            && open_opps_snapshot_fact[is_closed_stage] = FALSE()
+			            && (ISBLANK(drill_opp_id) || open_opps_snapshot_fact[entity_opp_id] = drill_opp_id)
+			    )
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _open_opps_snapshot_fact
+		lineageTag: 5087c60c-0a2a-44ff-9574-b2cf2078d4cf
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Compatibility measure for list visuals: pipeline amount on the canonical rowset.
+	measure 'meas.open_opps_snapshot_fact_pipeline_amt' = SUM(open_opps_snapshot_fact[amount])
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _open_opps_snapshot_fact
+		lineageTag: d6f8a6a4-9435-4068-a6ec-e00300cebf6d
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Compatibility measure for list visuals: expected value on the canonical rowset.
+	measure 'meas.open_opps_snapshot_fact_expected_value' = SUM(open_opps_snapshot_fact[expected_value])
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _open_opps_snapshot_fact
+		lineageTag: 2952ef4c-c7c6-4870-96bd-89dc7ae04a99
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Returns the opportunity age as of the selected date.
+	measure 'meas.open_opps_snapshot_fact_age_days' =
+			
+			VAR sel_date = [meas.cal_end_sel_date]
+			VAR created_on = MAX(open_opps_snapshot_fact[crm_created_on])
+			RETURN
+			IF(
+			    ISBLANK(created_on),
+			    BLANK(),
+			    DATEDIFF(DATE(YEAR(created_on), MONTH(created_on), DAY(created_on)), sel_date, DAY)
+			)
+		formatString: 0
+		displayFolder: _open_opps_snapshot_fact
+		lineageTag: 2de43d65-045f-4f0d-b86e-a88cbeba353f
+
+	/// Compatibility measure for the initial close date shown in the list.
+	measure 'meas.open_opps_snapshot_fact_initial_close_date' = MAX(open_opps_snapshot_fact[initial_close_date])
+		formatString: Short Date
+		displayFolder: _open_opps_snapshot_fact
+		lineageTag: 7290f247-2f74-446d-ad30-052cfa8d490e
+
+	/// Compatibility measure for total activity duration on the canonical rowset.
+	measure 'meas.open_opps_snapshot_fact_dur_hrs' = SUM(open_opps_snapshot_fact[act_dur_hours])
+		formatString: #,##0.0" hrs"
+		displayFolder: _open_opps_snapshot_fact
+		lineageTag: 343b49ea-aac2-4d18-bcb7-3af5f1270b10
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Compatibility measure for pace score display using the canonical row.
+	measure 'meas.open_opps_snapshot_fact_avg_pace_score' = MAX(open_opps_snapshot_fact[pace_score_bucket])
+		displayFolder: _open_opps_snapshot_fact
+		lineageTag: ba0ef160-b133-4900-8f16-6e9b185ef9ec
+
+	/// Compatibility measure for propensity-driven formatting in the list.
+	measure 'meas.open_opps_snapshot_fact_quality_bucket' = MAX(open_opps_snapshot_fact[trueai_propensity])
+		displayFolder: _open_opps_snapshot_fact
+		lineageTag: 904b0b4e-e157-46ed-b648-9964e3fbde18
+
+	/// Compatibility title measure reused by the page list visual.
+	measure 'meas.open_opps_snapshot_fact_tbl_title' =
+			
+			"Open Opps List as of " & FORMAT([meas.cal_end_sel_date], "MM/dd/yyyy")
+		displayFolder: _open_opps_snapshot_fact
+		lineageTag: 3c57b76f-e590-46af-a581-ac2ea96ac353
+
+	/// Canonical surrogate key for one opportunity state interval.
+	column snapshot_row_id
+		dataType: string
+		lineageTag: e7e7c894-7b1c-4c30-b79c-f81d8a0b8600
+		summarizeBy: none
+		sourceColumn: snapshot_row_id
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Canonical opportunity id used for the page row grain.
+	column entity_opp_id
+		dataType: string
+		lineageTag: 4f63aa3d-0e67-4e52-a2c9-d7d3414174f1
+		summarizeBy: none
+		sourceColumn: entity_opp_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_id
+		dataType: string
+		lineageTag: 95cb2e8f-8ebe-4fb9-a629-e78ad64c764e
+		summarizeBy: none
+		sourceColumn: opp_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_opp_id
+		dataType: string
+		lineageTag: 473d455e-d728-4554-a254-7d74d70ff6ac
+		summarizeBy: none
+		sourceColumn: crm_opp_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_row_doc_id
+		dataType: string
+		lineageTag: e6f8895b-f385-4ab6-a452-b22dcfcf7481
+		summarizeBy: none
+		sourceColumn: source_row_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_sort_id
+		dataType: int64
+		lineageTag: 93c004cb-88cf-4a0c-8b9c-f42d7f4519cc
+		summarizeBy: none
+		sourceColumn: source_sort_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column valid_from
+		dataType: dateTime
+		lineageTag: e941c1af-4e5c-4f79-9244-cc10e4d27291
+		summarizeBy: none
+		sourceColumn: valid_from
+
+		annotation SummarizationSetBy = Automatic
+
+	column valid_to
+		dataType: dateTime
+		lineageTag: 6cbf8c85-8508-4a6b-b97d-3f6daef405a7
+		summarizeBy: none
+		sourceColumn: valid_to
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_open_as_of_row
+		dataType: boolean
+		lineageTag: 65b15131-91e4-45b9-9b80-4c731719f89c
+		summarizeBy: none
+		sourceColumn: is_open_as_of_row
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_closed_stage
+		dataType: boolean
+		lineageTag: 206fae4d-0b4c-4a7f-b04d-52f76ac1574b
+		summarizeBy: none
+		sourceColumn: is_closed_stage
+
+		annotation SummarizationSetBy = Automatic
+
+	column snapshot_status
+		dataType: string
+		lineageTag: 71ddcf1d-f7a1-466b-a5b6-19dfe000d756
+		summarizeBy: none
+		sourceColumn: snapshot_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_stage
+		dataType: string
+		lineageTag: c2c5c42d-5b24-434f-a2ff-d6f534f9e1a3
+		summarizeBy: none
+		sourceColumn: trueai_stage
+		sortByColumn: trueai_stage_num
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_stage_name
+		dataType: string
+		lineageTag: a8d8a654-bfca-4b6c-a2f0-a3f60583386a
+		summarizeBy: none
+		sourceColumn: trueai_stage_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_stage_name
+		dataType: string
+		lineageTag: 6bd449ba-6e04-44fc-a077-9c5981aca5eb
+		summarizeBy: none
+		sourceColumn: crm_stage_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_stage_num
+		dataType: int64
+		lineageTag: 9d095607-df9d-4dc7-84a0-9944f3a3c27d
+		summarizeBy: sum
+		sourceColumn: trueai_stage_num
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_propensity
+		dataType: string
+		lineageTag: 1529fa6f-3826-4baa-a69a-0155187fd760
+		summarizeBy: none
+		sourceColumn: trueai_propensity
+		sortByColumn: trueai_propensity_num
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_propensity_num
+		dataType: int64
+		lineageTag: 7291ce6a-7cd4-42c5-bd79-1f7741aa8514
+		summarizeBy: sum
+		sourceColumn: trueai_propensity_num
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_sale_type
+		dataType: string
+		lineageTag: 2f493676-22dc-4b4e-bfc1-e960204a802f
+		summarizeBy: none
+		sourceColumn: trueai_sale_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column opp_name
+		dataType: string
+		lineageTag: 3e3187ef-fb54-4109-9afc-13e3681c9e7d
+		summarizeBy: none
+		sourceColumn: opp_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_name
+		dataType: string
+		lineageTag: 70f1488b-083f-4ee9-bf55-c9c8fa07a88b
+		summarizeBy: none
+		sourceColumn: account_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column owner_name
+		dataType: string
+		lineageTag: a67f5f78-fdf4-4db7-a0dd-aeea5118d961
+		summarizeBy: none
+		sourceColumn: owner_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_name
+		dataType: string
+		lineageTag: 31940b79-a6b6-4231-b261-27fbd8f7dd30
+		summarizeBy: none
+		sourceColumn: seller_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_group
+		dataType: string
+		lineageTag: 55485bff-b539-4524-a67b-a7596d921465
+		summarizeBy: none
+		sourceColumn: trueai_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_full_name
+		dataType: string
+		lineageTag: c84393b1-90bf-4ad1-a148-9eec1c93dfbe
+		summarizeBy: none
+		sourceColumn: trueai_full_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column amount
+		dataType: double
+		lineageTag: b4d8f6ce-03a1-4d6a-86a7-cd036cb69960
+		summarizeBy: sum
+		sourceColumn: amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column expected_value
+		dataType: double
+		lineageTag: c4cc46ac-2c7b-4c0d-bfde-996a2c566eb1
+		summarizeBy: sum
+		sourceColumn: expected_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_created_on
+		dataType: dateTime
+		lineageTag: 48c4fb1a-f0ca-4ecb-880b-83f143e0f0f4
+		summarizeBy: none
+		sourceColumn: crm_created_on
+
+		annotation SummarizationSetBy = Automatic
+
+	column crm_close_date
+		dataType: dateTime
+		lineageTag: 5ff7cc09-0b95-4c2d-84d5-b7c859e55f46
+		summarizeBy: none
+		sourceColumn: crm_close_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column initial_close_date
+		dataType: dateTime
+		lineageTag: 7a6ca7f9-9f1d-49a4-9f71-085f3f112c97
+		summarizeBy: none
+		sourceColumn: initial_close_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_pace_score
+		dataType: double
+		lineageTag: 8d76f50d-cf54-4ad8-9cb9-5378b11de5d0
+		summarizeBy: average
+		sourceColumn: trueai_pace_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column pace_score_bucket
+		dataType: string
+		lineageTag: 5942ecf0-dcd8-4dc6-af07-c29bbe6bafce
+		summarizeBy: none
+		sourceColumn: pace_score_bucket
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_act_count
+		dataType: int64
+		lineageTag: c0af845f-9c0d-4153-ad62-b138237520d7
+		summarizeBy: sum
+		sourceColumn: trueai_act_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column act_dur_hours
+		dataType: double
+		lineageTag: d92d0f82-d4de-47ee-bac1-dd85bf6db96f
+		summarizeBy: sum
+		sourceColumn: act_dur_hours
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_last_eng_act
+		dataType: dateTime
+		lineageTag: 8b41e618-a05d-461f-a564-84af96054073
+		summarizeBy: none
+		sourceColumn: trueai_last_eng_act
+
+		annotation SummarizationSetBy = Automatic
+
+	column stkhlds_all_contacts_count
+		dataType: int64
+		lineageTag: c6e0eb37-8a48-49f1-bcc4-e933252a9aa4
+		summarizeBy: sum
+		sourceColumn: stkhlds_all_contacts_count
+
+		annotation SummarizationSetBy = Automatic
+
+	partition open_opps_snapshot_fact = m
+		mode: import
+		source =
+				let
+				    NormalizeText = (value as nullable text, fallback as text) as text =>
+				        if value = null or Text.Trim(value) = "" then fallback else value,
+				    NormalizeIntervals = (oppRows as table) as table =>
+				        let
+				            OppSorted = Table.Sort(
+				                oppRows,
+				                {
+				                    {"source_valid_from", Order.Ascending},
+				                    {"_sys_filt_end_date", Order.Ascending},
+				                    {"source_sort_num", Order.Descending},
+				                    {"trueai_sort_id", Order.Descending},
+				                    {"_sys_doc_id", Order.Descending}
+				                }
+				            ),
+				            OppIndexed = Table.AddIndexColumn(OppSorted, "interval_index", 0, 1, Int64.Type),
+				            WithValidFrom = Table.AddColumn(
+				                OppIndexed,
+				                "valid_from",
+				                each
+				                    let
+				                        SourceValidFrom = [source_valid_from],
+				                        PrevValidTo = if [interval_index] = 0 then null else OppIndexed{[interval_index] - 1}[_sys_filt_end_date]
+				                    in
+				                        if SourceValidFrom = null then PrevValidTo
+				                        else if PrevValidTo <> null and PrevValidTo > SourceValidFrom then PrevValidTo
+				                        else SourceValidFrom,
+				                type date
+				            ),
+				            RemovedIndex = Table.RemoveColumns(WithValidFrom, {"interval_index"})
+				        in
+				            RemovedIndex,
+				    OpenPipelineRaw = getDBTable("open_pipeline"),
+				    OpenPipelineTyped = Table.TransformColumnTypes(
+				        OpenPipelineRaw,
+				        {
+				            {"_sys_doc_id", type text},
+				            {"_sys_filt_end_date", type date},
+				            {"_sys_filt_start_date", type date},
+				            {"crm_close_date", type datetime},
+				            {"crm_created_on", type datetime},
+				            {"crm_opp_id", type text},
+				            {"crm_stage_name", type text},
+				            {"trueai_act_count", Int64.Type},
+				            {"trueai_act_dur", type number},
+				            {"trueai_act_last_eng", type datetime},
+				            {"trueai_booking_amt", type number},
+				            {"trueai_current_prob_of_win", type number},
+				            {"trueai_init_close_date", type datetime},
+				            {"trueai_owner_id", type text},
+				            {"trueai_pace_score", type number},
+				            {"trueai_sort_id", type text},
+				            {"trueai_stage", type text},
+				            {"trueai_stage_name", type text}
+				        }
+				    ),
+				    OpenPipelineFiltered = Table.SelectRows(
+				        OpenPipelineTyped,
+				        each [crm_opp_id] <> null
+				            and Text.Trim([crm_opp_id]) <> ""
+				            and [_sys_filt_end_date] <> null
+				    ),
+				    WithSourceSortNum = Table.AddColumn(
+				        OpenPipelineFiltered,
+				        "source_sort_num",
+				        each try Int64.From([trueai_sort_id]) otherwise null,
+				        Int64.Type
+				    ),
+				    WithSourceValidFrom = Table.AddColumn(
+				        WithSourceSortNum,
+				        "source_valid_from",
+				        each if [_sys_filt_start_date] <> null then [_sys_filt_start_date] else if [crm_created_on] <> null then Date.From([crm_created_on]) else null,
+				        type date
+				    ),
+				    SortedIntervals = Table.Sort(
+				        WithSourceValidFrom,
+				        {
+				            {"crm_opp_id", Order.Ascending},
+				            {"source_valid_from", Order.Ascending},
+				            {"_sys_filt_end_date", Order.Ascending},
+				            {"source_sort_num", Order.Descending},
+				            {"trueai_sort_id", Order.Descending},
+				            {"_sys_doc_id", Order.Descending}
+				        }
+				    ),
+				    BufferedIntervals = Table.Buffer(SortedIntervals),
+				    CanonicalIntervals = Table.Distinct(
+				        BufferedIntervals,
+				        {"crm_opp_id", "source_valid_from", "_sys_filt_end_date"}
+				    ),
+				    GroupedByOpp = Table.Group(
+				        CanonicalIntervals,
+				        {"crm_opp_id"},
+				        {{"snapshot_rows", each NormalizeIntervals(_), type table}}
+				    ),
+				    ExpandedIntervals = Table.ExpandTableColumn(
+				        GroupedByOpp,
+				        "snapshot_rows",
+				        {
+				            "_sys_doc_id",
+				            "_sys_filt_end_date",
+				            "_sys_filt_start_date",
+				            "crm_close_date",
+				            "crm_created_on",
+				            "crm_stage_name",
+				            "source_sort_num",
+				            "source_valid_from",
+				            "trueai_act_count",
+				            "trueai_act_dur",
+				            "trueai_act_last_eng",
+				            "trueai_booking_amt",
+				            "trueai_current_prob_of_win",
+				            "trueai_init_close_date",
+				            "trueai_owner_id",
+				            "trueai_pace_score",
+				            "trueai_sort_id",
+				            "trueai_stage",
+				            "trueai_stage_name",
+				            "valid_from"
+				        },
+				        {
+				            "_sys_doc_id",
+				            "_sys_filt_end_date",
+				            "_sys_filt_start_date",
+				            "crm_close_date",
+				            "crm_created_on",
+				            "crm_stage_name",
+				            "source_sort_num",
+				            "source_valid_from",
+				            "trueai_act_count",
+				            "trueai_act_dur",
+				            "trueai_act_last_eng",
+				            "trueai_booking_amt",
+				            "trueai_current_prob_of_win",
+				            "trueai_init_close_date",
+				            "trueai_owner_id",
+				            "trueai_pace_score",
+				            "trueai_sort_id",
+				            "trueai_stage",
+				            "trueai_stage_name",
+				            "valid_from"
+				        }
+				    ),
+				    ValidIntervals = Table.SelectRows(
+				        ExpandedIntervals,
+				        each [valid_from] <> null and [valid_from] < [_sys_filt_end_date]
+				    ),
+				    OppsRaw = getDBTable("opps"),
+				    OppsTyped = Table.TransformColumnTypes(
+				        OppsRaw,
+				        {
+				            {"_sys_doc_id", type text},
+				            {"_sys_ssr_id", type text},
+				            {"_sys_filt_end_date", type date},
+				            {"_sys_filt_start_date", type date},
+				            {"_sys_is_active", type logical},
+				            {"crm_name", type text},
+				            {"crm_is_closed", type logical},
+				            {"crm_stage_name", type text},
+				            {"trueai_stage", type text},
+				            {"trueai_stage_name", type text},
+				            {"trueai_propensity", type text},
+				            {"trueai_propensity_num", Int64.Type},
+				            {"trueai_sale_type", type text},
+				            {"trueai_test", type logical}
+				        }
+				    ),
+				    OppsFiltered = Table.SelectRows(OppsTyped, each [_sys_doc_id] <> null and Text.Trim([_sys_doc_id]) <> ""),
+				    WithOppRows = Table.NestedJoin(
+				        ValidIntervals,
+				        {"crm_opp_id"},
+				        OppsFiltered,
+				        {"_sys_doc_id"},
+				        "opp_rows",
+				        JoinKind.LeftOuter
+				    ),
+				    WithOppRecord = Table.AddColumn(
+				        WithOppRows,
+				        "opp_record",
+				        each
+				            let
+				                OppRows = [opp_rows],
+				                TargetDate = [valid_from],
+				                MatchingRows =
+				                    if OppRows = null then #table({}, {})
+				                    else Table.SelectRows(
+				                        OppRows,
+				                        each ([_sys_filt_start_date] = null or [_sys_filt_start_date] <= TargetDate)
+				                            and ([_sys_filt_end_date] = null or [_sys_filt_end_date] > TargetDate)
+				                    ),
+				                RankedRows = MatchingRows,
+				                SortedRows =
+				                    if RankedRows = null then #table({}, {})
+				                    else Table.Sort(
+				                        RankedRows,
+				                        {
+				                            {"_sys_filt_end_date", Order.Descending},
+				                            {"_sys_filt_start_date", Order.Descending},
+				                            {"_sys_doc_id", Order.Descending}
+				                        }
+				                    ),
+				                RawRecord =
+				                    if SortedRows = null or Table.RowCount(SortedRows) = 0 then null else SortedRows{0},
+				                SafeRecord =
+				                    if RawRecord = null then
+				                        [
+				                            _sys_doc_id = null,
+				                            _sys_ssr_id = null,
+				                            _sys_is_active = null,
+				                            crm_name = null,
+				                            crm_is_closed = null,
+				                            crm_stage_name = null,
+				                            trueai_stage = null,
+				                            trueai_stage_name = null,
+				                            trueai_propensity = null,
+				                            trueai_propensity_num = null,
+				                            trueai_sale_type = null,
+				                            trueai_test = null
+				                        ]
+				                    else
+				                        Record.SelectFields(
+				                            RawRecord,
+				                            {
+				                                "_sys_doc_id",
+				                                "_sys_ssr_id",
+				                                "_sys_is_active",
+				                                "crm_name",
+				                                "crm_is_closed",
+				                                "crm_stage_name",
+				                                "trueai_stage",
+				                                "trueai_stage_name",
+				                                "trueai_propensity",
+				                                "trueai_propensity_num",
+				                                "trueai_sale_type",
+				                                "trueai_test"
+				                            },
+				                            MissingField.UseNull
+				                        )
+				            in
+				                SafeRecord,
+				        type record
+				    ),
+				    ExpandedOppRecord = Table.ExpandRecordColumn(
+				        WithOppRecord,
+				        "opp_record",
+				        {"_sys_doc_id", "_sys_ssr_id", "_sys_is_active", "crm_name", "crm_is_closed", "crm_stage_name", "trueai_stage", "trueai_stage_name", "trueai_propensity", "trueai_propensity_num", "trueai_sale_type", "trueai_test"},
+				        {"matched_opp_id", "_sys_ssr_id", "matched_opp_is_active", "opp_name", "matched_opp_is_closed", "matched_opp_crm_stage_name", "matched_opp_trueai_stage", "matched_opp_trueai_stage_name", "trueai_propensity", "trueai_propensity_num", "trueai_sale_type", "matched_opp_is_test"}
+				    ),
+				    FilteredEligibleOpps = Table.SelectRows(
+				        ExpandedOppRecord,
+				        each [matched_opp_id] <> null
+				            and [matched_opp_is_closed] = false
+				            and ([matched_opp_is_active] = null or [matched_opp_is_active] = true)
+				            and ([matched_opp_is_test] = null or [matched_opp_is_test] = false)
+				            and [opp_name] <> null
+				            and Text.Trim([opp_name]) <> ""
+				            and not Text.Contains(Text.Lower([opp_name]), "test")
+				    ),
+				    WithStageFallback = Table.TransformColumns(
+				        Table.AddColumn(
+				            Table.AddColumn(
+				                Table.AddColumn(
+				                    FilteredEligibleOpps,
+				                    "trueai_stage_resolved",
+				                    each
+				                        let
+				                            PipelineStage = [trueai_stage]
+				                        in
+				                            if PipelineStage <> null and Text.Trim(PipelineStage) <> "" then PipelineStage else [matched_opp_trueai_stage],
+				                    type text
+				                ),
+				                "trueai_stage_name_resolved",
+				                each
+				                    let
+				                        PipelineStageName = [trueai_stage_name]
+				                    in
+				                        if PipelineStageName <> null and Text.Trim(PipelineStageName) <> "" then PipelineStageName
+				                        else if [matched_opp_trueai_stage_name] <> null and Text.Trim([matched_opp_trueai_stage_name]) <> "" then [matched_opp_trueai_stage_name]
+				                        else [matched_opp_crm_stage_name],
+				                    type text
+				            ),
+				            "crm_stage_name_resolved",
+				            each
+				                let
+				                    PipelineCrmStageName = [crm_stage_name]
+				                in
+				                    if PipelineCrmStageName <> null and Text.Trim(PipelineCrmStageName) <> "" then PipelineCrmStageName else [matched_opp_crm_stage_name],
+				            type text
+				        ),
+				        {
+				            {"trueai_propensity", each if _ <> null and Text.Trim(_) <> "" then _ else null, type text}
+				        }
+				    ),
+				    CleanedResolvedStageColumns = Table.RemoveColumns(
+				        WithStageFallback,
+				        {"trueai_stage", "trueai_stage_name", "crm_stage_name"}
+				    ),
+				    RenamedResolvedStageColumns = Table.RenameColumns(
+				        CleanedResolvedStageColumns,
+				        {
+				            {"trueai_stage_resolved", "trueai_stage"},
+				            {"trueai_stage_name_resolved", "trueai_stage_name"},
+				            {"crm_stage_name_resolved", "crm_stage_name"}
+				        }
+				    ),
+				    WithOppDefaults =
+				        let
+				            EnsureTextColumn = (tbl as table, col as text) as table =>
+				                if Table.HasColumns(tbl, {col}) then tbl else Table.AddColumn(tbl, col, each null, type text),
+				            EnsureIntColumn = (tbl as table, col as text) as table =>
+				                if Table.HasColumns(tbl, {col}) then tbl else Table.AddColumn(tbl, col, each null, Int64.Type),
+				            WithPropensity = EnsureTextColumn(RenamedResolvedStageColumns, "trueai_propensity"),
+				            WithPropensityNum = EnsureIntColumn(WithPropensity, "trueai_propensity_num"),
+				            WithSaleType = EnsureTextColumn(WithPropensityNum, "trueai_sale_type"),
+				            WithOppName = EnsureTextColumn(WithSaleType, "opp_name"),
+				            WithSsrId = EnsureTextColumn(WithOppName, "_sys_ssr_id")
+				        in
+				            WithSsrId,
+				    UsersRaw = getDBTable("users"),
+				    UsersTyped = Table.TransformColumnTypes(
+				        UsersRaw,
+				        {
+				            {"_sys_doc_id", type text},
+				            {"trueai_full_name", type text},
+				            {"trueai_group", type text}
+				        }
+				    ),
+				    UsersDeduped = Table.Distinct(UsersTyped, {"_sys_doc_id"}),
+				    WithUsers = Table.NestedJoin(
+				        WithOppDefaults,
+				        {"trueai_owner_id"},
+				        UsersDeduped,
+				        {"_sys_doc_id"},
+				        "user_rows",
+				        JoinKind.LeftOuter
+				    ),
+				    ExpandedUsers = Table.ExpandTableColumn(
+				        WithUsers,
+				        "user_rows",
+				        {"trueai_full_name", "trueai_group"},
+				        {"trueai_full_name", "trueai_group"}
+				    ),
+				    SsrRaw = getDBTable("ssr"),
+				    SsrTyped = Table.TransformColumnTypes(
+				        SsrRaw,
+				        {
+				            {"_sys_doc_id", type text},
+				            {"crm_name", type text}
+				        }
+				    ),
+				    SsrDeduped = Table.Distinct(SsrTyped, {"_sys_doc_id"}),
+				    WithAccount = Table.NestedJoin(
+				        ExpandedUsers,
+				        {"_sys_ssr_id"},
+				        SsrDeduped,
+				        {"_sys_doc_id"},
+				        "ssr_rows",
+				        JoinKind.LeftOuter
+				    ),
+				    ExpandedAccount = Table.ExpandTableColumn(
+				        WithAccount,
+				        "ssr_rows",
+				        {"crm_name"},
+				        {"account_name"}
+				    ),
+				    SsrHistoryRaw = getDBTable("ssr_history"),
+				    SsrHistoryTyped = Table.TransformColumnTypes(
+				        SsrHistoryRaw,
+				        {
+				            {"entity_opp_id", type text},
+				            {"stkhlds_all_contacts_count", Int64.Type}
+				        }
+				    ),
+				    StakeholderCounts = Table.Group(
+				        Table.SelectRows(SsrHistoryTyped, each [entity_opp_id] <> null and Text.Trim([entity_opp_id]) <> ""),
+				        {"entity_opp_id"},
+				        {
+				            {"stkhlds_all_contacts_count", each try List.Max(List.RemoveNulls([stkhlds_all_contacts_count])) otherwise null, Int64.Type}
+				        }
+				    ),
+				    WithStakeholders = Table.NestedJoin(
+				        ExpandedAccount,
+				        {"crm_opp_id"},
+				        StakeholderCounts,
+				        {"entity_opp_id"},
+				        "stakeholder_rows",
+				        JoinKind.LeftOuter
+				    ),
+				    ExpandedStakeholders = Table.ExpandTableColumn(
+				        WithStakeholders,
+				        "stakeholder_rows",
+				        {"stkhlds_all_contacts_count"},
+				        {"stkhlds_all_contacts_count"}
+				    ),
+				    WithNormalizedColumns = Table.TransformColumns(
+				        ExpandedStakeholders,
+				        {
+				            {"trueai_stage", each NormalizeText(_, "Unknown"), type text},
+				            {"trueai_stage_name", each NormalizeText(_, "Unknown"), type text},
+				            {"crm_stage_name", each NormalizeText(_, "Unknown"), type text},
+				            {"trueai_propensity", each NormalizeText(_, "Unknown"), type text},
+				            {"trueai_sale_type", each NormalizeText(_, "Unknown"), type text},
+				            {"trueai_group", each NormalizeText(_, "Unknown"), type text}
+				        }
+				    ),
+				    WithOppNameFallback = Table.AddColumn(
+				        WithNormalizedColumns,
+				        "opp_name_resolved",
+				        each NormalizeText([opp_name], [crm_opp_id]),
+				        type text
+				    ),
+				    WithAccountNameFallback = Table.AddColumn(
+				        WithOppNameFallback,
+				        "account_name_resolved",
+				        each NormalizeText([account_name], NormalizeText([_sys_ssr_id], [crm_opp_id])),
+				        type text
+				    ),
+				    WithUserNameFallback = Table.AddColumn(
+				        WithAccountNameFallback,
+				        "trueai_full_name_resolved",
+				        each NormalizeText([trueai_full_name], NormalizeText([trueai_owner_id], [crm_opp_id])),
+				        type text
+				    ),
+				    CleanedFallbackColumns = Table.RemoveColumns(
+				        WithUserNameFallback,
+				        {"opp_name", "account_name", "trueai_full_name"}
+				    ),
+				    RenamedFallbackColumns = Table.RenameColumns(
+				        CleanedFallbackColumns,
+				        {
+				            {"opp_name_resolved", "opp_name"},
+				            {"account_name_resolved", "account_name"},
+				            {"trueai_full_name_resolved", "trueai_full_name"}
+				        }
+				    ),
+				    WithDerived = Table.AddColumn(
+				        RenamedFallbackColumns,
+				        "snapshot_row_id",
+				        each [crm_opp_id] & "|" & Date.ToText([valid_from], "yyyy-MM-dd") & "|" & Date.ToText([_sys_filt_end_date], "yyyy-MM-dd") & "|" & [_sys_doc_id],
+				        type text
+				    ),
+				    WithEntityOppId = Table.AddColumn(WithDerived, "entity_opp_id", each [crm_opp_id], type text),
+				    WithOppId = Table.AddColumn(WithEntityOppId, "opp_id", each [crm_opp_id], type text),
+				    WithAmount = Table.AddColumn(WithOppId, "amount", each [trueai_booking_amt], type number),
+				    WithExpectedValue = Table.AddColumn(
+				        WithAmount,
+				        "expected_value",
+				        each if [trueai_booking_amt] = null or [trueai_current_prob_of_win] = null then null else [trueai_booking_amt] * [trueai_current_prob_of_win],
+				        type number
+				    ),
+				    WithDurHours = Table.AddColumn(
+				        WithExpectedValue,
+				        "act_dur_hours",
+				        each if [trueai_act_dur] = null then null else [trueai_act_dur] / 3600,
+				        type number
+				    ),
+				    WithInitialCloseDate = Table.AddColumn(WithDurHours, "initial_close_date", each [trueai_init_close_date], type datetime),
+				    WithLastEngDate = Table.AddColumn(WithInitialCloseDate, "trueai_last_eng_act", each [trueai_act_last_eng], type datetime),
+				    WithClosedStage = Table.AddColumn(
+				        WithLastEngDate,
+				        "is_closed_stage",
+				        each [trueai_stage] = "Closed Won" or [trueai_stage] = "Closed Lost",
+				        type logical
+				    ),
+				    WithOpenFlag = Table.AddColumn(WithClosedStage, "is_open_as_of_row", each not [is_closed_stage], type logical),
+				    WithStatus = Table.AddColumn(WithOpenFlag, "snapshot_status", each if [is_closed_stage] then "Closed" else "Open", type text),
+				    WithStageNum = Table.AddColumn(
+				        WithStatus,
+				        "trueai_stage_num",
+				        each
+				            if [trueai_stage] = "Early" then 1
+				            else if [trueai_stage] = "Mid" then 2
+				            else if [trueai_stage] = "Late" then 3
+				            else if [trueai_stage] = "Closed Won" then 4
+				            else if [trueai_stage] = "Closed Lost" then 5
+				            else 6,
+				        Int64.Type
+				    ),
+				    WithPaceBucket = Table.AddColumn(
+				        WithStageNum,
+				        "pace_score_bucket",
+				        each
+				            let
+				                PaceScore = [trueai_pace_score],
+				                PaceBucket = if PaceScore = null then null else Number.Round(PaceScore * 5, 0)
+				            in
+				                if PaceBucket = null then "Unknown"
+				                else if PaceBucket <= 0 then "0 - Static"
+				                else if PaceBucket = 1 then "1 - Slow-Moving"
+				                else if PaceBucket = 2 then "2 - Progressing"
+				                else if PaceBucket = 3 then "3 - Advancing"
+				                else if PaceBucket = 4 then "4 - Accelerated"
+				                else "5 - Rapid",
+				        type text
+				    ),
+				    WithOwnerName = Table.AddColumn(WithPaceBucket, "owner_name", each [trueai_full_name], type text),
+				    WithSellerName = Table.AddColumn(WithOwnerName, "seller_name", each [trueai_full_name], type text),
+				    RenamedColumns = Table.RenameColumns(
+				        WithSellerName,
+				        {
+				            {"_sys_doc_id", "source_row_doc_id"},
+				            {"source_sort_num", "source_sort_id"},
+				            {"_sys_filt_end_date", "valid_to"}
+				        }
+				    ),
+				    SelectedColumns = Table.SelectColumns(
+				        RenamedColumns,
+				        {
+				            "snapshot_row_id",
+				            "entity_opp_id",
+				            "opp_id",
+				            "crm_opp_id",
+				            "source_row_doc_id",
+				            "source_sort_id",
+				            "valid_from",
+				            "valid_to",
+				            "is_open_as_of_row",
+				            "is_closed_stage",
+				            "snapshot_status",
+				            "trueai_stage",
+				            "trueai_stage_name",
+				            "crm_stage_name",
+				            "trueai_stage_num",
+				            "trueai_propensity",
+				            "trueai_propensity_num",
+				            "trueai_sale_type",
+				            "opp_name",
+				            "account_name",
+				            "owner_name",
+				            "seller_name",
+				            "trueai_group",
+				            "trueai_full_name",
+				            "amount",
+				            "expected_value",
+				            "crm_created_on",
+				            "crm_close_date",
+				            "initial_close_date",
+				            "trueai_pace_score",
+				            "pace_score_bucket",
+				            "trueai_act_count",
+				            "act_dur_hours",
+				            "trueai_last_eng_act",
+				            "stkhlds_all_contacts_count"
+				        },
+				        MissingField.UseNull
+				    ),
+				    FinalTyped = Table.TransformColumnTypes(
+				        SelectedColumns,
+				        {
+				            {"snapshot_row_id", type text},
+				            {"entity_opp_id", type text},
+				            {"opp_id", type text},
+				            {"crm_opp_id", type text},
+				            {"source_row_doc_id", type text},
+				            {"source_sort_id", Int64.Type},
+				            {"valid_from", type datetime},
+				            {"valid_to", type datetime},
+				            {"is_open_as_of_row", type logical},
+				            {"is_closed_stage", type logical},
+				            {"snapshot_status", type text},
+				            {"trueai_stage", type text},
+				            {"trueai_stage_name", type text},
+				            {"crm_stage_name", type text},
+				            {"trueai_stage_num", Int64.Type},
+				            {"trueai_propensity", type text},
+				            {"trueai_propensity_num", Int64.Type},
+				            {"trueai_sale_type", type text},
+				            {"opp_name", type text},
+				            {"account_name", type text},
+				            {"owner_name", type text},
+				            {"seller_name", type text},
+				            {"trueai_group", type text},
+				            {"trueai_full_name", type text},
+				            {"amount", type number},
+				            {"expected_value", type number},
+				            {"crm_created_on", type datetime},
+				            {"crm_close_date", type datetime},
+				            {"initial_close_date", type datetime},
+				            {"trueai_pace_score", type number},
+				            {"pace_score_bucket", type text},
+				            {"trueai_act_count", Int64.Type},
+				            {"act_dur_hours", type number},
+				            {"trueai_last_eng_act", type datetime},
+				            {"stkhlds_all_contacts_count", Int64.Type}
+				        }
+				    )
+				in
+				    FinalTyped
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_Id = 0fef07ce35f948b0b57fd84c2a9a4c0a
+

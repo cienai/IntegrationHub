@@ -9,7 +9,7 @@ table open_pipeline
 	/// Format/Type: #,##0.0" hrs"
 	measure 'meas.open_opps_dur_hrs' = ```
 			
-			VAR sel_date = [meas.sel_date] // get the selected date 
+			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] > sel_date)
 			
 			VAR filter_tbl = 
@@ -42,7 +42,7 @@ table open_pipeline
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.open_opps_engagement_ratio' = ```
 			
-			VAR sel_date = [meas.sel_date] // get the selected date 
+			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] > sel_date)
 			
 			VAR filter_tbl = 
@@ -80,7 +80,7 @@ table open_pipeline
 	measure 'meas.open_opps_last_eng_days' =
 			
 			var last_eng = CALCULATE(MAX(opps[crm_last_act_time]))            // get the last eng date
-			var _current_date =[meas.sel_date]              // get the current date
+			var _current_date =[meas.cal_end_sel_date]              // get the current as-of date
 			var res = IF(
 			    ISBLANK(last_eng),
 			    BLANK(),
@@ -112,7 +112,7 @@ table open_pipeline
 	measure 'meas.open_opps_sel_date_count' = ```
 			
 			
-			VAR sel_date = [meas.sel_date] // get the selected date 
+			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] >= sel_date)
 			
 			VAR filter_tbl = 
@@ -149,7 +149,7 @@ table open_pipeline
 			//*** This is the "earlier" measure sub filtere approach for TS data  - use to get a filter measure and a count only (counts can be used in pie charts etc)
 			
 			-- function that through multiple steps get the most recent records in a table for each coid and then allow u to do agg ops on it 
-			var sel_date = [meas.sel_date] // get the selected date 
+			var sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			
 			//var temp_res =  CALCULATE(COUNT(ssr_history[_sys_doc_id]))
 			var temp_tbl = CALCULATETABLE(open_pipeline , opps[_sys_filt_end_date] >= sel_date  ) // start by filtering the table to the appropriate period and override the end date to include open item,s 
@@ -184,7 +184,7 @@ table open_pipeline
 	/// Format/Type: Short Date
 	measure 'meas.open_opps_last_eng_act' =
 			
-			var sel_date = CALCULATE(MAX(cal_start_dates[Date]))
+			var sel_date = [meas.cal_end_sel_date]
 			var res =  CALCULATE(
 			    MAX(open_pipeline[trueai_last_eng_act])
 			)
@@ -238,7 +238,7 @@ table open_pipeline
 	/// Format/Type: Unspecified
 	measure 'meas.open_opps_tbl_title' =
 			
-			var _date = FORMAT([meas.sel_date], "MM/dd/yyyy")           // get the formatted date
+			var _date = FORMAT([meas.cal_end_sel_date], "MM/dd/yyyy")           // get the formatted as-of date
 			var _str = "Open Opps List as of "              // table title text
 			
 			 var res = _str & _date
@@ -318,7 +318,7 @@ table open_pipeline
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.open_opps_avg_win_prob' = ```
 			
-			VAR sel_date = [meas.sel_date] // get the selected date 
+			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] >= sel_date)
 			
 			VAR filter_tbl = 
@@ -370,7 +370,7 @@ table open_pipeline
 	/// Format/Type: #,0
 	measure 'meas.open_opps_count' = ```
 			
-			VAR sel_date = [meas.sel_date] // get the selected date 
+			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] >= sel_date)
 			
 			VAR filter_tbl = 
@@ -407,7 +407,7 @@ table open_pipeline
 			CALCULATE(
 			    [meas.open_opps_count],             // get the sply open opps count
 			    open_pipeline[trueai_stage] in {"Early", "Mid", "Late"},
-			    SAMEPERIODLASTYEAR(cal_start_dates[Date])
+			    SAMEPERIODLASTYEAR(cal_end_dates[Date])
 			)
 		formatString: #,0
 		displayFolder: _open_opps_pipeline
@@ -446,7 +446,7 @@ table open_pipeline
 			CALCULATE(
 			    [meas.open_opps_avg_win_prob],
 			    open_pipeline[trueai_stage] in {"Early", "Mid", "Late"},
-			    DATEADD(cal_start_dates[Date], -1, YEAR)
+			    DATEADD(cal_end_dates[Date], -1, YEAR)
 			)
 		formatString: 0%;-0%;0%
 		displayFolder: _open_opps_pipeline
@@ -483,7 +483,7 @@ table open_pipeline
 	measure 'meas.open_opps_pipeline_amt' = ```
 			
 			
-			VAR sel_date = [meas.sel_date] // get the selected date 
+			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] >= sel_date)
 			
 			VAR filter_tbl = 
@@ -523,7 +523,7 @@ table open_pipeline
 			CALCULATE(
 			    [meas.open_opps_pipeline_amt],
 			    open_pipeline[trueai_stage] in {"Early", "Mid", "Late"},
-			    SAMEPERIODLASTYEAR(cal_start_dates[Date])
+			    SAMEPERIODLASTYEAR(cal_end_dates[Date])
 			)
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _open_opps_pipeline
@@ -538,7 +538,7 @@ table open_pipeline
 	/// Format/Type: """+""#"" days"";""-""#"" days"";""-"""
 	measure 'meas.open_opps_pushed_pulled_day' = ```
 			
-			VAR sel_date = [meas.sel_date] // get the selected date 
+			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] >= sel_date)
 			
 			VAR filter_tbl = 
@@ -574,7 +574,7 @@ table open_pipeline
 			
 			CALCULATE(
 			    [meas.open_opps_pushed_pulled_day],             // get the sply open opps pipeline amt
-			    DATEADD(cal_start_dates[Date], -1, YEAR)
+			    DATEADD(cal_end_dates[Date], -1, YEAR)
 			)
 		formatString: """+""#"" days"";""-""#"" days"";""-"""
 		displayFolder: _open_opps_pipeline
@@ -639,10 +639,11 @@ table open_pipeline
 	/// Format/Type: Unspecified
 	measure 'meas.open_opps_items_trueai_stage' = ```
 			
-			var opps_latest_row  = CALCULATETABLE(TOPN(1,opps, opps[_sys_as_of], DESC))  // get the most recent entries
+			VAR current_opp_id = [meas.current_opp_id]
+			var opps_latest_row  = CALCULATETABLE(TOPN(1, FILTER(ALL(opps), opps[_sys_doc_id] = current_opp_id), opps[_sys_as_of], DESC))  // get the most recent entries
 			var opps_res =  CALCULATE(MAXX(opps_latest_row, opps[trueai_stage]))             // get the trueai stage name
 			
-			var open_pipeline_latest_row  = CALCULATETABLE(TOPN(1,open_pipeline, open_pipeline[_sys_as_of], DESC))  // get the most recent entries
+			var open_pipeline_latest_row  = CALCULATETABLE(TOPN(1, FILTER(ALL(open_pipeline), open_pipeline[crm_opp_id] = current_opp_id), open_pipeline[_sys_as_of], DESC))  // get the most recent entries
 			var open_pipeline_res =  CALCULATE(MAXX(open_pipeline_latest_row, open_pipeline[trueai_stage]))             // get the trueai stage name
 			
 			
@@ -682,7 +683,7 @@ table open_pipeline
 			
 			var _sply = CALCULATE(
 			    [meas.trueai_pace_score],       
-			    DATEADD(cal_start_dates[Date], -1, YEAR)            // SPLY 
+			    DATEADD(cal_end_dates[Date], -1, YEAR)            // SPLY 
 			)
 			var _avg =  ROUND(_sply,0)
 			var res = SWITCH(
@@ -714,7 +715,7 @@ table open_pipeline
 			var _avg = [meas.trueai_pace_score]             /// current
 			var _sply = CALCULATE(
 			    [meas.trueai_pace_score],       
-			    DATEADD(cal_start_dates[Date], -1, YEAR)            // SPLY 
+			    DATEADD(cal_end_dates[Date], -1, YEAR)            // SPLY 
 			)
 			
 			var res = DIVIDE(
@@ -739,7 +740,7 @@ table open_pipeline
 	/// Format/Type: 0
 	measure 'meas.open_opps_act_count' = ```
 			
-			VAR sel_date = [meas.sel_date] // get the selected date 
+			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] > sel_date)
 			
 			VAR filter_tbl = 
@@ -795,7 +796,8 @@ table open_pipeline
 	/// Format/Type: #" days"
 	measure 'meas.open_opps_age_days' =
 			
-			var res =  CALCULATE(MAX(opps[col.opp_age]))
+			VAR current_opp_id = [meas.current_opp_id]
+			var res =  CALCULATE(MAX(opps[col.opp_age]), FILTER(ALL(opps), opps[_sys_doc_id] = current_opp_id))
 			
 			RETURN
 			res
@@ -814,7 +816,7 @@ table open_pipeline
 			
 			var res = CALCULATE(
 			    [meas.open_opps_age_days], 
-			    DATEADD(cal_start_dates[Date], -1, YEAR)
+			    DATEADD(cal_end_dates[Date], -1, YEAR)
 			)
 			RETURN
 			res
@@ -1178,7 +1180,7 @@ table open_pipeline
 	/// Format/Type: #" days"
 	measure 'meas.closed_opps_age_days' = ```
 			
-			VAR sel_date = [meas.sel_date] // get the selected date 
+			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			
 			
 			VAR _age = 
@@ -1226,7 +1228,7 @@ table open_pipeline
 	/// Format/Type: #" days"
 	measure 'meas.opps_details_screen_age' = ```
 			
-			VAR SelectedDate = MAX('cal_start_dates'[Date])
+			VAR SelectedDate = [meas.cal_end_sel_date]
 			
 			var _age =  MAXX(
 			        'open_pipeline', 
@@ -1286,11 +1288,11 @@ table open_pipeline
 	/// Format/Type: Unspecified
 	measure 'meas.open_opps_last_eng_date_filter' = ```
 			
-			VAR sel_date = [meas.sel_date] // get the selected date 
+			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			
 			
 			 
-			VAR MaxOppCreated = CALCULATE(MAX(cal_start_dates[Date]))
+			VAR MaxOppCreated = [meas.cal_end_sel_date]
 			RETURN
 			IF (
 			    MAX('open_pipeline'[crm_created_on]) <= MaxOppCreated &&
@@ -1303,8 +1305,6 @@ table open_pipeline
 			```
 		displayFolder: _open_opps_pipeline
 		lineageTag: 3cf39ace-fd7b-4393-b313-238b3d23680b
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.closed_opps_pushed_pulled_days.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
@@ -1367,23 +1367,16 @@ table open_pipeline
 	/// Format/Type: Unspecified
 	measure 'meas.opp_details_most_recent_step_outcome' =
 			
-			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
-			var temp_res = CALCULATE(
-			    Max(ssr_history[step_outcome]),
-			    ssr_history[step_sequence] = _max_step_id           // get the most recent step outcome
-			)
-			var res = IF(
-			    temp_res=BLANK(),
-			    CALCULATE(
-			        Max(ssr_history[step_outcome]),
-			        ssr_history[step_sequence] = (_max_step_id -1)          // get the most recent step outcome
-			    ),
-			    temp_res
-			)
-			
-			
+			VAR current_ssr_history_id = [meas.current_opp_latest_ssr_history_doc_id]
 			RETURN
-			res
+			IF(
+			    ISBLANK(current_ssr_history_id),
+			    BLANK(),
+			    CALCULATE(
+			        MAX(ssr_history[step_outcome]),
+			        FILTER(ALL(ssr_history), ssr_history[_sys_doc_id] = current_ssr_history_id)
+			    )
+			)
 		displayFolder: _opps_details
 		lineageTag: aa15574a-fd7d-482f-a3cd-7eab0b46de95
 
@@ -1394,15 +1387,16 @@ table open_pipeline
 	/// Format/Type: Unspecified
 	measure 'meas.opp_details_most_recent_step_sub_type' =
 			
-			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
-			var res = CALCULATE(
-			    Max(ssr_history[step_sub_type]),
-			    ssr_history[step_sequence] = _max_step_id           // get the most recent step sub type
-			)
-			
-			
+			VAR current_ssr_history_id = [meas.current_opp_latest_ssr_history_doc_id]
 			RETURN
-			res
+			IF(
+			    ISBLANK(current_ssr_history_id),
+			    BLANK(),
+			    CALCULATE(
+			        MAX(ssr_history[step_sub_type]),
+			        FILTER(ALL(ssr_history), ssr_history[_sys_doc_id] = current_ssr_history_id)
+			    )
+			)
 		displayFolder: _opps_details
 		lineageTag: 1fbb5ddc-25e3-4ee3-ba4c-8c4ff9c461d2
 
@@ -1413,12 +1407,10 @@ table open_pipeline
 	/// Format/Type: 0
 	measure 'meas.open_opps_count_tbl_filter' = ```
 			
-			VAR sel_end_date =CALCULATE(MAX(cal_start_dates[Date])) // get the selected max date 
-			VAR sel_start_date =CALCULATE(MIN(cal_start_dates[Date])) // get the selected max date 
+			VAR sel_end_date = [meas.cal_end_sel_date] // snapshot inclusion is driven only by the as-of date
 			
 			VAR temp_tbl = CALCULATETABLE(
 			    open_pipeline, 
-			    opps[_sys_filt_start_date] >= sel_start_date,
 			    opps[_sys_filt_end_date] >= sel_end_date
 			)
 			
@@ -1464,7 +1456,7 @@ table open_pipeline
 	/// Format/Type: 0
 	measure 'meas.open_opps_age_days_filter' = ```
 			
-			VAR sel_date = [meas.sel_date] // get the selected date 
+			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
 			
 			VAR _age = 
 			    CALCULATE(
@@ -1523,23 +1515,16 @@ table open_pipeline
 	/// Format/Type: Unspecified
 	measure 'meas.opp_details_most_recent_sales_type' =
 			
-			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
-			var temp_res = CALCULATE(
-			    Max(ssr_history[opp_sale_type]),
-			    ssr_history[step_sequence] = _max_step_id           // get the most recent step outcome
-			)
-			var res = IF(
-			    temp_res=BLANK(),
-			    CALCULATE(
-			        Max(ssr_history[opp_sale_type]),
-			        ssr_history[step_sequence] = (_max_step_id -1)          // get the most recent step outcome
-			    ),
-			    temp_res
-			)
-			
-			
+			VAR current_ssr_history_id = [meas.current_opp_latest_ssr_history_doc_id]
 			RETURN
-			res
+			IF(
+			    ISBLANK(current_ssr_history_id),
+			    BLANK(),
+			    CALCULATE(
+			        MAX(ssr_history[opp_sale_type]),
+			        FILTER(ALL(ssr_history), ssr_history[_sys_doc_id] = current_ssr_history_id)
+			    )
+			)
 		displayFolder: _opps_details
 		lineageTag: eef20aec-590d-4d8c-aaea-4ff2369b0fee
 
@@ -1567,8 +1552,16 @@ table open_pipeline
 	/// Format/Type: Unspecified
 	measure 'meas.opps_details_avg_pace_score' =
 			
-			
-			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)
+			VAR current_opp_id = [meas.current_opp_id]
+			VAR current_open_pipeline_row =
+			    CALCULATETABLE(
+			        TOPN(
+			            1,
+			            FILTER(ALL(open_pipeline), open_pipeline[crm_opp_id] = current_opp_id),
+			            open_pipeline[_sys_as_of], DESC
+			        )
+			    )
+			var _avg =  ROUND(CALCULATE(MAXX(current_open_pipeline_row, open_pipeline[trueai_pace_score] * 5)),0)
 			
 			var res = SWITCH(
 			    _avg,
@@ -1594,7 +1587,8 @@ table open_pipeline
 	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 	measure 'meas.open_opps_items_trueai_booking_amt' = ```
 			
-			var latest_row  = CALCULATETABLE(TOPN(1,open_pipeline, open_pipeline[_sys_as_of], DESC))  // get the most recent entries
+			VAR current_opp_id = [meas.current_opp_id]
+			var latest_row  = CALCULATETABLE(TOPN(1, FILTER(ALL(open_pipeline), open_pipeline[crm_opp_id] = current_opp_id), open_pipeline[_sys_as_of], DESC))  // get the most recent entries
 			var res =  CALCULATE(MAXX(latest_row, open_pipeline[trueai_booking_amt]))             // get the total trueai booking amt
 			RETURN  
 			res
@@ -1811,7 +1805,9 @@ table open_pipeline
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: 0
-	measure 'meas.open_pipeline_count_id' = COUNT(open_pipeline[_sys_doc_id])
+	measure 'meas.open_pipeline_count_id' =
+			
+			COALESCE ( [meas.open_opps_snapshot_fact_count], 0 )
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 45a2df27-31e4-4b0f-9e84-bce4843d7a29
@@ -2034,6 +2030,201 @@ table open_pipeline
 			```
 		formatString: 0
 		lineageTag: f53163da-522b-4c02-b6f5-eb0518a27cb5
+
+	/// Measure meas.open_opps_sel_date_table_row_count.
+	/// Purpose: Count the rows that survive the row-level open opportunity filter used by the table visual.
+	/// Calculation Logic: Apply the row-safe measure per visible open_pipeline row and count rows where it is > 0.
+	/// Dynamic Behavior: Respects current filter context and mirrors the table's inclusion logic.
+	/// Format/Type: #,0
+	measure 'meas.open_opps_sel_date_table_row_count' =
+			
+			COUNTROWS(
+			    FILTER(
+			        VALUES(ssr_history[entity_opp_id]),
+			        NOT ISBLANK(ssr_history[entity_opp_id])
+			            && [meas.open_opps_sel_date_count] > 0
+			    )
+			)
+		formatString: #,0
+		displayFolder: _open_opps_pipeline
+		lineageTag: 18bd6e97-ff37-4143-9677-1dc4c8fda8f1
+
+	/// Measure meas.open_opps_snapshot_include.
+	/// Purpose: Returns 1 only for the single deterministic open_pipeline row that represents the opportunity as of the selected date.
+	/// Calculation Logic: Picks the latest qualifying row per crm_opp_id using sort id, then end date, then doc id; excludes closed rows as of the selected date.
+	/// Dynamic Behavior: Respects the selected snapshot date via [meas.sel_date]; uses crm_opp_id / entity_opp_id as the inclusion grain.
+	/// Format/Type: 0
+	measure 'meas.open_opps_snapshot_include' =
+			VAR sel_date =
+			    [meas.cal_end_sel_date]
+			VAR opp_id =
+			    COALESCE (
+			        SELECTEDVALUE ( open_pipeline[crm_opp_id] ),
+			        SELECTEDVALUE ( ssr_history[entity_opp_id] )
+			    )
+			VAR latest_row =
+			    TOPN (
+			        1,
+			        FILTER (
+			            ALL ( open_pipeline ),
+			            open_pipeline[crm_opp_id] = opp_id
+			                && NOT ISBLANK ( open_pipeline[crm_opp_id] )
+			                && open_pipeline[crm_created_on] <= sel_date
+			                && open_pipeline[_sys_filt_end_date] >= sel_date
+			        ),
+			        open_pipeline[trueai_sort_id], DESC,
+			        open_pipeline[_sys_filt_end_date], DESC,
+			        open_pipeline[_sys_doc_id], DESC
+			    )
+			VAR latest_row_doc_id =
+			    MAXX ( latest_row, open_pipeline[_sys_doc_id] )
+			VAR latest_row_stage =
+			    MAXX ( latest_row, open_pipeline[trueai_stage] )
+			VAR current_row_doc_id =
+			    SELECTEDVALUE ( open_pipeline[_sys_doc_id] )
+			RETURN
+			    IF (
+			        ISBLANK ( opp_id )
+			            || ISEMPTY ( latest_row )
+			            || latest_row_stage IN { "Closed Won", "Closed Lost" },
+			        0,
+			        IF (
+			            NOT ISBLANK ( current_row_doc_id ),
+			            INT ( current_row_doc_id = latest_row_doc_id ),
+			            1
+			        )
+			    )
+		formatString: 0
+		displayFolder: _open_opps_pipeline
+		lineageTag: 5c4665d2-a4f7-4fb7-b6e5-0df2f8907500
+
+	/// Measure meas.open_opps_snapshot_count.
+	/// Purpose: Counts distinct opportunities that pass the deterministic snapshot inclusion rule.
+	/// Calculation Logic: Counts visible entity_opp_id values where [meas.open_opps_snapshot_include] = 1.
+	/// Dynamic Behavior: Respects current filter context and keeps the measure at opp grain to avoid row inflation.
+	/// Format/Type: #,0
+	measure 'meas.open_opps_snapshot_count' =
+			
+			COUNTROWS (
+			    FILTER (
+			        VALUES ( ssr_history[entity_opp_id] ),
+			        NOT ISBLANK ( ssr_history[entity_opp_id] )
+			            && [meas.open_opps_snapshot_include] = 1
+			    )
+			)
+		formatString: #,0
+		displayFolder: _open_opps_pipeline
+		lineageTag: 3a1647ff-b6c3-4d8b-ae5d-7cf553c72ef4
+
+	/// Measure meas.open_opps_last_eng_asof.
+	/// Purpose: Returns the last engagement date that was knowable as of the selected snapshot date.
+	/// Calculation Logic: Filters ssr_history to rows valid on the selected date and engagement dates on or before that date.
+	/// Dynamic Behavior: Respects [meas.sel_date] and crm_opp_id / entity_opp_id filter context.
+	/// Format/Type: Short Date
+	measure 'meas.open_opps_last_eng_asof' =
+			VAR sel_date =
+			    [meas.cal_end_sel_date]
+			VAR opp_id =
+			    COALESCE (
+			        SELECTEDVALUE ( open_pipeline[crm_opp_id] ),
+			        SELECTEDVALUE ( ssr_history[entity_opp_id] )
+			    )
+			RETURN
+			    CALCULATE (
+			        MAX ( ssr_history[stkhlds_all_last_eng] ),
+			        FILTER (
+			            ALL ( ssr_history ),
+			            ssr_history[entity_opp_id] = opp_id
+			                && NOT ISBLANK ( ssr_history[stkhlds_all_last_eng] )
+			                && ssr_history[stkhlds_all_last_eng] <= sel_date
+			                && ssr_history[_sys_filt_start_date] <= sel_date
+			                && ssr_history[_sys_filt_end_date] >= sel_date
+			        )
+			    )
+		formatString: Short Date
+		displayFolder: _open_opps_pipeline
+		lineageTag: b275b15c-6b4b-4140-ae0d-3f96ee04eddb
+
+	/// Measure meas.open_opps_days_since_last_eng_asof.
+	/// Purpose: Returns days between the selected date and the last engagement date as of that selected date.
+	/// Calculation Logic: Computes a DATEDIFF from [meas.open_opps_last_eng_asof] to [meas.sel_date].
+	/// Dynamic Behavior: Respects [meas.sel_date] and the current opportunity context.
+	/// Format/Type: 0
+	measure 'meas.open_opps_days_since_last_eng_asof' =
+			VAR sel_date =
+			    [meas.cal_end_sel_date]
+			VAR last_eng =
+			    [meas.open_opps_last_eng_asof]
+			RETURN
+			    IF (
+			        ISBLANK ( last_eng ),
+			        BLANK (),
+			        DATEDIFF ( last_eng, sel_date, DAY )
+			    )
+		formatString: 0
+		displayFolder: _open_opps_pipeline
+		lineageTag: 1434767f-b23a-4d7d-ae5d-5262e7f7ca7b
+
+	/// Measure meas.open_opps_engagement_bucket.
+	/// Purpose: Buckets opportunities by engagement recency as of the selected date without changing snapshot inclusion.
+	/// Calculation Logic: Uses the as-of engagement date and a fallback check for any future-only engagement history.
+	/// Dynamic Behavior: Respects [meas.sel_date] and crm_opp_id / entity_opp_id filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.open_opps_engagement_bucket' =
+			VAR opp_id =
+			    COALESCE (
+			        SELECTEDVALUE ( open_pipeline[crm_opp_id] ),
+			        SELECTEDVALUE ( ssr_history[entity_opp_id] )
+			    )
+			VAR last_eng =
+			    [meas.open_opps_last_eng_asof]
+			VAR days_since =
+			    [meas.open_opps_days_since_last_eng_asof]
+			VAR has_any_engagement =
+			    CALCULATE (
+			        COUNTROWS ( ssr_history ),
+			        FILTER (
+			            ALL ( ssr_history ),
+			            ssr_history[entity_opp_id] = opp_id
+			                && NOT ISBLANK ( ssr_history[stkhlds_all_last_eng] )
+			        )
+			    ) > 0
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( last_eng ) && NOT has_any_engagement, "No engagement recorded",
+			        ISBLANK ( last_eng ) && has_any_engagement, "Engagement only after selected date",
+			        days_since <= 14, "0-14 days",
+			        days_since <= 30, "15-30 days",
+			        days_since <= 60, "31-60 days",
+			        days_since <= 90, "61-90 days",
+			        "90+ days"
+			    )
+		displayFolder: _open_opps_pipeline
+		lineageTag: 9e2d13d1-b80a-4e26-a86b-09e3776d8fc8
+
+	/// Measure meas.open_opps_engagement_filter_apply.
+	/// Purpose: Applies an explicit disconnected-slicer engagement filter without silently suppressing snapshot rows by default.
+	/// Calculation Logic: Matches the selected slicer bucket to [meas.open_opps_engagement_bucket]; defaults to All.
+	/// Dynamic Behavior: Respects the disconnected table open_opps_engagement_filter and the current opportunity context.
+	/// Format/Type: 0
+	measure 'meas.open_opps_engagement_filter_apply' =
+			VAR selected_bucket =
+			    SELECTEDVALUE ( open_opps_engagement_filter[bucket], "All" )
+			VAR current_bucket =
+			    [meas.open_opps_engagement_bucket]
+			RETURN
+			    IF (
+			        selected_bucket = "All"
+			            || selected_bucket = current_bucket,
+			        1,
+			        0
+			    )
+		formatString: 0
+		displayFolder: _open_opps_pipeline
+		lineageTag: 742bcb42-3b8d-4860-9eb8-458674153b85
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// The date of the last data request from the platform
 	column _sys_as_of
@@ -3036,6 +3227,14 @@ table open_pipeline
 		lineageTag: 2c593a8d-d985-4223-9c72-50778f1e4c67
 		summarizeBy: none
 		sourceColumn: cust_date3
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_sync_id
+		dataType: string
+		lineageTag: 5944a063-1786-4018-8caa-96c5fc649748
+		summarizeBy: none
+		sourceColumn: _sys_sync_id
 
 		annotation SummarizationSetBy = Automatic
 
