@@ -28,25 +28,6 @@ table ssr_history_success_factors
 	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(MAX) and IF.
 	/// Dynamic Behavior: Respects current filter context; responds to filters on ssr_history_success_factors[trueai_value_impact].
 	/// Format/Type: 0%;-0%;0%
-	measure 'meas.current_opp_success_factor_include' =
-			
-			VAR current_ssr_history_id = [meas.current_opp_latest_ssr_history_doc_id]
-			VAR factor_ssr_history_id = SELECTEDVALUE(ssr_history_success_factors[_sys_ssr_history_id])
-			RETURN
-			IF(
-			    NOT ISBLANK(current_ssr_history_id)
-			        && factor_ssr_history_id = current_ssr_history_id,
-			    1,
-			    BLANK()
-			)
-		formatString: 0
-		displayFolder: success_prob_factors
-		lineageTag: c1ce4397-dd52-492b-9c68-825fef8ec6c6
-
-	/// Purpose: Returns positive impact value if the max impact is greater than 0.
-	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(MAX) and IF.
-	/// Dynamic Behavior: Respects current filter context; responds to filters on ssr_history_success_factors[trueai_value_impact].
-	/// Format/Type: 0%;-0%;0%
 	measure 'meas.ssr_history_success_prob_impact_positive' =
 			
 			VAR include_row = [meas.current_opp_success_factor_include]
@@ -195,6 +176,25 @@ table ssr_history_success_factors
 			```
 		displayFolder: success_prob_factors
 		lineageTag: f24a5b64-818e-42df-920a-3a818a663c56
+
+	/// Purpose: Returns positive impact value if the max impact is greater than 0.
+	/// Calculation Logic: Uses VAR/RETURN with CALCULATE(MAX) and IF.
+	/// Dynamic Behavior: Respects current filter context; responds to filters on ssr_history_success_factors[trueai_value_impact].
+	/// Format/Type: 0%;-0%;0%
+	measure 'meas.current_opp_success_factor_include' =
+			
+			VAR current_ssr_history_id = [meas.current_opp_latest_ssr_history_doc_id]
+			VAR factor_ssr_history_id = SELECTEDVALUE(ssr_history_success_factors[_sys_ssr_history_id])
+			RETURN
+			IF(
+			    NOT ISBLANK(current_ssr_history_id)
+			        && factor_ssr_history_id = current_ssr_history_id,
+			    1,
+			    BLANK()
+			)
+		formatString: 0
+		displayFolder: success_prob_factors
+		lineageTag: c1ce4397-dd52-492b-9c68-825fef8ec6c6
 
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id

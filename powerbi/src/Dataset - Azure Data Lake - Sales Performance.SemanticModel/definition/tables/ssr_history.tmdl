@@ -9984,56 +9984,6 @@ table ssr_history
 		displayFolder: _opps_detail
 		lineageTag: 8db7b9c0-473c-4ae0-bb95-bf759e442575
 
-	measure 'meas.current_opp_id' =
-			
-			VAR opp_ids =
-			    FILTER(
-			        DISTINCT(
-			            UNION(
-			                SELECTCOLUMNS(VALUES(ssr_history[entity_opp_id]), "opp_id", ssr_history[entity_opp_id]),
-			                SELECTCOLUMNS(VALUES(open_opps_snapshot_fact[entity_opp_id]), "opp_id", open_opps_snapshot_fact[entity_opp_id]),
-			                SELECTCOLUMNS(VALUES(opps[_sys_doc_id]), "opp_id", opps[_sys_doc_id])
-			            )
-			        ),
-			        NOT ISBLANK([opp_id]) && [opp_id] <> ""
-			    )
-			RETURN
-			IF(COUNTROWS(opp_ids) = 1, MAXX(opp_ids, [opp_id]), BLANK())
-		displayFolder: _opps_detail
-		lineageTag: 8c4ce5d8-31cb-4448-8164-06303359f20a
-
-	measure 'meas.current_opp_latest_ssr_history_doc_id' =
-			
-			VAR current_opp_id = [meas.current_opp_id]
-			VAR latest_row =
-			    TOPN(
-			        1,
-			        FILTER(ALL(ssr_history), ssr_history[entity_opp_id] = current_opp_id),
-			        ssr_history[step_sequence], DESC,
-			        ssr_history[_sys_as_of], DESC,
-			        ssr_history[_sys_doc_id], DESC
-			    )
-			RETURN
-			IF(ISBLANK(current_opp_id), BLANK(), MAXX(latest_row, ssr_history[_sys_doc_id]))
-		displayFolder: _opps_detail
-		lineageTag: 71d87d37-728b-4a75-acbc-010d1fa8cd06
-
-	measure 'meas.current_opp_latest_ssr_id' =
-			
-			VAR current_opp_id = [meas.current_opp_id]
-			VAR latest_row =
-			    TOPN(
-			        1,
-			        FILTER(ALL(ssr_history), ssr_history[entity_opp_id] = current_opp_id),
-			        ssr_history[step_sequence], DESC,
-			        ssr_history[_sys_as_of], DESC,
-			        ssr_history[_sys_doc_id], DESC
-			    )
-			RETURN
-			IF(ISBLANK(current_opp_id), BLANK(), MAXX(latest_row, ssr_history[_sys_ssr_id]))
-		displayFolder: _opps_detail
-		lineageTag: 7f67ff7b-0852-46e3-a47f-d29b1fb4d2b5
-
 	/// Purpose: Returns a maximum value derived from ssr_history[step_sequence].
 	/// Calculation Logic: Uses CALCULATE, MAX, RETURN.
 	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr_history[step_sequence].
@@ -15814,6 +15764,56 @@ table ssr_history
 		lineageTag: 6bbf67ff-dcee-4043-b129-9c48f2bf44dd
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.current_opp_id' =
+			
+			VAR opp_ids =
+			    FILTER(
+			        DISTINCT(
+			            UNION(
+			                SELECTCOLUMNS(VALUES(ssr_history[entity_opp_id]), "opp_id", ssr_history[entity_opp_id]),
+			                SELECTCOLUMNS(VALUES(open_opps_snapshot_fact[entity_opp_id]), "opp_id", open_opps_snapshot_fact[entity_opp_id]),
+			                SELECTCOLUMNS(VALUES(opps[_sys_doc_id]), "opp_id", opps[_sys_doc_id])
+			            )
+			        ),
+			        NOT ISBLANK([opp_id]) && [opp_id] <> ""
+			    )
+			RETURN
+			IF(COUNTROWS(opp_ids) = 1, MAXX(opp_ids, [opp_id]), BLANK())
+		displayFolder: _opps_detail
+		lineageTag: 8c4ce5d8-31cb-4448-8164-06303359f20a
+
+	measure 'meas.current_opp_latest_ssr_history_doc_id' =
+			
+			VAR current_opp_id = [meas.current_opp_id]
+			VAR latest_row =
+			    TOPN(
+			        1,
+			        FILTER(ALL(ssr_history), ssr_history[entity_opp_id] = current_opp_id),
+			        ssr_history[step_sequence], DESC,
+			        ssr_history[_sys_as_of], DESC,
+			        ssr_history[_sys_doc_id], DESC
+			    )
+			RETURN
+			IF(ISBLANK(current_opp_id), BLANK(), MAXX(latest_row, ssr_history[_sys_doc_id]))
+		displayFolder: _opps_detail
+		lineageTag: 71d87d37-728b-4a75-acbc-010d1fa8cd06
+
+	measure 'meas.current_opp_latest_ssr_id' =
+			
+			VAR current_opp_id = [meas.current_opp_id]
+			VAR latest_row =
+			    TOPN(
+			        1,
+			        FILTER(ALL(ssr_history), ssr_history[entity_opp_id] = current_opp_id),
+			        ssr_history[step_sequence], DESC,
+			        ssr_history[_sys_as_of], DESC,
+			        ssr_history[_sys_doc_id], DESC
+			    )
+			RETURN
+			IF(ISBLANK(current_opp_id), BLANK(), MAXX(latest_row, ssr_history[_sys_ssr_id]))
+		displayFolder: _opps_detail
+		lineageTag: 7f67ff7b-0852-46e3-a47f-d29b1fb4d2b5
 
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id

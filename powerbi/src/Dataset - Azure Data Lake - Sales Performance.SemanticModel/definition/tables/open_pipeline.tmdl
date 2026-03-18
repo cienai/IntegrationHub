@@ -7,28 +7,25 @@ table open_pipeline
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: #,##0.0" hrs"
-	measure 'meas.open_opps_dur_hrs' = ```
-			
-			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
-			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] > sel_date)
-			
-			VAR filter_tbl = 
-			FILTER(
-			    temp_tbl,
-			    open_pipeline[trueai_sort_id] = 
-			    CALCULATE(
-			        MAX(open_pipeline[trueai_sort_id]),
-			        FILTER(
-			            ALL(open_pipeline),         // get the most recent open opps items
-			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id])
-			            && open_pipeline[_sys_filt_end_date] >= sel_date && open_pipeline[crm_created_on] <= sel_date
-			        )
-			    )
+	measure 'meas.open_opps_dur_hrs' =
+			VAR sel_date = [meas.cal_end_sel_date]
+			VAR stage_filter = VALUES(open_pipeline[trueai_stage])
+			VAR stage_name_filter = VALUES(open_pipeline[trueai_stage_name])
+			VAR propensity_filter = VALUES(opps[trueai_propensity])
+			RETURN
+			CALCULATE(
+			    AVERAGE(open_opps_snapshot_fact[act_dur_hours]),
+			    FILTER(
+			        open_opps_snapshot_fact,
+			        open_opps_snapshot_fact[valid_from] <= sel_date
+			            && open_opps_snapshot_fact[valid_to] > sel_date
+			            && open_opps_snapshot_fact[is_closed_stage] = FALSE()
+			            && open_opps_snapshot_fact[crm_export_eligible] = TRUE()
+			    ),
+			    KEEPFILTERS(TREATAS(stage_filter, open_opps_snapshot_fact[trueai_stage])),
+			    KEEPFILTERS(TREATAS(stage_name_filter, open_opps_snapshot_fact[trueai_stage_name])),
+			    KEEPFILTERS(TREATAS(propensity_filter, open_opps_snapshot_fact[trueai_propensity]))
 			)
-			
-			Var res  = AVERAGEX(filter_tbl,[trueai_act_dur] )
-			RETURN res/3600
-			```
 		formatString: #,##0.0" hrs"
 		displayFolder: _open_opps_pipeline
 		lineageTag: 6a45d4e5-bc9f-4cbc-a81a-7ca586f55139
@@ -109,33 +106,17 @@ table open_pipeline
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: #,0
-	measure 'meas.open_opps_sel_date_count' = ```
-			
-			
-			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
-			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] >= sel_date)
-			
-			VAR filter_tbl = 
-			FILTER(
-			    temp_tbl,
-			    open_pipeline[trueai_sort_id] = 
-			    CALCULATE(
-			        MAX(open_pipeline[trueai_sort_id]),
-			        FILTER(
-			            ALL(open_pipeline),         // get the most recent open opps items
-			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id]) 
-			            && open_pipeline[_sys_filt_end_date] >= sel_date && open_pipeline[_sys_filt_end_date] >= sel_date && open_pipeline[crm_created_on] <=sel_date
-			        )
-			    )
-			)
-			
-			var res =  CALCULATE(COUNTX(filter_tbl, [_sys_doc_id]))
-			
-			
+	measure 'meas.open_opps_sel_date_count' =
+			VAR stage_filter = VALUES(open_pipeline[trueai_stage])
+			VAR stage_name_filter = VALUES(open_pipeline[trueai_stage_name])
+			VAR propensity_filter = VALUES(opps[trueai_propensity])
 			RETURN
-			res
-			
-			```
+			CALCULATE(
+			    [meas.open_opps_snapshot_fact_count],
+			    KEEPFILTERS(TREATAS(stage_filter, open_opps_snapshot_fact[trueai_stage])),
+			    KEEPFILTERS(TREATAS(stage_name_filter, open_opps_snapshot_fact[trueai_stage_name])),
+			    KEEPFILTERS(TREATAS(propensity_filter, open_opps_snapshot_fact[trueai_propensity]))
+			)
 		formatString: #,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: e9d52ce3-8497-4ab0-94db-791065dcd7bb
@@ -213,9 +194,24 @@ table open_pipeline
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Unspecified
 	measure 'meas.open_opps_quality_bucket' =
-			
-			Var res  = MAXX(opps, opps[trueai_propensity] )
-			RETURN res
+			VAR sel_date = [meas.cal_end_sel_date]
+			VAR stage_filter = VALUES(open_pipeline[trueai_stage])
+			VAR stage_name_filter = VALUES(open_pipeline[trueai_stage_name])
+			VAR propensity_filter = VALUES(opps[trueai_propensity])
+			RETURN
+			CALCULATE(
+			    MAX(open_opps_snapshot_fact[trueai_propensity]),
+			    FILTER(
+			        open_opps_snapshot_fact,
+			        open_opps_snapshot_fact[valid_from] <= sel_date
+			            && open_opps_snapshot_fact[valid_to] > sel_date
+			            && open_opps_snapshot_fact[is_closed_stage] = FALSE()
+			            && open_opps_snapshot_fact[crm_export_eligible] = TRUE()
+			    ),
+			    KEEPFILTERS(TREATAS(stage_filter, open_opps_snapshot_fact[trueai_stage])),
+			    KEEPFILTERS(TREATAS(stage_name_filter, open_opps_snapshot_fact[trueai_stage_name])),
+			    KEEPFILTERS(TREATAS(propensity_filter, open_opps_snapshot_fact[trueai_propensity]))
+			)
 		displayFolder: _open_opps_pipeline
 		lineageTag: a0f1fe2d-9a8c-4f78-997c-e3802c7c466d
 
@@ -271,15 +267,25 @@ table open_pipeline
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: \$#,0;(\$#,0);\$#,0
-	measure 'meas.open_opps_total_expected_value' = ```
-			
-			var _pipeline_amt = [meas.open_opps_pipeline_amt]           // get the pipeline amt
-			var _win_prob = [meas.open_opps_avg_win_prob]              // get the avg win prob
-			var _expected_amount = _pipeline_amt*_win_prob
+	measure 'meas.open_opps_total_expected_value' =
+			VAR sel_date = [meas.cal_end_sel_date]
+			VAR stage_filter = VALUES(open_pipeline[trueai_stage])
+			VAR stage_name_filter = VALUES(open_pipeline[trueai_stage_name])
+			VAR propensity_filter = VALUES(opps[trueai_propensity])
 			RETURN
-			_expected_amount
-			
-			```
+			CALCULATE(
+			    SUM(open_opps_snapshot_fact[expected_value]),
+			    FILTER(
+			        open_opps_snapshot_fact,
+			        open_opps_snapshot_fact[valid_from] <= sel_date
+			            && open_opps_snapshot_fact[valid_to] > sel_date
+			            && open_opps_snapshot_fact[is_closed_stage] = FALSE()
+			            && open_opps_snapshot_fact[crm_export_eligible] = TRUE()
+			    ),
+			    KEEPFILTERS(TREATAS(stage_filter, open_opps_snapshot_fact[trueai_stage])),
+			    KEEPFILTERS(TREATAS(stage_name_filter, open_opps_snapshot_fact[trueai_stage_name])),
+			    KEEPFILTERS(TREATAS(propensity_filter, open_opps_snapshot_fact[trueai_propensity]))
+			)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: f6f5f311-dee6-4166-82e4-5396749b8afb
@@ -316,31 +322,7 @@ table open_pipeline
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: 0%;-0%;0%
-	measure 'meas.open_opps_avg_win_prob' = ```
-			
-			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
-			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] >= sel_date)
-			
-			VAR filter_tbl = 
-			FILTER(
-			    temp_tbl,
-			    open_pipeline[trueai_sort_id] = 
-			    CALCULATE(
-			        MAX(open_pipeline[trueai_sort_id]),
-			        FILTER(
-			            ALL(open_pipeline),         // get the most recent open opps items
-			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id]) 
-			            && open_pipeline[_sys_filt_end_date] >= sel_date && open_pipeline[crm_created_on] <= sel_date
-			        )
-			    )
-			)
-			
-			var res =  CALCULATE(AVERAGEX(filter_tbl, [trueai_success_prob]))
-			
-			
-			RETURN
-			res
-			```
+	measure 'meas.open_opps_avg_win_prob' = DIVIDE([meas.open_opps_total_expected_value], [meas.open_opps_pipeline_amt])
 		formatString: 0%;-0%;0%
 		displayFolder: _open_opps_pipeline
 		lineageTag: 09563c27-7a16-47f1-b1db-9b88b120a9c1
@@ -368,31 +350,21 @@ table open_pipeline
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: #,0
-	measure 'meas.open_opps_count' = ```
-			
-			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
-			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] >= sel_date)
-			
-			VAR filter_tbl = 
-			FILTER(
-			    temp_tbl,
-			    open_pipeline[trueai_sort_id] = 
-			    CALCULATE(
-			        MAX(open_pipeline[trueai_sort_id]),
-			        FILTER(
-			            ALL(open_pipeline),         // get the most recent open opps items
-			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id]) 
-			            && open_pipeline[_sys_filt_end_date] >= sel_date && open_pipeline[crm_created_on] <= sel_date
-			        )
+	measure 'meas.open_opps_count' =
+			VAR stage_filter =
+			    INTERSECT(
+			        VALUES(open_pipeline[trueai_stage]),
+			        DATATABLE("trueai_stage", STRING, {{"Early"}, {"Mid"}, {"Late"}})
 			    )
-			)
-			
-			var res =  CALCULATE(COUNTX(filter_tbl, [_sys_doc_id]), open_pipeline[trueai_stage] in {"Early", "Mid", "Late"})
-			
-			
+			VAR stage_name_filter = VALUES(open_pipeline[trueai_stage_name])
+			VAR propensity_filter = VALUES(opps[trueai_propensity])
 			RETURN
-			res
-			```
+			CALCULATE(
+			    [meas.open_opps_snapshot_fact_count],
+			    KEEPFILTERS(TREATAS(stage_filter, open_opps_snapshot_fact[trueai_stage])),
+			    KEEPFILTERS(TREATAS(stage_name_filter, open_opps_snapshot_fact[trueai_stage_name])),
+			    KEEPFILTERS(TREATAS(propensity_filter, open_opps_snapshot_fact[trueai_propensity]))
+			)
 		formatString: #,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 5887f433-2566-4a32-b1b4-3fce64f6b252
@@ -480,33 +452,17 @@ table open_pipeline
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
-	measure 'meas.open_opps_pipeline_amt' = ```
-			
-			
-			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
-			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] >= sel_date)
-			
-			VAR filter_tbl = 
-			FILTER(
-			    temp_tbl,
-			    open_pipeline[trueai_sort_id] = 
-			    CALCULATE(
-			        MAX(open_pipeline[trueai_sort_id]),
-			        FILTER(
-			            ALL(open_pipeline),         // get the most recent open opps items
-			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id]) 
-			            && open_pipeline[_sys_filt_end_date] >= sel_date && open_pipeline[crm_created_on] <=sel_date
-			        )
-			    )
-			)
-			
-			
-			var res =  CALCULATE(sumx(filter_tbl, [trueai_booking_amt]))
-			
-			
+	measure 'meas.open_opps_pipeline_amt' =
+			VAR stage_filter = VALUES(open_pipeline[trueai_stage])
+			VAR stage_name_filter = VALUES(open_pipeline[trueai_stage_name])
+			VAR propensity_filter = VALUES(opps[trueai_propensity])
 			RETURN
-			res
-			```
+			CALCULATE(
+			    [meas.open_opps_snapshot_fact_amount],
+			    KEEPFILTERS(TREATAS(stage_filter, open_opps_snapshot_fact[trueai_stage])),
+			    KEEPFILTERS(TREATAS(stage_name_filter, open_opps_snapshot_fact[trueai_stage_name])),
+			    KEEPFILTERS(TREATAS(propensity_filter, open_opps_snapshot_fact[trueai_propensity]))
+			)
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _open_opps_pipeline
 		lineageTag: ee5a9b16-a525-485b-a196-4a906df32704
@@ -611,11 +567,28 @@ table open_pipeline
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Unspecified
 	measure 'meas.open_opps_avg_pace_score' =
-			
-			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
-			var _capped_avg = IF(_avg > 5, 5, _avg)  // Cap the value at 5
-			var res = SWITCH(
-			    _capped_avg,
+			VAR sel_date = [meas.cal_end_sel_date]
+			VAR stage_filter = VALUES(open_pipeline[trueai_stage])
+			VAR stage_name_filter = VALUES(open_pipeline[trueai_stage_name])
+			VAR propensity_filter = VALUES(opps[trueai_propensity])
+			VAR avg_score =
+			    CALCULATE(
+			        ROUND(AVERAGE(open_opps_snapshot_fact[trueai_pace_score]) * 5, 0),
+			        FILTER(
+			            open_opps_snapshot_fact,
+			            open_opps_snapshot_fact[valid_from] <= sel_date
+			                && open_opps_snapshot_fact[valid_to] > sel_date
+			                && open_opps_snapshot_fact[is_closed_stage] = FALSE()
+			                && open_opps_snapshot_fact[crm_export_eligible] = TRUE()
+			        ),
+			        KEEPFILTERS(TREATAS(stage_filter, open_opps_snapshot_fact[trueai_stage])),
+			        KEEPFILTERS(TREATAS(stage_name_filter, open_opps_snapshot_fact[trueai_stage_name])),
+			        KEEPFILTERS(TREATAS(propensity_filter, open_opps_snapshot_fact[trueai_propensity]))
+			    )
+			VAR capped_avg = IF(avg_score > 5, 5, avg_score)
+			RETURN
+			SWITCH(
+			    capped_avg,
 			    0, "0 - Static",
 			    1, "1 - Slow-Moving",
 			    2, "2 - Progressing",
@@ -624,9 +597,6 @@ table open_pipeline
 			    5, "5 - Rapid",
 			    BLANK()
 			)
-			
-			RETURN
-			res
 		displayFolder: _open_opps_pipeline
 		lineageTag: 2cd78355-abb5-4625-b982-0a2fc4036aff
 
@@ -679,15 +649,28 @@ table open_pipeline
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Unspecified
-	measure 'meas.open_opps_avg_pace_score_sply' = ```
-			
-			var _sply = CALCULATE(
-			    [meas.trueai_pace_score],       
-			    DATEADD(cal_end_dates[Date], -1, YEAR)            // SPLY 
-			)
-			var _avg =  ROUND(_sply,0)
+	measure 'meas.open_opps_avg_pace_score_sply' =
+			VAR sel_date = [meas.cal_end_sel_date]
+			VAR stage_filter = VALUES(open_pipeline[trueai_stage])
+			VAR stage_name_filter = VALUES(open_pipeline[trueai_stage_name])
+			VAR propensity_filter = VALUES(opps[trueai_propensity])
+			VAR avg_score =
+			    CALCULATE(
+			        ROUND(AVERAGE(open_opps_snapshot_fact[trueai_pace_score]) * 5, 0),
+			        FILTER(
+			            open_opps_snapshot_fact,
+			            open_opps_snapshot_fact[valid_from] <= sel_date
+			                && open_opps_snapshot_fact[valid_to] > sel_date
+			                && open_opps_snapshot_fact[is_closed_stage] = FALSE()
+			                && open_opps_snapshot_fact[crm_export_eligible] = TRUE()
+			        ),
+			        KEEPFILTERS(TREATAS(stage_filter, open_opps_snapshot_fact[trueai_stage])),
+			        KEEPFILTERS(TREATAS(stage_name_filter, open_opps_snapshot_fact[trueai_stage_name])),
+			        KEEPFILTERS(TREATAS(propensity_filter, open_opps_snapshot_fact[trueai_propensity])),
+			        DATEADD(cal_end_dates[Date], -1, YEAR)
+			    )
 			var res = SWITCH(
-			    _avg,
+			    avg_score,
 			    0, "0 - Static",
 			    1, "1 - Slow-Moving",
 			    2, "2 - Progressing",
@@ -699,7 +682,6 @@ table open_pipeline
 			
 			RETURN
 			res
-			```
 		displayFolder: _open_opps_pipeline
 		lineageTag: e7cd5e66-6316-4e65-a0ca-8afcbaddce17
 
@@ -710,14 +692,33 @@ table open_pipeline
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: +0 %;-0 %;"0%"
-	measure 'meas.open_opps_avg_pace_score_sply_diff' = ```
-			
-			var _avg = [meas.trueai_pace_score]             /// current
-			var _sply = CALCULATE(
-			    [meas.trueai_pace_score],       
-			    DATEADD(cal_end_dates[Date], -1, YEAR)            // SPLY 
-			)
-			
+	measure 'meas.open_opps_avg_pace_score_sply_diff' =
+			VAR sel_date = [meas.cal_end_sel_date]
+			VAR stage_filter = VALUES(open_pipeline[trueai_stage])
+			VAR stage_name_filter = VALUES(open_pipeline[trueai_stage_name])
+			VAR propensity_filter = VALUES(opps[trueai_propensity])
+			var _avg =
+			    CALCULATE(
+			        AVERAGE(open_opps_snapshot_fact[trueai_pace_score]),
+			        FILTER(
+			            open_opps_snapshot_fact,
+			            open_opps_snapshot_fact[valid_from] <= sel_date
+			                && open_opps_snapshot_fact[valid_to] > sel_date
+			                && open_opps_snapshot_fact[is_closed_stage] = FALSE()
+			                && open_opps_snapshot_fact[crm_export_eligible] = TRUE()
+			        ),
+			        KEEPFILTERS(TREATAS(stage_filter, open_opps_snapshot_fact[trueai_stage])),
+			        KEEPFILTERS(TREATAS(stage_name_filter, open_opps_snapshot_fact[trueai_stage_name])),
+			        KEEPFILTERS(TREATAS(propensity_filter, open_opps_snapshot_fact[trueai_propensity]))
+			    )
+			var _sply =
+			    CALCULATE(
+			        AVERAGE(open_opps_snapshot_fact[trueai_pace_score]),
+			        KEEPFILTERS(TREATAS(stage_filter, open_opps_snapshot_fact[trueai_stage])),
+			        KEEPFILTERS(TREATAS(stage_name_filter, open_opps_snapshot_fact[trueai_stage_name])),
+			        KEEPFILTERS(TREATAS(propensity_filter, open_opps_snapshot_fact[trueai_propensity])),
+			        DATEADD(cal_end_dates[Date], -1, YEAR)
+			    )
 			var res = DIVIDE(
 			    (_avg - _sply),
 			    _sply,
@@ -726,7 +727,6 @@ table open_pipeline
 			
 			RETURN
 			res+0
-			```
 		formatString: +0 %;-0 %;"0%"
 		displayFolder: _open_opps_pipeline
 		lineageTag: 41d3a2d1-6046-441d-a9fa-40eebb66c5a5
@@ -738,29 +738,25 @@ table open_pipeline
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: 0
-	measure 'meas.open_opps_act_count' = ```
-			
-			VAR sel_date = [meas.cal_end_sel_date] // get the selected as-of date 
-			VAR temp_tbl = CALCULATETABLE(open_pipeline, opps[_sys_filt_end_date] > sel_date)
-			
-			VAR filter_tbl = 
-			FILTER(
-			    temp_tbl,
-			    open_pipeline[trueai_sort_id] = 
-			    CALCULATE(
-			        MAX(open_pipeline[trueai_sort_id]),
-			        FILTER(
-			            ALL(open_pipeline),         // get the most recent open opps items
-			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id])
-			            && open_pipeline[_sys_filt_end_date] >= sel_date && open_pipeline[crm_created_on] <= sel_date
-			        )
-			    )
+	measure 'meas.open_opps_act_count' =
+			VAR sel_date = [meas.cal_end_sel_date]
+			VAR stage_filter = VALUES(open_pipeline[trueai_stage])
+			VAR stage_name_filter = VALUES(open_pipeline[trueai_stage_name])
+			VAR propensity_filter = VALUES(opps[trueai_propensity])
+			RETURN
+			CALCULATE(
+			    SUM(open_opps_snapshot_fact[trueai_act_count]),
+			    FILTER(
+			        open_opps_snapshot_fact,
+			        open_opps_snapshot_fact[valid_from] <= sel_date
+			            && open_opps_snapshot_fact[valid_to] > sel_date
+			            && open_opps_snapshot_fact[is_closed_stage] = FALSE()
+			            && open_opps_snapshot_fact[crm_export_eligible] = TRUE()
+			    ),
+			    KEEPFILTERS(TREATAS(stage_filter, open_opps_snapshot_fact[trueai_stage])),
+			    KEEPFILTERS(TREATAS(stage_name_filter, open_opps_snapshot_fact[trueai_stage_name])),
+			    KEEPFILTERS(TREATAS(propensity_filter, open_opps_snapshot_fact[trueai_propensity]))
 			)
-			
-			Var res  = SUMX(filter_tbl,[trueai_act_count] )
-			RETURN 
-			res
-			```
 		formatString: 0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 6a434a8f-008e-4cae-9c06-610797cb5790
