@@ -11,7 +11,7 @@ table metadata_heatmap_items
 			
 			    
 			    VAR _name   = MAX(metadata_heatmap_items[heatmap_kpi1_ai_score_name])
-			    VAR _score  = [meas.kpi1_ai_score_trust_value]
+			    VAR _score  = [meas.kpi1_ai_score_trust_value_test]
 			    VAR _bucket = [meas.KPI1_AI_score_bucket]
 			    
 			    VAR res =
@@ -2934,16 +2934,16 @@ table metadata_heatmap_items
 			        _score_name = "AI Score Not Needed (insight always available)", 1,
 			        _score_name = "SSR Leadsource Consolidation",           [meas.ai_scores_ssr_leadsource],
 			        _score_name = "Sales Process",                          [meas.ai_scores_sales_process],
-			        _score_name = "Activity Capture Levels",                [meas.ai_scores_ci_act_capt_lvl],
+			        _score_name = "Activity Capture Level",                [meas.ai_scores_ci_act_capt_lvl],
 			        _score_name = "Bookings Calibration",                   [meas.ai_scores_booking_calibration],
 			        _score_name = "Revenue Calibration",                    [meas.ai_scores_revenue_calibration],
-			        _score_name = "Line-Item Products",                     [meas.ai_scores_line_items_products],
+			        _score_name = "Line Item Products",                     [meas.ai_scores_line_items_products],
 			        _score_name = "Performance Tiers",                      [meas.ai_scores_performance_tiers],
 			        _score_name = "Ramping Success",                        [meas.ai_scores_ramping],
 			        _score_name = "Prospecting Success Predictions",        [meas.ai_scores_pred_prospecting],
-			        _score_name = "Existing Customer Success Predictions",  [meas.ai_scores_pred_existing_customer_selling],
-			        _score_name = "Rep Org. Calibration",                   [meas.ai_scores_rep_org_calibration],
-			        _score_name = "New Logo Success Predictions",           [meas.ai_scores_pred_new_logo_selling]
+			        _score_name = "Existing Customer Selling Success Predictions",  [meas.ai_scores_pred_existing_customer_selling],
+			        _score_name = "Rep Organization Calibration",                   [meas.ai_scores_rep_org_calibration],
+			        _score_name = "New Logo Selling Success Predictions",           [meas.ai_scores_pred_new_logo_selling]
 			    )
 			
 					/* ===========================================================
@@ -5909,6 +5909,74 @@ table metadata_heatmap_items
 			```
 		displayFolder: _heatmap_details
 		lineageTag: 3f964261-276e-4f11-89e2-1e15ddb0a58a
+
+	measure 'meas.kpi1_ai_score_trust_value_test' = ```
+			
+			VAR _score_name =
+			    SELECTEDVALUE(metadata_heatmap_items[heatmap_kpi1_ai_score_name])
+			
+			-- underlying normalized value (0-1)
+			VAR _raw =
+			    SWITCH(
+			        TRUE(),
+			        _score_name = "Adjusted Duration", [meas.ai_scores_adj_duration],
+			        _score_name = "AI Score Not Needed (insight always available)", 1,
+			        _score_name = "SSR Leadsource Consolidation", [meas.ai_scores_ssr_leadsource],
+			        _score_name = "Sales Process", [meas.ai_scores_sales_process],
+			        _score_name = "Activity Capture Level", [meas.ai_scores_ci_act_capt_lvl],
+			        _score_name = "Bookings Calibration", [meas.ai_scores_booking_calibration],
+			        _score_name = "Revenue Calibration", [meas.ai_scores_revenue_calibration],
+			        _score_name = "Line Item Products", [meas.ai_scores_line_items_products],
+			        _score_name = "Performance Tiers", [meas.ai_scores_performance_tiers],
+			        _score_name = "Ramping Success", [meas.ai_scores_ramping],
+			        _score_name = "Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],
+			        _score_name = "Existing Customer Selling Success Predictions", [meas.ai_scores_pred_existing_customer_selling],
+			        _score_name = "Rep Organization Calibration", [meas.ai_scores_rep_org_calibration],
+			        _score_name = "New Logo Selling Success Predictions", [meas.ai_scores_pred_new_logo_selling],
+			        BLANK()
+			    )
+			
+			-- map heatmap score name -> metadata_ai_scores[score_name]
+			VAR boost_raw =
+			    CALCULATE(
+			        MAX(metadata_ai_scores[boost_expo]),
+			        KEEPFILTERS(
+			            TREATAS(
+			                { _score_name },
+			                metadata_ai_scores[score_name]
+			            )
+			        )
+			    )
+			
+			VAR boost_num = IFERROR(VALUE(boost_raw), 1)
+			VAR boost = IF(ISBLANK(boost_num), 1, boost_num)
+			
+			VAR boost_is_fraction = boost <> INT(boost)
+			VAR safe_post_boost_val =
+			    IF(
+			        ISBLANK(_raw),
+			        BLANK(),
+			        IF(
+			            _raw <= 0 && boost_is_fraction,
+			            _raw,
+			            POWER(ABS(_raw), boost)
+			        )
+			    )
+			
+			VAR _scaled = safe_post_boost_val * 100
+			VAR _capped =
+			    IF(
+			        ISBLANK(_scaled),
+			        BLANK(),
+			        MAX(0, MIN(_scaled, 100))
+			    )
+			RETURN
+			    ROUND(boost_raw, 2)
+			
+			```
+		lineageTag: 08a5989b-2eff-46d9-816d-321b169613f3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Unique heatmap item identifier
 	column _sys_doc_id
