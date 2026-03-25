@@ -1854,10 +1854,10 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_leads_industry' = ```
-						
+			
 						var _avg = AVERAGE(leads[trueai_industry_conf])         // get the leads average leadsource conf
-						var _conf = ROUND(_avg,2)*100    
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						var _conf = ROUND(_avg,2)    
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),1))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 6ef0fdcc-e12e-4c29-b699-140f2bfacb81
@@ -1893,10 +1893,10 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_leads_leadsource' = ```
-						
+			
 						var _avg = AVERAGE(leads[trueai_leadsource_conf])        // get the leads average lead source conf
-						var _conf = ROUND(_avg,2)*100    
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						var _conf = ROUND(_avg,2)   
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),1))
 			```
 		displayFolder: _ai_scores
 		lineageTag: ba1939ac-dad5-4b53-bf04-1f87a98828cf
@@ -2195,10 +2195,10 @@ table metadata_ai_scores
 	/// Dynamic Behavior: No explicit conditional branching detected.
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_opps_leadsource' = ```
-						
+			
 						var _avg =  AVERAGE(opps[trueai_leadsource_conf])         // get the opps average industry conf
-						var _conf = ROUND(_avg,2)*100    
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+						var _conf = ROUND(_avg,2)   
+						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),1))
 			```
 		displayFolder: _ai_scores
 		lineageTag: 82bde667-3bb7-4ca6-9d2d-166956b0290c
@@ -2365,18 +2365,15 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_pred_new_logo_selling' = ```
 			
-						var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
-						var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_new_logo_auc]), 0)     // get the latest auc for existing customer
-						var factor2 = COALESCE(MAXX(latest_row, companies_history[di_pred_new_logo_r2]), 0)     // get the latest r2
-						
-						var boost_expo = 0.65 // to get closer to one if good score after the score has been calcualted
-						var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
-						var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
-						
-						var score  = ((normalized_factor2 + factor1)/2) // avg of both normalized score + boosting
-						var _conf = score // make it an integer score
-						
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+			var factor1 = COALESCE([meas.ai_scores_new_logo_selling_factor1_value], 0)
+			var factor2 = COALESCE([meas.ai_scores_new_logo_selling_factor2_value], 0)
+			var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
+			var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
+			var score  = ((normalized_factor2 + factor1)/2) 
+			
+			
+			RETURN score
+			
 			```
 		displayFolder: _ai_scores
 		lineageTag: 1addb1e4-af83-4bdf-a923-b0622aca39cd
@@ -2460,18 +2457,14 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_pred_prospecting' = ```
 			
-						var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
-						var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_prospecting_auc]), 0)     // get the latest auc for existing customer
-						var factor2 = COALESCE(MAXX(latest_row, companies_history[di_pred_prospecting_r2]), 0)     // get the latest r2
-						
-						var boost_expo = 0.65 // to get closer to one if good score after the scor has been calcualted
-						var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
-						var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
-						
-						var score  = ((normalized_factor2 + factor1)/2)  // avg of both normalized score + boosting
-						var _conf = score // make it an integer score
-						
-						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
+			var factor1 = COALESCE([meas.ai_scores_prospecting_factor1_value], 0)
+			var factor2 =  COALESCE([meas.ai_scores_prospecting_factor2_value], 0)
+			var normalized_factor1  = (MAX((factor1-0.5),0)) + 0.5  // realize that 0.5 is useless, but boost back up so good is not 0.5
+			var normalized_factor2  = MAX(factor2, 0) // avoid neg numbers from factor2
+			var score  = ((normalized_factor2 + factor1)/2) 
+			
+			
+			RETURN score
 			```
 		displayFolder: _ai_scores
 		lineageTag: 25abb222-376b-4d2f-90ec-7ce8fb199f7b
@@ -2893,28 +2886,12 @@ table metadata_ai_scores
 	/// Format/Type: Unspecified
 	measure 'meas.average_ai_score' =
 			
-			VAR cats =
-			    VALUES(metadata_ai_scores_analysis_categories[_sys_doc_id])
-			
-			VAR result =
-			    IF(
-			        HASONEVALUE(metadata_ai_scores_analysis_categories[_sys_doc_id]),
-			        [meas.analysis_cat_weighted_avg],
-			        IF(
-			            COUNTROWS(cats) = 0,
-			            AVERAGEX(
-			                ALL(metadata_ai_scores_analysis_categories[_sys_doc_id]),
-			                CALCULATE([meas.analysis_cat_weighted_avg])
-			            ),
-			            AVERAGEX(
-			                cats,
-			                CALCULATE([meas.analysis_cat_weighted_avg])
-			            )
-			        )
+			var avg_score =
+			    AVERAGEX(
+			        metadata_ai_scores,
+			        [meas.readiness_ai_score]
 			    )
-			
-			RETURN
-			IF(ISBLANK(result), BLANK(), MIN(MAX(result,0),100))
+			RETURN MIN(MAX(avg_score, 0), 100)
 		formatString: 0
 		lineageTag: b12cdcbf-d399-4855-b356-3f9402c5215c
 
@@ -3315,30 +3292,22 @@ table metadata_ai_scores
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.readiness_average_ai_score' =
+	measure 'meas.readiness_average_ai_score' = ```
 			
-			VAR cats =
-			    VALUES(metadata_ai_scores_analysis_categories[_sys_doc_id])
+			var sum_prod = SUMX(
+			    metadata_ai_scores,
+			    [meas.ai_score] * [meas.metadata_score_weighting_pct]
+			) // get teh sum product of the weighting and the score
+			var sum_weights = SUMX(
+			    metadata_ai_scores,
+			     [meas.metadata_score_weighting_pct]
+			) // get the sum of weighting
+			var res = DIVIDE( sum_prod, sum_weights)
 			
-			VAR result =
-			    IF(
-			        HASONEVALUE(metadata_ai_scores_analysis_categories[_sys_doc_id]),
-			        COALESCE([meas.readiness_analysis_cat_weighted_avg], 0),
-			        IF(
-			            COUNTROWS(cats) = 0,
-			            AVERAGEX(
-			                ALL(metadata_ai_scores_analysis_categories[_sys_doc_id]),
-			                COALESCE(CALCULATE([meas.readiness_analysis_cat_weighted_avg]), 0)
-			            ),
-			            AVERAGEX(
-			                cats,
-			                COALESCE(CALCULATE([meas.readiness_analysis_cat_weighted_avg]), 0)
-			            )
-			        )
-			    )
+			return res
 			
-			RETURN
-			COALESCE(MIN(MAX(result,0),100), 0)
+			
+			```
 		formatString: 0
 		lineageTag: e888156c-3b86-4145-afc1-99c3c9628ddb
 
@@ -3513,116 +3482,107 @@ table metadata_ai_scores
 			
 			IF(
 			    [meas.ai_score_is_in_selected_category] = 1,
-			    COALESCE([measure 'meas.readiness_ai_score'], 0),
+			    COALESCE([meas.readiness_ai_score], 0),
 			    BLANK()
 			)
 		formatString: 0
 		lineageTag: 5d85f2b5-783c-432f-8c14-cad5bc0c2460
 
-	measure 'measure ''meas.readiness_ai_score''' = ```
+	measure 'meas.readiness_ai_score' =
 			
-					
-					VAR score_name = MAX(metadata_ai_scores[score_name])
-					
-					/* ===========================================================
-					   1) GET RAW METRIC VALUE (may not be numeric)
-					   =========================================================== */
-					VAR raw_val =
-					    SWITCH(
-					        score_name,
-					        "Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],
-					
-					        "New Logo Selling Success Predictions",
-					            (
-					                MAX(COALESCE([meas.ai_scores_new_logo_selling_factor2_value], 0), 0)
-					                + COALESCE([meas.ai_scores_new_logo_selling_factor1_value], 0)
-					            ) / 2,
-					
-					        "Post-Sales Support Success Predictions",
-					            [meas.ai_scores_pred_post_sales_support],
-					        "Existing Customer Selling Success Predictions", [meas.ai_scores_pred_existing_customer_selling],
-					        "Success Factor Analysis", [meas.ai_scores_success_factor_analysis],
-					        "Potential ACV", [meas.ai_scores_potential_acv],
-					        "List Price", [meas.ai_scores_list_price],
-					        "Line Item Products", [meas.ai_scores_line_items_products],
-					        "Accounts Industry Consolidation", [meas.ai_scores_accts_industry],
-					        "Accounts Lead Source Consolidation", [meas.ai_scores_accts_leadsource],
-					        "Leads Industry Consolidation", [meas.ai_scores_leads_industry],
-					        "Leads Lead Source Consolidation", [meas.ai_scores_leads_leadsource],
-					        "Opps Industry Consolidation", [meas.ai_scores_opps_industry],
-					        "Opps Lead Source Consolidation", [meas.ai_scores_opps_leadsource],
-					
-					        "SSR Industry Consolidation",
-					            CALCULATE(AVERAGE(ssr[trueai_industry_conf])),
-					
-					        "SSR Lead Source Consolidation",
-					            CALCULATE(AVERAGE(ssr[trueai_leadsource_conf])),
-					
-					        "Opportunities History", [meas.readiness_ai_scores_opps_history],
-					
-					        "Activity Capture Level",
-					            CALCULATE(
-					                AVERAGE(users_history[ci_act_capt_lvl]),
-					                users[trueai_user_role_function] IN {"AM","AE","SDR"}
-					            ),
-					
-					        "Activity Capture Level Confidence", [meas.ai_scores_ci_act_capt_lvl_conf],
-					
-					        "Time Allocation",
-					            CALCULATE(
-					                AVERAGE(users_history[ci_time_alloc_conf]),
-					                users[trueai_user_role_function] IN {"AM","AE","SDR"}
-					            ),
-					
-					        "Adjusted Duration", [meas.ai_scores_adj_duration_factor1_value],
-					        "Closing Ability", [meas.ai_scores_ci_closing_ability],
-					        "Discovery Skill", [meas.ai_scores_ci_discovery_skill],
-					        "Engagement Ability", [meas.ai_scores_ci_engagement_ability],
-					        "Work Effort", [meas.ai_scores_ci_work_effort],
-					        "Deal Maximizing", [meas.pi_score_ci_deal_maxing],
-					        "Performance Tiers", [meas.ai_scores_performance_tiers],
-					        "Ramping Success", [meas.ai_scores_ramping],
-					        "Time Management", [meas.ai_scores_ci_time_management],
-					        "Rep Organization Calibration", [meas.ai_scores_rep_org_calibration],
-					        "Bookings Calibration", [meas.ai_scores_booking_calibration],
-					        "Revenue Calibration", [meas.ai_scores_revenue_calibration],
-					        "Leads & Accounts Completeness Data Present", [meas.ai_scores_general_score],
-					        BLANK()
-					    )
-					
-					/* ===========================================================
-					   2) ENSURE RAW VALUE IS NUMERIC (ELIMINATE TEXT/NaN)
-					   =========================================================== */
-					VAR pre_boost_val =
-					    VAR n = VALUE(raw_val)
-					    RETURN IF(ISNUMBER(n), n, 0)
-					
-					/* ===========================================================
-					   3) READ BOOST EXPONENT (may also be non-numeric!)
-					   =========================================================== */
-					VAR boost_raw = MAX(metadata_ai_scores[boost_expo])
-					VAR boost = IF(ISNUMBER(boost_raw), boost_raw, 1)
-					
-					/* ===========================================================
-					   4) APPLY BOOST SAFELY (avoid fractional exponent on <=0)
-					   =========================================================== */
-					VAR boost_is_fraction = boost <> INT(boost)
-					VAR safe_post_boost_val =
-					    IF(
-					        pre_boost_val <= 0 && boost_is_fraction,
-					        pre_boost_val,
-					        POWER(ABS(pre_boost_val), boost)
-					    )
-					
-					/* ===========================================================
-					   5) SCALE TO 0–100
-					   =========================================================== */
-					VAR result_score = safe_post_boost_val * 100
-					
-					RETURN
-					    result_score + 0
+			VAR score_name =
+			    MAX(metadata_ai_scores[score_name])
 			
-			```
+			VAR raw_val =
+			    SWITCH(
+			        score_name,
+			        "Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],
+			
+			        "New Logo Selling Success Predictions",
+			            (
+			                MAX(COALESCE([meas.ai_scores_new_logo_selling_factor2_value], 0), 0)
+			                + COALESCE([meas.ai_scores_new_logo_selling_factor1_value], 0)
+			            ) / 2,
+			
+			        "Post-Sales Support Success Predictions", [meas.ai_scores_pred_post_sales_support],
+			        "Existing Customer Selling Success Predictions", [meas.ai_scores_pred_existing_customer_selling],
+			        "Success Factor Analysis", [meas.ai_scores_success_factor_analysis],
+			        "Potential ACV", [meas.ai_scores_potential_acv],
+			        "List Price", [meas.ai_scores_list_price],
+			        "Line Item Products", [meas.ai_scores_line_items_products],
+			        "Accounts Industry Consolidation", [meas.ai_scores_accts_industry],
+			        "Accounts Lead Source Consolidation", [meas.ai_scores_accts_leadsource],
+			        "Leads Industry Consolidation", [meas.ai_scores_leads_industry],
+			        "Leads Lead Source Consolidation", [meas.ai_scores_leads_leadsource],
+			        "Opps Industry Consolidation", [meas.ai_scores_opps_industry],
+			        "Opps Lead Source Consolidation", [meas.ai_scores_opps_leadsource],
+			
+			        "SSR Industry Consolidation",
+			            CALCULATE(AVERAGE(ssr[trueai_industry_conf])),
+			
+			        "SSR Lead Source Consolidation",
+			            CALCULATE(AVERAGE(ssr[trueai_leadsource_conf])),
+			
+			        "Opportunities History", [meas.readiness_ai_scores_opps_history],
+			
+			        "Activity Capture Level",
+			            CALCULATE(
+			                AVERAGE(users_history[ci_act_capt_lvl]),
+			                users[trueai_user_role_function] IN { "AM", "AE", "SDR" }
+			            ),
+			
+			        "Activity Capture Level Confidence", [meas.ai_scores_ci_act_capt_lvl_conf],
+			
+			        "Time Allocation",
+			            CALCULATE(
+			                AVERAGE(users_history[ci_time_alloc_conf]),
+			                users[trueai_user_role_function] IN { "AM", "AE", "SDR" }
+			            ),
+			
+			        "Adjusted Duration", [meas.ai_scores_adj_duration_factor1_value],
+			        "Closing Ability", [meas.ai_scores_ci_closing_ability],
+			        "Discovery Skill", [meas.ai_scores_ci_discovery_skill],
+			        "Engagement Ability", [meas.ai_scores_ci_engagement_ability],
+			        "Work Effort", [meas.ai_scores_ci_work_effort],
+			        "Deal Maximizing", [meas.pi_score_ci_deal_maxing],
+			        "Performance Tiers", [meas.ai_scores_performance_tiers],
+			        "Ramping Success", [meas.ai_scores_ramping],
+			        "Time Management", [meas.ai_scores_ci_time_management],
+			        "Rep Organization Calibration", [meas.ai_scores_rep_org_calibration],
+			        "Bookings Calibration", [meas.ai_scores_booking_calibration],
+			        "Revenue Calibration", [meas.ai_scores_revenue_calibration],
+			        "Leads & Accounts Completeness Data Present", [meas.ai_scores_general_score],
+			        BLANK()
+			    )
+			
+			VAR pre_boost_val =
+			    IFERROR(VALUE(raw_val), 0)
+			
+			VAR boost_raw =
+			    MAX(metadata_ai_scores[boost_expo])
+			
+			VAR boost =
+			    IF(
+			        ISBLANK(boost_raw) || NOT ISNUMBER(boost_raw) || boost_raw <= 0,
+			        1,
+			        boost_raw
+			    )
+			
+			VAR boost_is_fraction =
+			    boost <> INT(boost)
+			
+			VAR safe_post_boost_val =
+			    IF(
+			        pre_boost_val <= 0 && boost_is_fraction,
+			        pre_boost_val,
+			        POWER(ABS(pre_boost_val), boost)
+			    )
+			
+			VAR result_score =
+			    MIN(MAX(safe_post_boost_val * 100, 0), 100)
+			
+			RETURN
+			    result_score + 0
 		lineageTag: ffef63ec-4858-4976-8798-0fb002bdba60
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -3635,7 +3595,7 @@ table metadata_ai_scores
 			
 			IF(
 			    [meas.ai_score_is_in_selected_category] = 1,
-			    COALESCE([measure 'meas.readiness_ai_score'], 0),
+			    COALESCE([meas.readiness_ai_score], 0),
 			    BLANK()
 			)
 		formatString: 0
