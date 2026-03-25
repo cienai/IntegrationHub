@@ -8,8 +8,8 @@ table ssr
 	/// Format/Type: 0.0%;-0.0%;0.0%
 	measure 'meas.ssr_trueai_conversion_rate' = ```
 			
-			var total =CALCULATE(DISTINCTCount(ssr_history[_sys_ssr_id])  )  +0
-			var res =Divide([meas.ssr_trueai_converted_count] , total)
+			var total =CALCULATE([meas.ssr_doc_count_for_leadsource_gt_15]  )  +0
+			var res =Divide([meas.ssr_converted_count_for_leadsource_gt_15] , total)
 			
 			return res 
 			```
@@ -115,6 +115,44 @@ table ssr
 			)
 		formatString: General Date
 		lineageTag: 4f9f0a3e-3d2a-4b98-9c4b-4bb7f6c8a8f5
+
+	measure 'meas.ssr_doc_count_for_leadsource_gt_15' = ```
+			
+			VAR _eligible_leadsources =
+			    FILTER(
+			        VALUES(ssr[trueai_leadsource]),
+			        NOT ISBLANK(ssr[trueai_leadsource]) &&
+			        CALCULATE([meas.ssr_trueai_converted_count]) > 15
+			    )
+			RETURN
+			SUMX(
+			    _eligible_leadsources,
+			    CALCULATE(COUNT(ssr[_sys_doc_id]))
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 053e97a5-41f3-4312-86e3-9d7368095ea6
+
+	measure 'meas.ssr_converted_count_for_leadsource_gt_15' =
+			
+			VAR _by_leadsource =
+			    ADDCOLUMNS(
+			        VALUES(ssr[trueai_leadsource]),
+			        "__val", CALCULATE([meas.ssr_trueai_converted_count])
+			    )
+			RETURN
+			SUMX(
+			    FILTER(
+			        _by_leadsource,
+			        NOT ISBLANK(ssr[trueai_leadsource]) &&
+			        NOT ISBLANK([__val]) &&
+			        [__val] > 15
+			    ),
+			    [__val]
+			)
+		formatString: 0
+		lineageTag: 574b4534-c0c0-4137-bda5-11af62fb56ab
 
 	/// Record's standardized lead source
 	column trueai_leadsource

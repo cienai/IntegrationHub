@@ -8,28 +8,17 @@ table metadata_ai_scores_analysis_categories
 	/// Format/Type: Not specified.
 	measure 'meas.analysis_cat_weighted_avg' =
 			
-			VAR filtered_scores =
-			    FILTER(
-			        metadata_ai_scores,
-			        [meas.ai_score_is_in_selected_category] = 1
-			    )
+			var sum_prod = SUMX(
+			    metadata_ai_scores,
+			    [meas.ai_score] * [meas.metadata_score_weighting_pct]
+			) // get teh sum product of the weighting and the score
+			var sum_weights = SUMX(
+			    metadata_ai_scores,
+			     [meas.metadata_score_weighting_pct]
+			) // get the sum of weighting
+			var res = DIVIDE( sum_prod, sum_weights)
 			
-			VAR numerator =
-			    SUMX(
-			        filtered_scores,
-			        COALESCE([meas.ai_score], 0) * COALESCE(CALCULATE([meas.metadata_score_weighting_pct]), 0)
-			    )
-			
-			VAR denominator =
-			    SUMX(
-			        filtered_scores,
-			        COALESCE(CALCULATE([meas.metadata_score_weighting_pct]), 0)
-			    )
-			
-			VAR res = DIVIDE(numerator, denominator)
-			
-			RETURN
-			    COALESCE(MIN(MAX(res, 0), 100), 0)
+			return res
 		lineageTag: cbe9e9f8-ca6c-4058-bc0c-e15a4a8fe77f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
