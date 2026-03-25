@@ -239,7 +239,7 @@ table act_capture_level_summary
 	/// Format/Type: +#%;-#%;0%
 	measure 'meas.trueai_act_capt_score_improvement' =
 			
-			var trueai_score = ROUND([meas.trueai_act_capt_score],2)
+			var trueai_score = ROUND([meas.ai_scores_ci_act_capt_lvl_boost],2)
 			var crm_score = ROUND([meas.crm_act_capt_score],2)
 			var imp = divide(trueai_score - crm_score,  crm_score, 0)
 			var res = imp
@@ -352,6 +352,19 @@ table act_capture_level_summary
 			res
 		formatString: 0
 		lineageTag: b8ec6df0-1df6-41d1-b949-fcb80cb1af48
+
+	measure 'meas.ai_scores_ci_act_capt_lvl_boost' = ```
+			
+			var res = CALCULATE(
+					            AVERAGE(users_history[ci_act_capt_lvl]),
+					            users[trueai_user_role_function] IN {"AM","AE","SDR"}
+					            )
+			RETURN POWER(res,0.6)*100
+			
+			```
+		lineageTag: eff907d9-b15f-4542-a73b-00ee119943fc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Column _sys_docid.
 	column _sys_docid

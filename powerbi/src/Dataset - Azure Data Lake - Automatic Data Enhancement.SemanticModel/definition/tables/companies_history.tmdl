@@ -529,14 +529,14 @@ table companies_history
 	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
 	/// Format/Type: 0
 	measure 'meas.pi_score_ci_deal_maxing' = ```
-						
+			
 						
 						var _avg = CALCULATE(
 						    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_deal_maxing_conf]), BLANK()))      // get the avg deal mxing conf
 						)
 						var boost_expo = 0.90           // exponent value 
-						var _new_avg = (_avg)^ boost_expo  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
-						var _conf = ROUND(_new_avg,2)*100  // round the number and for integar value
+						var _new_avg = (_avg)  // pushes up the score slightly to make sure we get some “Excellent” scores when data is as good as it can be 
+						var _conf = ROUND(_new_avg,2)  // round the number and for integar value
 						
 						RETURN IF(ISBLANK(_conf), BLANK(), MIN(MAX(_conf,0),100))
 			```
