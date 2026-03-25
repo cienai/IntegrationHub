@@ -907,27 +907,15 @@ table metadata_heatmap_items
 		lineageTag: 02753d25-0261-4e07-aa42-b8bc3895f3a6
 
 	/// Measure meas.calc_hyp2_kpi2_nominator.
-	/// Purpose: Returns a value derived from completeness_summary[trueai_completeness_contact] and completeness_summary[entity].
+	/// Purpose: Returns a value derived from opportunity completeness fields.
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, AVERAGE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on completeness_summary[trueai_completeness_contact], completeness_summary[entity].
+	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: Unspecified
 	measure 'meas.calc_hyp2_kpi2_nominator' =
 			
-			var contact_ai = CALCULATE(
-			    AVERAGE(
-			        completeness_summary[trueai_completeness_contact]
-			    ),      // get the contact info average score for entity Leads
-			    completeness_summary[entity]="Leads"
-			)
-			
-			var contact_method = CALCULATE(
-			    AVERAGE(
-			        completeness_summary[trueai_completeness_contact_method]
-			    ),              // get the contact method average score for entity Leads
-			    completeness_summary[entity]="Leads"
-			)
-			
-			var res  = (contact_ai + contact_method)/2
+			var contact_ai = CALCULATE(AVERAGE(opps[trueai_complt_contact]))
+			var contact_method = CALCULATE(AVERAGE(opps[trueai_complt_marketing]))
+			var res  = DIVIDE(contact_ai + contact_method, 2)
 			
 			RETURN
 			res
@@ -4259,18 +4247,13 @@ table metadata_heatmap_items
 		lineageTag: baedc44c-944c-4ab7-8093-a224304ed2bd
 
 	/// Measure meas.calc_hyp2_kpi2_nominator_count.
-	/// Purpose: Returns a value derived from completeness_summary[entity].
+	/// Purpose: Returns a value derived from opps row count in current context.
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, COUNTROWS.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on completeness_summary[entity].
+	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: 0
 	measure 'meas.calc_hyp2_kpi2_nominator_count' =
 			
-			var contact_ai = CALCULATETABLE(
-			    completeness_summary,      // get the contact info average score for entity Leads
-			    completeness_summary[entity]="Opps"
-			)
-			
-			
+			var contact_ai = CALCULATETABLE(opps)
 			var res  = COUNTROWS(contact_ai)
 			
 			RETURN
