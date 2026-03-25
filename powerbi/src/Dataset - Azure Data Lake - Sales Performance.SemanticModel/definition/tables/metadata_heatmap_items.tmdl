@@ -4040,28 +4040,10 @@ table metadata_heatmap_items
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, CALCULATE, COUNTROWS, FILTER.
 	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date], ssr[trueai_first_purchase].
 	/// Format/Type: 0
-	measure 'meas.calc_hyp13_kpi1_nominator_count' = ```
+	measure 'meas.calc_hyp13_kpi1_nominator_count' =
 			
-			var period_start = [meas.context_date_min]
-			var period_end = [meas.context_date_max]
-			var period_in_months =  DATEDIFF(period_start, period_end + 1, month) * -1
-			var prev_period_start = EDATE(period_start,period_in_months)
-			var prev_period_end =   EDATE(period_end,period_in_months)
-			
-			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
-			
-			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
-			
-			var new_cnt = CALCULATE(
-			    COUNTROWS( EXCEPT(ending_custs,starting_custs )),
-			    ssr_history[step_name]="New Logo Selling"
-			)
-			
-			var res = new_cnt 
-			return IF(isblank(res), 0, res)
-			```
+			CALCULATE(
+			    [meas.ssr_history_rev_new_count])
 		formatString: 0
 		displayFolder: _record_counts
 		lineageTag: f042f1a8-38b9-41de-8ce5-49c58f482621
@@ -4071,35 +4053,10 @@ table metadata_heatmap_items
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, CALCULATE, SUM, COUNTROWS.
 	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date], ssr[trueai_first_purchase].
 	/// Format/Type: #,0
-	measure 'meas.calc_hyp13_kpi2_nominator_count' = ```
+	measure 'meas.calc_hyp13_kpi2_nominator_count' =
 			
-			// get the period dates based on current filter contetxt 
-			var period_start = [meas.context_date_min]
-			var period_end = [meas.context_date_max]
-			var period_in_months =  DATEDIFF(period_start, period_end + 1, month) * -1
-			var prev_period_start = EDATE(period_start,period_in_months)
-			var prev_period_end =   EDATE(period_end,period_in_months)
-			
-			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
-			
-			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
-			
-			// get the values based on temp tables
-			var starting_cnt = COUNTROWS(starting_custs)
-			var starting_amt = CALCULATE(SUM(ssr_history[opp_won_amt]),  cal_end_dates[date] >= prev_period_start &&  cal_end_dates[date] <= prev_period_end ,starting_custs) // look at last years rev for these 
-			var retained_cnt = COUNTROWS(retained_custs)
-			var retained_amt = CALCULATE(SUM(ssr_history[opp_won_amt]),  cal_end_dates[date] >= prev_period_start &&  cal_end_dates[date] <= prev_period_end ,EXCEPT(starting_custs, churned_custs)) // look at last years rev for these 
-			var new_cnt = COUNTROWS( EXCEPT(ending_custs,starting_custs ))
-			
-			
-			// assign the res
-			var res = new_cnt 
-			return IF(isblank(res), 0, res)
-			```
+			CALCULATE(
+			    [meas.ssr_history_rev_new_count])
 		formatString: #,0
 		displayFolder: _record_counts
 		lineageTag: cfd519b5-6ede-4292-9f46-44b95f4b4ab6
