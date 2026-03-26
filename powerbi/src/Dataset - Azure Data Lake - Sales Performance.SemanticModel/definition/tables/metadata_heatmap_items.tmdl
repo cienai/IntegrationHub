@@ -907,27 +907,15 @@ table metadata_heatmap_items
 		lineageTag: 02753d25-0261-4e07-aa42-b8bc3895f3a6
 
 	/// Measure meas.calc_hyp2_kpi2_nominator.
-	/// Purpose: Returns a value derived from completeness_summary[trueai_completeness_contact] and completeness_summary[entity].
+	/// Purpose: Returns a value derived from opportunity completeness fields.
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, AVERAGE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on completeness_summary[trueai_completeness_contact], completeness_summary[entity].
+	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: Unspecified
 	measure 'meas.calc_hyp2_kpi2_nominator' =
 			
-			var contact_ai = CALCULATE(
-			    AVERAGE(
-			        completeness_summary[trueai_completeness_contact]
-			    ),      // get the contact info average score for entity Leads
-			    completeness_summary[entity]="Leads"
-			)
-			
-			var contact_method = CALCULATE(
-			    AVERAGE(
-			        completeness_summary[trueai_completeness_contact_method]
-			    ),              // get the contact method average score for entity Leads
-			    completeness_summary[entity]="Leads"
-			)
-			
-			var res  = (contact_ai + contact_method)/2
+			var contact_ai = CALCULATE(AVERAGE(opps[trueai_complt_contact]))
+			var contact_method = CALCULATE(AVERAGE(opps[trueai_complt_marketing]))
+			var res  = DIVIDE(contact_ai + contact_method, 2)
 			
 			RETURN
 			res
@@ -2092,7 +2080,7 @@ table metadata_heatmap_items
 			    "11", FORMAT([meas.calc_hyp11_kpi1_nominator], "$##,#0"),             // hypothesis 11
 			    "12", FORMAT([meas.calc_hyp12_kpi1_nominator], "##,#0"" Accounts"),             // hypothesis 12
 			    "13", FORMAT([meas.calc_hyp13_kpi1_nominator], "##,#0"" Accounts"),                              // hypothesis 13
-			    "14", FORMAT([meas.calc_hyp14_kpi1_nominator],  "##,#0"" hr"),             // hypothesis 14
+			    "14", FORMAT([meas.calc_hyp14_kpi1_nominator],  "##,#0.0"" hr"),             // hypothesis 14
 			    "15", FORMAT([meas.calc_hyp15_kpi1_nominator], "##,#0"" Reps"),                              // hypothesis 15
 			    "16", FORMAT([meas.calc_hyp16_kpi1_nominator],  "##,#0"" Reps"),                              // hypothesis 16
 			    "17", FORMAT([meas.calc_hyp17_kpi1_nominator], "$##,#0"),                              
@@ -2405,7 +2393,7 @@ table metadata_heatmap_items
 			
 			var res = SWITCH(
 			    hyp_id,
-			    "1", FORMAT([meas.calc_hyp1_kpi2_denominator],"#,##0"" hrs"""),                      // hypothesis 1 kpi 2 Nominator
+			    "1", FORMAT([meas.calc_hyp1_kpi2_denominator],"#,##0.0"" hrs"""),                      // hypothesis 1 kpi 2 Nominator
 			    //"2", FORMAT([meas.calc_hyp2_kpi2_denominator], "0%"),                                       // hypothesis 2
 			    //"3", FORMAT(heatmap[meas.calc_hyp3_kpi2_denominator],"##,#0"" Accounts"),                                // get the hyp3 kpi 2
 			    //"4", FORMAT(heatmap[meas.calc_hyp4_kpi2_denominator], "0"),                             // hypothesis 4
@@ -2415,7 +2403,7 @@ table metadata_heatmap_items
 			    "8", FORMAT([meas.calc_hyp8_kpi2_denominator], "0"),                                       // hypothesis 8
 			    "9", FORMAT([meas.calc_hyp9_kpi2_denominator], "0"),                                       // hypothesis 9
 			    "10", FORMAT([meas.calc_hyp10_kpi2_denominator], "0"),                                     // hypothesis 10
-			    "11", FORMAT([meas.calc_hyp11_kpi2_denominator], "#,##0"" hrs"""),                          // hypothesis 11
+			    "11", FORMAT([meas.calc_hyp11_kpi2_denominator], "#,##0.0"" hrs"""),                          // hypothesis 11
 			    "12", FORMAT([meas.calc_hyp12_kpi2_denominator], "##,#0"" Accounts"),                                  // hypothesis 12
 			    "13", FORMAT([meas.calc_hyp13_kpi2_denominator], "$##,#0"),                                 // hypothesis 13
 			    //"14", FORMAT([meas.calc_hyp14_kpi2_denominator], "##,#0"" hrs"),                                  // hypothesis 14
@@ -2477,7 +2465,7 @@ table metadata_heatmap_items
 			
 			var res = SWITCH(
 			    hyp_id,
-			    "1", FORMAT([meas.calc_hyp1_kpi2_nominator],"#,##0"" hrs"""),                      // hypothesis 1 kpi 2 Nominator
+			    "1", FORMAT([meas.calc_hyp1_kpi2_nominator],"#,##0.0"" hrs"""),                      // hypothesis 1 kpi 2 Nominator
 			    //"2", FORMAT([meas.calc_hyp2_kpi2_nominator], "0%"),                                       // hypothesis 2
 			    //"3", FORMAT(heatmap[meas.calc_hyp3_kpi2_Nominator],"##,#0"" Accounts"),                                // get the hyp3 kpi 2
 			    //"4", FORMAT(heatmap[meas.calc_hyp4_kpi2_nominator], "0%"),                             // hypothesis 4
@@ -2487,7 +2475,7 @@ table metadata_heatmap_items
 			    "8", FORMAT([meas.calc_hyp8_kpi2_nominator], "0.00"),                                       // hypothesis 8
 			    "9", FORMAT([meas.calc_hyp9_kpi2_nominator], "0.00"),                                       // hypothesis 9
 			    "10", FORMAT([meas.calc_hyp10_kpi2_nominator], "0.00"),                                     // hypothesis 10
-			    "11", FORMAT([meas.calc_hyp11_kpi2_nominator], "#,##0"" hrs"""),                          // hypothesis 11
+			    "11", FORMAT([meas.calc_hyp11_kpi2_nominator], "#,##0.0"" hrs"""),                          // hypothesis 11
 			    "12", FORMAT([meas.calc_hyp12_kpi2_nominator], "##,#0"" Accounts"),                                  // hypothesis 12
 			    "13", FORMAT([meas.calc_hyp13_kpi2_nominator], "$##,#0"),                                 // hypothesis 13
 			    //"14", FORMAT([meas.calc_hyp14_kpi2_Nominator], "##,#0"" hrs"),                                  // hypothesis 14
@@ -2921,44 +2909,70 @@ table metadata_heatmap_items
 	/// Calculation Logic: Uses VAR/RETURN, MAX, MIN, SWITCH, IF.
 	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_ai_score_name].
 	/// Format/Type: Unspecified
-	measure 'meas.kpi1_ai_score_trust_value' =
+	measure 'meas.kpi1_ai_score_trust_value' = ```
 			
 			VAR _score_name =
-			    MAX(metadata_heatmap_items[heatmap_kpi1_ai_score_name])
+			    SELECTEDVALUE(metadata_heatmap_items[heatmap_kpi1_ai_score_name])
 			
-			-- underlying normalized value (0–1)
+			-- underlying normalized value (0-1)
 			VAR _raw =
 			    SWITCH(
 			        TRUE(),
-			        _score_name = "Adjusted Duration",                      [meas.ai_scores_adj_duration],
+			        _score_name = "Adjusted Duration", [meas.ai_scores_adj_duration],
 			        _score_name = "AI Score Not Needed (insight always available)", 1,
-			        _score_name = "SSR Leadsource Consolidation",           [meas.ai_scores_ssr_leadsource],
-			        _score_name = "Sales Process",                          [meas.ai_scores_sales_process],
-			        _score_name = "Activity Capture Levels",                [meas.ai_scores_ci_act_capt_lvl],
-			        _score_name = "Bookings Calibration",                   [meas.ai_scores_booking_calibration],
-			        _score_name = "Revenue Calibration",                    [meas.ai_scores_revenue_calibration],
-			        _score_name = "Line-Item Products",                     [meas.ai_scores_line_items_products],
-			        _score_name = "Performance Tiers",                      [meas.ai_scores_performance_tiers],
-			        _score_name = "Ramping Success",                        [meas.ai_scores_ramping],
-			        _score_name = "Prospecting Success Predictions",        [meas.ai_scores_pred_prospecting],
-			        _score_name = "Existing Customer Success Predictions",  [meas.ai_scores_pred_existing_customer_selling],
-			        _score_name = "Rep Org. Calibration",                   [meas.ai_scores_rep_org_calibration],
-			        _score_name = "New Logo Success Predictions",           [meas.ai_scores_pred_new_logo_selling]
+			        _score_name = "SSR Leadsource Consolidation", [meas.ai_scores_ssr_leadsource],
+			        _score_name = "Sales Process", [meas.ai_scores_sales_process],
+			        _score_name = "Activity Capture Level", [meas.ai_scores_ci_act_capt_lvl],
+			        _score_name = "Bookings Calibration", [meas.ai_scores_booking_calibration],
+			        _score_name = "Revenue Calibration", [meas.ai_scores_revenue_calibration],
+			        _score_name = "Line Item Products", [meas.ai_scores_line_items_products],
+			        _score_name = "Performance Tiers", [meas.ai_scores_performance_tiers],
+			        _score_name = "Ramping Success", [meas.ai_scores_ramping],
+			        _score_name = "Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],
+			        _score_name = "Existing Customer Selling Success Predictions", [meas.ai_scores_pred_existing_customer_selling],
+			        _score_name = "Rep Organization Calibration", [meas.ai_scores_rep_org_calibration],
+			        _score_name = "New Logo Selling Success Predictions", [meas.ai_scores_pred_new_logo_selling],
+			        BLANK()
 			    )
 			
-			-- scale 0–1 → 0–100
-			VAR _scaled = _raw * 100
+			-- map heatmap score name -> metadata_ai_scores[score_name]
+			VAR boost_raw =
+			    CALCULATE(
+			        MAX(metadata_ai_scores[boost_expo]),
+			        KEEPFILTERS(
+			            TREATAS(
+			                { _score_name },
+			                metadata_ai_scores[score_name]
+			            )
+			        )
+			    )
 			
-			-- preserve BLANK instead of converting to 0
+			VAR boost_num = IFERROR(VALUE(boost_raw), 1)
+			VAR boost = IF(ISBLANK(boost_num), 1, boost_num)
+			
+			VAR boost_is_fraction = boost <> INT(boost)
+			VAR safe_post_boost_val =
+			    IF(
+			        ISBLANK(_raw),
+			        BLANK(),
+			        IF(
+			            _raw <= 0 && boost_is_fraction,
+			            _raw,
+			            POWER(ABS(_raw), boost)
+			        )
+			    )
+			
+			VAR _scaled = safe_post_boost_val * 100
 			VAR _capped =
 			    IF(
 			        ISBLANK(_scaled),
 			        BLANK(),
 			        MAX(0, MIN(_scaled, 100))
 			    )
-			
 			RETURN
-			    _capped
+			    ROUND(_capped, 2)
+			
+			```
 		displayFolder: heatmap_kpis
 		lineageTag: 33ed841f-d4d2-4575-95cd-c4a06c7ee262
 
@@ -3039,41 +3053,65 @@ table metadata_heatmap_items
 	measure 'meas.kpi2_ai_score_trust_value' =
 			
 			VAR _score_name =
-			    MAX(metadata_heatmap_items[heatmap_kpi2_ai_score_name])
+			    SELECTEDVALUE(metadata_heatmap_items[heatmap_kpi2_ai_score_name])
 			
-			-- underlying normalized value (0–1)
+			-- underlying normalized value (0-1)
 			VAR _raw =
 			    SWITCH(
 			        TRUE(),
-			        _score_name = "Adjusted Duration",                      [meas.ai_scores_adj_duration],
-			        _score_name = "AI Score Not Needed (insight always available)", 1,   -- normalized
-			        _score_name = "SSR Leadsource Consolidation",           [meas.ai_scores_ssr_leadsource],
-			        _score_name = "Sales Process",                          [meas.ai_scores_sales_process],
-			        _score_name = "Activity Capture Levels",                [meas.ai_scores_ci_act_capt_lvl],
-			        _score_name = "Bookings Calibration",                   [meas.ai_scores_booking_calibration],
-			        _score_name = "Revenue Calibration",                    [meas.ai_scores_revenue_calibration],
-			        _score_name = "Line-Item Products",                     [meas.ai_scores_line_items_products],
-			        _score_name = "Performance Tiers",                      [meas.ai_scores_performance_tiers],
-			        _score_name = "Ramping Success",                        [meas.ai_scores_ramping],
-			        _score_name = "Prospecting Success Predictions",        [meas.ai_scores_pred_prospecting],
-			        _score_name = "Existing Customer Success Predictions",  [meas.ai_scores_pred_existing_customer_selling],
-			        _score_name = "Rep Org. Calibration",                   [meas.ai_scores_rep_org_calibration],
-			        _score_name = "New Logo Success Predictions",           [meas.ai_scores_pred_new_logo_selling]
+			        _score_name = "Adjusted Duration", [meas.ai_scores_adj_duration],
+			        _score_name = "AI Score Not Needed (insight always available)", 1,
+			        _score_name = "SSR Leadsource Consolidation", [meas.ai_scores_ssr_leadsource],
+			        _score_name = "Sales Process", [meas.ai_scores_sales_process],
+			        _score_name = "Activity Capture Level", [meas.ai_scores_ci_act_capt_lvl],
+			        _score_name = "Bookings Calibration", [meas.ai_scores_booking_calibration],
+			        _score_name = "Revenue Calibration", [meas.ai_scores_revenue_calibration],
+			        _score_name = "Line Item Products", [meas.ai_scores_line_items_products],
+			        _score_name = "Performance Tiers", [meas.ai_scores_performance_tiers],
+			        _score_name = "Ramping Success", [meas.ai_scores_ramping],
+			        _score_name = "Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],
+			        _score_name = "Existing Customer Selling Success Predictions", [meas.ai_scores_pred_existing_customer_selling],
+			        _score_name = "Rep Organization Calibration", [meas.ai_scores_rep_org_calibration],
+			        _score_name = "New Logo Selling Success Predictions", [meas.ai_scores_pred_new_logo_selling],
+			        BLANK()
 			    )
 			
-			-- scale 0–1 → 0–100
-			VAR _scaled = _raw * 100
+			-- map heatmap score name -> metadata_ai_scores[score_name]
+			VAR boost_raw =
+			    CALCULATE(
+			        MAX(metadata_ai_scores[boost_expo]),
+			        KEEPFILTERS(
+			            TREATAS(
+			                { _score_name },
+			                metadata_ai_scores[score_name]
+			            )
+			        )
+			    )
 			
-			-- cap between 0 and 100
+			VAR boost_num = IFERROR(VALUE(boost_raw), 1)
+			VAR boost = IF(ISBLANK(boost_num), 1, boost_num)
+			
+			VAR boost_is_fraction = boost <> INT(boost)
+			VAR safe_post_boost_val =
+			    IF(
+			        ISBLANK(_raw),
+			        BLANK(),
+			        IF(
+			            _raw <= 0 && boost_is_fraction,
+			            _raw,
+			            POWER(ABS(_raw), boost)
+			        )
+			    )
+			
+			VAR _scaled = safe_post_boost_val * 100
 			VAR _capped =
 			    IF(
 			        ISBLANK(_scaled),
 			        BLANK(),
 			        MAX(0, MIN(_scaled, 100))
 			    )
-			
 			RETURN
-			    _capped
+			    ROUND(_capped, 2)
 		formatString: 0
 		displayFolder: heatmap_kpis
 		lineageTag: 9a0c2441-1cdd-4190-a24e-05a59c2ff85b
@@ -4002,28 +4040,10 @@ table metadata_heatmap_items
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, CALCULATE, COUNTROWS, FILTER.
 	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date], ssr[trueai_first_purchase].
 	/// Format/Type: 0
-	measure 'meas.calc_hyp13_kpi1_nominator_count' = ```
+	measure 'meas.calc_hyp13_kpi1_nominator_count' =
 			
-			var period_start = [meas.context_date_min]
-			var period_end = [meas.context_date_max]
-			var period_in_months =  DATEDIFF(period_start, period_end + 1, month) * -1
-			var prev_period_start = EDATE(period_start,period_in_months)
-			var prev_period_end =   EDATE(period_end,period_in_months)
-			
-			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
-			
-			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
-			
-			var new_cnt = CALCULATE(
-			    COUNTROWS( EXCEPT(ending_custs,starting_custs )),
-			    ssr_history[step_name]="New Logo Selling"
-			)
-			
-			var res = new_cnt 
-			return IF(isblank(res), 0, res)
-			```
+			CALCULATE(
+			    [meas.ssr_history_rev_new_count])
 		formatString: 0
 		displayFolder: _record_counts
 		lineageTag: f042f1a8-38b9-41de-8ce5-49c58f482621
@@ -4033,35 +4053,10 @@ table metadata_heatmap_items
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, CALCULATE, SUM, COUNTROWS.
 	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date], ssr[trueai_first_purchase].
 	/// Format/Type: #,0
-	measure 'meas.calc_hyp13_kpi2_nominator_count' = ```
+	measure 'meas.calc_hyp13_kpi2_nominator_count' =
 			
-			// get the period dates based on current filter contetxt 
-			var period_start = [meas.context_date_min]
-			var period_end = [meas.context_date_max]
-			var period_in_months =  DATEDIFF(period_start, period_end + 1, month) * -1
-			var prev_period_start = EDATE(period_start,period_in_months)
-			var prev_period_end =   EDATE(period_end,period_in_months)
-			
-			 var overridden_dates_tbl =  CALCULATETABLE(ssr , cal_end_dates[Date] >=  date(1900,1,1) &&  cal_end_dates[Date] < date(2100,1,1)) -- get current filter context except all dates
-			
-			// get the tables - break out of filter context (AKK) and override based on first purch and churn
-			var starting_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_start)  // client before start of period,  churn after period started
-			var retained_custs = Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_start && ssr[trueai_churned_on]  >= period_end)  // client before start of period,  churn after period end
-			var churned_custs = Filter((overridden_dates_tbl), ssr[trueai_churned_on] >= period_start && ssr[trueai_churned_on] <= period_end)  // churned after period started, before period ended
-			var ending_custs =  Filter((overridden_dates_tbl), ssr[trueai_first_purchase] <= period_end && ssr[trueai_churned_on]  >= period_end)  // // client before end of period, churn after  period ended
-			
-			// get the values based on temp tables
-			var starting_cnt = COUNTROWS(starting_custs)
-			var starting_amt = CALCULATE(SUM(ssr_history[opp_won_amt]),  cal_end_dates[date] >= prev_period_start &&  cal_end_dates[date] <= prev_period_end ,starting_custs) // look at last years rev for these 
-			var retained_cnt = COUNTROWS(retained_custs)
-			var retained_amt = CALCULATE(SUM(ssr_history[opp_won_amt]),  cal_end_dates[date] >= prev_period_start &&  cal_end_dates[date] <= prev_period_end ,EXCEPT(starting_custs, churned_custs)) // look at last years rev for these 
-			var new_cnt = COUNTROWS( EXCEPT(ending_custs,starting_custs ))
-			
-			
-			// assign the res
-			var res = new_cnt 
-			return IF(isblank(res), 0, res)
-			```
+			CALCULATE(
+			    [meas.ssr_history_rev_new_count])
 		formatString: #,0
 		displayFolder: _record_counts
 		lineageTag: cfd519b5-6ede-4292-9f46-44b95f4b4ab6
@@ -4209,18 +4204,13 @@ table metadata_heatmap_items
 		lineageTag: baedc44c-944c-4ab7-8093-a224304ed2bd
 
 	/// Measure meas.calc_hyp2_kpi2_nominator_count.
-	/// Purpose: Returns a value derived from completeness_summary[entity].
+	/// Purpose: Returns a value derived from opps row count in current context.
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, COUNTROWS.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on completeness_summary[entity].
+	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: 0
 	measure 'meas.calc_hyp2_kpi2_nominator_count' =
 			
-			var contact_ai = CALCULATETABLE(
-			    completeness_summary,      // get the contact info average score for entity Leads
-			    completeness_summary[entity]="Opps"
-			)
-			
-			
+			var contact_ai = CALCULATETABLE(opps)
 			var res  = COUNTROWS(contact_ai)
 			
 			RETURN
