@@ -575,7 +575,8 @@ table metadata_ai_scores
 			            133004, 0.86
 			        )
 			    )
-			RETURN res
+			RETURN
+			    res
 			
 			```
 		displayFolder: _factor_value1
@@ -637,12 +638,16 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_ci_deal_maxing_factor1_value' =
 			
-			var _avg = CALCULATE(
-			    AVERAGEX(users_history, IFERROR(VALUE(users_history[ci_sb_deal_maxing_conf]), BLANK())),        // get the avg deal maximizing conf
-			    users[trueai_user_role_function] in {"AM", "AE"}
-			)
+			VAR _avg =
+			    CALCULATE(
+			        AVERAGEX(
+			            users_history,
+			            IFERROR(VALUE(users_history[ci_sb_deal_maxing_conf]), BLANK())
+			        ),
+			        users[trueai_user_role_function] IN {"AM", "AE"}
+			    )
 			RETURN
-			_avg+0
+			    _avg
 		displayFolder: _factor_value1
 		lineageTag: 836edda6-b925-4e80-bdb4-1c0292e8b84a
 
@@ -814,34 +819,23 @@ table metadata_ai_scores
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.ai_scores_opps_history_factor1_value' =
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: 0
+	measure 'meas.readiness_ai_scores_opps_history_factor1_value' =
 			
-			VAR won_opps =
-			    CALCULATETABLE(
-			        VALUES(opps[_sys_docid]),
-			        opps[trueai_is_won] = TRUE()
+			VAR factor1 =
+			    CALCULATE(
+			        [meas.ai_scores_opps_history_factor1_value],
+			        CROSSFILTER(opps[_sys_filt_start_date], cal_end_dates[date], NONE),
+			        TREATAS(VALUES(cal_end_dates[date]), open_pipeline[_sys_filt_end_date])
 			    )
-			
-			VAR tbl_won =
-			    CALCULATETABLE(
-			        opps_histories,
-			        NOT ISBLANK(opps_histories[crm_opp_id]),
-			        TREATAS(won_opps, opps_histories[crm_opp_id])
-			    )
-			VAR tbl_summarized_raw =
-			    SUMMARIZE(
-			        tbl_won,
-			        opps_histories[crm_opp_id],
-			        "stage_cnt_raw", DISTINCTCOUNT(opps_histories[trueai_stage_id])
-			    )
-			VAR tbl_summarized =
-			    ADDCOLUMNS(
-			        tbl_summarized_raw,
-			        "stage_cnt_capped", MIN([stage_cnt_raw], 6)
-			    )
-			RETURN
-			    AVERAGEX(tbl_summarized, [stage_cnt_capped])
-		lineageTag: 855166ce-1c77-4914-b513-ea11788f0945
+			RETURN factor1
+		displayFolder: _factor_value1
+		lineageTag: 512e3883-a026-4256-92c0-15cd3de692a4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
@@ -910,12 +904,8 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_potential_acv_factor1_value' =
 			
-			var temp =
-			    CALCULATE(
-			        AVERAGE(ssr[trueai_complt_all]),
-			        CROSSFILTER(ssr_history[_sys_filt_start_date], cal_end_dates[date], NONE),
-			        TREATAS(VALUES(cal_end_dates[date]), ssr_history[_sys_filt_end_date])
-			    )
+			// as we don't have some field to calculate the factor I am using here temporary variable for visualization purpose. need to apply the actual field while available
+			var temp = CALCULATE(AVERAGE(ssr[trueai_complt_all]))    // temp value for factor analysis
 			RETURN
 			temp
 		displayFolder: _factor_value1
@@ -1134,39 +1124,21 @@ table metadata_ai_scores
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'meas.ai_scores_opps_history_factor2_value' =
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
+	/// Dynamic Behavior: No explicit conditional branching detected.
+	/// Format/Type: Not specified.
+	measure 'meas.readiness_ai_scores_opps_history_factor2_value' = ```
 			
-			VAR won_opps =
-			    CALCULATETABLE(
-			        VALUES(opps[_sys_docid]),
-			        opps[trueai_is_won] = TRUE()
+			    CALCULATE(
+			        [meas.ai_scores_opps_history_factor2_value],
+			        CROSSFILTER(opps[_sys_filt_start_date], cal_end_dates[date], NONE),
+			        TREATAS(VALUES(cal_end_dates[date]), open_pipeline[_sys_filt_end_date])
 			    )
-			
-			VAR tbl_won =
-			    CALCULATETABLE(
-			        opps_histories,
-			        NOT ISBLANK(opps_histories[crm_opp_id]),
-			        TREATAS(won_opps, opps_histories[crm_opp_id])
-			    )
-			VAR tbl_summarized_raw =
-			    SUMMARIZE(
-			        tbl_won,
-			        opps_histories[crm_opp_id],
-			        "stage_cnt_raw", DISTINCTCOUNT(opps_histories[trueai_stage_id])
-			    )
-			VAR tbl_summarized =
-			    ADDCOLUMNS(
-			        tbl_summarized_raw,
-			        "stage_cnt_capped", MIN([stage_cnt_raw], 6)
-			    )
-			VAR count_sum_tbl = COUNTROWS(tbl_summarized)
-			VAR the_20_pct_ordinal = ROUND(count_sum_tbl * 0.8, 0)
-			VAR top_tbl_summarized =
-			    TOPN(the_20_pct_ordinal, tbl_summarized, [stage_cnt_capped], ASC)
-			VAR top_stage_count = MAXX(top_tbl_summarized, [stage_cnt_capped])
-			RETURN
-			    MAX(top_stage_count, 3)
-		lineageTag: f341495d-c49d-46ef-977e-753e3ab9eea9
+			```
+		formatString: 0
+		displayFolder: _factor_value2
+		lineageTag: 47282301-d72e-43a0-8754-a1106eb5b140
 
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
@@ -2048,31 +2020,13 @@ table metadata_ai_scores
 	/// Format/Type: Not specified.
 	measure 'meas.ai_scores_list_price' = ```
 			
-			VAR total_list_items =
-			    COUNT(opp_line_items[trueai_list_price])
+			var total_list_items = [meas.ai_scores_list_price_items_factor1_value]
+			var total_list_items_non_default = [meas.ai_scores_list_price_items_non_default_factor2_value]
+			var total_list_items_default = total_list_items- total_list_items_non_default
+			 
+			var score = DIVIDE(total_list_items_non_default, total_list_items )* 0.49 + DIVIDE(total_list_items_default, total_list_items) // penalize non default scores
 			
-			VAR total_list_items_non_default =
-			    CALCULATE(
-			        COUNT(opp_line_items[trueai_list_price]),
-			        opp_line_items[trueai_list_price_rule] <> 103007
-			    )
-			
-			VAR total_list_items_default =
-			    total_list_items - total_list_items_non_default
-			
-			VAR score01 =
-			    DIVIDE(total_list_items_non_default, total_list_items) * 0.49
-			    + DIVIDE(total_list_items_default, total_list_items)
-			
-			VAR score100 =
-			    score01
-			
-			RETURN
-			    IF(
-			        ISBLANK(score01),
-			        BLANK(),
-			        MIN(100, MAX(0, score100))
-			    )
+			RETURN  score
 			
 			```
 		displayFolder: _ai_scores
@@ -2137,14 +2091,21 @@ table metadata_ai_scores
 		displayFolder: _ai_scores
 		lineageTag: 35d3120c-5156-4171-827a-4a864b72cc13
 
-	measure 'meas.ai_scores_opps_history' =
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (factor1, factor2, _conf, res) used later in the expression. Dependencies: Columns: opps_histories[crm_opp_id], ssr_history[entity_opp_id].
+	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
+	/// Format/Type: Not specified.
+	measure 'meas.readiness_ai_scores_opps_history' =
 			
-			VAR factor1 = [meas.ai_scores_opps_history_factor1_value]
-			VAR factor2 = [meas.ai_scores_opps_history_factor2_value]
-			VAR ratio01 = MIN(DIVIDE(factor1, factor2, BLANK()), 1)
-			RETURN
-			    IF(ISBLANK(ratio01), BLANK(), MIN(100, MAX(0, ratio01)))
-		lineageTag: 0d744cb9-13bf-476b-84f6-844acdaaa6ff
+			VAR factor1 = [meas.readiness_ai_scores_opps_history_factor1_value]
+			VAR factor2 = [meas.readiness_ai_scores_opps_history_factor2_value]
+			
+			VAR ratio_raw = DIVIDE(factor1, factor2, BLANK())
+			VAR res = MIN(100, MAX(0, ratio_raw))
+			
+			RETURN IF(ISBLANK(ratio_raw), BLANK(), res)
+		displayFolder: _ai_scores
+		lineageTag: f214dba1-0a42-4c29-9898-0d3dbd51cbe1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -2901,22 +2862,6 @@ table metadata_ai_scores
 		displayFolder: _ai_scores
 		lineageTag: 984a8bb8-d8e9-4ec5-ac04-4b5ca8f9597a
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (score_name, res) used later in the expression. Dependencies: Columns: metadata_ai_scores[score_name] | Measures: [meas.ai_scores_pred_prospecting], [meas.ai_scores_pred_new_logo_selling], [meas.ai_scores_pred_post_sales_support], [meas.ai_scores_pred_existing_customer_selling], [meas.ai_scores_success_factor_analysis], [meas.ai_scores_potential_acv], [meas.ai_scores_list_price], [meas.ai_scores_line_items_products], [meas.ai_scores_accts_industry], [meas.ai_scores_accts_leadsource], [meas.ai_scores_leads_industry], [meas.ai_scores_leads_leadsource], [meas.ai_scores_opps_industry], [meas.ai_scores_opps_leadsource], [meas.ai_scores_ssr_industry], [meas.ai_scores_ssr_leadsource], [meas.ai_scores_opps_history], [meas.ai_scores_ci_act_capt_lvl], [meas.ai_scores_ci_act_capt_lvl_conf], [meas.ai_scores_ci_time_alloc], [meas.ai_scores_adj_duration], [meas.ai_scores_ci_closing_ability], [meas.ai_scores_ci_discovery_skill], [meas.ai_scores_ci_engagement_ability], [meas.ai_scores_ci_work_effort], [meas.ai_scores_ci_deal_maxing], [meas.ai_scores_performance_tiers], [meas.ai_scores_ramping], [meas.ai_scores_ci_time_management], [meas.ai_scores_rep_org_calibration], [meas.ai_scores_booking_calibration], [meas.ai_scores_revenue_calibration], [meas.ai_scores_general_score].
-	/// Dynamic Behavior: Uses SWITCH for conditional branching.
-	/// Format/Type: 0
-	measure 'meas.ai_score' =
-			
-			IF(
-			    [meas.ai_score_is_in_selected_category] = 1,
-			    COALESCE([meas.readiness_ai_score], 0),
-			    BLANK()
-			)
-		formatString: 0
-		lineageTag: 432d9e8d-81a5-4998-8f5c-3588b6380807
-
-		annotation PBI_FormatHint = {"isDecimal":true}
-
 	/// Measure meas.ai_scores_text.
 	/// Purpose: Returns the measure value from its DAX expression.
 	/// Calculation Logic: Uses VAR/RETURN, IF.
@@ -3256,154 +3201,78 @@ table metadata_ai_scores
 	measure 'meas.__compile_probe' = 1
 		lineageTag: 4490d946-e5a0-44ed-9d66-d17e168a7a2f
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0
-	measure 'meas.readiness_ai_scores_opps_history_factor1_value' =
+	measure 'meas.ai_scores_opps_history_factor1_value' =
 			
-			VAR factor1 =
-			    CALCULATE(
-			        [meas.ai_scores_opps_history_factor1_value],
-			        CROSSFILTER(opps[_sys_filt_start_date], cal_end_dates[date], NONE),
-			        TREATAS(VALUES(cal_end_dates[date]), open_pipeline[_sys_filt_end_date])
+			VAR won_opps =
+			    CALCULATETABLE(
+			        VALUES(opps[_sys_docid]),
+			        opps[trueai_is_won] = TRUE()
 			    )
-			RETURN factor1
-		displayFolder: _factor_value1
-		lineageTag: 512e3883-a026-4256-92c0-15cd3de692a4
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: Not specified.
-	measure 'meas.readiness_ai_scores_opps_history_factor2_value' = ```
-			
-			    CALCULATE(
-			        [meas.ai_scores_opps_history_factor2_value],
-			        CROSSFILTER(opps[_sys_filt_start_date], cal_end_dates[date], NONE),
-			        TREATAS(VALUES(cal_end_dates[date]), open_pipeline[_sys_filt_end_date])
+			VAR tbl_won =
+			    CALCULATETABLE(
+			        opps_histories,
+			        NOT ISBLANK(opps_histories[crm_opp_id]),
+			        TREATAS(won_opps, opps_histories[crm_opp_id])
 			    )
-			```
-		formatString: 0
-		displayFolder: _factor_value2
-		lineageTag: 47282301-d72e-43a0-8754-a1106eb5b140
-
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (factor1, factor2, _conf, res) used later in the expression. Dependencies: Columns: opps_histories[crm_opp_id], ssr_history[entity_opp_id].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: Not specified.
-	measure 'meas.readiness_ai_scores_opps_history' =
-			
-			VAR factor1 = [meas.readiness_ai_scores_opps_history_factor1_value]
-			VAR factor2 = [meas.readiness_ai_scores_opps_history_factor2_value]
-			
-			VAR ratio_raw = DIVIDE(factor1, factor2, BLANK())
-			VAR res = MIN(100, MAX(0, ratio_raw))
-			
-			RETURN IF(ISBLANK(ratio_raw), BLANK(), res)
-		displayFolder: _ai_scores
-		lineageTag: f214dba1-0a42-4c29-9898-0d3dbd51cbe1
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure 'meas.readiness_ai_score' =
-			
-			VAR score_name =
-			    MAX(metadata_ai_scores[score_name])
-			
-			VAR raw_val =
-			    SWITCH(
-			        score_name,
-			        "Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],
-			
-			        "New Logo Selling Success Predictions",
-			            (
-			                MAX(COALESCE([meas.ai_scores_new_logo_selling_factor2_value], 0), 0)
-			                + COALESCE([meas.ai_scores_new_logo_selling_factor1_value], 0)
-			            ) / 2,
-			
-			        "Post-Sales Support Success Predictions", [meas.ai_scores_pred_post_sales_support],
-			        "Existing Customer Selling Success Predictions", [meas.ai_scores_pred_existing_customer_selling],
-			        "Success Factor Analysis", [meas.ai_scores_success_factor_analysis],
-			        "Potential ACV", [meas.ai_scores_potential_acv],
-			        "List Price", [meas.ai_scores_list_price],
-			        "Line Item Products", [meas.ai_scores_line_items_products],
-			        "Accounts Industry Consolidation", [meas.ai_scores_accts_industry],
-			        "Accounts Lead Source Consolidation", [meas.ai_scores_accts_leadsource],
-			        "Leads Industry Consolidation", [meas.ai_scores_leads_industry],
-			        "Leads Lead Source Consolidation", [meas.ai_scores_leads_leadsource],
-			        "Opps Industry Consolidation", [meas.ai_scores_opps_industry],
-			        "Opps Lead Source Consolidation", [meas.ai_scores_opps_leadsource],
-			
-			        "SSR Industry Consolidation",
-			            CALCULATE(AVERAGE(ssr[trueai_industry_conf])),
-			
-			        "SSR Lead Source Consolidation",
-			            CALCULATE(AVERAGE(ssr[trueai_leadsource_conf])),
-			
-			        "Opportunities History", [meas.readiness_ai_scores_opps_history],
-			
-			        "Activity Capture Level",
-			            CALCULATE(
-			                AVERAGE(users_history[ci_act_capt_lvl]),
-			                users[trueai_user_role_function] IN { "AM", "AE", "SDR" }
-			            ),
-			
-			        "Activity Capture Level Confidence", [meas.ai_scores_ci_act_capt_lvl_conf],
-			
-			        "Time Allocation",
-			            CALCULATE(
-			                AVERAGE(users_history[ci_time_alloc_conf]),
-			                users[trueai_user_role_function] IN { "AM", "AE", "SDR" }
-			            ),
-			
-			        "Adjusted Duration", [meas.ai_scores_adj_duration_factor1_value],
-			        "Closing Ability", [meas.ai_scores_ci_closing_ability],
-			        "Discovery Skill", [meas.ai_scores_ci_discovery_skill],
-			        "Engagement Ability", [meas.ai_scores_ci_engagement_ability],
-			        "Work Effort", [meas.ai_scores_ci_work_effort],
-			        "Deal Maximizing", [meas.pi_score_ci_deal_maxing],
-			        "Performance Tiers", [meas.ai_scores_performance_tiers],
-			        "Ramping Success", [meas.ai_scores_ramping],
-			        "Time Management", [meas.ai_scores_ci_time_management],
-			        "Rep Organization Calibration", [meas.ai_scores_rep_org_calibration],
-			        "Bookings Calibration", [meas.ai_scores_booking_calibration],
-			        "Revenue Calibration", [meas.ai_scores_revenue_calibration],
-			        "Leads & Accounts Completeness Data Present", [meas.ai_scores_general_score],
-			        BLANK()
+			VAR tbl_summarized_raw =
+			    SUMMARIZE(
+			        tbl_won,
+			        opps_histories[crm_opp_id],
+			        "stage_cnt_raw", DISTINCTCOUNT(opps_histories[trueai_stage_id])
 			    )
-			
-			VAR pre_boost_val =
-			    IFERROR(VALUE(raw_val), 0)
-			
-			VAR boost_raw =
-			    MAX(metadata_ai_scores[boost_expo])
-			
-			VAR boost =
-			    IF(
-			        ISBLANK(boost_raw) || NOT ISNUMBER(boost_raw) || boost_raw <= 0,
-			        1,
-			        boost_raw
+			VAR tbl_summarized =
+			    ADDCOLUMNS(
+			        tbl_summarized_raw,
+			        "stage_cnt_capped", MIN([stage_cnt_raw], 6)
 			    )
-			
-			VAR boost_is_fraction =
-			    boost <> INT(boost)
-			
-			VAR safe_post_boost_val =
-			    IF(
-			        pre_boost_val <= 0 && boost_is_fraction,
-			        pre_boost_val,
-			        POWER(ABS(pre_boost_val), boost)
-			    )
-			
-			VAR result_score =
-			    MIN(MAX(safe_post_boost_val * 100, 0), 100)
-			
 			RETURN
-			    result_score + 0
-		lineageTag: ffef63ec-4858-4976-8798-0fb002bdba60
+			    AVERAGEX(tbl_summarized, [stage_cnt_capped])
+		lineageTag: 855166ce-1c77-4914-b513-ea11788f0945
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.ai_scores_opps_history_factor2_value' =
+			
+			VAR won_opps =
+			    CALCULATETABLE(
+			        VALUES(opps[_sys_docid]),
+			        opps[trueai_is_won] = TRUE()
+			    )
+			
+			VAR tbl_won =
+			    CALCULATETABLE(
+			        opps_histories,
+			        NOT ISBLANK(opps_histories[crm_opp_id]),
+			        TREATAS(won_opps, opps_histories[crm_opp_id])
+			    )
+			VAR tbl_summarized_raw =
+			    SUMMARIZE(
+			        tbl_won,
+			        opps_histories[crm_opp_id],
+			        "stage_cnt_raw", DISTINCTCOUNT(opps_histories[trueai_stage_id])
+			    )
+			VAR tbl_summarized =
+			    ADDCOLUMNS(
+			        tbl_summarized_raw,
+			        "stage_cnt_capped", MIN([stage_cnt_raw], 6)
+			    )
+			VAR count_sum_tbl = COUNTROWS(tbl_summarized)
+			VAR the_20_pct_ordinal = ROUND(count_sum_tbl * 0.8, 0)
+			VAR top_tbl_summarized =
+			    TOPN(the_20_pct_ordinal, tbl_summarized, [stage_cnt_capped], ASC)
+			VAR top_stage_count = MAXX(top_tbl_summarized, [stage_cnt_capped])
+			RETURN
+			    MAX(top_stage_count, 3)
+		lineageTag: f341495d-c49d-46ef-977e-753e3ab9eea9
+
+	measure 'meas.ai_scores_opps_history' =
+			
+			VAR factor1 = [meas.ai_scores_opps_history_factor1_value]
+			VAR factor2 = [meas.ai_scores_opps_history_factor2_value]
+			VAR ratio01 = MIN(DIVIDE(factor1, factor2, BLANK()), 1)
+			RETURN
+			    IF(ISBLANK(ratio01), BLANK(), MIN(100, MAX(0, ratio01)))
+		lineageTag: 0d744cb9-13bf-476b-84f6-844acdaaa6ff
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -3600,6 +3469,121 @@ table metadata_ai_scores
 			)
 		formatString: 0
 		lineageTag: 5d85f2b5-783c-432f-8c14-cad5bc0c2460
+
+	measure 'meas.readiness_ai_score' =
+			
+			VAR score_name =
+			    MAX(metadata_ai_scores[score_name])
+			
+			VAR raw_val =
+			    SWITCH(
+			        score_name,
+			        "Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],
+			
+			        "New Logo Selling Success Predictions",
+			            (
+			                MAX(COALESCE([meas.ai_scores_new_logo_selling_factor2_value], 0), 0)
+			                + COALESCE([meas.ai_scores_new_logo_selling_factor1_value], 0)
+			            ) / 2,
+			
+			        "Post-Sales Support Success Predictions", [meas.ai_scores_pred_post_sales_support],
+			        "Existing Customer Selling Success Predictions", [meas.ai_scores_pred_existing_customer_selling],
+			        "Success Factor Analysis", [meas.ai_scores_success_factor_analysis],
+			        "Potential ACV", [meas.ai_scores_potential_acv],
+			        "List Price", [meas.ai_scores_list_price],
+			        "Line Item Products", [meas.ai_scores_line_items_products],
+			        "Accounts Industry Consolidation", [meas.ai_scores_accts_industry],
+			        "Accounts Lead Source Consolidation", [meas.ai_scores_accts_leadsource],
+			        "Leads Industry Consolidation", [meas.ai_scores_leads_industry],
+			        "Leads Lead Source Consolidation", [meas.ai_scores_leads_leadsource],
+			        "Opps Industry Consolidation", [meas.ai_scores_opps_industry],
+			        "Opps Lead Source Consolidation", [meas.ai_scores_opps_leadsource],
+			
+			        "SSR Industry Consolidation",
+			            CALCULATE(AVERAGE(ssr[trueai_industry_conf])),
+			
+			        "SSR Lead Source Consolidation",
+			            CALCULATE(AVERAGE(ssr[trueai_leadsource_conf])),
+			
+			        "Opportunities History", [meas.readiness_ai_scores_opps_history],
+			
+			        "Activity Capture Level",
+			            CALCULATE(
+			                AVERAGE(users_history[ci_act_capt_lvl]),
+			                users[trueai_user_role_function] IN { "AM", "AE", "SDR" }
+			            ),
+			
+			        "Activity Capture Level Confidence", [meas.ai_scores_ci_act_capt_lvl_conf],
+			
+			        "Time Allocation",
+			            CALCULATE(
+			                AVERAGE(users_history[ci_time_alloc_conf]),
+			                users[trueai_user_role_function] IN { "AM", "AE", "SDR" }
+			            ),
+			
+			        "Adjusted Duration", [meas.ai_scores_adj_duration_factor1_value],
+			        "Closing Ability", [meas.ai_scores_ci_closing_ability],
+			        "Discovery Skill", [meas.ai_scores_ci_discovery_skill],
+			        "Engagement Ability", [meas.ai_scores_ci_engagement_ability],
+			        "Work Effort", [meas.ai_scores_ci_work_effort],
+			        "Deal Maximizing", [meas.pi_score_ci_deal_maxing],
+			        "Performance Tiers", [meas.ai_scores_performance_tiers],
+			        "Ramping Success", [meas.ai_scores_ramping],
+			        "Time Management", [meas.ai_scores_ci_time_management],
+			        "Rep Organization Calibration", [meas.ai_scores_rep_org_calibration],
+			        "Bookings Calibration", [meas.ai_scores_booking_calibration],
+			        "Revenue Calibration", [meas.ai_scores_revenue_calibration],
+			        "Leads & Accounts Completeness Data Present", [meas.ai_scores_general_score],
+			        BLANK()
+			    )
+			
+			VAR pre_boost_val =
+			    IFERROR(VALUE(raw_val), 0)
+			
+			VAR boost_raw =
+			    MAX(metadata_ai_scores[boost_expo])
+			
+			VAR boost =
+			    IF(
+			        ISBLANK(boost_raw) || NOT ISNUMBER(boost_raw) || boost_raw <= 0,
+			        1,
+			        boost_raw
+			    )
+			
+			VAR boost_is_fraction =
+			    boost <> INT(boost)
+			
+			VAR safe_post_boost_val =
+			    IF(
+			        pre_boost_val <= 0 && boost_is_fraction,
+			        pre_boost_val,
+			        POWER(ABS(pre_boost_val), boost)
+			    )
+			
+			VAR result_score =
+			    MIN(MAX(safe_post_boost_val * 100, 0), 100)
+			
+			RETURN
+			    result_score + 0
+		lineageTag: ffef63ec-4858-4976-8798-0fb002bdba60
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: VAR blocks define intermediate values (score_name, res) used later in the expression. Dependencies: Columns: metadata_ai_scores[score_name] | Measures: [meas.ai_scores_pred_prospecting], [meas.ai_scores_pred_new_logo_selling], [meas.ai_scores_pred_post_sales_support], [meas.ai_scores_pred_existing_customer_selling], [meas.ai_scores_success_factor_analysis], [meas.ai_scores_potential_acv], [meas.ai_scores_list_price], [meas.ai_scores_line_items_products], [meas.ai_scores_accts_industry], [meas.ai_scores_accts_leadsource], [meas.ai_scores_leads_industry], [meas.ai_scores_leads_leadsource], [meas.ai_scores_opps_industry], [meas.ai_scores_opps_leadsource], [meas.ai_scores_ssr_industry], [meas.ai_scores_ssr_leadsource], [meas.ai_scores_opps_history], [meas.ai_scores_ci_act_capt_lvl], [meas.ai_scores_ci_act_capt_lvl_conf], [meas.ai_scores_ci_time_alloc], [meas.ai_scores_adj_duration], [meas.ai_scores_ci_closing_ability], [meas.ai_scores_ci_discovery_skill], [meas.ai_scores_ci_engagement_ability], [meas.ai_scores_ci_work_effort], [meas.ai_scores_ci_deal_maxing], [meas.ai_scores_performance_tiers], [meas.ai_scores_ramping], [meas.ai_scores_ci_time_management], [meas.ai_scores_rep_org_calibration], [meas.ai_scores_booking_calibration], [meas.ai_scores_revenue_calibration], [meas.ai_scores_general_score].
+	/// Dynamic Behavior: Uses SWITCH for conditional branching.
+	/// Format/Type: 0
+	measure 'meas.ai_score' =
+			
+			IF(
+			    [meas.ai_score_is_in_selected_category] = 1,
+			    COALESCE([meas.readiness_ai_score], 0),
+			    BLANK()
+			)
+		formatString: 0
+		lineageTag: 432d9e8d-81a5-4998-8f5c-3588b6380807
+
+		annotation PBI_FormatHint = {"isDecimal":true}
 
 	measure Measure
 		lineageTag: 03f58b6d-08db-427b-87e8-566aaecdf77e

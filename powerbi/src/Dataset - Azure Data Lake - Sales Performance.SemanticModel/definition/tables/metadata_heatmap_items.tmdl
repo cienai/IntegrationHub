@@ -185,14 +185,14 @@ table metadata_heatmap_items
 			
 			var _predicted_rate = CALCULATE(
 			    [meas.ssr_history_success_prob_avg],
-			    YEAR(cal_end_dates[Date])=current_year,                 // get the previous year average predicted win rate
+			    YEAR(cal_end_dates[Date])=current_year,                 // get the current year average predicted win rate
 			    ssr_history[step_name]="Existing Customer Selling",
 			    ssr_history[opp_sale_type]="Renewal"
 			)
 			
 			var _initial_booking_amt = CALCULATE(
 			    [meas.ssr_history_booking_amt],
-			    YEAR(cal_end_dates[Date])=current_year,                 // get the previous year initial booking amt
+			    YEAR(cal_end_dates[Date])=current_year,                 // get the current year initial booking amt
 			    ssr_history[step_name]="Existing Customer Selling",
 			    ssr_history[opp_sale_type]="Renewal"
 			)
@@ -339,16 +339,11 @@ table metadata_heatmap_items
 	/// Format/Type: 0
 	measure 'meas.calc_hyp12_kpi1_nominator' =
 			
-			var _max_date = [meas.context_date_max]
-			RETURN
-			    CALCULATE(
-			        DISTINCTCOUNT(ssr[_sys_doc_id]),
-			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK() || ssr[trueai_churned_on] >= DATE(YEAR(_max_date)+1,01,01)),
-			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK()),
-			        ssr_history[step_name]="Existing Customer Selling",     // keep the date filter and ignore the context filter and get the attempted cross sale count
-			        ssr_history[opp_existing_customer_selling_cross_sale]=TRUE(),
-			        ALL(cal_end_dates)
-			    )
+			CALCULATE(
+			    DISTINCTCOUNT(ssr[_sys_doc_id]),
+			    ssr_history[step_name]="Existing Customer Selling",
+			    ssr_history[opp_existing_customer_selling_cross_sale] = TRUE()
+			)
 		formatString: 0
 		displayFolder: heatmap_kpis
 		lineageTag: 0a79c4ce-7c0d-4ca1-b49a-fafc90e62ef5
