@@ -239,7 +239,7 @@ table act_capture_level_summary
 	/// Format/Type: +#%;-#%;0%
 	measure 'meas.trueai_act_capt_score_improvement' =
 			
-			var trueai_score = ROUND([meas.ai_scores_ci_act_capt_lvl_boost],2)
+			var trueai_score = ROUND([meas.ai_scores_ci_act_capt_lvl_boost_last_full_year],2)
 			var crm_score = ROUND([meas.crm_act_capt_score],2)
 			var imp = divide(trueai_score - crm_score,  crm_score, 0)
 			var res = imp
@@ -363,6 +363,52 @@ table act_capture_level_summary
 			
 			```
 		lineageTag: eff907d9-b15f-4542-a73b-00ee119943fc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.ai_scores_ci_act_capt_lvl_boost_last_full_year' = ```
+			
+			VAR _selected_year_months =
+			    SUMMARIZE(
+			        ALLSELECTED(cal_end_dates),
+			        cal_end_dates[year],
+			        cal_end_dates[month_number]
+			    )
+			VAR _full_years =
+			    FILTER(
+			        GROUPBY(
+			            _selected_year_months,
+			            cal_end_dates[year],
+			            "month_count", COUNTX(CURRENTGROUP(), 1)
+			        ),
+			        [month_count] = 12
+			    )
+			VAR _last_full_year =
+			    MAXX(_full_years, cal_end_dates[year])
+			VAR _dates_last_full_year =
+			    SELECTCOLUMNS(
+			        FILTER(
+			            ALLSELECTED(cal_end_dates),
+			            cal_end_dates[year] = _last_full_year
+			        ),
+			        "d", cal_end_dates[date]
+			    )
+			VAR res =
+			    IF(
+			        ISBLANK(_last_full_year),
+			        BLANK(),
+			        CALCULATE(
+			            AVERAGE(users_history[ci_act_capt_lvl]),
+			            users[trueai_user_role_function] IN {"AM", "AE", "SDR"},
+			            CROSSFILTER(users_history[_sys_filt_start_date], cal_end_dates[date], NONE),
+			            TREATAS(_dates_last_full_year, users_history[_sys_filt_end_date])
+			        )
+			    )
+			RETURN
+			    IF(ISBLANK(res), BLANK(), POWER(res, 0.6) * 100)
+			
+			```
+		lineageTag: fae469f7-e2a9-4f06-86e5-92dde7bbd0d2
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
