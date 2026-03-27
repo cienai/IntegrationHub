@@ -612,7 +612,7 @@ table open_pipeline
 	/// Format/Type: Unspecified
 	measure 'meas.open_opps_avg_pace_score' =
 			
-			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_tier])),0)      // get the rounded avg of [trueai_pace_score] multply with 5
+			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
 			var _capped_avg = IF(_avg > 5, 5, _avg)  // Cap the value at 5
 			var res = SWITCH(
 			    _capped_avg,
@@ -629,6 +629,8 @@ table open_pipeline
 			res
 		displayFolder: _open_opps_pipeline
 		lineageTag: 2cd78355-abb5-4625-b982-0a2fc4036aff
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.open_opps_items_trueai_stage.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
@@ -1212,7 +1214,7 @@ table open_pipeline
 	/// Format/Type: Unspecified
 	measure 'meas.opps_creator_name' =
 			CALCULATE(
-			    MAX(opps[trueai_creator_id])
+			    MAX(opps[col.creator_name])
 			)
 		displayFolder: _opps_details
 		lineageTag: e8050285-8de1-458d-9c75-d7bfaa7f7806
@@ -1548,7 +1550,7 @@ table open_pipeline
 	/// Format/Type: Unspecified
 	measure 'meas.trueai_pace_score' =
 			
-			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_tier])),0)      // get the rounded avg of [trueai_pace_score] multply with 5
+			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
 			var _capped_avg = IF(_avg > 5, 5, _avg)  // Cap the value at 5
 			
 			RETURN
@@ -1566,7 +1568,7 @@ table open_pipeline
 	measure 'meas.opps_details_avg_pace_score' =
 			
 			
-			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_tier])),0)
+			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)
 			
 			var res = SWITCH(
 			    _avg,
@@ -1582,6 +1584,8 @@ table open_pipeline
 			res
 		displayFolder: _opps_details
 		lineageTag: 7a4fcb97-150c-44be-9490-680fa978ba2f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.open_opps_items_trueai_booking_amt.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
@@ -3032,14 +3036,6 @@ table open_pipeline
 		lineageTag: 2c593a8d-d985-4223-9c72-50778f1e4c67
 		summarizeBy: none
 		sourceColumn: cust_date3
-
-		annotation SummarizationSetBy = Automatic
-
-	column _sys_sync_id
-		dataType: string
-		lineageTag: 02d4cb1e-043d-4fdc-a82c-f6ecfb4a623a
-		summarizeBy: none
-		sourceColumn: _sys_sync_id
 
 		annotation SummarizationSetBy = Automatic
 
