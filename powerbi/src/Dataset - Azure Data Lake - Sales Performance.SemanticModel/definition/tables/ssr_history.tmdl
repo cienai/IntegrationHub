@@ -3176,14 +3176,29 @@ table ssr_history
 	/// Format/Type: \$#,0;(\$#,0);\$#,0
 	measure 'meas.ssr_history_asof_open_pipeline_adj_amt' = ```
 			
-			-- NOTE Open pipeline needs to override normal filter dates and is depndant on a second SYNCED slicer tied to the cal_end_dates_no_relationship table 
-			var end_date =  CALCULATE(LASTDATE(cal_start_dates[Date]), ALLSELECTED())  -- get the end date of the second slicer 
-			var all_dates_tbl = CALCULATETABLE(ssr_history, cal_end_dates[Date] > date(1900,1,1) && cal_end_dates[Date] < date(2100,1,2)) -- override the normal date filter and get current filters through calc table
-			var filt_tbl = FILTER(all_dates_tbl,ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}  && ssr_history[_sys_filt_end_date] >= end_date &&  ssr_history[_sys_filt_start_date] < end_date) -- apply the right steps and filter dates
-			
-			var res = SUMX(filt_tbl, ssr_history[opp_booking_amt] * ssr_history[step_success_prob] )
-			
-			return res
+			var end_date =
+			        CALCULATE ( LASTDATE ( cal_start_dates[Date] ), ALLSELECTED () )
+			    var all_dates_tbl =
+			        CALCULATETABLE (
+			            ssr_history,
+			            cal_end_dates[Date] > DATE ( 1900, 1, 1 )
+			                && cal_end_dates[Date] < DATE ( 2100, 1, 2 )
+			        )
+			    var filt_tbl =
+			        FILTER (
+			            all_dates_tbl,
+			            ssr_history[step_name] in { "New Logo Selling", "Existing Customer Selling" }
+			                && ssr_history[_sys_filt_end_date] >= end_date
+			                && ssr_history[_sys_filt_start_date] < end_date
+			        )
+			    var res =
+			        SUMX (
+			            filt_tbl,
+			            COALESCE ( ssr_history[step_pred_booking_amt], ssr_history[opp_booking_amt] )
+			                * ssr_history[step_success_prob]
+			        )
+			    return
+			        res
 			
 			```
 		formatString: \$#,0;(\$#,0);\$#,0
@@ -3327,15 +3342,31 @@ table ssr_history
 	/// Format/Type: \$#,0;(\$#,0);\$#,0
 	measure 'meas.ssr_history_asof_open_pipeline_adj_amt_sply' = ```
 			
-			-- NOTE Open pipeline needs to override normal filter dates and is depndant on a second SYNCED slicer tied to the cal_end_dates_no_relationship table 
-			var temp_date =  CALCULATE(LASTDATE(cal_start_dates[Date]), ALLSELECTED())  -- get the end date of the second slicer 
-			var end_date  = DATE(Year(Temp_date) -1, MONTH(temp_date), DAY(temp_date)) -- shift one year older
-			var all_dates_tbl = CALCULATETABLE(ssr_history, cal_end_dates[Date] > date(1900,1,1) && cal_end_dates[Date] < date(2100,1,2)) -- override the normal date filter and get current filters through calc table
-			var filt_tbl = FILTER(all_dates_tbl,ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"}  && ssr_history[_sys_filt_end_date] >= end_date &&  ssr_history[_sys_filt_start_date] < end_date) -- apply the right steps and filter dates
-			
-			var res = SUMX(filt_tbl, ssr_history[opp_booking_amt] * ssr_history[step_success_prob] )
-			
-			return res
+			var temp_date =
+			        CALCULATE ( LASTDATE ( cal_start_dates[Date] ), ALLSELECTED () )
+			    var end_date =
+			        DATE ( YEAR ( temp_date ) - 1, MONTH ( temp_date ), DAY ( temp_date ) )
+			    var all_dates_tbl =
+			        CALCULATETABLE (
+			            ssr_history,
+			            cal_end_dates[Date] > DATE ( 1900, 1, 1 )
+			                && cal_end_dates[Date] < DATE ( 2100, 1, 2 )
+			        )
+			    var filt_tbl =
+			        FILTER (
+			            all_dates_tbl,
+			            ssr_history[step_name] in { "New Logo Selling", "Existing Customer Selling" }
+			                && ssr_history[_sys_filt_end_date] >= end_date
+			                && ssr_history[_sys_filt_start_date] < end_date
+			        )
+			    var res =
+			        SUMX (
+			            filt_tbl,
+			            COALESCE ( ssr_history[step_pred_booking_amt], ssr_history[opp_booking_amt] )
+			                * ssr_history[step_success_prob]
+			        )
+			    return
+			        res
 			
 			```
 		formatString: \$#,0;(\$#,0);\$#,0
@@ -17671,3 +17702,4 @@ table ssr_history
 	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navigation
+
