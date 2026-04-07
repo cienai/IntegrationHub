@@ -1,0 +1,85 @@
+DEFINE
+    VAR __DS0FilterTable =
+        VALUES('cal_end_dates'[Date])
+
+    VAR __DS0FilterTable2 =
+        TREATAS({TRUE}, 'ssr'[trueai_ssr_is_master])
+
+    VAR __DS0FilterTable3 =
+        FILTER(
+            KEEPFILTERS(VALUES('act_time_alloc_summary'[user_role_function])),
+            NOT(ISBLANK('act_time_alloc_summary'[user_role_function]))
+        )
+
+    VAR __DS0Core =
+        SUMMARIZECOLUMNS(
+            ROLLUPADDISSUBTOTAL('act_time_alloc_summary'[user_role_function], "IsGrandTotalRowTotal"),
+            __DS0FilterTable,
+            __DS0FilterTable2,
+            __DS0FilterTable3,
+
+            "Tot_Reps", 'act_time_alloc_summary'[meas.act_time_alloc_reps],
+            "Tot_Reps_FormatString", IGNORE("0"),
+
+            "Pct_Reps_Act_Cap_Lvl", 'act_time_alloc_summary'[meas.act_time_rep_act_capture_value_pct],
+            "Pct_Reps_Act_Cap_Lvl_FormatString", IGNORE("0.00%;-0.00%;0.00%"),
+
+            "Reps_Time_Allocation", 'act_time_alloc_summary'[meas.act_time_alloc_reps_w_act_capt_level],
+            "Reps_Time_Allocation_FormatString", IGNORE("0"),
+
+            "Pct_Reps_Time_Allocation", 'act_time_alloc_summary'[meas.act_time_rep_w_act_capt_level_pct],
+            "Pct_Reps_Time_Allocation_FormatString", IGNORE("0%;-0%;0%"),
+
+            "Tot_Activities", SUM('act_time_alloc_summary'[act_tot_count]),
+            "Tot_Activities_FormatString", IGNORE("#,0"),
+
+            "Avg_Duration_per_Activity", 'act_time_alloc_summary'[meas.act_time_alloc_avg_dur],
+            "Avg_Duration_per_Activity_FormatString", IGNORE("###,###,###\" min\""),
+
+            "Captured_Duration", 'act_time_alloc_summary'[meas.act_time_alloc_captured_durations_h],
+            "Captured_Duration_FormatString", IGNORE("###,###,###0.0\" hrs\""),
+
+            "Adjustment_Factor", AVERAGE('act_time_alloc_summary'[act_capt_lvl_adjustment]),
+            "Adjustment_Factor_FormatString", IGNORE("0.00"),
+
+            "Prep_Factor", AVERAGE('act_time_alloc_summary'[prep_adjustment]),
+            "Prep_Factor_FormatString", IGNORE("0.00"),
+
+            "Adjusted_Duration", 'act_time_alloc_summary'[meas.act_time_alloc_adj_durations_h],
+            "Adjusted_Duration_FormatString", IGNORE("###,###,###\" hrs\""),
+
+            "Avg_Weekly_Hrs_per_Rep", 'act_time_alloc_summary'[meas.act_time_alloc_hours_weekly],
+            "Avg_Weekly_Hrs_per_Rep_FormatString", IGNORE("###,###,###\"  hrs/week\"")
+        )
+
+    VAR __DS0PrimaryWindowed =
+        TOPN(
+            501,
+            __DS0Core,
+            [IsGrandTotalRowTotal], ASC,
+            [Tot_Reps], DESC,
+            'act_time_alloc_summary'[user_role_function], ASC
+        )
+
+    VAR __DS0Output =
+        SELECTCOLUMNS(
+            __DS0PrimaryWindowed,
+            "User Role", IF([IsGrandTotalRowTotal], "Total", 'act_time_alloc_summary'[user_role_function]),
+            "Tot. # Reps", [Tot_Reps],
+            "% Reps w. Act. Cap. Lvl.", [Pct_Reps_Act_Cap_Lvl],
+            "# Reps w. Time Allocation", [Reps_Time_Allocation],
+            "% Reps w. Time Allocation", [Pct_Reps_Time_Allocation],
+            "# Tot. Activities", [Tot_Activities],
+            "Avg. Duration per Activity", [Avg_Duration_per_Activity],
+            "Captured Duration", [Captured_Duration],
+            "Adjustment Factor", [Adjustment_Factor],
+            "Prep Factor", [Prep_Factor],
+            "Adjusted Duration", [Adjusted_Duration],
+            "Avg. Weekly Hrs. per Rep", [Avg_Weekly_Hrs_per_Rep]
+        )
+
+EVALUATE
+    __DS0Output
+
+ORDER BY
+    [User Role] ASC
