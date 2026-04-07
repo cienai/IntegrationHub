@@ -55,16 +55,22 @@ table metadata_ai_scores
 	/// Calculation Logic: Uses VAR/RETURN, ABS.
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: Unspecified
-	measure 'meas.ai_scores_booking_calibration' = ```
+	measure 'meas.ai_scores_booking_calibration' =
 			
-			
-			
-			var factor1 = [meas.ai_scores_booking_calibration_factor1_value]
-			var factor2 = [meas.ai_scores_booking_calibration_factor2_value] 
-			
-			var res  = ((factor1 - ABS(factor1 - factor2))/factor1) + 0
-			RETURN res
-			```
+			VAR factor1 = [meas.ai_scores_booking_calibration_factor1_value]
+			VAR factor2 = [meas.ai_scores_booking_calibration_factor2_value]
+			VAR score_raw =
+			    DIVIDE(
+			        factor1 - ABS(factor1 - factor2),
+			        factor1,
+			        0
+			    )
+			RETURN
+			IF(
+			    ISBLANK(factor1) || factor1 <= 0,
+			    BLANK(),     -- prevents divide-by-zero/undefined
+			    MIN(1, MAX(0, score_raw))
+			)
 		displayFolder: _ai_scores
 		lineageTag: fe57f762-597f-4e7c-9903-2ed634cc1ca7
 
