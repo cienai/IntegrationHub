@@ -336,6 +336,9 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 5887f433-2566-4a32-b1b4-3fce64f6b252
 
+	/// Measure meas.open_opps_pipeline_amt.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 	measure 'meas.open_opps_pipeline_amt' = ```
@@ -405,6 +408,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_avg_pace_score.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
@@ -472,6 +476,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
+	/// Measure meas.open_opps_act_count.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
@@ -505,6 +510,9 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
+	/// Measure meas.open_opps_initial_close_date.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Short Date
 	measure 'meas.open_opps_initial_close_date' =
@@ -770,6 +778,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 6bfaea9e-b5e3-430d-9ac4-7824f78d80f6
 
+	/// Measure meas.open_opps_items_act_eng_rate.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
@@ -795,6 +804,9 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: b47a791b-611d-4c41-bed6-d76b0df5fe8c
 
+	/// Measure meas.closed_opps_pushed_pulled_days.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: 0
 	measure 'meas.closed_opps_pushed_pulled_days' = CALCULATE(MAX(ssr_history[step_days_pushed_pulled]))
@@ -1306,6 +1318,9 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: 69c96034-6487-4773-aeb2-26c2adbde284
 
+	/// Measure meas.open_pipeline_win_rate.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: 0.00%;-0.00%;0.00%
 	measure 'meas.open_pipeline_win_rate' =
@@ -1382,6 +1397,643 @@ table open_pipeline
 			```
 		formatString: 0
 		lineageTag: f53163da-522b-4c02-b6f5-eb0518a27cb5
+
+	/// Measure meas.open_opps_last_eng_act.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: Short Date
+	measure 'meas.open_opps_last_eng_act' =
+			
+			var sel_date = CALCULATE(MAX(cal_start_dates[Date]))
+			var res =  CALCULATE(
+			    MAX(open_pipeline[trueai_last_eng_act])
+			)
+			
+			RETURN
+			res
+		formatString: Short Date
+		displayFolder: _open_opps_pipeline
+		lineageTag: eb720c10-21e8-4cd2-b827-189df4909e8e
+
+	/// Measure meas.open_opps_total_expected_value_sply_diff.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: +0 %;-0 %;"-"
+	measure 'meas.open_opps_total_expected_value_sply_diff' = ```
+			
+			
+			var _current = CALCULATE([meas.open_opps_total_expected_value],open_pipeline[trueai_stage] in {"Early", "Mid", "Late"})          // get the current booking amt
+			var _sply_amt = [meas.open_opps_total_expected_value_sply]          // get tge sply 
+			
+			var res = DIVIDE(
+			    (_current - _sply_amt),
+			    _sply_amt
+			)
+			
+			RETURN
+			res
+			```
+		formatString: +0 %;-0 %;"-"
+		displayFolder: _open_opps_pipeline
+		lineageTag: bcf22a5a-dc4a-4dd5-95a6-6140f6154c4e
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.open_opps_total_expected_value_sply.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: \$#,0;(\$#,0);\$#,0
+	measure 'meas.open_opps_total_expected_value_sply' =
+			
+			var _pipeline_amt = [meas.open_opps_pipeline_amt_sply]           // get the pipeline amt
+			var _win_prob = [meas.open_opps_avg_win_prob_sply]               // get the avg win prob
+			var _expected_amount = _pipeline_amt*_win_prob
+			RETURN
+			_expected_amount
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _open_opps_pipeline
+		lineageTag: 27bc090d-3507-41d7-ab3a-2678f1aaa5d0
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Measure meas.open_opps_count_sply.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: #,0
+	measure 'meas.open_opps_count_sply' =
+			
+			CALCULATE(
+			    [meas.open_opps_count],             // get the sply open opps count
+			    open_pipeline[trueai_stage] in {"Early", "Mid", "Late"},
+			    SAMEPERIODLASTYEAR(cal_start_dates[Date])
+			)
+		formatString: #,0
+		displayFolder: _open_opps_pipeline
+		lineageTag: 1364f987-e2fc-4a19-aa1a-6793b825a130
+
+	/// Measure meas.open_opps_count_sply_diff.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: +0 %;-0 %;"-"
+	measure 'meas.open_opps_count_sply_diff' =
+			
+			var _current = CALCULATE([meas.open_opps_count],open_pipeline[trueai_stage] in {"Early", "Mid", "Late"})           // currently open opps count
+			var _sply  = [meas.open_opps_count_sply]       // get the sply open opps cou nt
+			var res = DIVIDE(
+			    (_current-_sply),
+			    _sply
+			)
+			
+			
+			RETURN
+			res
+		formatString: +0 %;-0 %;"-"
+		displayFolder: _open_opps_pipeline
+		lineageTag: 847f07b1-8fa4-449e-b982-0b4257a69757
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.open_opps_avg_win_prob_sply.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: 0%;-0%;0%
+	measure 'meas.open_opps_avg_win_prob_sply' =
+			
+			CALCULATE(
+			    [meas.open_opps_avg_win_prob],
+			    open_pipeline[trueai_stage] in {"Early", "Mid", "Late"},
+			    DATEADD(cal_start_dates[Date], -1, YEAR)
+			)
+		formatString: 0%;-0%;0%
+		displayFolder: _open_opps_pipeline
+		lineageTag: bec26611-00c2-4632-a584-4ba4e1d29146
+
+	/// Measure meas.open_opps_avg_win_prob_sply_diff.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: +0 %;-0 %;"-"
+	measure 'meas.open_opps_avg_win_prob_sply_diff' =
+			
+			var _current = CALCULATE([meas.open_opps_avg_win_prob],open_pipeline[trueai_stage] in {"Early", "Mid", "Late"})            // get the current prob
+			var _sply = [meas.open_opps_avg_win_prob_sply]              // get the sply prob
+			
+			var res = DIVIDE(
+			            (_current - _sply),
+			            _sply
+			)
+			
+			RETURN
+			res
+		formatString: +0 %;-0 %;"-"
+		displayFolder: _open_opps_pipeline
+		lineageTag: bf752ab9-241b-4989-a052-9cdb5a8b1615
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.open_opps_pipeline_amt_sply.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+	measure 'meas.open_opps_pipeline_amt_sply' =
+			
+			CALCULATE(
+			    [meas.open_opps_pipeline_amt],
+			    open_pipeline[trueai_stage] in {"Early", "Mid", "Late"},
+			    SAMEPERIODLASTYEAR(cal_start_dates[Date])
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		displayFolder: _open_opps_pipeline
+		lineageTag: dd4d4f41-a8cb-431f-af87-090fffea3092
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Measure meas.open_opps_pushed_pulled_day_sply.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: """+""#"" days"";""-""#"" days"";""-"""
+	measure 'meas.open_opps_pushed_pulled_day_sply' =
+			
+			CALCULATE(
+			    [meas.open_opps_pushed_pulled_day],             // get the sply open opps pipeline amt
+			    DATEADD(cal_start_dates[Date], -1, YEAR)
+			)
+		formatString: """+""#"" days"";""-""#"" days"";""-"""
+		displayFolder: _open_opps_pipeline
+		lineageTag: 0fdc3b1b-d2b2-466f-88fa-5b5212fa2ab2
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.open_opps_pushed_pulled_day_sply_diff.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: +0 %;-0 %;"-"
+	measure 'meas.open_opps_pushed_pulled_day_sply_diff' =
+			
+			var _current = [meas.open_opps_pushed_pulled_day]           // currently open opps pushed pulled day
+			var _sply  = [meas.open_opps_pushed_pulled_day_sply]            // get the sply open opps pushed pulled day
+			var res = DIVIDE(
+			    (_current-_sply),
+			    _sply
+			)
+			
+			
+			RETURN
+			res
+		formatString: +0 %;-0 %;"-"
+		displayFolder: _open_opps_pipeline
+		lineageTag: 503232e7-d329-4f73-ab02-afe03361dcc7
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.open_opps_avg_pace_score_sply.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: Unspecified
+	measure 'meas.open_opps_avg_pace_score_sply' = ```
+			
+			var _sply = CALCULATE(
+			    [meas.trueai_pace_score],       
+			    DATEADD(cal_start_dates[Date], -1, YEAR)            // SPLY 
+			)
+			var _avg =  ROUND(_sply,0)
+			var res = SWITCH(
+			    _avg,
+			    0, "0 - Static",
+			    1, "1 - Slow-Moving",
+			    2, "2 - Progressing",
+			    3, "3 - Advancing",
+			    4, "4 - Accelerated",
+			    5, "5 - Rapid",
+			    BLANK()
+			)
+			
+			RETURN
+			res
+			```
+		displayFolder: _open_opps_pipeline
+		lineageTag: e7cd5e66-6316-4e65-a0ca-8afcbaddce17
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.open_opps_avg_pace_score_sply_diff.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: +0 %;-0 %;"0%"
+	measure 'meas.open_opps_avg_pace_score_sply_diff' = ```
+			
+			var _avg = [meas.trueai_pace_score]             /// current
+			var _sply = CALCULATE(
+			    [meas.trueai_pace_score],       
+			    DATEADD(cal_start_dates[Date], -1, YEAR)            // SPLY 
+			)
+			
+			var res = DIVIDE(
+			    (_avg - _sply),
+			    _sply,
+			    0
+			)
+			
+			RETURN
+			res+0
+			```
+		formatString: +0 %;-0 %;"0%"
+		displayFolder: _open_opps_pipeline
+		lineageTag: 41d3a2d1-6046-441d-a9fa-40eebb66c5a5
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.open_opps_pipeline_amt_sply_diff.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: +0 %;-0 %;"-"
+	measure 'meas.open_opps_pipeline_amt_sply_diff' =
+			
+			var _current = CALCULATE([meas.open_opps_pipeline_amt],open_pipeline[trueai_stage] in {"Early", "Mid", "Late"})
+			var _sply = [meas.open_opps_pipeline_amt_sply]
+			
+			var res = DIVIDE(
+			    (_current - _sply),
+			    _sply
+			)
+			RETURN
+			res
+		formatString: +0 %;-0 %;"-"
+		displayFolder: _open_opps_pipeline
+		lineageTag: d6256281-bb95-4002-b9dc-f549b83adb97
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.open_opps_age_days.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: #" days"
+	measure 'meas.open_opps_age_days' =
+			
+			var res =  CALCULATE(MAX(opps[col.opp_age]))
+			
+			RETURN
+			res
+		formatString: #" days"
+		displayFolder: _open_opps_pipeline
+		lineageTag: ad1da48a-6e54-4e91-a08c-c7bc384cc905
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.open_opps_age_days_sply.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: #" days"
+	measure 'meas.open_opps_age_days_sply' = ```
+			
+			var res = CALCULATE(
+			    [meas.open_opps_age_days], 
+			    DATEADD(cal_start_dates[Date], -1, YEAR)
+			)
+			RETURN
+			res
+			```
+		formatString: #" days"
+		displayFolder: _open_opps_pipeline
+		lineageTag: 20796ce7-2bb9-4d4f-aff7-29c4f18cf0f2
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.open_opps_age_days_sply_diff.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: +0 %;-0 %;"-"
+	measure 'meas.open_opps_age_days_sply_diff' =
+			
+			var _current = [meas.open_opps_age_days]
+			var _sply = [meas.open_opps_age_days_sply]
+			
+			var res = DIVIDE(
+			    (_current - _sply),
+			    _sply
+			)
+			
+			RETURN
+			res
+		formatString: +0 %;-0 %;"-"
+		displayFolder: _open_opps_pipeline
+		lineageTag: e0d8f8e6-07e4-438e-bc93-43c5cb5bc567
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.open_opps_items_act_eng_counts.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: 0
+	measure 'meas.open_opps_items_act_eng_counts' =
+			
+			
+			SWITCH(TRUE(),
+			    MAX(all_act_support[order])=1, [meas.open_opps_items_all_act_eng_count],
+			    MAX(all_act_support[order])=2, [meas.open_opps_items_phone_act_eng_count],
+			    MAX(all_act_support[order])=3, [meas.open_opps_items_email_act_eng_count],
+			    MAX(all_act_support[order])=4, [meas.open_opps_items_meeting_act_eng_count],
+			    MAX(all_act_support[order])=5, [meas.open_opps_items_social_act_eng_count]
+			)
+		formatString: 0
+		displayFolder: _opps_details
+		lineageTag: cb8a841a-7579-4716-997f-4d32193b4f51
+
+	/// Measure meas.open_opps_items_act_non_eng_counts.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: 0
+	measure 'meas.open_opps_items_act_non_eng_counts' =
+			
+			
+			SWITCH(TRUE(),
+			    MAX(all_act_support[order])=1, [meas.open_opps_items_all_act-non_eng_count],
+			    MAX(all_act_support[order])=2, [meas.open_opps_items_phone_act-non_eng_count],
+			    MAX(all_act_support[order])=3, [meas.open_opps_items_email_act-non_eng_count],
+			    MAX(all_act_support[order])=4, [meas.open_opps_items_meeting_act-non_eng_count],
+			    MAX(all_act_support[order])=5, [meas.open_opps_items_social_act-non_eng_count]
+			)
+		formatString: 0
+		displayFolder: _opps_details
+		lineageTag: 9b0454a2-e77d-45a6-acf0-2e9e84b9639a
+
+	/// Measure meas.closed_opps_age_days.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: #" days"
+	measure 'meas.closed_opps_age_days' = ```
+			
+			VAR sel_date = [meas.sel_date] // get the selected date 
+			
+			
+			VAR _age = 
+			    CALCULATE(
+			        AVERAGEX(
+			            opps,
+			            opps[col.opp_age]
+			        )
+			    )
+			
+			RETURN
+			    _age
+			```
+		formatString: #" days"
+		displayFolder: _opps_details
+		lineageTag: 41a9e006-5351-4ec8-a506-fd7469bcf761
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.opps_creator_name.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: Unspecified
+	measure 'meas.opps_creator_name' =
+			CALCULATE(
+			    MAX(opps[col.creator_name])
+			)
+		displayFolder: _opps_details
+		lineageTag: e8050285-8de1-458d-9c75-d7bfaa7f7806
+
+	/// Measure meas.opps_details_screen_age.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: #" days"
+	measure 'meas.opps_details_screen_age' = ```
+			
+			VAR SelectedDate = MAX('cal_start_dates'[Date])
+			
+			var _age =  MAXX(
+			        'open_pipeline', 
+			        DATEDIFF('open_pipeline'[crm_created_on], SelectedDate, DAY)
+			    )
+			
+			var _closed_opps_age = [meas.closed_opps_age_days]             // get the closed opps list
+			var _step_outcome = CALCULATE(FIRSTNONBLANK(ssr_history[step_outcome],1))
+			var _cond = IF(
+			    NOT _step_outcome  in {"Closed Won", "Closed Lost"},
+			    _age,
+			    _closed_opps_age
+			)
+			
+			
+			RETURN
+			_cond
+			```
+		formatString: #" days"
+		displayFolder: _opps_details
+		lineageTag: 739619e9-cbe2-42f5-ab90-fc0688874c9e
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.opps_details_screen_pushed_pulled.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: """+""#"" days"";""-""#"" days"";""-"""
+	measure 'meas.opps_details_screen_pushed_pulled' =
+			
+			
+			VAR _age = [meas.open_opps_pushed_pulled_day]
+			var _step_outcome = CALCULATE(FIRSTNONBLANK(ssr_history[step_outcome],1))
+			var closed_opp = CALCULATE(
+			    MAX(ssr_history[trueai_days_pushed_pulled]),
+			    ssr_history[step_outcome] in {"Closed Won", "Closed Lost"}
+			)
+			var _cond = IF(
+			    _step_outcome  in {"Closed Won", "Closed Lost"},
+			    closed_opp,
+			    _age
+			)
+			
+			RETURN
+			_cond
+		formatString: """+""#"" days"";""-""#"" days"";""-"""
+		displayFolder: _opps_details
+		lineageTag: 09e0b95c-4799-473c-a99c-6f69f3bfb86e
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Measure meas.open_opps_last_eng_date_filter.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: Unspecified
+	measure 'meas.open_opps_last_eng_date_filter' = ```
+			
+			VAR sel_date = [meas.sel_date] // get the selected date 
+			
+			
+			 
+			VAR MaxOppCreated = CALCULATE(MAX(cal_start_dates[Date]))
+			RETURN
+			IF (
+			    MAX('open_pipeline'[crm_created_on]) <= MaxOppCreated &&
+			    MAX(open_pipeline[trueai_last_eng_act]) <= MaxOppCreated,
+			    1,
+			    0
+			)
+			
+			
+			```
+		displayFolder: _open_opps_pipeline
+		lineageTag: 3cf39ace-fd7b-4393-b313-238b3d23680b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.open_opps_count_tbl_filter.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: 0
+	measure 'meas.open_opps_count_tbl_filter' = ```
+			
+			VAR sel_end_date =CALCULATE(MAX(cal_start_dates[Date])) // get the selected max date 
+			VAR sel_start_date =CALCULATE(MIN(cal_start_dates[Date])) // get the selected max date 
+			
+			VAR temp_tbl = CALCULATETABLE(
+			    open_pipeline, 
+			    opps[_sys_filt_start_date] >= sel_start_date,
+			    opps[_sys_filt_end_date] >= sel_end_date
+			)
+			
+			VAR filter_tbl = 
+			FILTER(
+			    temp_tbl,
+			    open_pipeline[_sys_doc_id] = 
+			    CALCULATE(
+			        MAX(open_pipeline[_sys_doc_id]),
+			        FILTER(
+			            ALL(open_pipeline),         // get the most recent open opps items
+			            open_pipeline[crm_opp_id] = EARLIER(open_pipeline[crm_opp_id])
+			        )
+			    )
+			)
+			
+			var res =  CALCULATE(COUNTX(filter_tbl, [_sys_doc_id]))
+			
+			
+			RETURN
+			res
+			
+			```
+		formatString: 0
+		displayFolder: _open_opps_pipeline
+		lineageTag: 2ca20c71-4d42-4429-98e2-916ffaec97bc
+
+	/// Measure meas.open_pipeline_lost_booking_amt_in_stage.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: \$#,0;(\$#,0);\$#,0
+	measure 'meas.open_pipeline_lost_booking_amt_in_stage' = [meas.opps_booking_lost_amt] - [meas.opps_booking_amt_reached_next_stage]
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _open_opps_pipeline
+		lineageTag: 7cfad227-8096-4d3c-867e-ecb6cb164339
+
+	/// Measure meas.open_pipeline_stages_avg.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: 0.00
+	measure 'meas.open_pipeline_stages_avg' =
+			
+			DIVIDE(
+			    [meas.opps_max_stages],
+			    [meas.opps_deals_won_count]
+			)
+		formatString: 0.00
+		displayFolder: _open_pipeline
+		lineageTag: 10d10955-21db-49f5-9e8d-c442e26e9976
+
+	/// Measure meas.open_pipeline_deals_skip_count.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: 0
+	measure 'meas.open_pipeline_deals_skip_count' =
+			
+			CALCULATE (
+			    [meas.open_pipeline_deals_reached_stage_count],
+			     opps[col.trueai_opp_stages_recorded] < 5
+			)
+		formatString: 0
+		displayFolder: _open_pipeline
+		lineageTag: 857f871b-8f2b-4feb-9647-751d2205a62d
+
+	/// Measure meas.open_pipeline_deals_skip_pct.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: 0.00%;-0.00%;0.00%
+	measure 'meas.open_pipeline_deals_skip_pct' = DIVIDE([meas.open_pipeline_deals_skip_count],[meas.open_pipeline_total_deals])
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: _open_pipeline
+		lineageTag: 7f9662b6-0c94-479c-a6be-031d130f7b5e
+
+	/// Measure meas.ssr_history_duration_hrs_deals_accumulated.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: Unspecified
+	measure 'meas.ssr_history_duration_hrs_deals_accumulated' = ```
+			
+			VAR CurIdx = MAX ( 'open_pipeline'[trueai_avg_step_sequence] ) RETURN SUMX ( FILTER ( ALL ( 'open_pipeline'[trueai_avg_step_sequence] ), 
+			
+			'open_pipeline'[trueai_avg_step_sequence] <= CurIdx ), CALCULATE ( [meas.ssr_history_duration_hrs_new_logo] + [meas.ssr_history_duration_hrs_existing_customer_selling] )
+			)
+			```
+		displayFolder: _open_pipeline
+		lineageTag: d82ce027-846a-4f66-b154-2612252fd977
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.opps_details_screen_trueai_pushed_pulled.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: Unspecified
+	measure 'meas.opps_details_screen_trueai_pushed_pulled' =
+			
+			VAR _age =
+			    AVERAGE ( open_pipeline[trueai_days_pushed_pulled] )
+			VAR _step_outcome =
+			    CALCULATE ( FIRSTNONBLANK ( ssr_history[step_outcome], 1 ) )
+			VAR closed_opp =
+			    CALCULATE (
+			        MAX ( ssr_history[trueai_days_pushed_pulled] ),
+			        ssr_history[step_outcome] IN { "Closed Won", "Closed Lost" }
+			    )
+			VAR _cond =
+			    IF (
+			        _step_outcome IN { "Closed Won", "Closed Lost" },
+			        closed_opp,
+			        _age
+			    )
+			RETURN
+			    _cond
+		lineageTag: c5ec0e68-cb24-4f7f-afa1-0d61eb1d2a5c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// The date of the last data request from the platform
 	column _sys_as_of
