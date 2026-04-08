@@ -28,9 +28,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Check ADE display-score clamps
         run: python scripts/check_ade_display_scores.py
+
+      - name: Check Power BI platform columns
+        env:
+          GIT_DIFF_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: python scripts/check_powerbi_platform_columns.py
 
       - name: Cache pbi-tools
         id: cache-pbi-tools
@@ -134,4 +141,3 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}-${{ github.sha }}
           path: ${{ needs.build-pbix.outputs.pbix_path }}
-
