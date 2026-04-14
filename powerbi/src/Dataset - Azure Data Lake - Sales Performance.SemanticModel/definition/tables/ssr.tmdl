@@ -1343,6 +1343,36 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	column 'Account Age Bucket' =
+			
+			VAR StartDate = 'ssr'[trueai_first_purchase]
+			VAR EndDate =
+			    COALESCE(
+			        'ssr'[trueai_churned_on],
+			        TODAY()
+			    )
+			VAR AgeDays =
+			    IF(
+			        ISBLANK(StartDate),
+			        BLANK(),
+			        DATEDIFF(StartDate, EndDate, DAY)
+			    )
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    ISBLANK(AgeDays), BLANK(),
+			    AgeDays < 50, "0-49 days",
+			    AgeDays < 100, "50-99 days",
+			    AgeDays < 250, "100-249 days",
+			    AgeDays < 500, "250-499 days",
+			    AgeDays < 1000, "500-999 days",
+			    "1000+ days"
+			)
+		lineageTag: 33b65644-30f8-4bc7-a96f-5b500c90b2ce
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
 	partition ssr-5b934306-a526-4a93-a2ba-c6a8a109259e = m
 		mode: import
 		source = ```

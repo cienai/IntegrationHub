@@ -177,24 +177,6 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: e2464022-caf0-4ce8-bdf3-5bd3ae240186
 
-	/// Measure meas.open_opps_last_eng_act.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Short Date
-	measure 'meas.open_opps_last_eng_act' =
-			
-			var sel_date = CALCULATE(MAX(cal_start_dates[Date]))
-			var res =  CALCULATE(
-			    MAX(open_pipeline[trueai_last_eng_act])
-			)
-			
-			RETURN
-			res
-		formatString: Short Date
-		displayFolder: _open_opps_pipeline
-		lineageTag: eb720c10-21e8-4cd2-b827-189df4909e8e
-
 	/// Measure meas.open_opps_stkhlds_involved.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
@@ -527,23 +509,6 @@ table open_pipeline
 		lineageTag: 6a434a8f-008e-4cae-9c06-610797cb5790
 
 		annotation PBI_FormatHint = {"isDecimal":true}
-
-	/// Measure meas.open_opps_age_days.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #" days"
-	measure 'meas.open_opps_age_days' =
-			
-			var res =  CALCULATE(MAX(opps[col.opp_age]))
-			
-			RETURN
-			res
-		formatString: #" days"
-		displayFolder: _open_opps_pipeline
-		lineageTag: ad1da48a-6e54-4e91-a08c-c7bc384cc905
-
-		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// Measure meas.open_opps_initial_close_date.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
@@ -1432,6 +1397,41 @@ table open_pipeline
 			```
 		formatString: 0
 		lineageTag: f53163da-522b-4c02-b6f5-eb0518a27cb5
+
+	/// Measure meas.open_opps_last_eng_act.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: Short Date
+	measure 'meas.open_opps_last_eng_act' =
+			
+			var sel_date = CALCULATE(MAX(cal_start_dates[Date]))
+			var res =  CALCULATE(
+			    MAX(open_pipeline[trueai_last_eng_act])
+			)
+			
+			RETURN
+			res
+		formatString: Short Date
+		displayFolder: _open_opps_pipeline
+		lineageTag: eb720c10-21e8-4cd2-b827-189df4909e8e
+
+	/// Measure meas.open_opps_age_days.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: #" days"
+	measure 'meas.open_opps_age_days' =
+			
+			var res =  CALCULATE(MAX(opps[col.opp_age]))
+			
+			RETURN
+			res
+		formatString: #" days"
+		displayFolder: _open_opps_pipeline
+		lineageTag: ad1da48a-6e54-4e91-a08c-c7bc384cc905
+
+		annotation PBI_FormatHint = {"isCustom":true}
 
 	/// The date of the last data request from the platform
 	column _sys_as_of
@@ -2434,6 +2434,14 @@ table open_pipeline
 		lineageTag: 2c593a8d-d985-4223-9c72-50778f1e4c67
 		summarizeBy: none
 		sourceColumn: cust_date3
+
+		annotation SummarizationSetBy = Automatic
+
+	column _sys_sync_id
+		dataType: string
+		lineageTag: 05de13ae-ee98-4f88-ad23-fc5ae454e6ab
+		summarizeBy: none
+		sourceColumn: _sys_sync_id
 
 		annotation SummarizationSetBy = Automatic
 
