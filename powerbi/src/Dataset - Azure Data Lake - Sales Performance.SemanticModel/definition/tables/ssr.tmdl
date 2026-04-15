@@ -1373,6 +1373,27 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	column Current_ACV_Bucket = ```
+			
+			VAR Current_ACV=ssr[trueai_curr_acv]
+			    
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    ISBLANK(Current_ACV), BLANK(),
+			    Current_ACV < 50000, "<50000",
+			    Current_ACV < 100000, "50000-99999",
+			    Current_ACV < 5000000, "100000-499999",
+			    Current_ACV < 1000000, "500000-999999",
+			    Current_ACV < 5000000, "1000000-499999",
+			    ">5000000"
+			)
+			```
+		lineageTag: e446b57b-051f-414e-8d22-4d051e456cf3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
 	partition ssr-5b934306-a526-4a93-a2ba-c6a8a109259e = m
 		mode: import
 		source = ```
