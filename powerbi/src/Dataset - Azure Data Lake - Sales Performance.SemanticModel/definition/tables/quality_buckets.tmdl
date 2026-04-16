@@ -212,22 +212,21 @@ table quality_buckets
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: 0
-	measure 'meas.propensity_tier_conditional_background_color' =
+	measure 'meas.propensity_tier_conditional_background_color' = ```
 			
-			VAR bucket_val =
-			    SELECTEDVALUE(quality_buckets[col.propensity_min_max_tier])
+			 var bucket_val = CALCULATE(MAX(opps[trueai_propensity]))
 			
 			RETURN
 			SWITCH(
-			    TRUE(),
-			    ISBLANK(bucket_val), BLANK(),
-			    CONTAINSSTRING(bucket_val, "Lowest"), 1,
-			    CONTAINSSTRING(bucket_val, "Highest"), 5,
-			    CONTAINSSTRING(bucket_val, "Low"), 2,
-			    CONTAINSSTRING(bucket_val, "Mid"), 3,
-			    CONTAINSSTRING(bucket_val, "High"), 4,
-			    BLANK()
+			    True(),
+			    CONTAINSSTRING(bucket_val, "Lowest"),1,
+			    CONTAINSSTRING(bucket_val, "Low"),2,
+			    CONTAINSSTRING(bucket_val, "Mid"),3,        // get a condition for creating a background color in the table visual
+			    CONTAINSSTRING(bucket_val, "High"),4,
+			    CONTAINSSTRING(bucket_val, "Highest"),5
 			)
+			
+			```
 		formatString: 0
 		displayFolder: _quality_measures
 		lineageTag: c65fc392-be42-4abe-ae4b-fa852cad8d1b

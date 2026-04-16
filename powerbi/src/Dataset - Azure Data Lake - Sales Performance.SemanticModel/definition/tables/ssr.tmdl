@@ -186,37 +186,6 @@ table ssr
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Purpose: Returns the measure value derived from the DAX expression.
-	/// Calculation Logic: Direct expression without VAR/RETURN.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: \$#,0.0;(\$#,0.0);\$#,0.0
-	measure 'meas.trueai_curr_acv' = SUM(ssr[trueai_curr_acv])
-		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
-		displayFolder: _opps_detail
-		lineageTag: 6fb7f734-43ea-44d1-b12b-47b5bdc22686
-
-		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
-
-	measure 'meas.trueai_curr_acv_company_size_sum' =
-			
-			SUMX(
-			    VALUES(ssr[col.trueai_company_size_aprox_val]),
-			    CALCULATE(SUM(ssr[trueai_curr_acv]))
-			)
-		lineageTag: 5e5fa33c-47e5-4a3d-a1a3-d22c29079055
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure 'meas.trueai_curr_acv_industry_sum' =
-			
-			SUMX(
-			    VALUES(ssr[trueai_industry]),
-			    CALCULATE(SUM(ssr[trueai_curr_acv]))
-			)
-		lineageTag: d1c56f5b-8580-4e6d-86a8-c6840c5aea56
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	/// Record's standardized lead source
 	column trueai_leadsource
 		dataType: string
@@ -1371,62 +1340,6 @@ table ssr
 			isDefault
 			relationship: 9eff66a3-2498-477b-a625-4cea2950121f
 			defaultHierarchy: LocalDateTable_172225b5-5ae5-4387-b255-26965afe3ae5.'Date Hierarchy'
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'Account Age Bucket' =
-			
-			VAR StartDate = 'ssr'[trueai_first_purchase]
-			VAR EndDate =
-			    COALESCE(
-			        'ssr'[trueai_churned_on],
-			        TODAY()
-			    )
-			
-			VAR AgeDays =
-			    IF(
-			        ISBLANK(StartDate),
-			        BLANK(),
-			        DATEDIFF(StartDate, EndDate, DAY)
-			    )
-			
-			VAR Years =
-			    DIVIDE(AgeDays, 365.25)
-			
-			RETURN
-			SWITCH(
-			    TRUE(),
-			    ISBLANK(Years), BLANK(),
-			    Years < 1, "1 year",
-			    Years < 2, "2 years",
-			    Years < 3, "3 years",
-			    Years < 4, "4 years",
-			    Years < 5, "5 years",
-			    "6+ years"
-			)
-		lineageTag: 33b65644-30f8-4bc7-a96f-5b500c90b2ce
-		summarizeBy: none
-
-		annotation SummarizationSetBy = Automatic
-
-	column Current_ACV_Bucket = ```
-			
-			VAR Current_ACV=ssr[trueai_curr_acv]
-			    
-			RETURN
-			SWITCH(
-			    TRUE(),
-			    ISBLANK(Current_ACV), BLANK(),
-			    Current_ACV < 50000, "<50000",
-			    Current_ACV < 100000, "50000-99999",
-			    Current_ACV < 5000000, "100000-499999",
-			    Current_ACV < 1000000, "500000-999999",
-			    Current_ACV < 5000000, "1000000-499999",
-			    ">5000000"
-			)
-			```
-		lineageTag: e446b57b-051f-414e-8d22-4d051e456cf3
-		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 
