@@ -432,33 +432,48 @@ table ssr_history
 	/// Calculation Logic: Uses VAR/RETURN with YEAR/DATE, CALCULATE(SUM), DIVIDE, and exponentiation to compute CAGR.
 	/// Dynamic Behavior: Respects current filter context; CALCULATE filters cal_end_dates[date] to start/end year ranges.
 	/// Format/Type: 0.00%;-0.00%;0.00%
-	measure 'meas.ssr_history_rev_cagr' = ```
+	measure 'meas.ssr_history_rev_cagr' =
 			
 			
+			VAR start_year = YEAR([meas.context_date_min])
+			VAR end_year = YEAR([meas.context_date_max])
+			VAR period_years = end_year - start_year
 			
-			-- annual num
-			var start_year = Year([meas.context_date_min])
-			var end_year = Year([meas.context_date_max]) 
-			var period_years = end_year - start_year
-			var start_date = date(start_year ,1,1) -- jan 1
-			var start_date_end = Date(start_year, 12,31)
+			VAR start_date = DATE(start_year, 1, 1)
+			VAR start_date_end = DATE(start_year, 12, 31)
 			
-			var end_date = date(end_year , 1,1) -- jan 1 the prev  yr
-			var end_date_end = Date(end_year , 12,31)
+			VAR end_date = DATE(end_year, 1, 1)
+			VAR end_date_end = DATE(end_year, 12, 31)
 			
-			var first_period_rev = calculate(sum(ssr_history[opp_won_amt]), cal_end_dates[date] >= start_date  && cal_end_dates[date] <= start_date_end  )
-			var last_period_rev = calculate(sum(ssr_history[opp_won_amt]) , cal_end_dates[date] >= end_date  && cal_end_dates[date] <= end_date_end  )
+			VAR first_period_rev =
+			    CALCULATE(
+			        SUM(ssr_history[opp_won_amt]),
+			        cal_end_dates[date] >= start_date &&
+			        cal_end_dates[date] <= start_date_end
+			    )
 			
-			var cagr_growth_rate = divide(last_period_rev , first_period_rev ,blank() )  ^ (1/period_years) - 1
-			return  
-			cagr_growth_rate
+			VAR last_period_rev =
+			    CALCULATE(
+			        SUM(ssr_history[opp_won_amt]),
+			        cal_end_dates[date] >= end_date &&
+			        cal_end_dates[date] <= end_date_end
+			    )
 			
+			VAR growth_ratio =
+			    DIVIDE(last_period_rev, first_period_rev, BLANK())
 			
-			
-			
-			
-			//https://powerbi.tips/2016/05/measures-calculate-cagr/
-			```
+			RETURN
+			IF(
+			    period_years <= 0 ||
+			    ISBLANK(first_period_rev) ||
+			    ISBLANK(last_period_rev) ||
+			    first_period_rev <= 0 ||
+			    last_period_rev <= 0 ||
+			    ISBLANK(growth_ratio) ||
+			    growth_ratio <= 0,
+			    BLANK(),
+			    POWER(growth_ratio, DIVIDE(1, period_years)) - 1
+			)
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _rev_analysis
 		lineageTag: 6f5b3199-dfef-4035-bca0-faa6328035eb
@@ -9768,17 +9783,6 @@ table ssr_history
 	/// Purpose: Returns the measure value derived from the DAX expression.
 	/// Calculation Logic: Direct expression without VAR/RETURN.
 	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: \$#,0.0;(\$#,0.0);\$#,0.0
-	measure 'meas.trueai_curr_acv' = MAX(ssr[trueai_curr_acv])
-		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
-		displayFolder: _opps_detail
-		lineageTag: 6fb7f734-43ea-44d1-b12b-47b5bdc22686
-
-		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
-
-	/// Purpose: Returns the measure value derived from the DAX expression.
-	/// Calculation Logic: Direct expression without VAR/RETURN.
-	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: mm/dd/yyyy
 	measure 'meas.trueai_first_purchase' = MAX(ssr[trueai_first_purchase])
 		formatString: mm/dd/yyyy
@@ -15095,6 +15099,12 @@ table ssr_history
 		lineageTag: 6bbf67ff-dcee-4043-b129-9c48f2bf44dd
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.accounts_distinct_count' =
+			
+			DISTINCTCOUNT(ssr[_sys_doc_id])
+		formatString: 0
+		lineageTag: 8ea1cb19-7694-4ae4-90a9-272e257fa6f7
 
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
