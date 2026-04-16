@@ -2187,8 +2187,17 @@ table metadata_ai_scores
 		mode: import
 		source = ```
 				let
-				    dbTable = getDBTable("metadata_ai_scores"),      // get the right table
-				    dbTableTyped = Table.TransformColumnTypes(dbTable,{
+				    rawDbTable = try getDBTable("metadata_ai_scores"),      // get the right table
+				    dbTable =
+				        if rawDbTable[HasError] then
+				            #table(
+				                {"_sys_doc_id","_sys_is_active","_sys_modified_on","boost_expo","category","description","factor_1_name","factor_2_name","factor_3_name","notes","score_name","sort","weight"},
+				                {}
+				            )
+				        else
+				            rawDbTable[Value],
+				    dbTableWithSchema = Table.SelectColumns(dbTable, {"_sys_doc_id","_sys_is_active","_sys_modified_on","boost_expo","category","description","factor_1_name","factor_2_name","factor_3_name","notes","score_name","sort","weight"}, MissingField.UseNull),
+				    dbTableTyped = Table.TransformColumnTypes(dbTableWithSchema,{
 				        {"_sys_doc_id", type text},
 				        {"_sys_is_active", type text},
 				        {"_sys_modified_on", type datetime},
