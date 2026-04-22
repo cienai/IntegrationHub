@@ -61,30 +61,33 @@ expression getDBTable = ```
 		        else if db_type = "Azure Data Lake" then
 		                let azureTable =
 		                        let Source  = getDBConnection(), // get the folder info
-		                                RenamedColumns = Table.RenameColumns(Source,{{"Folder Path", "FolderPath"}}), // rename so easier to search for
-		                                folder = RenamedColumns{0}[FolderPath], // get one file name
-		                                coid = Text.BetweenDelimiters(folder, "cien_", "_"), // get the coid
-		                                fileName =   coid & "_" &  tableName &  "/", // get the file name we're searching for. need the co id because some tables have the same suffix
+		                                RenamedColumns = if Table.HasColumns(Source, "Folder Path") then Table.RenameColumns(Source,{{"Folder Path", "FolderPath"}}) else Source, // rename so easier to search for
+		                                folder = try RenamedColumns{0}[FolderPath] otherwise "", // safely handle empty sources
+		                                coid = try Text.BetweenDelimiters(folder, "cien_", "_") otherwise "", // get the coid when present
+		                                fileName = if Text.Length(coid) > 0 then coid & "_" & tableName & "/" else tableName & "/", // fallback if coid cannot be parsed
 		                                FilteredRowsJustCurrentTable = Table.SelectRows(RenamedColumns, each Text.EndsWith([FolderPath],fileName)),  // find all files for that table
 		                                FilteredRowsJustParquet = Table.SelectRows(FilteredRowsJustCurrentTable, each ([Extension] = ".parquet")), // filter out just teh parquet files
 		                                FilteredRpwsMpHiddenFiles = Table.SelectRows(FilteredRowsJustParquet, each [Attributes]?[Hidden]? <> true), // dont include hidden files if there are any
-		                                InvokeTransformParquetFunction1 = Table.AddColumn(FilteredRpwsMpHiddenFiles, "Transform_File", each transformParquetFile([Content])), // push transformed parquet data as a table for each row in a new col
+		                                InvokeTransformParquetFunction1 = Table.AddColumn(FilteredRpwsMpHiddenFiles, "Transform_File", each try transformParquetFile([Content]) otherwise null), // keep refresh alive when a single parquet file is malformed
 		                                RemovedOtherColumns = Table.SelectColumns(InvokeTransformParquetFunction1, {"Transform_File"}), // keep only transformed tables
+		                                ValidTransformedRows = Table.SelectRows(RemovedOtherColumns, each Value.Is([Transform_File], type table)),
+		                                PrimarySchema = try if not Table.IsEmpty(ValidTransformedRows) then ValidTransformedRows{0}[Transform_File] else null otherwise null,
+		                                SecondarySchema = try if not Table.IsEmpty(FilteredRowsJustParquet) then transformParquetFile(FilteredRowsJustParquet{0}[Content]) else null otherwise null,
 		                                FallbackSchemaTable =
-		                                        if not Table.IsEmpty(RemovedOtherColumns) then
-		                                                RemovedOtherColumns{0}[Transform_File]
-		                                        else if not Table.IsEmpty(FilteredRowsJustParquet) then
-		                                                transformParquetFile(FilteredRowsJustParquet{0}[Content])
+		                                        if Value.Is(PrimarySchema, type table) then
+		                                                PrimarySchema
+		                                        else if Value.Is(SecondarySchema, type table) then
+		                                                SecondarySchema
 		                                        else
 		                                                #table({}, {}),
 		                                ColNames = Table.ColumnNames(FallbackSchemaTable), // avoid failing when filtered rows are empty
 		                                ExpandedBinRowColsIntoTable =
 		                                        if List.IsEmpty(ColNames) then
 		                                                #table({}, {})
-		                                        else if Table.IsEmpty(RemovedOtherColumns) then
+		                                        else if Table.IsEmpty(ValidTransformedRows) then
 		                                                #table(ColNames, {})
 		                                        else
-		                                                Table.ExpandTableColumn(RemovedOtherColumns, "Transform_File", ColNames), // combine rows into a single table
+		                                                Table.ExpandTableColumn(ValidTransformedRows, "Transform_File", ColNames), // combine rows into a single table
 		
 		                                // Check if "_sys_doc_id" column exists
 		                                CheckColumnExists = if List.Contains(ColNames, "_sys_doc_id") then
