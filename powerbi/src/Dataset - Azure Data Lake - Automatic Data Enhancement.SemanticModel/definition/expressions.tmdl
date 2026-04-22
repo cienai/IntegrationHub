@@ -105,10 +105,23 @@ expression getDBTable = ```
 		                                FilteredRowsJustCurrentTable = Table.SelectRows(RenamedColumns, each Text.EndsWith([FolderPath],fileName)),  // find all files for that table
 		                                FilteredRowsJustParquet = Table.SelectRows(FilteredRowsJustCurrentTable, each ([Extension] = ".parquet")), // filter out just teh parquet files
 		                                FilteredRpwsMpHiddenFiles = Table.SelectRows(FilteredRowsJustParquet, each [Attributes]?[Hidden]? <> true), // dont include hidden files if there are any
-		                                InvokeTransformParquetFunction1 = Table.AddColumn(FilteredRpwsMpHiddenFiles, "Transform_File", each transformParquetFile([Content])), // push in the trasnformed parquity data as as pbi table for each row in a new col
-		                                RemovedOtherColumns = Table.SelectColumns(InvokeTransformParquetFunction1, {"Transform_File"}), // get rid of all other cvols
-		                                ColNames= Table.ColumnNames(RemovedOtherColumns{0}[Transform_File]), // get the col names from the first row
-		                                ExpandedBinRowColsIntoTable = Table.ExpandTableColumn(RemovedOtherColumns, "Transform_File",ColNames),  // combine those rows into a single table
+		                                InvokeTransformParquetFunction1 = Table.AddColumn(FilteredRpwsMpHiddenFiles, "Transform_File", each transformParquetFile([Content])), // push transformed parquet data as a table for each row in a new col
+		                                RemovedOtherColumns = Table.SelectColumns(InvokeTransformParquetFunction1, {"Transform_File"}), // keep only transformed tables
+		                                FallbackSchemaTable =
+		                                        if not Table.IsEmpty(RemovedOtherColumns) then
+		                                                RemovedOtherColumns{0}[Transform_File]
+		                                        else if not Table.IsEmpty(FilteredRowsJustParquet) then
+		                                                transformParquetFile(FilteredRowsJustParquet{0}[Content])
+		                                        else
+		                                                #table({}, {}),
+		                                ColNames = Table.ColumnNames(FallbackSchemaTable), // avoid failing when filtered rows are empty
+		                                ExpandedBinRowColsIntoTable =
+		                                        if List.IsEmpty(ColNames) then
+		                                                #table({}, {})
+		                                        else if Table.IsEmpty(RemovedOtherColumns) then
+		                                                #table(ColNames, {})
+		                                        else
+		                                                Table.ExpandTableColumn(RemovedOtherColumns, "Transform_File", ColNames), // combine rows into a single table
 		
 		                                // Check if "_sys_doc_id" column exists
 		                                CheckColumnExists = if List.Contains(ColNames, "_sys_doc_id") then
@@ -210,4 +223,3 @@ expression file_folder_data_lake = "aceme24/export/" meta [IsParameterQuery=true
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Text
-
