@@ -1,0 +1,108 @@
+table 'Metric Formatting'
+	lineageTag: 8fe77c95-62f0-40e0-bb27-b38605f29f0f
+
+	calculationGroup
+		precedence: 21
+
+		calculationItem 'Calculation item' = SELECTEDMEASURE()
+
+			formatStringDefinition =
+					VAR _format =
+					    COALESCE(
+					        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+					        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+					        ""
+					    )
+					
+					VAR _prefix =
+					    COALESCE(
+					        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+					        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+					        ""
+					    )
+					
+					VAR _prefixFmt =
+					    IF(
+					        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+					        """" & _prefix & " """,
+					        ""
+					    )
+					
+					VAR v =
+					    ABS(SELECTEDMEASURE())
+					
+					RETURN
+					SWITCH(
+					    TRUE(),
+					
+					    ISBLANK(SELECTEDMEASURE()), "",
+					
+					    /* Percent */
+					    _format = "#,0.0"" %""" && v <= 1,
+					        _prefixFmt & "0.0%",
+					
+					    _format = "#,0.0"" %""" && v > 1,
+					        _prefixFmt & "#,0.0"" %""",
+					
+					    /* Hours */
+					    _format = "#,0.0"" hrs""" && v >= 1000000,
+					        _prefixFmt & "0.0,,""M hrs""",
+					
+					    _format = "#,0.0"" hrs""" && v >= 1000,
+					        _prefixFmt & "0.0,""K hrs""",
+					
+					    _format = "#,0.0"" hrs""",
+					        _prefixFmt & "#,0.0"" hrs""",
+					
+					    /* Days */
+					    _format = "#,0"" days""" && v >= 1000000,
+					        _prefixFmt & "0.0,,""M days""",
+					
+					    _format = "#,0"" days""" && v >= 1000,
+					        _prefixFmt & "0.0,""K days""",
+					
+					    _format = "#,0"" days""",
+					        _prefixFmt & "#,0"" days""",
+					
+					    /* Currency */
+					    _format = "Currency" && v >= 1000000,
+					        _prefixFmt & "$0.0,,""M""",
+					
+					    _format = "Currency" && v >= 1000,
+					        _prefixFmt & "$0.0,""K""",
+					
+					    _format = "Currency",
+					        _prefixFmt & "$#,##0.0",
+					
+					    /* Integer / count */
+					    _format = "#,0" && v >= 1000000,
+					        _prefixFmt & "0.0,,""M""",
+					
+					    _format = "#,0" && v >= 1000,
+					        _prefixFmt & "0.0,""K""",
+					
+					    _format = "#,0",
+					        _prefixFmt & "#,0",
+					
+					    /* Default decimal */
+					    _prefixFmt & "#,##0.0"
+					)
+
+	column 'Calculation group column'
+		dataType: string
+		lineageTag: 5bf9322b-3231-4dff-88b5-71a1c1762bd2
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		formatString: 0
+		lineageTag: 9a7e83a5-7f54-4493-8c4d-556f247a17d5
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+

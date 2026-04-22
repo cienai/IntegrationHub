@@ -332,18 +332,22 @@ table performance_metric_1
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
 	/// Format/Type: Unspecified
-	measure 'meas.performance_metric_value' =
+	measure 'meas.performance_metric_value_formatted' =
+			
+			VAR _valid1 =
+			    HASONEVALUE(metadata_performance_metrics[sys_doc_id])
+			
+			VAR _valid2 =
+			    HASONEVALUE(metadata_performance_metrics_secondary[sys_doc_id])
 			
 			VAR _id =
-			    SELECTEDVALUE( metadata_performance_metrics[sys_doc_id] )
+			    SELECTEDVALUE(metadata_performance_metrics[sys_doc_id])
 			
 			VAR _measureToReturn =
 			    SWITCH(
 			        TRUE(),
 			
-			        /* ============================
-			           ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…â€™ Revenue Type Metrics
-			           ============================ */
+			        /* Revenue Type Metrics */
 			        _id = "rev01", [meas.opp_nnb_amt],
 			        _id = "rev02", [meas.opp_cross_sale_amt],
 			        _id = "rev03", [meas.opp_downgrade_amt],
@@ -355,45 +359,90 @@ table performance_metric_1
 			        _id = "rev09", [meas.opp_mrr_amt],
 			        _id = "rev10", [meas.opps_non_nnb_amt],
 			
-			        /* ============================
-			           ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…â€™ Existing Sales Metrics
-			           ============================ */
+			        /* Existing Sales Metrics */
 			        _id = "sal01", [meas.ssr_history_won_amt],
 			        _id = "sal02", [meas.total_opps_count],
 			        _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
 			        _id = "sal04", [meas.ssr_history_win_rate],
 			        _id = "sal05", [meas.total_opps_count],
 			
-			        /* ============================
-			           ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…â€™ Pipeline Metrics
-			           ============================ */
+			        /* Pipeline Metrics */
 			        _id = "pip01", [meas.pipeline_amt_sum],
 			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
 			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
 			
-			        /* ============================
-			           ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…â€™ Activity Metrics
-			           ============================ */
+			        /* Activity Metrics */
 			        _id = "act01", [meas.stkhlds_all_act_count],
 			        _id = "act02", [meas.stkhlds_all_act_email_count],
 			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
 			        _id = "act04", [meas.ssr_history_duration_hrs],
 			
-			        /* ============================
-			           ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂºÃ¢â‚¬Ëœ Default
-			           ============================ */
 			        BLANK()
 			    )
 			
 			RETURN
 			IF(
-			    ISBLANK(_measureToReturn),
+			    NOT (_valid1 && _valid2),
 			    BLANK(),
-			    _measureToReturn   -- ÃƒÂ°Ã…Â¸Ã‚Â§Ã‚Â  NO CALCULATE HERE (keeps row context intact)
+			    COALESCE(_measureToReturn,0)
 			)
 		lineageTag: bd190e07-9c43-45a0-9200-f41bfd650dcf
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
+		formatStringDefinition =
+				VAR _format =
+				    SELECTEDVALUE(metadata_performance_metrics[metric_format], "")
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _txt =
+				    SWITCH(
+				        TRUE(),
+				        ISBLANK(SELECTEDMEASURE()), "",
+				        v = 0, "",
+				
+				        /* Percent stored as 0–1 */
+				        _format = "#,0.0"" %""" && v <= 1,
+				            FORMAT(v * 100, IF(MOD(v * 100, 1) = 0, "0", "0.0")) & "%",
+				
+				        /* Percent stored as 0–100 */
+				        _format = "#,0.0"" %""",
+				            FORMAT(v, IF(MOD(v, 1) = 0, "0", "0.0")) & "%",
+				
+				        /* Days */
+				        _format = "#,0"" days""",
+				            FORMAT(v, "0") & " days",
+				
+				        /* Hours */
+				        _format = "#,0.0"" hrs""",
+				            FORMAT(v, "0.0") & " hrs",
+				
+				        /* Currency */
+				        _format = "Currency" && v >= 1000000,
+				            FORMAT(v / 1000000, IF(MOD(v / 1000000, 1) = 0, "0", "0.0")) & "M",
+				
+				        _format = "Currency" && v >= 1000,
+				            FORMAT(v / 1000, IF(MOD(v / 1000, 1) = 0, "0", "0.0")) & "K",
+				
+				        _format = "Currency",
+				            FORMAT(v, "#,##0"),
+				
+				        /* Counts / integers */
+				        _format = "#,0" && v >= 1000000,
+				            FORMAT(v / 1000000, IF(MOD(v / 1000000, 1) = 0, "0", "0.0")) & "M",
+				
+				        _format = "#,0" && v >= 1000,
+				            FORMAT(v / 1000, IF(MOD(v / 1000, 1) = 0, "0", "0.0")) & "K",
+				
+				        _format = "#,0",
+				            FORMAT(v, "#,##0"),
+				
+				        /* Fallback */
+				        FORMAT(v, "#,##0.0")
+				    )
+				
+				RETURN
+				"'" & _txt & "'"
 
 	/// Measure meas.slicer_placeholder.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
@@ -403,73 +452,6 @@ table performance_metric_1
 	measure 'meas.slicer_placeholder' = SELECTEDVALUE( metadata_performance_metrics_slicer[sys_doc_id] )
 		lineageTag: dc634891-d706-4118-b640-36637669037f
 
-	/// Measure meas.performance_metric_value_secondary.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
-	measure 'meas.performance_metric_value_secondary' =
-			
-			VAR _id =
-			    SELECTEDVALUE( metadata_performance_metrics_secondary[sys_doc_id] )
-			
-			VAR _measureToReturn =
-			    SWITCH(
-			        TRUE(),
-			
-			        /* ============================
-			           :pushpin: Revenue Type Metrics
-			           ============================ */
-			        _id = "rev01", [meas.opp_nnb_amt],
-			        _id = "rev02", [meas.opp_cross_sale_amt],
-			        _id = "rev03", [meas.opp_downgrade_amt],
-			        _id = "rev04", [meas.opp_renewal_amt],
-			        _id = "rev05", [meas.opp_arr_amt],
-			        _id = "rev06", [meas.opp_nd_amt],
-			        _id = "rev07", [meas.opp_one_time_amt],
-			        _id = "rev08", [meas.opp_expansion_amt],
-			        _id = "rev09", [meas.opp_mrr_amt],
-			
-			        /* ============================
-			           :pushpin: Existing Sales Metrics
-			           ============================ */
-			        _id = "sal01", [meas.ssr_history_won_amt],
-			        _id = "sal02", [meas.total_opps_count],
-			        _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
-			        _id = "sal04", [meas.ssr_history_win_rate],
-			        _id = "sal05", [meas.total_opps_count],
-			
-			        /* ============================
-			           :pushpin: Pipeline Metrics
-			           ============================ */
-			        _id = "pip01", [meas.pipeline_amt_sum],
-			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
-			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
-			
-			        /* ============================
-			           :pushpin: Activity Metrics
-			           ============================ */
-			        _id = "act01", [meas.stkhlds_all_act_count],
-			        _id = "act02", [meas.stkhlds_all_act_email_count],
-			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
-			        _id = "act04", [meas.ssr_history_duration_hrs],
-			
-			        /* ============================
-			           :octagonal_sign: Default
-			           ============================ */
-			        BLANK()
-			    )
-			
-			RETURN
-			IF(
-			    ISBLANK(_measureToReturn),
-			    BLANK(),
-			    _measureToReturn   -- :brain: NO CALCULATE HERE (keeps row context intact)
-			)
-		lineageTag: c453710f-4a24-41a3-a56a-5af756a2cf7d
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	/// Measure meas.restricted_line_chart_only_performance_metric_value_secondary.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
@@ -477,16 +459,20 @@ table performance_metric_1
 	/// Format/Type: Unspecified
 	measure 'meas.restricted_line_chart_only_performance_metric_value_secondary' =
 			
+			VAR _valid1 =
+			    HASONEVALUE(metadata_performance_metrics[sys_doc_id])
+			
+			VAR _valid2 =
+			    HASONEVALUE(metadata_performance_metrics_secondary[sys_doc_id])
+			
 			VAR _id =
-			    SELECTEDVALUE( metadata_performance_metrics_secondary[sys_doc_id] )
+			    SELECTEDVALUE(metadata_performance_metrics_secondary[sys_doc_id])
 			
 			VAR _measureToReturn =
 			    SWITCH(
 			        TRUE(),
 			
-			        /* ============================
-			           :pushpin: Revenue Type Metrics
-			           ============================ */
+			        /* Revenue Type Metrics */
 			        _id = "rev01", [meas.opp_nnb_amt],
 			        _id = "rev02", [meas.opp_cross_sale_amt],
 			        _id = "rev03", [meas.opp_downgrade_amt],
@@ -497,41 +483,32 @@ table performance_metric_1
 			        _id = "rev08", [meas.opp_expansion_amt],
 			        _id = "rev09", [meas.opp_mrr_amt],
 			
-			        /* ============================
-			           :pushpin: Existing Sales Metrics
-			           ============================ */
+			        /* Existing Sales Metrics */
 			        _id = "sal01", [meas.ssr_history_won_amt],
 			        _id = "sal02", [meas.total_opps_count],
 			        _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
 			        _id = "sal04", [meas.ssr_history_win_rate],
 			        _id = "sal05", [meas.total_opps_count],
 			
-			        /* ============================
-			           :pushpin: Pipeline Metrics
-			           ============================ */
+			        /* Pipeline Metrics */
 			        _id = "pip01", [meas.pipeline_amt],
 			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
 			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
 			
-			        /* ============================
-			           :pushpin: Activity Metrics
-			           ============================ */
+			        /* Activity Metrics */
 			        _id = "act01", [meas.stkhlds_all_act_count],
 			        _id = "act02", [meas.stkhlds_all_act_email_count],
 			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
 			        _id = "act04", [meas.ssr_history_duration_hrs],
 			
-			        /* ============================
-			           :octagonal_sign: Default
-			           ============================ */
 			        BLANK()
 			    )
 			
 			RETURN
 			IF(
-			    ISBLANK(_measureToReturn),
+			    NOT (_valid1 && _valid2),
 			    BLANK(),
-			    _measureToReturn   -- :brain: NO CALCULATE HERE (keeps row context intact)
+			    _measureToReturn
 			)
 		lineageTag: 3828ecc7-4fa9-468f-a709-05e58ebde70f
 
@@ -564,20 +541,7 @@ table performance_metric_1
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Unspecified
-	measure 'meas.performance_metric_value_max' = ```
-			
-			  
-			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
-						users[trueai_full_name],
-						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
-						
-			)
-			var perf_metric_average_per_rep = MAXX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
-			
-			RETURN perf_metric_average_per_rep
-			
-			
-			```
+	measure 'meas.performance_metric_value_max' = VAR pre_agg_tbl_by_rep = SUMMARIZECOLUMNS( users[trueai_full_name], "Perf_Metric_Pre_Agg", [meas.performance_metric_value] ) VAR perf_metric_average_per_rep = MAXX(pre_agg_tbl_by_rep, [Perf_Metric_Pre_Agg]) RETURN perf_metric_average_per_rep
 		lineageTag: 33158416-bf01-4d63-bc8b-4e9d8926169e
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -677,19 +641,19 @@ table performance_metric_1
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Unspecified
-	measure 'meas.performance_metric_value_sum' = ```
+	measure 'meas.performance_metric_value_sum' =
 			
-			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
-						users[trueai_full_name],
-						"Perf_Metric_Pre_Agg", [meas.performance_metric_value]
-						
-			)
-			var perf_metric_average_per_rep = SUMX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+			VAR pre_agg_tbl_by_rep =
+			    SUMMARIZECOLUMNS(
+			        users[trueai_full_name],
+			        "Perf_Metric_Pre_Agg", [meas.performance_metric_value]
+			    )
 			
-			RETURN perf_metric_average_per_rep
+			VAR perf_metric_sum_per_rep =
+			    SUMX(pre_agg_tbl_by_rep, [Perf_Metric_Pre_Agg])
 			
-			
-			```
+			RETURN
+			    perf_metric_sum_per_rep
 		lineageTag: 4cd46dff-fa0c-42b1-af62-8ff080a2f5ac
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -716,7 +680,7 @@ table performance_metric_1
 			VAR _RepTable = 
 			    SUMMARIZECOLUMNS(
 			        users[trueai_full_name],
-			        "x", [meas.performance_metric_value], -- Slicer 1
+			        "x", [meas.performance_metric_value_formatted], -- Slicer 1
 			        "y", [meas.performance_metric_value_secondary]  -- Slicer 2
 			    )
 			
@@ -757,7 +721,7 @@ table performance_metric_1
 			SWITCH(
 			    _SelectedField,
 			    -- If Button 1 is clicked, return Metric 1 values
-			    NAMEOF('performance_metric_1'[meas.performance_metric_name]), [meas.performance_metric_value],
+			    NAMEOF('performance_metric_1'[meas.performance_metric_name]), [meas.performance_metric_value_formatted],
 			    
 			    -- If Button 2 is clicked, return Metric 2 values
 			    NAMEOF('performance_metric_2'[meas.performance_metric_secondary_name]), [meas.performance_metric_value_secondary],
@@ -775,34 +739,28 @@ table performance_metric_1
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Unspecified
-	measure 'meas.performance_metric_value_avg_peer' = ```
+	measure 'meas.performance_metric_value_avg_peer' =
 			
-			// CALCULATE(
-			//     VAR tbl = SUMMARIZECOLUMNS(
-			//         ssr_history[col.step_owner_group],
-			//         ssr_history[trueai_user_role_alias],
-			//         "Measure_Pre_AGG", [meas.performance_metric_value]
-			//     )
-			//     RETURN AVERAGEX( tbl, [Measure_Pre_AGG] )
-			//     ,
-			//     -- This removes any filter specifically on the Rep's name
-			//     REMOVEFILTERS(users[trueai_full_name]) 
-			// )
+			VAR _selectedRole =
+			    SELECTEDVALUE(Selector_Users[trueai_user_role_alias])
 			
-			    CALCULATE(
-			        -- We summarize the USERS table to get a list of people
-			    VAR tbl = SUMMARIZECOLUMNS(
+			VAR _selectedGroup =
+			    SELECTEDVALUE(Selector_Users[trueai_group])
+			
+			RETURN
+			CALCULATE(
+			    VAR tbl =
+			        SUMMARIZECOLUMNS(
 			            users[trueai_full_name],
 			            "Measure_Pre_AGG", [meas.performance_metric_value]
 			        )
-			        RETURN AVERAGEX( tbl, [Measure_Pre_AGG] )
-			        ,
-			        REMOVEFILTERS(users[trueai_full_name])
+			    RETURN
+			        AVERAGEX(tbl, [Measure_Pre_AGG]),
 			
-			    )
-			
-			
-			```
+			    REMOVEFILTERS(users[trueai_full_name]),
+			    KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			    KEEPFILTERS(users[trueai_group] = _selectedGroup)
+			)
 		lineageTag: 5160e701-f84f-4f9c-bf98-a9d289d0c26f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -836,21 +794,32 @@ table performance_metric_1
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Unspecified
-	measure 'meas.performance_metric_value_max_peer' = ```
+	measure 'meas.performance_metric_value_max_peer' =
 			
+			VAR _selectedRole =
+			    SELECTEDVALUE(Selector_Users[trueai_user_role_alias])
 			
+			VAR _selectedGroup =
+			    SELECTEDVALUE(Selector_Users[trueai_group])
+			
+			RETURN
+			IF(
+			    ISBLANK(_selectedRole) || ISBLANK(_selectedGroup),
+			    BLANK(),
 			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG", [meas.performance_metric_value]
-			        )
-			        RETURN MAXX( tbl , [Measure_Pre_AGG] ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
+			        VAR tbl =
+			            SUMMARIZECOLUMNS(
+			                users[trueai_full_name],
+			                "Measure_Pre_AGG", [meas.performance_metric_value]
+			            )
+			        RETURN
+			            MAXX(tbl, [Measure_Pre_AGG]),
+			
+			        REMOVEFILTERS(users[trueai_full_name]),
+			        KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			        KEEPFILTERS(users[trueai_group] = _selectedGroup)
 			    )
-			
-			
-			
-			```
+			)
 		lineageTag: d3806bb9-112d-4660-8a82-d3ffce27082b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -860,17 +829,32 @@ table performance_metric_1
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Unspecified
-	measure 'meas.performance_metric_value_min_peer' = ```
+	measure 'meas.performance_metric_value_min_peer' =
 			
+			VAR _selectedRole =
+			    SELECTEDVALUE(Selector_Users[trueai_user_role_alias])
+			
+			VAR _selectedGroup =
+			    SELECTEDVALUE(Selector_Users[trueai_group])
+			
+			RETURN
+			IF(
+			    ISBLANK(_selectedRole) || ISBLANK(_selectedGroup),
+			    BLANK(),
 			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG", [meas.performance_metric_value]
-			        )
-			        RETURN MINX(tbl, [Measure_Pre_AGG] ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
+			        VAR tbl =
+			            SUMMARIZECOLUMNS(
+			                users[trueai_full_name],
+			                "Measure_Pre_AGG", [meas.performance_metric_value]
+			            )
+			        RETURN
+			            MINX(tbl, [Measure_Pre_AGG]),
+			
+			        REMOVEFILTERS(users[trueai_full_name]),
+			        KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			        KEEPFILTERS(users[trueai_group] = _selectedGroup)
 			    )
-			```
+			)
 		lineageTag: d352ee87-3732-49c6-afb3-f4dc027068e4
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -880,18 +864,32 @@ table performance_metric_1
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Unspecified
-	measure 'meas.performance_metric_value_median_peer' = ```
+	measure 'meas.performance_metric_value_median_peer' =
 			
+			VAR _selectedRole =
+			    SELECTEDVALUE(Selector_Users[trueai_user_role_alias])
+			
+			VAR _selectedGroup =
+			    SELECTEDVALUE(Selector_Users[trueai_group])
+			
+			RETURN
+			IF(
+			    ISBLANK(_selectedRole) || ISBLANK(_selectedGroup),
+			    BLANK(),
 			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG", [meas.performance_metric_value]
-			        )
-			        RETURN MEDIANX( tbl , [Measure_Pre_AGG] ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
-			    )
+			        VAR tbl =
+			            SUMMARIZECOLUMNS(
+			                users[trueai_full_name],
+			                "Measure_Pre_AGG", [meas.performance_metric_value]
+			            )
+			        RETURN
+			            MEDIANX(tbl, [Measure_Pre_AGG]),
 			
-			```
+			        REMOVEFILTERS(users[trueai_full_name]),
+			        KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			        KEEPFILTERS(users[trueai_group] = _selectedGroup)
+			    )
+			)
 		lineageTag: 40b78582-969b-4a96-9566-1193bee9f26f
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -901,17 +899,32 @@ table performance_metric_1
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Unspecified
-	measure 'meas.performance_metric_value_std_deviation_peer' = ```
+	measure 'meas.performance_metric_value_std_deviation_peer' =
 			
+			VAR _selectedRole =
+			    SELECTEDVALUE(Selector_Users[trueai_user_role_alias])
+			
+			VAR _selectedGroup =
+			    SELECTEDVALUE(Selector_Users[trueai_group])
+			
+			RETURN
+			IF(
+			    ISBLANK(_selectedRole) || ISBLANK(_selectedGroup),
+			    BLANK(),
 			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG", [meas.performance_metric_value]
-			        )
-			        RETURN STDEVX.P( tbl , [Measure_Pre_AGG] ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
+			        VAR tbl =
+			            SUMMARIZECOLUMNS(
+			                users[trueai_full_name],
+			                "Measure_Pre_AGG", [meas.performance_metric_value]
+			            )
+			        RETURN
+			            STDEVX.P(tbl, [Measure_Pre_AGG]),
+			
+			        REMOVEFILTERS(users[trueai_full_name]),
+			        KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			        KEEPFILTERS(users[trueai_group] = _selectedGroup)
 			    )
-			```
+			)
 		lineageTag: 2465309d-38ce-49c1-82d1-08c029932ff7
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -921,18 +934,304 @@ table performance_metric_1
 	/// Calculation Logic: See DAX expression.
 	/// Dynamic Behavior: See DAX expression.
 	/// Format/Type: Unspecified
-	measure 'meas.performance_metric_value_sum_peer' = ```
+	measure 'meas.performance_metric_value_sum_peer' =
 			
+			VAR _selectedRole =
+			    SELECTEDVALUE(Selector_Users[trueai_user_role_alias])
+			
+			VAR _selectedGroup =
+			    SELECTEDVALUE(Selector_Users[trueai_group])
+			
+			RETURN
+			IF(
+			    ISBLANK(_selectedRole) || ISBLANK(_selectedGroup),
+			    BLANK(),
 			    CALCULATE(
-			        VAR tbl = SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG", [meas.performance_metric_value]
-			        )
-			        RETURN SUMX( tbl , [Measure_Pre_AGG] ),
-			        REMOVEFILTERS(users[trueai_full_name]) 
+			        VAR tbl =
+			            SUMMARIZECOLUMNS(
+			                users[trueai_full_name],
+			                "Measure_Pre_AGG", [meas.performance_metric_value]
+			            )
+			        RETURN
+			            SUMX(tbl, [Measure_Pre_AGG]),
+			
+			        REMOVEFILTERS(users[trueai_full_name]),
+			        KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			        KEEPFILTERS(users[trueai_group] = _selectedGroup)
 			    )
-			```
+			)
 		lineageTag: 66f44f39-7246-4b8c-baa9-ed16c350de1e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.performance_metric_value' =
+			
+			VAR _valid1 =
+			    HASONEVALUE(metadata_performance_metrics[sys_doc_id])
+			
+			VAR _valid2 =
+			    HASONEVALUE(metadata_performance_metrics_secondary[sys_doc_id])
+			
+			VAR _id =
+			    SELECTEDVALUE(metadata_performance_metrics[sys_doc_id])
+			
+			VAR _measureToReturn =
+			    SWITCH(
+			        TRUE(),
+			
+			        /* Revenue Type Metrics */
+			        _id = "rev01", [meas.opp_nnb_amt],
+			        _id = "rev02", [meas.opp_cross_sale_amt],
+			        _id = "rev03", [meas.opp_downgrade_amt],
+			        _id = "rev04", [meas.opp_renewal_amt],
+			        _id = "rev05", [meas.opp_arr_amt],
+			        _id = "rev06", [meas.opp_nd_amt],
+			        _id = "rev07", [meas.opp_one_time_amt],
+			        _id = "rev08", [meas.opp_expansion_amt],
+			        _id = "rev09", [meas.opp_mrr_amt],
+			        _id = "rev10", [meas.opps_non_nnb_amt],
+			
+			        /* Existing Sales Metrics */
+			        _id = "sal01", [meas.ssr_history_won_amt],
+			        _id = "sal02", [meas.total_opps_count],
+			        _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			        _id = "sal04", [meas.ssr_history_win_rate],
+			        _id = "sal05", [meas.total_opps_count],
+			
+			        /* Pipeline Metrics */
+			        _id = "pip01", [meas.pipeline_amt_sum],
+			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			
+			        /* Activity Metrics */
+			        _id = "act01", [meas.stkhlds_all_act_count],
+			        _id = "act02", [meas.stkhlds_all_act_email_count],
+			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			        _id = "act04", [meas.ssr_history_duration_hrs],
+			
+			        BLANK()
+			    )
+			
+			RETURN
+			   _measureToReturn
+		formatString: 0.00
+		lineageTag: ad47929c-60c7-4d49-a628-ca199370d1c5
+
+	measure 'meas.performance_metric_value_axisA_max' =
+			
+			VAR _format =
+			    SELECTEDVALUE(metadata_performance_metrics[metric_format], "")
+			
+			VAR base =
+			    [meas.performance_metric_value_max]
+			
+			VAR raw =
+			    base + base * 0.05
+			
+			RETURN
+			IF(
+			    ISBLANK(base) || base = 0,
+			    BLANK(),
+			    SWITCH(
+			        TRUE(),
+			        _format = "#,0.0"" %""" && raw <= 1, raw,
+			        raw >= 1000000, raw / 1000000,
+			        raw >= 1000, raw / 1000,
+			        raw
+			    )
+			)
+		lineageTag: 21aa1fd9-eb47-483e-b19b-0a7811633706
+
+		formatStringDefinition =
+				VAR _format =
+				    SELECTEDVALUE(metadata_performance_metrics[metric_format], "")
+				
+				VAR rawBase =
+				    [meas.performance_metric_value_max]
+				
+				VAR raw =
+				    rawBase + rawBase * 0.05
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				    ISBLANK(rawBase) || rawBase = 0, "",
+				
+				    _format = "#,0.0"" %""" && raw <= 1,
+				        IF(MOD(raw * 100, 1) = 0, "0%", "0.0%"),
+				
+				    _format = "#,0.0"" %""",
+				        IF(MOD(raw, 1) = 0, "0%", "0.0%"),
+				
+				    _format = "#,0"" days""",
+				        "0"" days""",
+				
+				    _format = "#,0.0"" hrs""",
+				        "0.0"" hrs""",
+				
+				    raw >= 1000000,
+				        IF(MOD(raw / 1000000, 1) = 0, "0\M", "0.0\M"),
+				
+				    raw >= 1000,
+				        IF(MOD(raw / 1000, 1) = 0, "0\K", "0.0\K"),
+				
+				    _format = "#,0",
+				        "0",
+				
+				    "0.0"
+				)
+
+	measure 'meas.performance_metric_value_axisA_max_half' =
+			
+			VAR _format =
+			    SELECTEDVALUE(metadata_performance_metrics[metric_format], "")
+			
+			VAR base =
+			    [meas.performance_metric_value_max]
+			
+			VAR raw =
+			    base / 2
+			
+			VAR roundedRaw =
+			    IF(
+			        _format = "#,0.0"" %""" && raw <= 1,
+			        raw,
+			        CEILING(raw, 5)
+			    )
+			
+			RETURN
+			IF(
+			    ISBLANK(base) || base = 0,
+			    BLANK(),
+			    SWITCH(
+			        TRUE(),
+			        _format = "#,0.0"" %""" && roundedRaw <= 1, roundedRaw,
+			        roundedRaw >= 1000000, roundedRaw / 1000000,
+			        roundedRaw >= 1000, roundedRaw / 1000,
+			        roundedRaw
+			    )
+			)
+		lineageTag: b6dd6ff5-cfdd-4073-9d8a-8f2d8e6a310a
+
+		formatStringDefinition =
+				VAR _format =
+				    SELECTEDVALUE(metadata_performance_metrics[metric_format], "")
+				
+				VAR rawBase =
+				    [meas.performance_metric_value_max]
+				
+				VAR raw =
+				    rawBase / 2
+				
+				VAR roundedRaw =
+				    IF(
+				        _format = "#,0.0"" %""" && raw <= 1,
+				        raw,
+				        CEILING(raw, 5)
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				    ISBLANK(rawBase) || rawBase = 0, "",
+				
+				    _format = "#,0.0"" %""" && roundedRaw <= 1,
+				        IF(MOD(roundedRaw * 100, 1) = 0, "0%", "0.0%"),
+				
+				    _format = "#,0.0"" %""",
+				        IF(MOD(roundedRaw, 1) = 0, "0%", "0.0%"),
+				
+				    _format = "#,0"" days""",
+				        "0"" days""",
+				
+				    _format = "#,0.0"" hrs""",
+				        "0.0"" hrs""",
+				
+				    roundedRaw >= 1000000,
+				        IF(MOD(roundedRaw / 1000000, 1) = 0, "0\M", "0.0\M"),
+				
+				    roundedRaw >= 1000,
+				        IF(MOD(roundedRaw / 1000, 1) = 0, "0\K", "0.0\K"),
+				
+				    _format = "#,0",
+				        "0",
+				
+				    "0.0"
+				)
+
+	measure 'meas.is_same_group_role_peer' =
+			
+			VAR _selectedRole =
+			    CALCULATE(
+			        SELECTEDVALUE(users[trueai_user_role_alias]),
+			        ALLSELECTED(users[trueai_full_name])
+			    )
+			
+			VAR _selectedGroup =
+			    CALCULATE(
+			        SELECTEDVALUE(users[trueai_group]),
+			        ALLSELECTED(users[trueai_full_name])
+			    )
+			
+			VAR _currentRole =
+			    SELECTEDVALUE(users[trueai_user_role_alias])
+			
+			VAR _currentGroup =
+			    SELECTEDVALUE(users[trueai_group])
+			
+			RETURN
+			IF(
+			    NOT ISBLANK(_selectedRole) &&
+			    NOT ISBLANK(_selectedGroup) &&
+			    _currentRole = _selectedRole &&
+			    _currentGroup = _selectedGroup,
+			    1,
+			    0
+			)
+		formatString: 0
+		lineageTag: f8dce238-64d4-4286-8f03-f5a0230e64f8
+
+	measure 'meas.peer_flag' =
+			
+			VAR _selectedRole =
+			    SELECTEDVALUE(Selector_Users[trueai_user_role_alias])
+			
+			VAR _selectedGroup =
+			    SELECTEDVALUE(Selector_Users[trueai_group])
+			
+			VAR _currentRole =
+			    SELECTEDVALUE(users[trueai_user_role_alias])
+			
+			VAR _currentGroup =
+			    SELECTEDVALUE(users[trueai_group])
+			
+			RETURN
+			IF(
+			    NOT ISBLANK(_selectedRole) &&
+			    NOT ISBLANK(_selectedGroup) &&
+			    _currentRole = _selectedRole &&
+			    _currentGroup = _selectedGroup,
+			    1,
+			    0
+			)
+		formatString: 0
+		lineageTag: 7d53cfc9-3876-4cd1-ab24-e5bd0f21c5cc
+
+	measure 'meas.performance_metric_value_selected_user' =
+			
+			VAR _selectedUser =
+			    SELECTEDVALUE(Selector_Users[trueai_full_name])
+			
+			RETURN
+			IF(
+			    ISBLANK(_selectedUser),
+			    BLANK(),
+			    CALCULATE(
+			        [meas.performance_metric_value],
+			        TREATAS({_selectedUser}, users[trueai_full_name])
+			    )
+			)
+		lineageTag: 7b01459b-0e80-45b9-bdbb-2d757008dce5
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
