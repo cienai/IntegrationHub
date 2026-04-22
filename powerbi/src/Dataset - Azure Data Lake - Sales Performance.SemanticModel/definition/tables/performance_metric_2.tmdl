@@ -125,6 +125,85 @@ table performance_metric_2
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
+
 	/// Measure meas.performance_metric_value_secondary_sum.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
@@ -145,6 +224,85 @@ table performance_metric_2
 		lineageTag: 950ff1b5-8c2d-4687-860a-375a40ff9be1
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
 
 	/// Measure meas.performance_metric_value_secondary_min.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
@@ -167,6 +325,85 @@ table performance_metric_2
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
+
 	/// Measure meas.performance_metric_value_secondary_max.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
@@ -188,6 +425,85 @@ table performance_metric_2
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
+
 	/// Measure meas.performance_metric_value_secondary_count.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
@@ -206,6 +522,84 @@ table performance_metric_2
 						RETURN perf_metric_average_per_rep
 			```
 		formatString: 0
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
 		lineageTag: f4977a8c-d096-4d98-9c5d-8c41fad1c792
 
 	/// Measure meas.performance_metric_value_secondary_median.
@@ -229,6 +623,85 @@ table performance_metric_2
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
+
 	/// Measure meas.performance_metric_value_secondary_std_deviation.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
@@ -250,6 +723,85 @@ table performance_metric_2
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
+
 	/// Measure meas.performance_metric_secondary_name.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
@@ -267,7 +819,18 @@ table performance_metric_2
 	/// Format/Type: Unspecified
 	measure 'meas.concat_selected_perf_metric1_and_metric2_names' =
 			
-			[meas.performance_metric_name]&" vs "&[meas.performance_metric_secondary_name]
+			VAR _valid1 =
+			    HASONEVALUE(metadata_performance_metrics[sys_doc_id])
+			
+			VAR _valid2 =
+			    HASONEVALUE(metadata_performance_metrics_secondary[sys_doc_id])
+			
+			RETURN
+			IF(
+			    _valid1 && _valid2,
+			    [meas.performance_metric_name] & " vs " & [meas.performance_metric_secondary_name],
+			    "Select one metric to render graph"
+			)
 		lineageTag: 7147359b-ba6f-4f9e-9d05-8114cb4716d9
 
 	/// Measure meas.performance_metric_sort_select_dynamic_slicer_label.
@@ -310,6 +873,85 @@ table performance_metric_2
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
+
 	/// Measure meas.performance_metric_value_secondary_count_peer.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
@@ -327,6 +969,84 @@ table performance_metric_2
 			    )
 			```
 		formatString: 0
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
 		lineageTag: 174ccbee-dd5d-466d-8997-cb21c56591a6
 
 	/// Measure meas.performance_metric_value_secondary_max_peer.
@@ -349,6 +1069,85 @@ table performance_metric_2
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
+
 	/// Measure meas.performance_metric_value_secondary_median_peer.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
@@ -368,6 +1167,85 @@ table performance_metric_2
 		lineageTag: 942d3f9b-4b44-4ce5-b768-5d868641fccb
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
 
 	/// Measure meas.performance_metric_value_secondary_min_peer.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
@@ -389,6 +1267,85 @@ table performance_metric_2
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
+
 	/// Measure meas.performance_metric_value_secondary_std_dev_peer.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
@@ -409,6 +1366,85 @@ table performance_metric_2
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
+
 	/// Measure meas.performance_metric_value_secondary_sum_peer.
 	/// Purpose: Compute the measure result from the DAX expression and current filter context.
 	/// Calculation Logic: See DAX expression.
@@ -428,6 +1464,361 @@ table performance_metric_2
 		lineageTag: ef0385c9-a10c-4817-b0d9-07b6ef3ff713
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		formatStringDefinition =
+				VAR _format =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_format]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format]),
+				        ""
+				    )
+				
+				VAR _prefix =
+				    COALESCE(
+				        SELECTEDVALUE(metadata_performance_metrics[metric_prefix]),
+				        SELECTEDVALUE(metadata_performance_metrics_secondary[metric_prefix]),
+				        ""
+				    )
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _prefixFmt =
+				    IF(
+				        NOT ISBLANK(_prefix) && LEN(TRIM(_prefix)) > 0,
+				        """" & _prefix & " """,
+				        ""
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				
+				    ISBLANK(SELECTEDMEASURE()), "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""",
+				        _prefixFmt & "0.0%",
+				
+				    /* Hours */
+				    _format = "#,0.0"" hrs""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M hrs""",
+				
+				    _format = "#,0.0"" hrs""" && v >= 1000,
+				        _prefixFmt & "0.0,""K hrs""",
+				
+				    _format = "#,0.0"" hrs""",
+				        _prefixFmt & "#,0.0"" hrs""",
+				
+				    /* Days */
+				    _format = "#,0"" days""" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M days""",
+				
+				    _format = "#,0"" days""" && v >= 1000,
+				        _prefixFmt & "0.0,""K days""",
+				
+				    _format = "#,0"" days""",
+				        _prefixFmt & "#,0"" days""",
+				
+				    /* Currency */
+				    _format = "Currency" && v >= 1000000,
+				        _prefixFmt & "$0.0,,""M""",
+				
+				    _format = "Currency" && v >= 1000,
+				        _prefixFmt & "$0.0,""K""",
+				
+				    _format = "Currency",
+				        _prefixFmt & "$#,##0.0",
+				
+				    /* Integer / count */
+				    _format = "#,0" && v >= 1000000,
+				        _prefixFmt & "0.0,,""M""",
+				
+				    _format = "#,0" && v >= 1000,
+				        _prefixFmt & "0.0,""K""",
+				
+				    _format = "#,0",
+				        _prefixFmt & "#,0",
+				
+				    /* Default */
+				    _prefixFmt & "#,##0.0"
+				)
+
+	measure 'meas.performance_metric_value_axisB_max' =
+			
+			VAR _format =
+			    SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format], "")
+			
+			VAR base =
+			    [meas.performance_metric_value_secondary_max]
+			
+			VAR raw =
+			    base + base * 0.05
+			
+			VAR roundedRaw =
+			    IF(
+			        _format = "#,0.0"" %""" && raw <= 1,
+			        raw,
+			        CEILING(raw, 5)
+			    )
+			
+			RETURN
+			IF(
+			    ISBLANK(base) || base = 0,
+			    BLANK(),
+			    SWITCH(
+			        TRUE(),
+			        _format = "#,0.0"" %""" && roundedRaw <= 1, roundedRaw,
+			        roundedRaw >= 1000000, roundedRaw / 1000000,
+			        roundedRaw >= 1000, roundedRaw / 1000,
+			        roundedRaw
+			    )
+			)
+		lineageTag: 30fd1ece-c84e-4e40-8a04-4344da62586a
+
+		formatStringDefinition =
+				VAR _format =
+				    SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format], "")
+				
+				VAR rawBase =
+				    [meas.performance_metric_value_secondary_max]
+				
+				VAR raw =
+				    rawBase + rawBase * 0.05
+				
+				VAR roundedRaw =
+				    IF(
+				        _format = "#,0.0"" %""" && raw <= 1,
+				        raw,
+				        CEILING(raw, 5)
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				    ISBLANK(rawBase) || rawBase = 0, "",
+				
+				    _format = "#,0.0"" %""" && roundedRaw <= 1,
+				        "0.0%",
+				
+				    _format = "#,0.0"" %""",
+				        "0.0%",
+				
+				    _format = "#,0"" days""",
+				        "0"" days""",
+				
+				    _format = "#,0.0"" hrs""",
+				        "0.0"" hrs""",
+				
+				    roundedRaw >= 1000000,
+				        "0.0\M",
+				
+				    roundedRaw >= 1000,
+				        "0.0\K",
+				
+				    _format = "#,0",
+				        "0",
+				
+				    "0.0"
+				)
+
+	measure 'meas.performance_metric_value_axisB_max_half' =
+			
+			VAR _format =
+			    SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format], "")
+			
+			VAR base =
+			    [meas.performance_metric_value_secondary_max]
+			
+			VAR raw =
+			    base / 2
+			
+			VAR roundedRaw =
+			    IF(
+			        _format = "#,0.0"" %""" && raw <= 1,
+			        raw,
+			        CEILING(raw, 5)
+			    )
+			
+			RETURN
+			IF(
+			    ISBLANK(base) || base = 0,
+			    BLANK(),
+			    SWITCH(
+			        TRUE(),
+			        _format = "#,0.0"" %""" && roundedRaw <= 1, roundedRaw,
+			        roundedRaw >= 1000000, roundedRaw / 1000000,
+			        roundedRaw >= 1000, roundedRaw / 1000,
+			        roundedRaw
+			    )
+			)
+		lineageTag: 9c913338-3f1e-4c24-96dd-17eeeaf438ea
+
+		formatStringDefinition =
+				VAR _format =
+				    SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format], "")
+				
+				VAR rawBase =
+				    [meas.performance_metric_value_secondary_max]
+				
+				VAR raw =
+				    rawBase / 2
+				
+				VAR roundedRaw =
+				    IF(
+				        _format = "#,0.0"" %""" && raw <= 1,
+				        raw,
+				        CEILING(raw, 5)
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				    ISBLANK(rawBase) || rawBase = 0, "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""" && roundedRaw <= 1,
+				        "0.0%",
+				
+				    _format = "#,0.0"" %""",
+				        "0.0%",
+				
+				    /* Days / Hours */
+				    _format = "#,0"" days""",
+				        "0"" days""",
+				
+				    _format = "#,0.0"" hrs""",
+				        "0.0"" hrs""",
+				
+				    /* Millions */
+				    roundedRaw >= 1000000,
+				        "0.0\M",
+				
+				    /* Thousands */
+				    roundedRaw >= 1000,
+				        "0.0\K",
+				
+				    /* Default */
+				    "0"
+				)
+
+	measure 'meas.performance_metric_value_secondary_formatted' = VAR _valid1 = HASONEVALUE(metadata_performance_metrics[sys_doc_id]) VAR _valid2 = HASONEVALUE(metadata_performance_metrics_secondary[sys_doc_id]) VAR _id = SELECTEDVALUE(metadata_performance_metrics_secondary[sys_doc_id]) VAR _measureToReturn = SWITCH( TRUE(), /* Revenue Type Metrics */ _id = "rev01", [meas.opp_nnb_amt], _id = "rev02", [meas.opp_cross_sale_amt], _id = "rev03", [meas.opp_downgrade_amt], _id = "rev04", [meas.opp_renewal_amt], _id = "rev05", [meas.opp_arr_amt], _id = "rev06", [meas.opp_nd_amt], _id = "rev07", [meas.opp_one_time_amt], _id = "rev08", [meas.opp_expansion_amt], _id = "rev09", [meas.opp_mrr_amt], /* Existing Sales Metrics */ _id = "sal01", [meas.ssr_history_won_amt], _id = "sal02", [meas.total_opps_count], _id = "sal03", [meas.trueai_potential_acv_per_step_avg], _id = "sal04", [meas.ssr_history_win_rate], _id = "sal05", [meas.total_opps_count], /* Pipeline Metrics */ _id = "pip01", [meas.pipeline_amt_sum], _id = "pip03", [meas.ssr_history_mgmt_pipeline_count], _id = "pip04", [meas.open_pipeline_avg_days_in_stage], /* Activity Metrics */ _id = "act01", [meas.stkhlds_all_act_count], _id = "act02", [meas.stkhlds_all_act_email_count], _id = "act03", [meas.stkhlds_all_act_meeting_count], _id = "act04", [meas.ssr_history_duration_hrs], BLANK() ) RETURN IF( NOT (_valid1 && _valid2), BLANK(), COALESCE(_measureToReturn,0) )
+		lineageTag: 9ec5b0fd-cde1-4d9d-94c6-94fd2616d352
+
+		formatStringDefinition =
+				VAR _format =
+				    SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format], "")
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _txt =
+				    SWITCH(
+				        TRUE(),
+				        ISBLANK(SELECTEDMEASURE()), "",
+				        v = 0, "",
+				
+				        /* Percent stored as 0–1 */
+				        _format = "#,0.0"" %""" && v <= 1,
+				            FORMAT(v * 100, IF(MOD(v * 100, 1) = 0, "0", "0.0")) & "%",
+				
+				        /* Percent stored as 0–100 */
+				        _format = "#,0.0"" %""",
+				            FORMAT(v, IF(MOD(v, 1) = 0, "0", "0.0")) & "%",
+				
+				        /* Days */
+				        _format = "#,0"" days""",
+				            FORMAT(v, "0") & " days",
+				
+				        /* Hours */
+				        _format = "#,0.0"" hrs""",
+				            FORMAT(v, "0.0") & " hrs",
+				
+				        /* Currency */
+				        _format = "Currency" && v >= 1000000,
+				            FORMAT(v / 1000000, IF(MOD(v / 1000000, 1) = 0, "0", "0.0")) & "M",
+				
+				        _format = "Currency" && v >= 1000,
+				            FORMAT(v / 1000, IF(MOD(v / 1000, 1) = 0, "0", "0.0")) & "K",
+				
+				        _format = "Currency",
+				            FORMAT(v, "#,##0"),
+				
+				        /* Counts / integers */
+				        _format = "#,0" && v >= 1000000,
+				            FORMAT(v / 1000000, IF(MOD(v / 1000000, 1) = 0, "0", "0.0")) & "M",
+				
+				        _format = "#,0" && v >= 1000,
+				            FORMAT(v / 1000, IF(MOD(v / 1000, 1) = 0, "0", "0.0")) & "K",
+				
+				        _format = "#,0",
+				            FORMAT(v, "#,##0"),
+				
+				        /* Fallback */
+				        FORMAT(v, "#,##0.0")
+				    )
+				
+				RETURN
+				"'" & _txt & "'"
+
+	/// Measure meas.performance_metric_value_secondary.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: Unspecified
+	measure 'meas.performance_metric_value_secondary' = ```
+			
+			VAR _valid1 =
+			    HASONEVALUE(metadata_performance_metrics[sys_doc_id])
+			
+			VAR _valid2 =
+			    HASONEVALUE(metadata_performance_metrics_secondary[sys_doc_id])
+			
+			VAR _id =
+			    SELECTEDVALUE(metadata_performance_metrics_secondary[sys_doc_id])
+			
+			VAR _measureToReturn =
+			    SWITCH(
+			        TRUE(),
+			
+			        /* Revenue Type Metrics */
+			        _id = "rev01", [meas.opp_nnb_amt],
+			        _id = "rev02", [meas.opp_cross_sale_amt],
+			        _id = "rev03", [meas.opp_downgrade_amt],
+			        _id = "rev04", [meas.opp_renewal_amt],
+			        _id = "rev05", [meas.opp_arr_amt],
+			        _id = "rev06", [meas.opp_nd_amt],
+			        _id = "rev07", [meas.opp_one_time_amt],
+			        _id = "rev08", [meas.opp_expansion_amt],
+			        _id = "rev09", [meas.opp_mrr_amt],
+			
+			        /* Existing Sales Metrics */
+			        _id = "sal01", [meas.ssr_history_won_amt],
+			        _id = "sal02", [meas.total_opps_count],
+			        _id = "sal03", [meas.trueai_potential_acv_per_step_avg],
+			        _id = "sal04", [meas.ssr_history_win_rate],
+			        _id = "sal05", [meas.total_opps_count],
+			
+			        /* Pipeline Metrics */
+			        _id = "pip01", [meas.pipeline_amt_sum],
+			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			
+			        /* Activity Metrics */
+			        _id = "act01", [meas.stkhlds_all_act_count],
+			        _id = "act02", [meas.stkhlds_all_act_email_count],
+			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			        _id = "act04", [meas.ssr_history_duration_hrs],
+			
+			        BLANK()
+			    )
+			
+			RETURN
+			    _measureToReturn
+			
+			```
+		formatString: 0.00
+		lineageTag: c453710f-4a24-41a3-a56a-5af756a2cf7d
 
 	/// Column _sys_doc_id.
 	column _sys_doc_id
