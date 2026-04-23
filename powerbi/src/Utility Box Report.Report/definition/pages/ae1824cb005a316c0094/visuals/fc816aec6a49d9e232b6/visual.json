@@ -1,0 +1,180 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.6.0/schema.json",
+  "name": "fc816aec6a49d9e232b6",
+  "position": {
+    "x": 57.074497009244155,
+    "y": 462.86025013594343,
+    "z": 54002,
+    "height": 409.96193583469278,
+    "width": 1173.5073409461663,
+    "tabOrder": 54002
+  },
+  "visual": {
+    "visualType": "scriptVisual",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "users"
+                    }
+                  },
+                  "Property": "trueai_full_name"
+                }
+              },
+              "queryRef": "users.trueai_full_name",
+              "nativeQueryRef": "trueai_full_name"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "performance_metric_1"
+                    }
+                  },
+                  "Property": "meas.performance_metric_value"
+                }
+              },
+              "queryRef": "performance_metric_1.meas.performance_metric_value",
+              "nativeQueryRef": "meas.performance_metric_value"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "performance_metric_2"
+                    }
+                  },
+                  "Property": "meas.performance_metric_value_secondary"
+                }
+              },
+              "queryRef": "performance_metric_2.meas.performance_metric_value_secondary",
+              "nativeQueryRef": "meas.performance_metric_value_secondary"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "users"
+                  }
+                },
+                "Property": "trueai_full_name"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "script": [
+        {
+          "properties": {
+            "source": {
+              "expr": {
+                "Literal": {
+                  "Value": "'library(ggplot2)\n\n# -------- DATA PREP --------\ndataset <- dataset[, 1:3]\ncolnames(dataset) <- c(\"user_name\", \"metric1\", \"metric2\")\n\ndataset$user_name <- as.character(dataset$user_name)\ndataset$metric1 <- as.numeric(dataset$metric1)\ndataset$metric2 <- as.numeric(dataset$metric2)\n\ndataset <- dataset[!is.na(dataset$user_name) &\n                   !is.na(dataset$metric1) &\n                   !is.na(dataset$metric2), ]\n\ndataset <- unique(dataset)\ndataset <- dataset[order(dataset$metric1, decreasing = TRUE), ]\n\nif (nrow(dataset) == 0) {\n  stop(\"No usable rows found.\")\n}\n\n# -------- SCALE --------\nm1_max <- max(dataset$metric1, na.rm = TRUE)\nm2_max <- max(dataset$metric2, na.rm = TRUE)\n\nif (m1_max == 0) m1_max <- 1\nif (m2_max == 0) m2_max <- 1\n\nscale_factor <- m1_max / m2_max\n\n# -------- BUILD DATA --------\nplot_data <- data.frame(\n  user_name = rep(dataset$user_name, 2),\n  metric_type = rep(c(\"Primary\", \"Secondary\"), each = nrow(dataset)),\n  value = c(dataset$metric1, dataset$metric2 * scale_factor),\n  label = c(round(dataset$metric1, 2), round(dataset$metric2, 2))\n)\n\nplot_data$user_name <- factor(plot_data$user_name, levels = dataset$user_name)\n\n# -------- PLOT --------\nggplot(plot_data, aes(x = user_name, y = value, fill = metric_type)) +\n  \n  geom_col(position = position_dodge(width = 0.8), width = 0.7) +\n  \n  geom_text(\n    aes(label = label),\n    position = position_dodge(width = 0.8),\n    vjust = -0.3,\n    size = 3.5,\n    color = \"white\",\n    family = \"Segoe UI\",\n    fontface = \"bold\"\n  ) +\n  \n  # 🎨 YOUR CUSTOM COLORS HERE\n  scale_fill_manual(\n    values = c(\n      \"Primary\" = \"#4A4C60\",\n      \"Secondary\" = \"#B7C298\"\n    )\n  ) +\n  \n  scale_y_continuous(\n    sec.axis = sec_axis(~ . / scale_factor),\n    expand = expansion(mult = c(0, 0.12))\n  ) +\n  \n  theme_minimal(base_family = \"Segoe UI\") +\n  theme(\n    # Background & border\n    panel.background = element_rect(fill = \"#20222D\", color = \"#20222D\"),\n    plot.background  = element_rect(fill = \"#20222D\", color = \"#20222D\"),\n    panel.border     = element_rect(fill = NA, color = \"#20222D\"),\n    \n    # Remove legend & titles\n    legend.position = \"none\",\n    axis.title = element_blank(),\n    \n    # Axis text\n    axis.text.x = element_text(\n      size = 12,\n      angle = 45,\n      hjust = 1,\n      color = \"white\",\n      family = \"Segoe UI\"\n    ),\n    axis.text.y = element_text(\n      size = 10,\n      color = \"white\",\n      family = \"Segoe UI\"\n    ),\n    \n    # Grid\n    panel.grid.major.x = element_blank(),\n    panel.grid.minor = element_blank(),\n    panel.grid.major.y = element_line(color = \"#44475A\")\n  )'"
+                }
+              }
+            },
+            "provider": {
+              "expr": {
+                "Literal": {
+                  "Value": "'R'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "2838b13ae10069999083",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "performance_metric_1"
+              }
+            },
+            "Property": "meas.performance_metric_value"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "add03e9dcec1650dbc3d",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "performance_metric_2"
+              }
+            },
+            "Property": "meas.performance_metric_value_secondary"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "fe869970b38e19936205",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "users"
+              }
+            },
+            "Property": "trueai_full_name"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
+  }
+}
