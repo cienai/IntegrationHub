@@ -962,6 +962,53 @@ table performance_metric_1
 			    )
 			)
 		lineageTag: 21aa1fd9-eb47-483e-b19b-0a7811633706
+		formatStringDefinition =
+				VAR _format =
+				    SELECTEDVALUE(metadata_performance_metrics[metric_format], "")
+				
+				VAR rawBase =
+				    [meas.performance_metric_value_max]
+				
+				VAR raw =
+				    rawBase / 2
+				
+				VAR roundedRaw =
+				    IF(
+				        _format = "#,0.0"" %""" && raw <= 1,
+				        raw,
+				        CEILING(raw, 5)
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				    ISBLANK(rawBase) || rawBase = 0, "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""" && roundedRaw <= 1,
+				        "0.0%",
+				
+				    _format = "#,0.0"" %""",
+				        "0.0%",
+				
+				    /* Days / Hours */
+				    _format = "#,0"" days""",
+				        "0"" days""",
+				
+				    _format = "#,0.0"" hrs""",
+				        "0.0"" hrs""",
+				
+				    /* Millions */
+				    roundedRaw >= 1000000,
+				        "0.0\M",
+				
+				    /* Thousands */
+				    roundedRaw >= 1000,
+				        "0.0\K",
+				
+				    /* Default */
+				    "0"
+				)
 
 	measure 'meas.performance_metric_value_axisA_max_half' =
 			
@@ -994,6 +1041,53 @@ table performance_metric_1
 			    )
 			)
 		lineageTag: b6dd6ff5-cfdd-4073-9d8a-8f2d8e6a310a
+		formatStringDefinition =
+				VAR _format =
+				    SELECTEDVALUE(metadata_performance_metrics[metric_format], "")
+				
+				VAR rawBase =
+				    [meas.performance_metric_value_max]
+				
+				VAR raw =
+				    rawBase / 2
+				
+				VAR roundedRaw =
+				    IF(
+				        _format = "#,0.0"" %""" && raw <= 1,
+				        raw,
+				        CEILING(raw, 5)
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				    ISBLANK(rawBase) || rawBase = 0, "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""" && roundedRaw <= 1,
+				        "0.0%",
+				
+				    _format = "#,0.0"" %""",
+				        "0.0%",
+				
+				    /* Days / Hours */
+				    _format = "#,0"" days""",
+				        "0"" days""",
+				
+				    _format = "#,0.0"" hrs""",
+				        "0.0"" hrs""",
+				
+				    /* Millions */
+				    roundedRaw >= 1000000,
+				        "0.0\M",
+				
+				    /* Thousands */
+				    roundedRaw >= 1000,
+				        "0.0\K",
+				
+				    /* Default */
+				    "0"
+				)
 
 	measure 'meas.is_same_group_role_peer' =
 			
