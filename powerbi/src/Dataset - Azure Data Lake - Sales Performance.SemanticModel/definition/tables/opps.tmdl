@@ -1603,6 +1603,86 @@ table opps
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	measure 'meas.opps_lost_deals_in_stage_tot_pct' =
+			
+			DIVIDE (
+			    [meas.lost_count],
+			    CALCULATE (
+			    [meas.lost_count],
+			    REMOVEFILTERS ( ssr_history ),
+			    REMOVEFILTERS ( opps ),
+			    opps[trueai_is_won] = FALSE (),
+			    NOT ISBLANK ( ssr_history[opp_lost_stage] ),
+			    cal_end_dates
+			)
+			)
+		formatString: 0
+		lineageTag: eff11ce7-5011-420e-8921-a69d23c1c6f2
+
+	measure 'meas.lost_loss_reason_pct' =
+			
+			DIVIDE (
+			    CALCULATE (
+			        COUNT ( opps[crm_loss_reason] ),
+			        ssr_history[step_outcome] = "Closed Lost",
+			        NOT ISBLANK ( opps[crm_loss_reason] )
+			    ),
+			    CALCULATE (
+			        COUNT ( ssr_history[_sys_doc_id] ),
+			        ssr_history[step_outcome] = "Closed Lost"
+			    )
+			)
+		lineageTag: cd99fdb1-c0a2-4c96-883e-2bfca0b687a9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.biggest_loss_driver' =
+			
+			VAR TopReason =
+			    TOPN (
+			        1,
+			        FILTER (
+			            ALL ( opps[crm_loss_reason] ),
+			            NOT ISBLANK ( opps[crm_loss_reason] )
+			        ),
+			        CALCULATE (
+			            COUNTROWS ( opps ),
+			            ssr_history[step_outcome] = "Closed Lost"
+			        ),
+			        DESC
+			    )
+			RETURN
+			MAXX ( TopReason, opps[crm_loss_reason] )
+		lineageTag: 30f1b581-cab9-4adb-bcd6-51e4a9b5e406
+
+	measure 'meas.biggest_loss_driver_pct' =
+			
+			VAR TopReason =
+			    TOPN (
+			        1,
+			        FILTER (
+			            ALL ( opps[crm_loss_reason] ),
+			            NOT ISBLANK ( opps[crm_loss_reason] )
+			        ),
+			        [meas.lost_count],
+			        DESC
+			    )
+			
+			VAR TopReasonCount =
+			    CALCULATE (
+			        [meas.lost_count],
+			        KEEPFILTERS ( TopReason )
+			    )
+			
+			VAR TotalLost =
+			    [meas.lost_count]
+			
+			RETURN
+			DIVIDE ( TopReasonCount, TotalLost )
+		lineageTag: 885f5ade-0b07-49fd-9f60-6fa86ea6e084
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
 		dataType: string
