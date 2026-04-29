@@ -15096,6 +15096,58 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	measure 'meas.ssr_funnel_cumulative_from_stage' =
+			
+			VAR curr_stage =
+			    SELECTEDVALUE(ssr_history[opp_lost_crm_stage])
+			
+			VAR curr_rank =
+			    SWITCH(
+			        curr_stage,
+			        "Discovery", 1,
+			        "Needs and Demo", 2,
+			        "Proposal", 3,
+			        "Negotiation", 4,
+			        BLANK()
+			    )
+			
+			VAR cumulative_lost_from_stage =
+			    CALCULATE(
+			        DISTINCTCOUNT(ssr_history[entity_opp_id]),
+			        ssr_history[step_outcome] = "Closed Lost",
+			        FILTER(
+			            ALL(ssr_history[opp_lost_crm_stage]),
+			            SWITCH(
+			                ssr_history[opp_lost_crm_stage],
+			                "Discovery", 1,
+			                "Needs and Demo", 2,
+			                "Proposal", 3,
+			                "Negotiation", 4,
+			                BLANK()
+			            ) >= curr_rank
+			        )
+			    )
+			
+			VAR won_deals =
+			    CALCULATE(
+			        DISTINCTCOUNT(ssr_history[entity_opp_id]),
+			        REMOVEFILTERS(ssr_history[opp_lost_crm_stage]),
+			        ssr_history[step_name] IN {
+			            "New Logo Selling",
+			            "Existing Customer Selling"
+			        },
+			        ssr_history[step_success] = TRUE()
+			    )
+			
+			RETURN
+			IF(
+			    ISBLANK(curr_rank),
+			    BLANK(),
+			    COALESCE(cumulative_lost_from_stage, 0) + COALESCE(won_deals, 0)
+			)
+		formatString: 0
+		lineageTag: b48fc77e-83a1-4bb6-97fd-44868bb2df64
+
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
 		dataType: string
