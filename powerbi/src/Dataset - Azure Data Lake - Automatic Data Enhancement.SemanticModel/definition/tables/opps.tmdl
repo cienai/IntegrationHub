@@ -1369,7 +1369,19 @@ table opps
 		source =
 				let
 				  dbTable = getDBTable("opps"), // get the right table
-				  dbTableTyped = Table.TransformColumnTypes(dbTable,{ // change types to what we're expecting
+				  RequiredCols = {
+				    "trueai_discount_amt_rule"
+				  },
+				  EnsureRequiredCols =
+				    List.Accumulate(
+				      RequiredCols,
+				      dbTable,
+				      (state as table, colName as text) =>
+				        if List.Contains(Table.ColumnNames(state), colName)
+				        then state
+				        else Table.AddColumn(state, colName, each null, type nullable text)
+				    ),
+				  dbTableTyped = Table.TransformColumnTypes(EnsureRequiredCols,{ // change types to what we're expecting
 				    {"crm_pipeline_name", type text},
 				{"crm_stage_id", type text},
 				{"crm_stage_name", type text},
@@ -1420,6 +1432,7 @@ table opps
 				{"trueai_creator_id_rule", Int64.Type},
 				{"trueai_cross_sale_amt", type number},
 				{"trueai_discount_amt", type number},
+				{"trueai_discount_amt_rule", type text},
 				{"trueai_discount_pct", type number},
 				{"trueai_discount_pct_tier", type text},
 				{"trueai_downgrade_amt", type number},
