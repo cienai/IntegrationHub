@@ -1343,6 +1343,37 @@ table ssr
 
 		annotation SummarizationSetBy = Automatic
 
+	column 'Account Age Bucket' =
+			
+			VAR StartDate = 'ssr'[trueai_first_purchase]
+			VAR EndDate =
+			    COALESCE(
+			        'ssr'[trueai_churned_on],
+			        TODAY()
+			    )
+			VAR AgeYears =
+			    IF(
+			        ISBLANK(StartDate),
+			        BLANK(),
+			        DATEDIFF(StartDate, EndDate, YEAR)
+			    )
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    ISBLANK(AgeYears), BLANK(),
+			    AgeYears < 1, "Less than 1 year",
+			    AgeYears = 1, "1 year",
+			    AgeYears = 2, "2 years",
+			    AgeYears = 3, "3 years",
+			    AgeYears = 4, "4 years",
+			    AgeYears = 5, "5 years",
+			    "6 or more years"
+			)
+		lineageTag: 33b65644-30f8-4bc7-a96f-5b500c90b2ce
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
 	partition ssr-5b934306-a526-4a93-a2ba-c6a8a109259e = m
 		mode: import
 		source = ```
