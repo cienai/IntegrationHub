@@ -72,13 +72,25 @@ table DimDiscountTier
 			
 			VAR StartDate = MIN('ssr'[trueai_first_purchase])
 			VAR EndDate = MIN('ssr'[trueai_churned_on])
+			VAR AgeYears =
+			    IF(
+			        ISBLANK(StartDate) || ISBLANK(EndDate),
+			        BLANK(),
+			        DATEDIFF(StartDate, EndDate, YEAR)
+			    )
 			RETURN
-			IF(
-			    ISBLANK(StartDate) || ISBLANK(EndDate),
-			    BLANK(),
-			    DATEDIFF(StartDate, EndDate, DAY)
+			SWITCH(
+			    TRUE(),
+			    ISBLANK(AgeYears), BLANK(),
+			    AgeYears < 1, "Less than 1 year",
+			    AgeYears = 1, "1 year",
+			    AgeYears = 2, "2 years",
+			    AgeYears = 3, "3 years",
+			    AgeYears = 4, "4 years",
+			    AgeYears = 5, "5 years",
+			    "6 or more years"
 			)
-		formatString: 0
+		formatString: @
 		lineageTag: 53d68558-65ad-49aa-b892-f54d49ed1463
 
 	measure 'Accounts (Distinct)' =
