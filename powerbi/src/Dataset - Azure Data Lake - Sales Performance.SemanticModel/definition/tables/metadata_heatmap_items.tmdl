@@ -325,8 +325,8 @@ table metadata_heatmap_items
 	measure 'meas.calc_hyp12_kpi1_denominator' =
 			
 			CALCULATE(
-			    COUNTROWS(ssr_history),
-			    ssr_history[step_name]="Post-Sales Support"
+			    DISTINCTCOUNT(ssr_history[_sys_ssr_id]),
+			    ssr_history[step_name] = "Existing Customer Selling"
 			)
 		formatString: 0
 		displayFolder: heatmap_kpis
@@ -339,16 +339,10 @@ table metadata_heatmap_items
 	/// Format/Type: 0
 	measure 'meas.calc_hyp12_kpi1_nominator' =
 			
-			var _max_date = [meas.context_date_max]
-			RETURN
-			    CALCULATE(
-			        DISTINCTCOUNT(ssr[_sys_doc_id]),
-			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK() || ssr[trueai_churned_on] >= DATE(YEAR(_max_date)+1,01,01)),
-			        KEEPFILTERS(ssr[trueai_churned_on]=BLANK()),
-			        ssr_history[step_name]="Existing Customer Selling",     // keep the date filter and ignore the context filter and get the attempted cross sale count
-			        ssr_history[opp_existing_customer_selling_cross_sale]=TRUE(),
-			        ALL(cal_end_dates)
-			    )
+			CALCULATE(
+			    DISTINCTCOUNT(ssr_history[_sys_ssr_id]),
+			    ssr_history[opp_existing_customer_selling_cross_sale] = TRUE()
+			)
 		formatString: 0
 		displayFolder: heatmap_kpis
 		lineageTag: 0a79c4ce-7c0d-4ca1-b49a-fafc90e62ef5

@@ -3328,38 +3328,6 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column di_pred_post_sales_qual_bucket_tiers
-		dataType: string
-		lineageTag: 3e740fe9-a52c-4cbe-8133-3ac75cf50907
-		summarizeBy: none
-		sourceColumn: di_pred_post_sales_qual_bucket_tiers
-
-		annotation SummarizationSetBy = Automatic
-
-	column di_pred_prospecting_qual_bucket_tiers
-		dataType: string
-		lineageTag: 5f2275a0-633a-4582-a188-eb9023535140
-		summarizeBy: none
-		sourceColumn: di_pred_prospecting_qual_bucket_tiers
-
-		annotation SummarizationSetBy = Automatic
-
-	column di_pred_new_logo_qual_bucket_tiers
-		dataType: string
-		lineageTag: 8d5a4bb6-8cb3-49b4-8097-eb5a0ad408d3
-		summarizeBy: none
-		sourceColumn: di_pred_new_logo_qual_bucket_tiers
-
-		annotation SummarizationSetBy = Automatic
-
-	column di_pred_existing_customer_qual_bucket_tiers
-		dataType: string
-		lineageTag: f88da92b-add3-427f-9177-60117ae59bea
-		summarizeBy: none
-		sourceColumn: di_pred_existing_customer_qual_bucket_tiers
-
-		annotation SummarizationSetBy = Automatic
-
 	column ml_training_scores_value_pred_booking_amt_reset_on
 		dataType: string
 		lineageTag: 60efbd86-421a-4e66-a5cc-82af86c4a90d
@@ -3472,6 +3440,38 @@ table companies_history
 
 		annotation SummarizationSetBy = Automatic
 
+	column booking_calibration_score
+		dataType: string
+		lineageTag: 4eb26f7f-c075-4f94-bbf4-00f7fd4e56b0
+		summarizeBy: none
+		sourceColumn: booking_calibration_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column calibration_score
+		dataType: string
+		lineageTag: 8f3af5f3-8cc8-4148-a91d-0d6ec32cdd89
+		summarizeBy: none
+		sourceColumn: calibration_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column rep_org_calibration_score
+		dataType: string
+		lineageTag: 5a5e1714-7602-4c6a-93e7-6ae34388b31d
+		summarizeBy: none
+		sourceColumn: rep_org_calibration_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column revenue_calibration_score
+		dataType: string
+		lineageTag: 9eb469f1-cc74-4f3f-a4fa-6f8f9cf2cc81
+		summarizeBy: none
+		sourceColumn: revenue_calibration_score
+
+		annotation SummarizationSetBy = Automatic
+
 	partition companies_history = m
 		mode: import
 		source =
@@ -3481,7 +3481,11 @@ table companies_history
 				    // Ensure this column always exists in the output rowset (prevents Tabular "rowset column does not exist" errors)
 				    // If more missing columns show up, add them to this list.
 				    RequiredCols = {
-				        "ml_training_scores_value_pred_booking_amt_reset_on"
+				        "ml_training_scores_value_pred_booking_amt_reset_on",
+				        "booking_calibration_score",
+				        "calibration_score",
+				        "rep_org_calibration_score",
+				        "revenue_calibration_score"
 				    },
 				
 				    #"Ensure Required Columns" =
@@ -3619,8 +3623,12 @@ table companies_history
 				      {"users_non_match_hr_id_won_deals", Int64.Type},
 				      {"users_sales", Int64.Type},
 				
-				      // Type the ensured column (it now always exists)
-				      {"ml_training_scores_value_pred_booking_amt_reset_on", type text}
+				      // Type the ensured columns (they now always exist)
+				      {"ml_training_scores_value_pred_booking_amt_reset_on", type text},
+				      {"booking_calibration_score", type text},
+				      {"calibration_score", type text},
+				      {"rep_org_calibration_score", type text},
+				      {"revenue_calibration_score", type text}
 				    },
 				
 				    // Safe typing: only apply mappings for columns that exist at refresh time
@@ -3765,11 +3773,11 @@ table companies_history
 				        "geo_required_erp_accounts",
 				        "geo_api_requests_erp_accounts",
 				        "di_compound_score_all",
-				        "di_pred_post_sales_qual_bucket_tiers",
-				        "di_pred_prospecting_qual_bucket_tiers",
-				        "di_pred_new_logo_qual_bucket_tiers",
-				        "di_pred_existing_customer_qual_bucket_tiers",
 				        "ml_training_scores_value_pred_booking_amt_reset_on",
+				        "booking_calibration_score",
+				        "calibration_score",
+				        "rep_org_calibration_score",
+				        "revenue_calibration_score",
 				        "di_pred_booking_amt_reset_on",
 				        "di_pred_close_date_if_won_reset_on",
 				        "di_pred_close_date_if_lost_reset_on",

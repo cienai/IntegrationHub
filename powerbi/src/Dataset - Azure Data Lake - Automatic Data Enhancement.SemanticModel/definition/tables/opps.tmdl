@@ -1340,12 +1340,48 @@ table opps
 
 		annotation SummarizationSetBy = Automatic
 
+	column _sys_sync_id
+		dataType: string
+		lineageTag: a9888d24-3e52-4266-93f4-a6bc0f024dca
+		summarizeBy: none
+		sourceColumn: _sys_sync_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_discount_amt_rule
+		dataType: string
+		lineageTag: b96ba794-5419-4b2c-bef0-ae00e357db6e
+		summarizeBy: none
+		sourceColumn: trueai_discount_amt_rule
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_discount_pct_rule
+		dataType: string
+		lineageTag: c488308b-32f7-4379-b27a-31c01e4f0366
+		summarizeBy: none
+		sourceColumn: trueai_discount_pct_rule
+
+		annotation SummarizationSetBy = Automatic
+
 	partition opps-7efea0ac-85ea-4ff0-8641-71292e110fb6 = m
 		mode: import
 		source =
 				let
 				  dbTable = getDBTable("opps"), // get the right table
-				  dbTableTyped = Table.TransformColumnTypes(dbTable,{ // change types to what we're expecting
+				  RequiredCols = {
+				    "trueai_discount_amt_rule"
+				  },
+				  EnsureRequiredCols =
+				    List.Accumulate(
+				      RequiredCols,
+				      dbTable,
+				      (state as table, colName as text) =>
+				        if List.Contains(Table.ColumnNames(state), colName)
+				        then state
+				        else Table.AddColumn(state, colName, each null, type nullable text)
+				    ),
+				  dbTableTyped = Table.TransformColumnTypes(EnsureRequiredCols,{ // change types to what we're expecting
 				    {"crm_pipeline_name", type text},
 				{"crm_stage_id", type text},
 				{"crm_stage_name", type text},
@@ -1396,6 +1432,7 @@ table opps
 				{"trueai_creator_id_rule", Int64.Type},
 				{"trueai_cross_sale_amt", type number},
 				{"trueai_discount_amt", type number},
+				{"trueai_discount_amt_rule", type text},
 				{"trueai_discount_pct", type number},
 				{"trueai_discount_pct_tier", type text},
 				{"trueai_downgrade_amt", type number},

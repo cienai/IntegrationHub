@@ -6,29 +6,26 @@ table performance_metric_format
 
 		calculationItem 'calc.apply_format' = SELECTEDMEASURE()
 
-			formatStringDefinition =
+			formatStringDefinition = ```
 					-----------------------------------------
-					-- 📌 Dynamic Format Engine (no K/M abbreviations)
+					-- Dynamic Format Engine (no K/M abbreviations)
 					-----------------------------------------
 					
 					VAR _prefix =
-					    SELECTEDVALUE( 'metadata_performance_metrics'[metric_prefix] )
+					    SELECTEDVALUE('metadata_performance_metrics'[metric_prefix])
 					
 					VAR _fmtMeta =
-					    SELECTEDVALUE( 'metadata_performance_metrics'[metric_format] )
-					
-					VAR _id =
-					    SELECTEDVALUE( 'metadata_performance_metrics'[sys_doc_id] )
+					    SELECTEDVALUE('metadata_performance_metrics'[metric_format])
 					
 					VAR _val =
 					    SELECTEDMEASURE()
 					
 					-----------------------------------------
-					-- 📌 Type Detection
+					-- Type Detection
 					-----------------------------------------
 					VAR _isRevenue =
 					    NOT ISBLANK(_fmtMeta)
-					        && CONTAINSSTRING( LOWER(_fmtMeta), "currency" )
+					        && CONTAINSSTRING(LOWER(_fmtMeta), "currency")
 					
 					VAR _isPercent  = NOT ISBLANK(_fmtMeta) && CONTAINSSTRING(_fmtMeta, "%")
 					VAR _isDuration = NOT ISBLANK(_fmtMeta) && CONTAINSSTRING(_fmtMeta, "hrs")
@@ -36,70 +33,77 @@ table performance_metric_format
 					
 					VAR _withPrefix = NOT ISBLANK(_prefix)
 					
+					VAR _absVal =
+					    ABS(_val)
+					
 					-----------------------------------------
-					-- 📌 Prefix Helper  (adds space after prefix)
+					-- Prefix Helper (adds space after prefix)
 					-----------------------------------------
 					VAR _p =
 					    IF(_withPrefix, _prefix & " ", "")
 					
 					-----------------------------------------
-					-- 📌 Revenue: always full currency, no K/M
+					-- Revenue: always full currency, no K/M
 					-----------------------------------------
 					VAR _revenueFmt =
 					    IF(
 					        _isRevenue,
-					        _p & "$#,0",        -- <== no ,K or ,,M here
+					        _p & "$#,0",
 					        BLANK()
 					    )
 					
 					-----------------------------------------
-					-- 📌 Percent, Duration, Days (use metadata)
+					-- Percent, Duration, Days
 					-----------------------------------------
 					VAR _nonAbbrevFmt =
 					    SWITCH(
 					        TRUE(),
-					        _isPercent,  _p & _fmtMeta,
+					        _isPercent,
+					            IF(
+					                _absVal <= 1,
+					                _p & "0.0%",
+					                _p & "#,0.0"" %"""
+					            ),
 					        _isDuration, _p & _fmtMeta,
 					        _isDays,     _p & _fmtMeta,
 					        BLANK()
 					    )
 					
 					-----------------------------------------
-					-- 📌 Fallback
+					-- Fallback
 					-----------------------------------------
 					RETURN
 					    COALESCE(
-					        _nonAbbrevFmt,          -- percentages, durations, days
-					        _revenueFmt,            -- revenue (full dollars)
-					        _p & _fmtMeta,          -- any other custom format from metadata
-					        "#,0"                   -- ultimate fallback
+					        _nonAbbrevFmt,
+					        _revenueFmt,
+					        _p & _fmtMeta,
+					        "#,0"
 					    )
+					
+					```
 
 		calculationItem 'calc.apply_format_secondary' = SELECTEDMEASURE()
 
-			formatStringDefinition =
+			formatStringDefinition = ```
 					-----------------------------------------
-					-- 📌 Dynamic Format Engine (no K/M abbreviations)
+					-- Dynamic Format Engine (no K/M abbreviations) - Secondary
 					-----------------------------------------
 					
 					VAR _prefix =
-					    SELECTEDVALUE( 'metadata_performance_metrics_secondary'[metric_prefix] )
+					    SELECTEDVALUE('metadata_performance_metrics_secondary'[metric_prefix])
 					
 					VAR _fmtMeta =
-					    SELECTEDVALUE( 'metadata_performance_metrics_secondary'[metric_format] )
-					
-					VAR _id =
-					    SELECTEDVALUE( 'metadata_performance_metrics_secondary'[sys_doc_id] )
+					    SELECTEDVALUE('metadata_performance_metrics_secondary'[metric_format])
 					
 					VAR _val =
 					    SELECTEDMEASURE()
 					
 					-----------------------------------------
-					-- 📌 Type Detection
+					-- Type Detection
 					-----------------------------------------
 					VAR _isRevenue =
 					    NOT ISBLANK(_fmtMeta)
-					        && CONTAINSSTRING( LOWER(_fmtMeta), "currency" )
+					        && CONTAINSSTRING(LOWER(_fmtMeta), "currency")
 					
 					VAR _isPercent  = NOT ISBLANK(_fmtMeta) && CONTAINSSTRING(_fmtMeta, "%")
 					VAR _isDuration = NOT ISBLANK(_fmtMeta) && CONTAINSSTRING(_fmtMeta, "hrs")
@@ -107,44 +111,54 @@ table performance_metric_format
 					
 					VAR _withPrefix = NOT ISBLANK(_prefix)
 					
+					VAR _absVal =
+					    ABS(_val)
+					
 					-----------------------------------------
-					-- 📌 Prefix Helper  (adds space after prefix)
+					-- Prefix Helper (adds space after prefix)
 					-----------------------------------------
 					VAR _p =
 					    IF(_withPrefix, _prefix & " ", "")
 					
 					-----------------------------------------
-					-- 📌 Revenue: always full currency, no K/M
+					-- Revenue: always full currency, no K/M
 					-----------------------------------------
 					VAR _revenueFmt =
 					    IF(
 					        _isRevenue,
-					        _p & "$#,0",        -- <== no ,K or ,,M here
+					        _p & "$#,0",
 					        BLANK()
 					    )
 					
 					-----------------------------------------
-					-- 📌 Percent, Duration, Days (use metadata)
+					-- Percent, Duration, Days
 					-----------------------------------------
 					VAR _nonAbbrevFmt =
 					    SWITCH(
 					        TRUE(),
-					        _isPercent,  _p & _fmtMeta,
+					        _isPercent,
+					            IF(
+					                _absVal <= 1,
+					                _p & "0.0%",
+					                _p & "#,0.0"" %"""
+					            ),
 					        _isDuration, _p & _fmtMeta,
 					        _isDays,     _p & _fmtMeta,
 					        BLANK()
 					    )
 					
 					-----------------------------------------
-					-- 📌 Fallback
+					-- Fallback
 					-----------------------------------------
 					RETURN
 					    COALESCE(
-					        _nonAbbrevFmt,          -- percentages, durations, days
-					        _revenueFmt,            -- revenue (full dollars)
-					        _p & _fmtMeta,          -- any other custom format from metadata
-					        "#,0"                   -- ultimate fallback
+					        _nonAbbrevFmt,
+					        _revenueFmt,
+					        _p & _fmtMeta,
+					        "#,0"
 					    )
+					
+					```
 
 	/// Column Name.
 	column Name
