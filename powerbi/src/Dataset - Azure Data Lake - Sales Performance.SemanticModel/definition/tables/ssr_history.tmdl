@@ -15189,6 +15189,44 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	measure 'meas.exp_rpts_all_new_logo_deals_count' = CALCULATE(Count(ssr_history[_sys_doc_id]), ssr_history[step_name] IN {"New Logo Selling"})       // new logo won deals count
+		lineageTag: bdc852ba-2524-4a48-ba1b-839b68e4bc0c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.exp_rpts_existing_customer_won_deals' = CALCULATE(Count(ssr_history[_sys_doc_id]), ssr_history[step_name] IN {"Existing Customer Selling"} && ssr_history[step_success] = True)       // new logo won deals count
+		lineageTag: 455b2983-a61c-4667-9aa4-1176bcc96d6f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.exp_rpts_existing_customer_all_deals' = CALCULATE(Count(ssr_history[_sys_doc_id]), ssr_history[step_name] IN {"Existing Customer Selling"})       // new logo won deals count
+		lineageTag: 01624def-c6d8-44b5-a5ff-e95918672b29
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.ssr_history_win_rate_existing_customer' = DIVIDE([meas.exp_rpts_existing_customer_won_deals],[meas.exp_rpts_existing_customer_all_deals])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: facdcaa4-a65e-4241-86a4-acbd4545b16e
+
+	measure 'meas.ssr_history_amt_new_logo_win_rate' = DIVIDE([meas.exp_rpts_all_new_logo_won_deals],[meas.exp_rpts_all_new_logo_deals_count])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: febefbd9-54a6-4c77-812e-da5ef9b9f1f6
+
+	measure 'meas.ssr_history_pipeline_amt_avg' = DIVIDE([meas.open_pipeline_booking_amt], [meas.open_pipeline_count_id])
+		lineageTag: e4874c37-ecbd-4953-9ccf-81d0661d1225
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.ssr_history_vi_value_delivered' = ```
+			
+			var val_delivered = CALCULATE(sum(ssr_history[vi_value_delivered]))
+			var res = val_delivered
+			return res 
+			```
+		lineageTag: 1a866b56-aa63-4e6c-a6ac-b3d0e50b8ea9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
 		dataType: string
