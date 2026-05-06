@@ -1651,9 +1651,19 @@ table opps
 			        ),
 			        DESC
 			    )
+			
+			VAR Result =
+			    MAXX ( TopReason, opps[crm_loss_reason] )
+			
 			RETURN
-			MAXX ( TopReason, opps[crm_loss_reason] )
+			IF (
+			    ISBLANK ( Result ) || Result = "",
+			    "No data",
+			    Result
+			)
 		lineageTag: 30f1b581-cab9-4adb-bcd6-51e4a9b5e406
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure 'meas.biggest_loss_driver_pct' =
 			
@@ -1677,8 +1687,15 @@ table opps
 			VAR TotalLost =
 			    [meas.lost_count]
 			
+			VAR Result =
+			    DIVIDE ( TopReasonCount, TotalLost )
+			
 			RETURN
-			DIVIDE ( TopReasonCount, TotalLost )
+			IF (
+			    ISBLANK ( Result ),
+			    "",
+			    Result
+			)
 		lineageTag: 885f5ade-0b07-49fd-9f60-6fa86ea6e084
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
