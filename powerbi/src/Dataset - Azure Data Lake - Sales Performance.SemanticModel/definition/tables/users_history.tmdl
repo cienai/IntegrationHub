@@ -2612,8 +2612,15 @@ table users_history
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: 0
 	measure 'meas.ci_sb_closing_ability_num' =
-			VAR score_raw = AVERAGE(users_history[ci_sb_closing_ability_num])
-			RETURN score_raw * 100
+			
+			VAR score_raw =
+			    AVERAGE(users_history[ci_sb_closing_ability_num])
+			
+			VAR score_scaled =
+			    score_raw * 100
+			
+			RETURN
+			MROUND(score_scaled, 5)
 		formatString: 0
 		lineageTag: c7d25f8f-38c0-4f7f-ba0e-a88afaa0f414
 
@@ -2625,8 +2632,15 @@ table users_history
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: 0
 	measure 'meas.ci_sb_work_effort_num' =
-			VAR score_raw = AVERAGE(users_history[ci_sb_work_effort_num])
-			RETURN score_raw * 100
+			
+			VAR score_raw =
+			    AVERAGE(users_history[ci_sb_work_effort_num])
+			
+			VAR score_scaled =
+			    score_raw * 100
+			
+			RETURN
+			MROUND(score_scaled, 5)
 		formatString: 0
 		lineageTag: 6f57cf29-f392-4982-99f6-3f7c8d532872
 
@@ -2638,8 +2652,15 @@ table users_history
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: 0
 	measure 'meas.ci_sb_discov_skills_num' =
-			VAR score_raw = AVERAGE(users_history[ci_sb_discov_skills_num])
-			RETURN score_raw * 100
+			
+			VAR score_raw =
+			    AVERAGE(users_history[ci_sb_discov_skills_num])
+			
+			VAR score_scaled =
+			    score_raw * 100
+			
+			RETURN
+			MROUND(score_scaled, 5)
 		formatString: 0
 		lineageTag: 2d6d944b-85f8-4cb3-a37f-88f45e0951c4
 
@@ -2651,8 +2672,15 @@ table users_history
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: 0
 	measure 'meas.ci_sb_engmt_ability_num' =
-			VAR score_raw = AVERAGE(users_history[ci_sb_engmt_ability_num])
-			RETURN score_raw * 100
+			
+			VAR score_raw =
+			    AVERAGE(users_history[ci_sb_engmt_ability_num])
+			
+			VAR score_scaled =
+			    score_raw * 100
+			
+			RETURN
+			MROUND(score_scaled, 5)
 		formatString: 0
 		lineageTag: 16256f46-8496-4699-97dd-8dcf0eec7902
 
@@ -2664,8 +2692,15 @@ table users_history
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: 0
 	measure 'meas.ci_sb_deal_maxing_num' =
-			VAR score_raw = AVERAGE(users_history[ci_sb_deal_maxing_num])
-			RETURN score_raw * 100
+			
+			VAR score_raw =
+			    AVERAGE(users_history[ci_sb_deal_maxing_num])
+			
+			VAR score_scaled =
+			    score_raw * 100
+			
+			RETURN
+			MROUND(score_scaled, 5)
 		formatString: 0
 		lineageTag: 211f0d4d-2d8e-4105-b8e0-ecf37f765086
 
@@ -2677,8 +2712,15 @@ table users_history
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: 0
 	measure 'meas.ci_sb_time_management_num' =
-			VAR score_raw = AVERAGE(users_history[ci_sb_time_management_num])
-			RETURN score_raw * 100
+			
+			VAR score_raw =
+			    AVERAGE(users_history[ci_sb_time_management_num])
+			
+			VAR score_scaled =
+			    score_raw * 100
+			
+			RETURN
+			MROUND(score_scaled, 5)
 		formatString: 0
 		lineageTag: f09085d3-0ef8-466d-b4cc-9e1a3bcac226
 
@@ -2696,20 +2738,23 @@ table users_history
 			VAR _selectedGroup =
 			    SELECTEDVALUE(users[trueai_group])
 			
-			RETURN
-			CALCULATE(
-			    VAR tbl =
-			        SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG", [meas.ci_sb_closing_ability_num]
-			        )
-			    RETURN
-			        AVERAGEX(tbl, [Measure_Pre_AGG]),
+			VAR _result =
+			    CALCULATE(
+			        VAR tbl =
+			            SUMMARIZECOLUMNS(
+			                users[trueai_full_name],
+			                "Measure_Pre_AGG", [meas.ci_sb_closing_ability_num]
+			            )
+			        RETURN
+			            AVERAGEX(tbl, [Measure_Pre_AGG]),
 			
-			    REMOVEFILTERS(users[trueai_full_name]),
-			    KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
-			    KEEPFILTERS(users[trueai_group] = _selectedGroup)
-			)
+			        REMOVEFILTERS(users[trueai_full_name]),
+			        KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			        KEEPFILTERS(users[trueai_group] = _selectedGroup)
+			    )
+			
+			RETURN
+			MROUND(_result, 5)
 		formatString: 0
 		lineageTag: 84d1f11f-72ec-47e7-9953-c9fb5f66ce21
 
@@ -2727,20 +2772,23 @@ table users_history
 			VAR _selectedGroup =
 			    SELECTEDVALUE(users[trueai_group])
 			
-			RETURN
-			CALCULATE(
-			    VAR tbl =
-			        SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG", [meas.ci_sb_work_effort_num]
-			        )
-			    RETURN
-			        AVERAGEX(tbl, [Measure_Pre_AGG]),
+			VAR _result =
+			    CALCULATE(
+			        VAR tbl =
+			            SUMMARIZECOLUMNS(
+			                users[trueai_full_name],
+			                "Measure_Pre_AGG", [meas.ci_sb_work_effort_num]
+			            )
+			        RETURN
+			            AVERAGEX(tbl, [Measure_Pre_AGG]),
 			
-			    REMOVEFILTERS(users[trueai_full_name]),
-			    KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
-			    KEEPFILTERS(users[trueai_group] = _selectedGroup)
-			)
+			        REMOVEFILTERS(users[trueai_full_name]),
+			        KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			        KEEPFILTERS(users[trueai_group] = _selectedGroup)
+			    )
+			
+			RETURN
+			MROUND(_result, 5)
 		formatString: 0
 		lineageTag: 727a7129-1cee-4557-8aad-9e21816ebac4
 
@@ -2758,20 +2806,23 @@ table users_history
 			VAR _selectedGroup =
 			    SELECTEDVALUE(users[trueai_group])
 			
-			RETURN
-			CALCULATE(
-			    VAR tbl =
-			        SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG", [meas.ci_sb_discov_skills_num]
-			        )
-			    RETURN
-			        AVERAGEX(tbl, [Measure_Pre_AGG]),
+			VAR _result =
+			    CALCULATE(
+			        VAR tbl =
+			            SUMMARIZECOLUMNS(
+			                users[trueai_full_name],
+			                "Measure_Pre_AGG", [meas.ci_sb_discov_skills_num]
+			            )
+			        RETURN
+			            AVERAGEX(tbl, [Measure_Pre_AGG]),
 			
-			    REMOVEFILTERS(users[trueai_full_name]),
-			    KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
-			    KEEPFILTERS(users[trueai_group] = _selectedGroup)
-			)
+			        REMOVEFILTERS(users[trueai_full_name]),
+			        KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			        KEEPFILTERS(users[trueai_group] = _selectedGroup)
+			    )
+			
+			RETURN
+			MROUND(_result, 5)
 		formatString: 0
 		lineageTag: 3f35f536-f63f-4f20-a8a4-d0f6f180301e
 
@@ -2789,20 +2840,23 @@ table users_history
 			VAR _selectedGroup =
 			    SELECTEDVALUE(users[trueai_group])
 			
-			RETURN
-			CALCULATE(
-			    VAR tbl =
-			        SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG", [meas.ci_sb_engmt_ability_num]
-			        )
-			    RETURN
-			        AVERAGEX(tbl, [Measure_Pre_AGG]),
+			VAR _result =
+			    CALCULATE(
+			        VAR tbl =
+			            SUMMARIZECOLUMNS(
+			                users[trueai_full_name],
+			                "Measure_Pre_AGG", [meas.ci_sb_engmt_ability_num]
+			            )
+			        RETURN
+			            AVERAGEX(tbl, [Measure_Pre_AGG]),
 			
-			    REMOVEFILTERS(users[trueai_full_name]),
-			    KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
-			    KEEPFILTERS(users[trueai_group] = _selectedGroup)
-			)
+			        REMOVEFILTERS(users[trueai_full_name]),
+			        KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			        KEEPFILTERS(users[trueai_group] = _selectedGroup)
+			    )
+			
+			RETURN
+			MROUND(_result, 5)
 		formatString: 0
 		lineageTag: 8cdcb5eb-5503-492e-bfd4-a5c841d84bb8
 
@@ -2820,20 +2874,23 @@ table users_history
 			VAR _selectedGroup =
 			    SELECTEDVALUE(users[trueai_group])
 			
-			RETURN
-			CALCULATE(
-			    VAR tbl =
-			        SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG", [meas.ci_sb_deal_maxing_num]
-			        )
-			    RETURN
-			        AVERAGEX(tbl, [Measure_Pre_AGG]),
+			VAR _result =
+			    CALCULATE(
+			        VAR tbl =
+			            SUMMARIZECOLUMNS(
+			                users[trueai_full_name],
+			                "Measure_Pre_AGG", [meas.ci_sb_deal_maxing_num]
+			            )
+			        RETURN
+			            AVERAGEX(tbl, [Measure_Pre_AGG]),
 			
-			    REMOVEFILTERS(users[trueai_full_name]),
-			    KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
-			    KEEPFILTERS(users[trueai_group] = _selectedGroup)
-			)
+			        REMOVEFILTERS(users[trueai_full_name]),
+			        KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			        KEEPFILTERS(users[trueai_group] = _selectedGroup)
+			    )
+			
+			RETURN
+			MROUND(_result, 5)
 		formatString: 0
 		lineageTag: d4e50a73-44d7-42de-a5b0-1fc2fd9a5829
 
@@ -2851,20 +2908,23 @@ table users_history
 			VAR _selectedGroup =
 			    SELECTEDVALUE(users[trueai_group])
 			
-			RETURN
-			CALCULATE(
-			    VAR tbl =
-			        SUMMARIZECOLUMNS(
-			            users[trueai_full_name],
-			            "Measure_Pre_AGG", [meas.ci_sb_time_management_num]
-			        )
-			    RETURN
-			        AVERAGEX(tbl, [Measure_Pre_AGG]),
+			VAR _result =
+			    CALCULATE(
+			        VAR tbl =
+			            SUMMARIZECOLUMNS(
+			                users[trueai_full_name],
+			                "Measure_Pre_AGG", [meas.ci_sb_time_management_num]
+			            )
+			        RETURN
+			            AVERAGEX(tbl, [Measure_Pre_AGG]),
 			
-			    REMOVEFILTERS(users[trueai_full_name]),
-			    KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
-			    KEEPFILTERS(users[trueai_group] = _selectedGroup)
-			)
+			        REMOVEFILTERS(users[trueai_full_name]),
+			        KEEPFILTERS(users[trueai_user_role_alias] = _selectedRole),
+			        KEEPFILTERS(users[trueai_group] = _selectedGroup)
+			    )
+			
+			RETURN
+			MROUND(_result, 5)
 		formatString: 0
 		lineageTag: e81882a8-d396-417d-8dce-a47b4f50cf3f
 
@@ -3433,6 +3493,32 @@ table users_history
 		lineageTag: 7c4e923e-d688-44d8-ace0-74c256978f54
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.selected_period_performance_tier_num' =
+			
+			VAR TierTable =
+			    ADDCOLUMNS(
+			        VALUES(users_history[ci_perf_qtly_performance_tier_num]),
+			        "TierCount", CALCULATE(COUNTROWS(users_history))
+			    )
+			
+			VAR TopTier =
+			    TOPN(
+			        1,
+			        TierTable,
+			        [TierCount], DESC,
+			        users_history[ci_perf_qtly_performance_tier_num], ASC
+			    )
+			
+			RETURN
+			    MAXX(
+			        TopTier,
+			        users_history[ci_perf_qtly_performance_tier_num]
+			    )
+		formatString: 0
+		lineageTag: 4ed5d2aa-190d-4bd0-9c19-aef498a7b4cc
+
+		annotation PBI_FormatHint = {"isDecimal":true}
 
 	/// Column 'col.ci.perf_qtly_bookings_user' = ```.
 	column 'col.ci.perf_qtly_bookings_user' = ```
