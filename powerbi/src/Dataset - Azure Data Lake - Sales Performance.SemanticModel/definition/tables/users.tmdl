@@ -913,6 +913,106 @@ table users
 		formatString: 0
 		lineageTag: 550088a4-2ca6-4565-8d5b-a9bcee1e2a0d
 
+	measure 'meas.direct_reports_amt' = SUM(users[trueai_direct_reports])
+		lineageTag: 0551da29-4829-4d52-9762-2d0e3ff2abee
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.total_reports_amt' = SUM(users[trueai_tot_reports])
+		lineageTag: 8ec55328-c440-474b-bf8d-89287171010e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.rep_details_rep_manager_name.
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: Unspecified
+	measure 'meas.rep_details_rep_manager_name' =
+			
+			VAR mgr_id =
+			    SELECTEDVALUE ( users[trueai_mgr_id] )
+			
+			RETURN
+			CALCULATE (
+			    MAX ( users[trueai_full_name] ),
+			    ALL ( users ),
+			    users[_sys_doc_id] = mgr_id
+			)
+		displayFolder: _rep_details
+		lineageTag: c82fbced-ceda-4b4a-9735-63791160a2ae
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Direct Reports' =
+			
+			VAR SelectedManagerID =
+			    LOOKUPVALUE(
+			        users_mgr[_sys_doc_id],
+			        users_mgr[trueai_full_name],
+			        SELECTEDVALUE(users_mgr[col.rep_details_rep_manager_name])
+			    )
+			
+			RETURN
+			IF(
+			    SELECTEDVALUE(users[trueai_mgr_id]) = SelectedManagerID,
+			    1,
+			    0
+			)
+		lineageTag: 0e890793-2dbc-4ef6-bb5e-f7d54b1c356c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Reports' = ```
+			
+			VAR SelectedManagerIDs =
+			        MAXX(
+			        FILTER(
+			            ALL(users_mgr),
+			            users_mgr[trueai_full_name]
+			                = SELECTEDVALUE(users_mgr[col.rep_details_rep_manager_name])
+			        ),
+			        users_mgr[_sys_doc_id]
+			    )
+			
+			VAR CurrentUserID =
+			    SELECTEDVALUE(users[_sys_doc_id])
+			
+			VAR CurrentUserPath =
+			    SELECTEDVALUE(users[user_mgr_path])
+			
+			RETURN
+			IF(
+			    NOT ISBLANK(SelectedManagerIDs)
+			        && PATHCONTAINS(CurrentUserPath, SelectedManagerIDs)
+			        && CurrentUserID <> SelectedManagerIDs,
+			    1,
+			    0
+			)
+			
+			```
+		lineageTag: c90b007a-2690-498e-b0ae-b7babd623bd2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Show User' =
+			
+			VAR ViewType =
+			    SELECTEDVALUE(
+			        'Report View Type'[ViewType]
+			    )
+			
+			RETURN
+			SWITCH(
+			    ViewType,
+			    "Direct Reports", [Direct Reports],
+			    "Total Reports", [Total Reports],
+			    1
+			)
+		lineageTag: 3e66d657-2ada-44a9-b9d6-ac3820c49d09
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	/// User's division in the CRM
 	column crm_division
 		dataType: string
@@ -1866,6 +1966,32 @@ table users
 		lineageTag: 1122ee95-1baf-4fcf-bccf-7971b23ece95
 		summarizeBy: none
 		sourceColumn: cust_date3
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'col.rep_details_rep_manager_name' =
+			
+			VAR mgr_id =
+			    users[trueai_mgr_id]
+			
+			RETURN
+			CALCULATE (
+			    MAX ( users[trueai_full_name] ),
+			    FILTER (
+			        ALL ( users ),
+			        users[_sys_doc_id] = mgr_id
+			    )
+			)
+		lineageTag: e89639ee-3b23-44ff-be08-a14848a9bedf
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_mgr_path =
+			
+			PATH(users[_sys_doc_id], users[trueai_mgr_id])
+		lineageTag: 90190ea9-47ae-4e51-9049-95f397486bc7
+		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 

@@ -1,0 +1,289 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.6.0/schema.json",
+  "name": "d3828ebd220cbf71c73e",
+  "position": {
+    "x": 0,
+    "y": 451.77870920142738,
+    "z": 69000,
+    "height": 528.06851761538871,
+    "width": 1279.0463191903207,
+    "tabOrder": 71000
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "performance_metric_1"
+                    }
+                  },
+                  "Property": "meas.performance_metric_value"
+                }
+              },
+              "queryRef": "performance_metric_1.meas.performance_metric_value",
+              "nativeQueryRef": "meas.performance_metric_value"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "performance_metric_2"
+                    }
+                  },
+                  "Property": "meas.performance_metric_value_secondary"
+                }
+              },
+              "queryRef": "performance_metric_2.meas.performance_metric_value_secondary",
+              "nativeQueryRef": "meas.performance_metric_value_secondary"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "users"
+                    }
+                  },
+                  "Property": "trueai_group"
+                }
+              },
+              "queryRef": "users.trueai_group",
+              "nativeQueryRef": "trueai_group"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "users"
+                    }
+                  },
+                  "Property": "trueai_user_role_alias"
+                }
+              },
+              "queryRef": "users.trueai_user_role_alias",
+              "nativeQueryRef": "trueai_user_role_alias"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "users"
+                    }
+                  },
+                  "Property": "trueai_full_name"
+                }
+              },
+              "queryRef": "users.trueai_full_name",
+              "nativeQueryRef": "trueai_full_name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "metadata_performance_metrics"
+                    }
+                  },
+                  "Property": "sys_doc_id"
+                }
+              },
+              "queryRef": "metadata_performance_metrics.sys_doc_id",
+              "nativeQueryRef": "sys_doc_id"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "metadata_performance_metrics_secondary"
+                    }
+                  },
+                  "Property": "sys_doc_id"
+                }
+              },
+              "queryRef": "metadata_performance_metrics_secondary.sys_doc_id",
+              "nativeQueryRef": "sys_doc_id_1",
+              "displayName": "sys_doc_id_1"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "vega": [
+        {
+          "properties": {
+            "provider": {
+              "expr": {
+                "Literal": {
+                  "Value": "'vega'"
+                }
+              }
+            },
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\r\n  \"$schema\": \"https://vega.github.io/schema/vega/v5.json\",\r\n  \"background\": null,\r\n  \"autosize\": {\"type\": \"fit\", \"contains\": \"padding\"},\r\n  \"padding\": {\"left\": 70, \"right\": 75, \"top\": 20, \"bottom\": 95},\r\n\r\n  \"signals\": [\r\n    {\r\n      \"name\": \"hideLabels\",\r\n      \"update\": \"length(data(''source'')) > 50\"\r\n    }\r\n  ],\r\n\r\n  \"data\": [\r\n    {\"name\": \"dataset\"},\r\n    {\r\n      \"name\": \"source\",\r\n      \"source\": \"dataset\",\r\n      \"transform\": [\r\n        {\r\n          \"type\": \"filter\",\r\n          \"expr\": \"datum.trueai_full_name != null && (datum.meas_performance_metric_value != null || datum.meas_performance_metric_value_secondary != null)\"\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"name\": \"stats\",\r\n      \"source\": \"source\",\r\n      \"transform\": [\r\n        {\r\n          \"type\": \"aggregate\",\r\n          \"fields\": [\"meas_performance_metric_value\", \"meas_performance_metric_value_secondary\"],\r\n          \"ops\": [\"max\", \"max\"],\r\n          \"as\": [\"m1Max\", \"m2Max\"]\r\n        },\r\n        {\r\n          \"type\": \"formula\",\r\n          \"as\": \"scaleFactor\",\r\n          \"expr\": \"datum.m2Max == null || datum.m2Max == 0 ? 1 : datum.m1Max / datum.m2Max\"\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"name\": \"primaryBars\",\r\n      \"source\": \"source\",\r\n      \"transform\": [\r\n        {\r\n          \"type\": \"filter\",\r\n          \"expr\": \"datum.meas_performance_metric_value != null && isValid(datum.meas_performance_metric_value)\"\r\n        },\r\n        {\r\n          \"type\": \"formula\",\r\n          \"as\": \"scaledValue\",\r\n          \"expr\": \"datum.meas_performance_metric_value\"\r\n        },\r\n        {\r\n          \"type\": \"formula\",\r\n          \"as\": \"label\",\r\n          \"expr\": \"datum.meas_performance_metric_value == 0 ? '''' : indexof([''sal04'',''pip02'',''pip09'',''sal07'',''sal10''], datum.sys_doc_id) >= 0 ? format(datum.meas_performance_metric_value * 100, ''.1f'') + ''%'' : datum.sys_doc_id == ''pip04'' ? (abs(datum.meas_performance_metric_value) >= 1000000000 ? format(datum.meas_performance_metric_value / 1000000000, ''.1f'') + ''B'' : abs(datum.meas_performance_metric_value) >= 1000000 ? format(datum.meas_performance_metric_value / 1000000, ''.1f'') + ''M'' : abs(datum.meas_performance_metric_value) >= 1000 ? format(datum.meas_performance_metric_value / 1000, ''.0f'') + ''K'' : format(datum.meas_performance_metric_value, '',.0f'')) + '' days'' : datum.sys_doc_id == ''act04'' ? (abs(datum.meas_performance_metric_value) >= 1000000000 ? format(datum.meas_performance_metric_value / 1000000000, ''.1f'') + ''B'' : abs(datum.meas_performance_metric_value) >= 1000000 ? format(datum.meas_performance_metric_value / 1000000, ''.1f'') + ''M'' : abs(datum.meas_performance_metric_value) >= 1000 ? format(datum.meas_performance_metric_value / 1000, ''.0f'') + ''K'' : format(datum.meas_performance_metric_value, '',.1f'')) + '' hrs'' : indexof([''sb01'',''sb02'',''sb03'',''sb04'',''sb05'',''sb06'',''sb07'',''act05'',''Comb01'',''Comb02'',''Comb03''], datum.sys_doc_id) >= 0 ? format(datum.meas_performance_metric_value, '',.0f'') : indexof([''sal01'',''sal03'',''pip01'',''rev01'',''rev02'',''rev03'',''rev04'',''rev05'',''rev06'',''rev07'',''rev08'',''rev09'',''rev10'',''sal06'',''sal09'',''pip05'',''vi01'',''vi02'',''vi03''], datum.sys_doc_id) >= 0 ? ''$'' + (abs(datum.meas_performance_metric_value) >= 1000000000 ? format(datum.meas_performance_metric_value / 1000000000, ''.1f'') + ''B'' : abs(datum.meas_performance_metric_value) >= 1000000 ? format(datum.meas_performance_metric_value / 1000000, ''.1f'') + ''M'' : abs(datum.meas_performance_metric_value) >= 1000 ? format(datum.meas_performance_metric_value / 1000, ''.0f'') + ''K'' : format(datum.meas_performance_metric_value, '',.0f'')) : abs(datum.meas_performance_metric_value) >= 1000000000 ? format(datum.meas_performance_metric_value / 1000000000, ''.1f'') + ''B'' : abs(datum.meas_performance_metric_value) >= 1000000 ? format(datum.meas_performance_metric_value / 1000000, ''.1f'') + ''M'' : abs(datum.meas_performance_metric_value) >= 1000 ? format(datum.meas_performance_metric_value / 1000, ''.0f'') + ''K'' : format(datum.meas_performance_metric_value, '',.0f'')\"\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"name\": \"secondaryBars\",\r\n      \"source\": \"source\",\r\n      \"transform\": [\r\n        {\r\n          \"type\": \"filter\",\r\n          \"expr\": \"datum.meas_performance_metric_value_secondary != null && isValid(datum.meas_performance_metric_value_secondary)\"\r\n        },\r\n        {\r\n          \"type\": \"formula\",\r\n          \"as\": \"scaledValue\",\r\n          \"expr\": \"datum.meas_performance_metric_value_secondary * data(''stats'')[0].scaleFactor\"\r\n        },\r\n        {\r\n          \"type\": \"formula\",\r\n          \"as\": \"label\",\r\n          \"expr\": \"datum.meas_performance_metric_value_secondary == 0 ? '''' : indexof([''sal04'',''pip02'',''pip09'',''sal07'',''sal10''], datum.sys_doc_id_1) >= 0 ? format(datum.meas_performance_metric_value_secondary * 100, ''.1f'') + ''%'' : datum.sys_doc_id_1 == ''pip04'' ? (abs(datum.meas_performance_metric_value_secondary) >= 1000000000 ? format(datum.meas_performance_metric_value_secondary / 1000000000, ''.1f'') + ''B'' : abs(datum.meas_performance_metric_value_secondary) >= 1000000 ? format(datum.meas_performance_metric_value_secondary / 1000000, ''.1f'') + ''M'' : abs(datum.meas_performance_metric_value_secondary) >= 1000 ? format(datum.meas_performance_metric_value_secondary / 1000, ''.0f'') + ''K'' : format(datum.meas_performance_metric_value_secondary, '',.0f'')) + '' days'' : datum.sys_doc_id_1 == ''act04'' ? (abs(datum.meas_performance_metric_value_secondary) >= 1000000000 ? format(datum.meas_performance_metric_value_secondary / 1000000000, ''.1f'') + ''B'' : abs(datum.meas_performance_metric_value_secondary) >= 1000000 ? format(datum.meas_performance_metric_value_secondary / 1000000, ''.1f'') + ''M'' : abs(datum.meas_performance_metric_value_secondary) >= 1000 ? format(datum.meas_performance_metric_value_secondary / 1000, ''.0f'') + ''K'' : format(datum.meas_performance_metric_value_secondary, '',.1f'')) + '' hrs'' : indexof([''sb01'',''sb02'',''sb03'',''sb04'',''sb05'',''sb06'',''sb07'',''act05'',''Comb01'',''Comb02'',''Comb03''], datum.sys_doc_id_1) >= 0 ? format(datum.meas_performance_metric_value_secondary, '',.0f'') : indexof([''sal01'',''sal03'',''pip01'',''rev01'',''rev02'',''rev03'',''rev04'',''rev05'',''rev06'',''rev07'',''rev08'',''rev09'',''rev10'',''sal06'',''sal09'',''pip05'',''vi01'',''vi02'',''vi03''], datum.sys_doc_id_1) >= 0 ? ''$'' + (abs(datum.meas_performance_metric_value_secondary) >= 1000000000 ? format(datum.meas_performance_metric_value_secondary / 1000000000, ''.1f'') + ''B'' : abs(datum.meas_performance_metric_value_secondary) >= 1000000 ? format(datum.meas_performance_metric_value_secondary / 1000000, ''.1f'') + ''M'' : abs(datum.meas_performance_metric_value_secondary) >= 1000 ? format(datum.meas_performance_metric_value_secondary / 1000, ''.0f'') + ''K'' : format(datum.meas_performance_metric_value_secondary, '',.0f'')) : abs(datum.meas_performance_metric_value_secondary) >= 1000000000 ? format(datum.meas_performance_metric_value_secondary / 1000000000, ''.1f'') + ''B'' : abs(datum.meas_performance_metric_value_secondary) >= 1000000 ? format(datum.meas_performance_metric_value_secondary / 1000000, ''.1f'') + ''M'' : abs(datum.meas_performance_metric_value_secondary) >= 1000 ? format(datum.meas_performance_metric_value_secondary / 1000, ''.0f'') + ''K'' : format(datum.meas_performance_metric_value_secondary, '',.0f'')\"\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"name\": \"allBars\",\r\n      \"source\": [\"primaryBars\", \"secondaryBars\"]\r\n    }\r\n  ],\r\n\r\n  \"scales\": [\r\n    {\r\n      \"name\": \"xscale\",\r\n      \"type\": \"band\",\r\n      \"domain\": {\"data\": \"source\", \"field\": \"trueai_full_name\", \"sort\": true},\r\n      \"range\": \"width\",\r\n      \"paddingInner\": 0.15,\r\n      \"paddingOuter\": 0.05\r\n    },\r\n    {\r\n      \"name\": \"xoffset\",\r\n      \"type\": \"band\",\r\n      \"domain\": [\"Primary\", \"Secondary\"],\r\n      \"range\": [0, {\"signal\": \"bandwidth(''xscale'')\"}],\r\n      \"padding\": 0.12\r\n    },\r\n    {\r\n      \"name\": \"yscale\",\r\n      \"type\": \"linear\",\r\n      \"domain\": {\"data\": \"allBars\", \"field\": \"scaledValue\"},\r\n      \"range\": \"height\",\r\n      \"nice\": true,\r\n      \"zero\": true\r\n    },\r\n    {\r\n      \"name\": \"secondaryYScale\",\r\n      \"type\": \"linear\",\r\n      \"domain\": {\"data\": \"source\", \"field\": \"meas_performance_metric_value_secondary\"},\r\n      \"range\": \"height\",\r\n      \"nice\": true,\r\n      \"zero\": true\r\n    },\r\n    {\r\n      \"name\": \"color\",\r\n      \"type\": \"ordinal\",\r\n      \"domain\": [\"Primary\", \"Secondary\"],\r\n      \"range\": [\"#B0E0E2\", \"#B7C298\"]\r\n    }\r\n  ],\r\n\r\n  \"axes\": [\r\n    {\r\n      \"orient\": \"bottom\",\r\n      \"scale\": \"xscale\",\r\n      \"labelAngle\": -45,\r\n      \"labelAlign\": \"right\",\r\n      \"labelColor\": \"white\",\r\n      \"labelFontSize\": 11,\r\n      \"tickColor\": \"white\",\r\n      \"domain\": false,\r\n      \"title\": null,\r\n      \"encode\": {\r\n        \"labels\": {\r\n          \"update\": {\r\n            \"opacity\": {\r\n              \"signal\": \"hideLabels ? 0 : 1\"\r\n            }\r\n          }\r\n        }\r\n      }\r\n    },\r\n\r\n    {\r\n      \"orient\": \"left\",\r\n      \"scale\": \"yscale\",\r\n      \"labelColor\": \"white\",\r\n      \"labelFontSize\": 10,\r\n      \"grid\": true,\r\n      \"gridColor\": \"#44475A\",\r\n      \"domain\": false,\r\n      \"title\": null,\r\n      \"encode\": {\r\n        \"labels\": {\r\n          \"update\": {\r\n            \"text\": {\r\n              \"signal\": \"indexof([''sal04'',''pip02'',''pip09'',''sal07'',''sal10''], data(''source'')[0].sys_doc_id) >= 0 ? format(datum.value * 100, ''.0f'') + ''%'' : abs(datum.value) >= 1000000000 ? format(datum.value / 1000000000, ''.1f'') + ''B'' : abs(datum.value) >= 1000000 ? format(datum.value / 1000000, ''.1f'') + ''M'' : abs(datum.value) >= 1000 ? format(datum.value / 1000, ''.0f'') + ''K'' : format(datum.value, '',.0f'')\"\r\n            }\r\n          }\r\n        }\r\n      }\r\n    },\r\n\r\n    {\r\n      \"orient\": \"right\",\r\n      \"scale\": \"secondaryYScale\",\r\n      \"labelColor\": \"white\",\r\n      \"labelFontSize\": 10,\r\n      \"domain\": false,\r\n      \"title\": null,\r\n      \"encode\": {\r\n        \"labels\": {\r\n          \"update\": {\r\n            \"text\": {\r\n              \"signal\": \"indexof([''sal04'',''pip02'',''pip09'',''sal07'',''sal10''], data(''source'')[0].sys_doc_id_1) >= 0 ? format(datum.value * 100, ''.0f'') + ''%'' : abs(datum.value) >= 1000000000 ? format(datum.value / 1000000000, ''.1f'') + ''B'' : abs(datum.value) >= 1000000 ? format(datum.value / 1000000, ''.1f'') + ''M'' : abs(datum.value) >= 1000 ? format(datum.value / 1000, ''.0f'') + ''K'' : format(datum.value, '',.0f'')\"\r\n            }\r\n          }\r\n        }\r\n      }\r\n    }\r\n  ],\r\n\r\n  \"marks\": [\r\n    {\r\n      \"name\": \"primary_bar_marks\",\r\n      \"type\": \"rect\",\r\n      \"from\": {\"data\": \"primaryBars\"},\r\n      \"encode\": {\r\n        \"update\": {\r\n          \"x\": {\"signal\": \"scale(''xscale'', datum.trueai_full_name) + scale(''xoffset'', ''Primary'')\"},\r\n          \"width\": {\"scale\": \"xoffset\", \"band\": 1},\r\n          \"y\": {\"scale\": \"yscale\", \"field\": \"scaledValue\"},\r\n          \"y2\": {\"scale\": \"yscale\", \"value\": 0},\r\n          \"fill\": {\"scale\": \"color\", \"value\": \"Primary\"},\r\n          \"tooltip\": {\"signal\": \"{''User'': datum.trueai_full_name, ''Value'': datum.label}\"}\r\n        }\r\n      }\r\n    },\r\n\r\n    {\r\n      \"name\": \"secondary_bar_marks\",\r\n      \"type\": \"rect\",\r\n      \"from\": {\"data\": \"secondaryBars\"},\r\n      \"encode\": {\r\n        \"update\": {\r\n          \"x\": {\"signal\": \"scale(''xscale'', datum.trueai_full_name) + scale(''xoffset'', ''Secondary'')\"},\r\n          \"width\": {\"scale\": \"xoffset\", \"band\": 1},\r\n          \"y\": {\"scale\": \"yscale\", \"field\": \"scaledValue\"},\r\n          \"y2\": {\"scale\": \"yscale\", \"value\": 0},\r\n          \"fill\": {\"scale\": \"color\", \"value\": \"Secondary\"},\r\n          \"tooltip\": {\"signal\": \"{''User'': datum.trueai_full_name, ''Value'': datum.label}\"}\r\n        }\r\n      }\r\n    },\r\n\r\n    {\r\n      \"type\": \"text\",\r\n      \"from\": {\"data\": \"primaryBars\"},\r\n      \"encode\": {\r\n        \"update\": {\r\n          \"x\": {\"signal\": \"scale(''xscale'', datum.trueai_full_name) + scale(''xoffset'', ''Primary'') + bandwidth(''xoffset'') / 2\"},\r\n          \"y\": {\"scale\": \"yscale\", \"field\": \"scaledValue\", \"offset\": -5},\r\n          \"text\": {\"field\": \"label\"},\r\n          \"align\": {\"value\": \"center\"},\r\n          \"baseline\": {\"value\": \"bottom\"},\r\n          \"fill\": {\"value\": \"#E6E6E6\"},\r\n          \"fontSize\": {\"value\": 9},\r\n          \"fontWeight\": {\"value\": \"normal\"},\r\n          \"opacity\": {\r\n            \"signal\": \"hideLabels ? 0 : 0.85\"\r\n          }\r\n        }\r\n      }\r\n    },\r\n\r\n    {\r\n      \"type\": \"text\",\r\n      \"from\": {\"data\": \"secondaryBars\"},\r\n      \"encode\": {\r\n        \"update\": {\r\n          \"x\": {\"signal\": \"scale(''xscale'', datum.trueai_full_name) + scale(''xoffset'', ''Secondary'') + bandwidth(''xoffset'') / 2\"},\r\n          \"y\": {\"scale\": \"yscale\", \"field\": \"scaledValue\", \"offset\": -5},\r\n          \"text\": {\"field\": \"label\"},\r\n          \"align\": {\"value\": \"center\"},\r\n          \"baseline\": {\"value\": \"bottom\"},\r\n          \"fill\": {\"value\": \"#E6E6E6\"},\r\n          \"fontSize\": {\"value\": 9},\r\n          \"fontWeight\": {\"value\": \"normal\"},\r\n          \"opacity\": {\r\n            \"signal\": \"hideLabels ? 0 : 0.85\"\r\n          }\r\n        }\r\n      }\r\n    }\r\n  ]\r\n}'"
+                }
+              }
+            },
+            "jsonConfig": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"autosize\": {\n    \"contains\": \"padding\",\n    \"type\": \"fit\"\n  }\n}'"
+                }
+              }
+            },
+            "enableTooltips": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableContextMenu": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableHighlight": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableSelection": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "selectionMaxDataPoints": {
+              "expr": {
+                "Literal": {
+                  "Value": "50D"
+                }
+              }
+            },
+            "selectionMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'simple'"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'6.2.0'"
+                }
+              }
+            },
+            "renderMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'svg'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateManagement": [
+        {
+          "properties": {
+            "viewportHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "518.0685176153887D"
+                }
+              }
+            },
+            "viewportWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "1269.0463191903207D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "developer": [
+        {
+          "properties": {
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'1.9.1.0'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "visualTooltip": [
+        {
+          "properties": {
+            "type": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Canvas'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "showDrillToggleButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "showDrillRoleSelector": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

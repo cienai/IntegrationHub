@@ -491,6 +491,38 @@ table quality_buckets
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_propensity_min_max_tier_pros' = ```.
+	column 'col.trueai_propensity_min_max_tier_pros' =
+			
+			var bucket = CALCULATE(
+			    MAX(
+			        quality_buckets[bucket]  // get the propensity
+			    )
+			)
+			
+			VAR lower_prob =CALCULATE(
+			    MAX(
+			        quality_buckets[prob_lower_bound]       // get the lower bound of prob
+			    )
+			)
+			
+			VAR upper_prob =CALCULATE(
+			    MAX(
+			        quality_buckets[prob_upper_bound]       // get the upper bound of prob
+			    )
+			)
+			var res =bucket & " " & "(" & FORMAT(lower_prob, "0%") & "-" & FORMAT(upper_prob,"#%") & ")"  // legacy alias kept for existing visuals
+			
+			RETURN
+			res
+		lineageTag: 2d9e4282-67ae-4682-b7bf-58f2c39bc428
+		summarizeBy: none
+		sortByColumn: bucket_num
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
 	partition quality_buckets = m
 		mode: import
 		source =
