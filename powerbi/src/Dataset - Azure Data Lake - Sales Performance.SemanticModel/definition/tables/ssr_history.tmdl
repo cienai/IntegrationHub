@@ -11226,8 +11226,13 @@ table ssr_history
 	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr_history[_sys_doc_id].
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.ssr_history_win_rate' =
+			
 			CALCULATE(
-			    DIVIDE([meas.ssr_history_success_count], count(ssr_history[_sys_doc_id]))
+			    DIVIDE(
+			        [meas.ssr_history_success_count],
+			        COUNT(ssr_history[_sys_doc_id])
+			    ),
+			    open_pipeline[trueai_stage] IN { "Early", "Mid", "Late" }
 			)
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _mgmt_rpt_bookings
