@@ -4396,8 +4396,8 @@ table ssr_history
 	/// Format/Type: Unspecified
 	measure 'meas.manager_direct_active_mgr_full_name' =
 			
-			var first_name = CALCULATE(MAX(managers_direct[crm_first_name]))    // get the first name from manager_total table
-			var last_name = CALCULATE(MAX(managers_direct[crm_last_name]))       // get the last name from manager_total table
+			var first_name = BLANK()
+			var last_name = BLANK()
 			RETURN
 			
 			first_name & " " & last_name
@@ -9787,10 +9787,9 @@ table ssr_history
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: \$#,0;(\$#,0);\$#,0
 	measure 'meas.trueai_potential_acv' = CALCULATE(MAX(ssr[trueai_potential_acv]))
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: _opps_detail
 		lineageTag: 851ef328-e369-4246-a130-43aa00d0ed51
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Purpose: Returns the measure value derived from the DAX expression.
 	/// Calculation Logic: Direct expression without VAR/RETURN.
@@ -10921,7 +10920,7 @@ table ssr_history
 			     COUNT(
 			        ssr_history[_sys_doc_id]
 			     ),
-			     ssr_history[step_success] = true
+			     opps[trueai_is_won] = true
 			)
 			
 			RETURN
@@ -11227,10 +11226,15 @@ table ssr_history
 	/// Dynamic Behavior: Respects current filter context; CALCULATE modifies filter context using its filter arguments and responds to filters on ssr_history[_sys_doc_id].
 	/// Format/Type: 0%;-0%;0%
 	measure 'meas.ssr_history_win_rate' =
+			
 			CALCULATE(
-			    DIVIDE([meas.ssr_history_success_count], count(ssr_history[_sys_doc_id]))
+			    DIVIDE(
+			        [meas.ssr_history_success_count],
+			        COUNT(ssr_history[_sys_doc_id])
+			    ),
+			    open_pipeline[trueai_stage] IN { "Early", "Mid", "Late" }
 			)
-		formatString: 0%;-0%;0%
+		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _mgmt_rpt_bookings
 		lineageTag: 6ece012b-d5d8-4957-a271-8359f45eb152
 
@@ -15093,27 +15097,22 @@ table ssr_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	measure 'meas.ssr_funnel_cumulative_from_stage' =
+	measure 'meas.ssr_funnel_stage_progression' =
 			
-			VAR curr_crm_stage =
-			    SELECTEDVALUE(ssr_history[opp_lost_crm_stage])
-			
-			VAR curr_stage_group =
+			VAR CurrentStage =
 			    SELECTEDVALUE(ssr_history[opp_lost_stage])
 			
-			-- map Early/Mid/Late to numeric order
-			VAR curr_stage_rank =
+			VAR CurrentRank =
 			    SWITCH(
-			        curr_stage_group,
+			        CurrentStage,
 			        "Early", 1,
 			        "Mid", 2,
 			        "Late", 3
 			    )
 			
-			-- build full ranking table
 			VAR StageTable =
 			    ADDCOLUMNS(
-			        ALL(ssr_history[opp_lost_crm_stage], ssr_history[opp_lost_stage]),
+			        ALL(ssr_history[opp_lost_stage]),
 			        "StageRank",
 			            SWITCH(
 			                ssr_history[opp_lost_stage],
@@ -15123,57 +15122,26 @@ table ssr_history
 			            )
 			    )
 			
-			-- rank using BOTH: group first, then alphabetical crm stage
-			VAR RankedTable =
-			    ADDCOLUMNS(
-			        StageTable,
-			        "FullRank",
-			            RANKX(
-			                StageTable,
-			                [StageRank] & "|" & ssr_history[opp_lost_crm_stage],
-			                ,
-			                ASC,
-			                DENSE
-			            )
-			    )
-			
-			VAR curr_rank =
-			    MAXX(
-			        FILTER(
-			            RankedTable,
-			            ssr_history[opp_lost_crm_stage] = curr_crm_stage
-			        ),
-			        [FullRank]
-			    )
-			
-			VAR cumulative_lost_from_stage =
+			VAR LostDealsFromStage =
 			    CALCULATE(
 			        DISTINCTCOUNT(ssr_history[entity_opp_id]),
+			        REMOVEFILTERS(ssr_history[opp_lost_stage]),
 			        ssr_history[step_outcome] = "Closed Lost",
 			        FILTER(
-			            RankedTable,
-			            [FullRank] >= curr_rank
+			            StageTable,
+			            [StageRank] >= CurrentRank
 			        )
 			    )
 			
-			VAR won_deals =
+			VAR WonDeals =
 			    CALCULATE(
-			        DISTINCTCOUNT(ssr_history[entity_opp_id]),
-			        REMOVEFILTERS(ssr_history[opp_lost_crm_stage]),
+			        COUNT(opps[trueai_booking_amt]),
 			        REMOVEFILTERS(ssr_history[opp_lost_stage]),
-			        ssr_history[step_name] IN {
-			            "New Logo Selling",
-			            "Existing Customer Selling"
-			        },
-			        ssr_history[step_success] = TRUE()
+			        opps[trueai_is_won] = TRUE()
 			    )
 			
 			RETURN
-			IF(
-			    ISBLANK(curr_rank),
-			    BLANK(),
-			    COALESCE(cumulative_lost_from_stage, 0) + COALESCE(won_deals, 0)
-			)
+			WonDeals + LostDealsFromStage
 		formatString: 0
 		lineageTag: b48fc77e-83a1-4bb6-97fd-44868bb2df64
 
@@ -15223,9 +15191,17 @@ table ssr_history
 			var res = val_delivered
 			return res 
 			```
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 1a866b56-aa63-4e6c-a6ac-b3d0e50b8ea9
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
+	measure 'meas.ssr_history_unique_reps_count_prospecting' =
+			CALCULATE(
+			    DISTINCTCOUNT(ssr_history[step_owner_id]),
+			    ssr_history[step_name] = "Prospecting"
+			)
+		formatString: 0
+		displayFolder: _rep_analysis
+		lineageTag: 4e7e9c66-3f39-4bff-8904-fdf3c994f6c1
 
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
