@@ -9304,8 +9304,7 @@ table ssr_history
 			            ssr[trueai_first_touch] < end_date &&
 			            datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) >= 0 &&
 			            datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) <= 21
-			        ),
-			        users[trueai_user_role_department] = "mkt"
+			        )
 			    )
 			
 			return
@@ -14414,17 +14413,25 @@ table ssr_history
 	/// Format/Type: Unspecified
 	measure 'meas.ssr_history_success_count_mkt_prospecting_inbound' =
 			
-			var res =
-			    calculate(
-			        distinctcount(ssr_history[_sys_ssr_id]),
-			        ssr_history[step_name] = "New Logo Selling",
-			        ssr_history[step_success] = true,
-			        ssr[trueai_leadsource_is_inbound] = true,
-			        users[trueai_user_role_department] = "mkt"
+			VAR MKT_Leads =
+			    CALCULATETABLE(
+			        VALUES(ssr_history[_sys_ssr_id]),
+			        users[trueai_user_role_department] = "MKT",
+			        ssr[trueai_leadsource_is_inbound] = TRUE(),
+			        ssr_history[step_name] = "Lead Gen"
 			    )
 			
-			return
-			    coalesce(res, 0)
+			VAR res =
+			    CALCULATE(
+			        DISTINCTCOUNT(ssr_history[_sys_ssr_id]),
+			        TREATAS(MKT_Leads, ssr_history[_sys_ssr_id]),
+			        ssr_history[step_success] = TRUE(),
+			        ssr_history[step_name] = "New Logo Selling",
+			        REMOVEFILTERS(users[trueai_user_role_department])
+			    )
+			
+			RETURN
+			COALESCE(res, 0)
 		displayFolder: _lead_analysis
 		lineageTag: d737c4ab-36bf-4374-83ce-1c4b04b767a6
 
