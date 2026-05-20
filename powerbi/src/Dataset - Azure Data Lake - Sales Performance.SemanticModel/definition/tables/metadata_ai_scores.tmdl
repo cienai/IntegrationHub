@@ -57,19 +57,18 @@ table metadata_ai_scores
 	/// Format/Type: Unspecified
 	measure 'meas.ai_scores_booking_calibration' =
 			
-			VAR factor1 = [meas.ai_scores_booking_calibration_factor1_value]
-			VAR factor2 = [meas.ai_scores_booking_calibration_factor2_value]
-			VAR score_raw =
-			    DIVIDE(
-			        factor1 - ABS(factor1 - factor2),
-			        factor1,
-			        0
+			VAR _score =
+			    IFERROR(
+			        VALUE(
+			            MAX(companies_history[booking_calibration_score])
+			        ),
+			        BLANK()
 			    )
+			
 			RETURN
-			IF(
-			    ISBLANK(factor1) || factor1 <= 0,
-			    BLANK(),     -- prevents divide-by-zero/undefined
-			    MIN(1, MAX(0, score_raw))
+			MIN(
+			    MAX(_score, 0),
+			    1
 			)
 		displayFolder: _ai_scores
 		lineageTag: fe57f762-597f-4e7c-9903-2ed634cc1ca7
@@ -513,42 +512,19 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_rep_org_calibration' =
 			
-			VAR factor1 = [meas.ai_scores_rep_org_calibration_factor1_value]
-			VAR factor2 = [meas.ai_scores_rep_org_calibration_factor2_value]
-			VAR factor3 = [meas.ai_scores_rep_org_calibration_factor3_value]
-			
-			-- weight to apply
-			VAR w = 2
-			
-			-- Build a table with named columns, then remove blanks
-			VAR temp_tbl =
-			    FILTER (
-			        SELECTCOLUMNS (
-			            {
-			                (factor1, w),
-			                (factor2, w),
-			                (factor3, w)
-			            },
-			            "Value", [Value1],
-			            "Weight", [Value2]
-			        ),
-			        NOT ISBLANK ( [Value] )
+			VAR _score =
+			    VALUE(
+			        MAX(companies_history[rep_org_calibration_score])
 			    )
 			
-			-- Weighted score calculation
-			VAR _adj = SUMX ( temp_tbl, [Value] * [Weight] )
-			VAR _wt = SUMX ( temp_tbl, [Weight] )
-			VAR raw_score = DIVIDE ( _adj, _wt )
-			
-			-- Clamp score between 0 and 1
-			VAR safe = MIN ( MAX ( raw_score, 0 ), 1 )
-			
-			RETURN safe
+			RETURN
+			MIN(
+			    MAX(_score, 0),
+			    1
+			)
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 65e27ada-7d1f-40df-8bd5-50a4fa39c4d5
-
-		annotation PBI_FormatHint = {"isDecimal":true}
 
 	/// Measure meas.ai_scores_revenue_calibration.
 	/// Purpose: Returns the measure value from its DAX expression.
@@ -557,17 +533,19 @@ table metadata_ai_scores
 	/// Format/Type: 0
 	measure 'meas.ai_scores_revenue_calibration' =
 			
-			
-			var factor1 = [meas.ai_scores_revenue_calibration_factor1_value]
-			VAR factor2 = [meas.ai_scores_revenue_calibration_factor2_value]
-			var score = (factor1 - ABS(factor1 - factor2))/factor1
-			
-			var res = IF(
-			    factor1=BLANK() || factor1=0, 0, score
-			)
+			VAR _score =
+			    IFERROR(
+			        VALUE(
+			            MAX(companies_history[revenue_calibration_score])
+			        ),
+			        BLANK()
+			    )
 			
 			RETURN
-			res
+			MIN(
+			    MAX(_score, 0),
+			    1
+			)
 		formatString: 0
 		displayFolder: _ai_scores
 		lineageTag: 8a9703ba-19d0-4204-b805-7268fdae0e11
