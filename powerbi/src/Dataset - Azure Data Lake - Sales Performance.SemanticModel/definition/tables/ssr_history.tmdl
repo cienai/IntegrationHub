@@ -9304,8 +9304,7 @@ table ssr_history
 			            ssr[trueai_first_touch] < end_date &&
 			            datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) >= 0 &&
 			            datediff(ssr[trueai_added_on], ssr[trueai_first_touch], day) <= 21
-			        ),
-			        users[trueai_user_role_department] = "mkt"
+			        )
 			    )
 			
 			return
@@ -9457,14 +9456,23 @@ table ssr_history
 	/// Format/Type: Unspecified
 	measure 'meas.owner_full_name' =
 			
-			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
-			var res = CALCULATE(
-			    Max(users[trueai_full_name]),
-			    ssr_history[step_sequence] = _max_step_id           // get the most recent reps name
-			)
+			VAR _max_step_id =
+			    CALCULATE(
+			        MAX(ssr_history[step_sequence])
+			    )
+			
+			VAR _owner_id =
+			    CALCULATE(
+			        MAX(ssr_history[step_owner_id]),   -- replace with actual column
+			        ssr_history[step_sequence] = _max_step_id
+			    )
 			
 			RETURN
-			res
+			LOOKUPVALUE(
+			    users[trueai_full_name],
+			    users[_sys_doc_id],
+			    _owner_id
+			)
 		displayFolder: _opps_detail
 		lineageTag: 63ac0d34-90a8-4bd6-813d-bd601884a6bc
 
@@ -9484,16 +9492,26 @@ table ssr_history
 	/// Format/Type: Unspecified
 	measure 'meas.step_owner_group' =
 			
-			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
-			var res = CALCULATE(
-			    Max(users[trueai_group]),
-			    ssr_history[step_sequence] = _max_step_id           // get the most recent reps role
-			)
+			VAR _latest_row =
+			    TOPN(
+			        1,
+			        ssr_history,
+			        ssr_history[step_sequence], DESC
+			    )
+			
+			VAR _owner_id =
+			    MAXX(_latest_row, ssr_history[step_owner_id])
 			
 			RETURN
-			res
+			LOOKUPVALUE(
+			    users[trueai_group],
+			    users[_sys_doc_id],
+			    _owner_id
+			)
 		displayFolder: _opps_detail
 		lineageTag: dfb34cff-0710-4c51-b257-c20e6ac9048a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Purpose: Returns a maximum value derived from ssr_history[step_sequence].
 	/// Calculation Logic: Uses CALCULATE, MAX, RETURN.
@@ -9501,22 +9519,32 @@ table ssr_history
 	/// Format/Type: Unspecified
 	measure 'meas.step_owner_user_role_aliased' =
 			
-			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
-			var res = CALCULATE(
-			    Max(users[trueai_user_role_alias]),
-			    ssr_history[step_sequence] = _max_step_id           // get the most recent reps role
-			)
+			VAR _latest_row =
+			    TOPN(
+			        1,
+			        ssr_history,
+			        ssr_history[step_sequence], DESC
+			    )
+			
+			VAR _owner_id =
+			    MAXX(_latest_row, ssr_history[step_owner_id])
 			
 			RETURN
-			res
+			LOOKUPVALUE(
+			    users[trueai_user_role_alias],
+			    users[_sys_doc_id],
+			    _owner_id
+			)
 		displayFolder: _opps_detail
 		lineageTag: f533f6fb-f353-4ef8-b03f-e5b8e1d6ea24
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Purpose: Returns the measure value derived from the DAX expression.
 	/// Calculation Logic: Direct expression without VAR/RETURN.
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: 0
-	measure 'meas.step_users_total' = SUM(ssr_history[step_users_tot])
+	measure 'meas.step_users_total' = DISTINCTCOUNT(ssr_history[step_owner_id])
 		formatString: 0
 		displayFolder: _opps_detail
 		lineageTag: 999d089b-e8ce-4948-bf65-476b47968236
@@ -9534,7 +9562,7 @@ table ssr_history
 	/// Calculation Logic: Direct expression without VAR/RETURN.
 	/// Dynamic Behavior: Respects current filter context.
 	/// Format/Type: mm/dd/yyyy
-	measure 'meas.stkhlds_all_first_act' = MAX(ssr_history[stkhlds_all_first_act])
+	measure 'meas.stkhlds_all_first_act' = MIN(ssr_history[stkhlds_all_first_act])
 		formatString: mm/dd/yyyy
 		displayFolder: _opps_detail
 		lineageTag: 962713b9-cb6e-418b-ad06-e4acd19e2668
@@ -14385,17 +14413,25 @@ table ssr_history
 	/// Format/Type: Unspecified
 	measure 'meas.ssr_history_success_count_mkt_prospecting_inbound' =
 			
-			var res =
-			    calculate(
-			        distinctcount(ssr_history[_sys_ssr_id]),
-			        ssr_history[step_name] = "New Logo Selling",
-			        ssr_history[step_success] = true,
-			        ssr[trueai_leadsource_is_inbound] = true,
-			        users[trueai_user_role_department] = "mkt"
+			VAR MKT_Leads =
+			    CALCULATETABLE(
+			        VALUES(ssr_history[_sys_ssr_id]),
+			        users[trueai_user_role_department] = "MKT",
+			        ssr[trueai_leadsource_is_inbound] = TRUE(),
+			        ssr_history[step_name] = "Lead Gen"
 			    )
 			
-			return
-			    coalesce(res, 0)
+			VAR res =
+			    CALCULATE(
+			        DISTINCTCOUNT(ssr_history[_sys_ssr_id]),
+			        TREATAS(MKT_Leads, ssr_history[_sys_ssr_id]),
+			        ssr_history[step_success] = TRUE(),
+			        ssr_history[step_name] = "New Logo Selling",
+			        REMOVEFILTERS(users[trueai_user_role_department])
+			    )
+			
+			RETURN
+			COALESCE(res, 0)
 		displayFolder: _lead_analysis
 		lineageTag: d737c4ab-36bf-4374-83ce-1c4b04b767a6
 
@@ -15202,6 +15238,65 @@ table ssr_history
 		formatString: 0
 		displayFolder: _rep_analysis
 		lineageTag: 4e7e9c66-3f39-4bff-8904-fdf3c994f6c1
+
+	measure 'meas.most_involved_rep' =
+			
+			VAR LatestStepSequence =
+			    CALCULATE(
+			        MAX(ssr_history[step_sequence])
+			    )
+			
+			VAR LatestOwnerID =
+			    CALCULATE(
+			        MAX(ssr_history[step_owner_id]),
+			        FILTER(
+			            ssr_history,
+			            ssr_history[step_sequence] = LatestStepSequence
+			        )
+			    )
+			
+			VAR RepCounts =
+			    ADDCOLUMNS(
+			        VALUES(ssr_history[step_owner_id]),
+			        "StepCount",
+			            CALCULATE(COUNTROWS(ssr_history))
+			    )
+			
+			VAR MaxCount =
+			    MAXX(RepCounts, [StepCount])
+			
+			VAR TopReps =
+			    FILTER(
+			        RepCounts,
+			        [StepCount] = MaxCount
+			    )
+			
+			VAR NumTopReps =
+			    COUNTROWS(TopReps)
+			
+			VAR FinalRepID =
+			    IF(
+			        NumTopReps = 1,
+			        MAXX(TopReps, ssr_history[step_owner_id]),
+			        IF(
+			            CONTAINS(
+			                TopReps,
+			                ssr_history[step_owner_id], LatestOwnerID
+			            ),
+			            LatestOwnerID,
+			            MAXX(TopReps, ssr_history[step_owner_id])
+			        )
+			    )
+			
+			RETURN
+			LOOKUPVALUE(
+			    users[trueai_full_name],
+			    users[_sys_doc_id],
+			    FinalRepID
+			)
+		lineageTag: 82a1bc9b-043a-4b62-8183-71355059d916
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id

@@ -4461,9 +4461,11 @@ table metadata_heatmap_items
 			)
 			
 			RETURN
-			res
+			IF(SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])="6" && [meas.stakeholder_num_flag]=False, "False",res)
 		displayFolder: _record_counts
 		lineageTag: 0ac0e6d9-d2e3-4330-9efb-43a42e4c5af9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.heatmap_kpi1_min_record_count.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi1_min_count].
@@ -5870,6 +5872,24 @@ table metadata_heatmap_items
 			```
 		displayFolder: _heatmap_details
 		lineageTag: 3f964261-276e-4f11-89e2-1e15ddb0a58a
+
+	measure 'meas.stakeholder_num_flag' =
+			
+			
+			var stakeholder_info = CALCULATE(
+			    COUNTROWS(ssr_history),
+			    ssr_history[stkhlds_all_contacts_count]>0
+			)
+			
+			var total_rows =COUNTROWS(ssr_history)
+			
+			var percentage=stakeholder_info/total_rows
+			
+			RETURN
+			IF(percentage>0.30, True, False)
+		lineageTag: 7fb568b1-55dc-41f0-a5ee-222f4411c1f5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Unique heatmap item identifier
 	column _sys_doc_id
