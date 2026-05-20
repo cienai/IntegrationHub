@@ -15241,33 +15241,58 @@ table ssr_history
 
 	measure 'meas.most_involved_rep' =
 			
+			VAR LatestStepSequence =
+			    CALCULATE(
+			        MAX(ssr_history[step_sequence])
+			    )
+			
+			VAR LatestOwnerID =
+			    CALCULATE(
+			        MAX(ssr_history[step_owner_id]),
+			        FILTER(
+			            ssr_history,
+			            ssr_history[step_sequence] = LatestStepSequence
+			        )
+			    )
+			
 			VAR RepCounts =
 			    ADDCOLUMNS(
 			        VALUES(ssr_history[step_owner_id]),
 			        "StepCount",
-			            CALCULATE(
-			                COUNTROWS(ssr_history)
-			            )
+			            CALCULATE(COUNTROWS(ssr_history))
 			    )
 			
-			VAR TopRep =
-			    TOPN(
-			        1,
+			VAR MaxCount =
+			    MAXX(RepCounts, [StepCount])
+			
+			VAR TopReps =
+			    FILTER(
 			        RepCounts,
-			        [StepCount], DESC
+			        [StepCount] = MaxCount
 			    )
 			
-			VAR RepID =
-			    MAXX(
-			        TopRep,
-			        ssr_history[step_owner_id]
+			VAR NumTopReps =
+			    COUNTROWS(TopReps)
+			
+			VAR FinalRepID =
+			    IF(
+			        NumTopReps = 1,
+			        MAXX(TopReps, ssr_history[step_owner_id]),
+			        IF(
+			            CONTAINS(
+			                TopReps,
+			                ssr_history[step_owner_id], LatestOwnerID
+			            ),
+			            LatestOwnerID,
+			            MAXX(TopReps, ssr_history[step_owner_id])
+			        )
 			    )
 			
 			RETURN
 			LOOKUPVALUE(
 			    users[trueai_full_name],
 			    users[_sys_doc_id],
-			    RepID
+			    FinalRepID
 			)
 		lineageTag: 82a1bc9b-043a-4b62-8183-71355059d916
 
