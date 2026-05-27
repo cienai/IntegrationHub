@@ -13228,11 +13228,19 @@ table ssr_history
 
 	/// Description: Calculates loss-reason population coverage for closed-lost opportunities.
 	measure 'meas.loss_reason_population_coverage_pct_new' =
-			VAR factor1 = [meas.loss_reason_lost_opps_with_reason]
-			VAR factor2 = [meas.opps_deals_lost_count]
 			
-			VAR res =  MIN(DIVIDE ( factor1, factor2, 0 ) ,1)
-			RETURN res*100
+			VAR factor1 =
+			    COALESCE ( [meas.loss_reason_lost_opps_with_reason], 0 )
+			
+			VAR factor2 =
+			    COALESCE ( [meas.opps_deals_lost_count], 0 )
+			
+			RETURN
+			IF (
+			    factor1 = 0 && factor2 = 0,
+			    BLANK (),
+			    MIN ( DIVIDE ( factor1, factor2, 0 ), 1 ) * 100
+			)
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: all_activity_opp
 		lineageTag: 7f2d621f-6f24-44c9-bfe2-d85d7ea6a7ff
