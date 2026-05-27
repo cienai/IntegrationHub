@@ -2,55 +2,6 @@
 table metadata_heatmap_items
 	lineageTag: 00dab9dc-0c89-4db4-8a5a-7354e75406d2
 
-	/// Measure meas.ai_score_kpi1.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_ai_score_name].
-	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, IF.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_ai_score_name].
-	/// Format/Type: Unspecified
-	measure 'meas.ai_score_kpi1' = ```
-			
-			    
-			    VAR _name   = MAX(metadata_heatmap_items[heatmap_kpi1_ai_score_name])
-			    VAR _score  = [meas.kpi1_ai_score_trust_value]
-			    VAR _bucket = [meas.KPI1_AI_score_bucket]
-			    
-			    VAR res =
-			        IF(
-			            ISBLANK(_name),
-			            "--",
-			            FORMAT(_score, "0") & " - " & _bucket
-			        )
-			    
-			    RETURN
-			    res
-			```
-		displayFolder: heatmap_kpis
-		lineageTag: 3b88c8ca-43e4-40ba-8362-3348a24d070e
-
-	/// Measure meas.ai_score_kpi2.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_ai_score_name].
-	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, IF.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_ai_score_name].
-	/// Format/Type: Unspecified
-	measure 'meas.ai_score_kpi2' = ```
-			
-			 VAR _name   = MAX(metadata_heatmap_items[heatmap_kpi2_ai_score_name])
-			    VAR _score  = [meas.kpi2_ai_score_trust_value]
-			    VAR _bucket = [meas.KPI2_AI_score_bucket]
-			    
-			    VAR res =
-			        IF(
-			            ISBLANK(_name),
-			            "--",
-			            FORMAT(_score, "0") & " - " & _bucket
-			        )
-			    
-			    RETURN
-			    res
-			```
-		displayFolder: heatmap_kpis
-		lineageTag: afcfa086-1bb4-48c3-b064-9bd05417b189
-
 	/// Measure meas.calc_hyp1_kpi1_denominator.
 	/// Purpose: Returns a value derived from ssr_history[step_name].
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATE.
@@ -1503,96 +1454,6 @@ table metadata_heatmap_items
 		displayFolder: heatmap_kpis
 		lineageTag: 5ff90036-d407-4de3-b5e4-39f54e4104cd
 
-	/// Measure meas.check_kpi1_kpi2_weight.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.check_kpi1_kpi2_weight' =
-			
-			var _kpi1 = [meas.getKPI1Weight]
-			var _kpi2 = [meas.getKPI2Weight]
-			var res = IF(
-			    _kpi1+_kpi2 = 1.00,
-			    "ok",
-			    "error"
-			)
-			
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: b82cee2a-7f09-480f-9db9-da6a1fac29ad
-
-	/// Measure meas.getHeatmapConditionalColor.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: 0
-	measure 'meas.getHeatmapConditionalColor' = ```
-			
-			var _ai_score = [meas.getHeatmapKPI_AIScore]        // get the validated and not validated
-			var _heatmapScore = [meas.getHeatmapScore]          // get the heatmap score
-			var res = IF(
-			                _ai_score = "Limited",
-			                1,
-			                IF(
-			                    _ai_score in {"Fair","Good", "Great", "Excellent"} && _heatmapScore >=0 && _heatmapScore < 30, 2,
-			                    IF(
-			                         _ai_score in {"Fair","Good", "Great", "Excellent"} && _heatmapScore >=30 && _heatmapScore < 45, 3,
-			                        IF(
-			                             _ai_score in {"Fair","Good", "Great", "Excellent"} && _heatmapScore >=45 && _heatmapScore < 50, 4,
-			                            IF(
-			                                 _ai_score in {"Fair","Good", "Great", "Excellent"}&& _heatmapScore >=50 && _heatmapScore < 65, 5,
-			                                IF(
-			                                     _ai_score in {"Fair","Good", "Great", "Excellent"} && _heatmapScore >=65 && _heatmapScore < 80, 6,
-			                                    IF(
-			                                         _ai_score in {"Fair","Good", "Great", "Excellent"} && _heatmapScore >=80 && _heatmapScore <= 100, 7
-			                                    )
-			                                )
-			                            )
-			                        )
-			                    )
-			                )
-			)
-			
-			RETURN
-			res
-			
-			```
-		formatString: 0
-		displayFolder: heatmap_kpis
-		lineageTag: ac5452d6-99a7-4005-9ef0-0e28aa4df057
-
-	/// Measure meas.getHeatmapConditionalColor_new.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, SWITCH.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: 0
-	measure 'meas.getHeatmapConditionalColor_new' = ```
-			
-			// var _ai_score = [meas.getHeatmapKPI_AIScore]        // get the validated and not validated
-			var _heatmapScore = [meas.heatmap_details_score_new]          // get the heatmap score
-			var res = SWITCH(
-			    TRUE(),
-			    _heatmapScore="ND",1,
-			    _heatmapScore="N/A",2,
-			    _heatmapScore >=0 && _heatmapScore < 30,3,
-			    _heatmapScore >=30 && _heatmapScore < 45,4,
-			    _heatmapScore >=45 && _heatmapScore < 50,5,
-			    _heatmapScore >=50 && _heatmapScore < 65,6,
-			    _heatmapScore >=65 && _heatmapScore < 80,7,
-			    _heatmapScore >=80 && _heatmapScore <= 100,8
-			)
-			
-			RETURN
-			res
-			
-			```
-		formatString: 0
-		displayFolder: heatmap_kpis
-		lineageTag: beaacaea-29c3-43ad-bfca-8228a3d91f8c
-
 	/// Measure meas.getHeatmapKPI_AIScore.
 	/// Purpose: Returns the measure value from its DAX expression.
 	/// Calculation Logic: Uses VAR/RETURN, SWITCH, IF, ROUND.
@@ -1629,66 +1490,6 @@ table metadata_heatmap_items
 		formatString: 0.00
 		displayFolder: heatmap_kpis
 		lineageTag: c5d815dd-024f-4300-b354-bfb72811632a
-
-	/// Measure meas.getHeatmapKPI1_formula_used.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_whats_better].
-	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, SWITCH, ABS.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_whats_better].
-	/// Format/Type: Unspecified
-	measure 'meas.getHeatmapKPI1_formula_used' =
-			
-			
-			var _better = MAX(metadata_heatmap_items[heatmap_kpi1_whats_better])           // get ghe what's better
-			var _kpi = FORMAT([meas.getKPI1],"0.00")                   // get the KPI1
-			var _sd = [meas.trueai_kpi1_sd]             // standard deviation
-			var _ref_value = [meas.trueai_kpi1_ref_value]       // reference value
-			var _min = [meas.trueai_kpi1_min]                   // get the kpi min value
-			var _max = [meas.trueai_kpi1_max]                   // get the Max value
-			var _kpi_score = [meas.getKPI1_score]                // get the KPI Score
-			
-			var txt = "Normalizing this value and multiplying by 100 gives us the KPI 1 Score: "
-			
-			var _higher =txt & "(KPI 1 Value "& _kpi &" – Min Value "& _min & " ) /  (Max Value " & _max & " - Min Value "& _min &") * 100 =KPI 1 Score" & _kpi_score
-			var _lower = txt & "(KPI 1 Value "&_kpi & " -" & "Max Value "& _max & " ) / (Min Value " & _min & " - Max Value "& _max & ") * 100 =KPI 1 Score"& _kpi_score
-			var _center = txt &"1/(1+ABS(KPI  1 Value "& _kpi &" - Reference Value"& _ref_value &")/Standard Deviation"& _sd &") * 100 = KPI 1 Score "&_kpi_score
-			
-			var res = SWITCH(
-			    _better,
-			    "Higher", _higher,
-			    "Lower", _lower,
-			    "Center", _center
-			)
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: 8f1c15a2-ad3f-4746-a959-8c3b429b688c
-
-	/// Measure meas.getHeatmapKPI2_formula_used.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_whats_better].
-	/// Calculation Logic: Uses VAR/RETURN, MAX, SWITCH, ABS.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_whats_better].
-	/// Format/Type: Unspecified
-	measure 'meas.getHeatmapKPI2_formula_used' =
-			
-			
-			var _better = MAX(metadata_heatmap_items[heatmap_kpi2_whats_better])           // get ghe what's better
-			var txt = "Normalizing this value and multiplying by 100 gives us the score: "
-			var _higher =txt & "(KPI – Min) /  (Max-Min) * 100 = Score"
-			var _lower = txt & "(KPI1 - Max) / (Min - Max) * 100 = Score"
-			var _center = txt &"1 / ( 1 + ABS(KPI - Reference)/Standard Deviation) * 100 = Score"
-			
-			var res = SWITCH(
-			    _better,
-			    "Higher", _higher,
-			    "Lower", _lower,
-			    "Center", _center
-			)
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: 1d1dc947-d1c0-400f-86a8-0429ae6ab4df
 
 	/// Measure meas.getHeatmapRawScore.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_weight].
@@ -1745,30 +1546,6 @@ table metadata_heatmap_items
 		lineageTag: 32d061c2-e221-4e48-b5fb-9df0c7b9dea0
 
 		annotation PBI_FormatHint = {"isDecimal":true}
-
-	/// Measure meas.getKP2_Score_chng.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, DIVIDE.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.getKP2_Score_chng' = ```
-			
-			
-			var cy_kpi2 = [meas.getKPI2_score_cy]          // get the current year KPI1
-			var sply_kpi2 = [meas.getKPI2_score_sply]          // get the previous year KPI1
-			
-			var res = DIVIDE(
-			    (cy_kpi2 - sply_kpi2),
-			    sply_kpi2                     // get the improvemnet compared to cy 
-			)
-			
-			RETURN
-			res
-			```
-		displayFolder: heatmap_kpis
-		lineageTag: 391739a4-9509-45be-8f03-0de6addbdffd
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.getKPI1.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id].
@@ -1832,30 +1609,6 @@ table metadata_heatmap_items
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.getKPI1_Score_change_pct.
-	/// Purpose: Returns a value derived from cal_end_dates[Date].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, DIVIDE, YEAR.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date].
-	/// Format/Type: Unspecified
-	measure 'meas.getKPI1_Score_change_pct' = ```
-			
-			
-			var cy = [meas.getKPI1_score]            // get the integer KPI 1 score
-			var _sply  = CALCULATE(
-			    [meas.getKPI1_score],              // get the existing measure forKPI 1 score            // get the KPI 1 score same period last year
-			    SAMEPERIODLASTYEAR(cal_end_dates[Date])           
-			)
-			var res = DIVIDE((cy - _sply), _sply)           // get the ratio
-			
-			
-			RETURN
-			res
-			```
-		displayFolder: heatmap_kpis
-		lineageTag: 2ba7d4a8-2640-4a50-b2da-d2d2369e505d
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	/// Measure meas.getKPI1_score_cy.
 	/// Purpose: Returns a value derived from cal_end_dates[Date].
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, DATE, YEAR, MONTH.
@@ -1882,31 +1635,6 @@ table metadata_heatmap_items
 		formatString: 0
 		displayFolder: heatmap_kpis
 		lineageTag: a06892ee-f6a3-48ce-94ad-82a5e03b8545
-
-		annotation PBI_FormatHint = {"isDecimal":true}
-
-	/// Measure meas.getKPI1_score_cy_5q.
-	/// Purpose: Returns a value derived from cal_end_dates[Date].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, DATE, EDATE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date].
-	/// Format/Type: 0
-	measure 'meas.getKPI1_score_cy_5q' =
-			
-			
-			VAR _max_date = [meas.context_date_max] // Get the max date in the dataset
-			var _min_date = EDATE([meas.context_date_min],-3)           // get the 3 months back from the context min date
-			
-			var res = CALCULATE(
-			    [meas.getKPI1_score_cy],
-			    cal_end_dates[Date] >= _min_date && cal_end_dates[Date] <= _max_date
-			)
-			
-			
-			RETURN
-			res
-		formatString: 0
-		displayFolder: heatmap_kpis
-		lineageTag: a15d1bdd-6026-4e65-b838-ead839d1798e
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
@@ -2225,29 +1953,6 @@ table metadata_heatmap_items
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.getKPI2_Score_change_pct.
-	/// Purpose: Returns a value derived from cal_end_dates[Date].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, DIVIDE, YEAR.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date].
-	/// Format/Type: Unspecified
-	measure 'meas.getKPI2_Score_change_pct' = ```
-			
-			var cy = [meas.getKPI2_score]            // get the integer KPI 2 score
-			var _sply  = CALCULATE(
-			    [meas.getKPI2_score],              // get the existing measure forKPI 2 score            // get the KPI 2 score same period last year
-			    SAMEPERIODLASTYEAR(cal_end_dates[Date])           
-			)
-			var res = DIVIDE((cy - _sply), _sply)           // get the ratio
-			
-			
-			RETURN
-			res
-			```
-		displayFolder: heatmap_kpis
-		lineageTag: c07674bd-6dfa-4ade-a107-6543968acf32
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	/// Measure meas.getKPI2_score_cy.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_def_short] and cal_end_dates[Date].
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, IF, DATE.
@@ -2284,30 +1989,6 @@ table metadata_heatmap_items
 		lineageTag: 0fb54a2f-621d-4280-bd05-3b6e8cc47070
 
 		annotation PBI_FormatHint = {"isDecimal":true}
-
-	/// Measure meas.getKPI2_score_cy_5q.
-	/// Purpose: Returns a value derived from cal_end_dates[Date].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, DATE, EDATE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date].
-	/// Format/Type: Unspecified
-	measure 'meas.getKPI2_score_cy_5q' =
-			
-			
-			VAR _max_date = [meas.context_date_max] // Get the max date in the dataset
-			var _min_date = EDATE([meas.context_date_min],-3)
-			
-			var res = CALCULATE(
-			    [meas.getKPI2_score_cy],
-			    cal_end_dates[Date] >= _min_date && cal_end_dates[Date] <= _max_date
-			)
-			
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: 40e03981-6b77-412e-9aac-a187087fac4c
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.getKPI2_score_delta.
 	/// Purpose: Returns the measure value from its DAX expression.
@@ -2557,51 +2238,6 @@ table metadata_heatmap_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.heatmap_booking_growth_rate.
-	/// Purpose: Returns a value derived from cal_end_dates[Date] and ssr_history[step_name].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, CALCULATE, SUMX, MAX.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date], ssr_history[step_name].
-	/// Format/Type: 0%;-0%;0%
-	measure 'meas.heatmap_booking_growth_rate' = ```
-			
-			
-			-- get the dates
-			var curr_date = CALCULATE(MAX(cal_end_dates[Date])) // get the mgmt current end date
-			var end_date = curr_date
-			var end_date_sply = date(Year(end_date) -1,Month(end_date),day(end_date)) // get the yoy end date
-			var start_year = Year(curr_date) 
-			var start_qtr_month = (Quarter(curr_date) * 3) - 2  
-			var start_month = Month(curr_date)
-			var start_date_ytd = date(start_year,1,1)  
-			var start_date_ytd_sply = date(start_year-1,1,1)  
-			var start_date_qtd = date(start_year,start_qtr_month ,1)  
-			var start_date_qtd_sply = date(start_year -1,start_qtr_month,1)  
-			var start_date_mtd = date(start_year,start_month,1)  
-			var start_date_mtd_sply = date(start_year -1,start_month,1)  
-			
-			-- get data for overridden date periods but still contextual for current year
-			var dates_tbl_cur =  CALCULATETABLE(ssr_history , cal_end_dates[Date] >=  start_date_ytd &&  cal_end_dates[Date] <= end_date)
-			var cur_tbl = FILTER(
-			    dates_tbl_cur,
-			    ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"} && ssr_history[step_success]=True
-			)
-			var res_cur = SUMX(cur_tbl, ssr_history[opp_won_amt]) + 0
-			
-			-- get data for overridden date periods but still contextual for current year
-			var dates_tbl_sply =  CALCULATETABLE(ssr_history , cal_end_dates[Date] >=  start_date_ytd_sply &&  cal_end_dates[Date] <= end_date_sply)
-			var sply_tbl = FILTER(
-			    dates_tbl_sply,
-			    ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"} && ssr_history[step_success]=True
-			)
-			var res_sply = SUMX(sply_tbl, ssr_history[opp_won_amt]) + 0
-			var res = DIVIDE((res_cur-res_sply),res_sply,0)
-			return 
-			res
-			```
-		formatString: 0%;-0%;0%
-		displayFolder: heatmap_kpis
-		lineageTag: 192bf663-1795-4b03-9ced-03ed2f8f2db8
-
 	/// Measure meas.heatmap_rounded_score.
 	/// Purpose: Returns the measure value from its DAX expression.
 	/// Calculation Logic: Uses VAR/RETURN, MAX, ROUND.
@@ -2618,214 +2254,6 @@ table metadata_heatmap_items
 		lineageTag: ec026e3f-2bd0-461d-a9c7-ea838cbd882c
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.heatmap_trust_data_pi.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_trust_data_pi' = ```
-			
-			// KPI1 Model Score + KPI2 AI Model Score / 2
-			
-			var _kpi1 = [meas.kpi1_ai_score_trust_value]           // get AI score for kpi1
-			var _kpi2 = [meas.kpi2_ai_score_trust_value]           // get AI score for kpi2
-			
-			var res = IF(
-			    _kpi2=BLANK(), 
-			     "(" & _kpi1  & ") / 1 = "& FORMAT((_kpi1 + _kpi2)/1,"0"), 
-			    "(" & _kpi1 & " + " & _kpi2 & ") / 2 = "& FORMAT((_kpi1 + _kpi2)/2,"0")
-			)
-			
-			RETURN
-			res
-			```
-		displayFolder: heatmap_kpis
-		lineageTag: f5eae470-d0e5-43cf-8357-e08d13a73fa1
-
-	/// Measure meas.how_kpi1_calculated.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, FORMAT.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.how_kpi1_calculated' =
-			
-			var _nominator = [meas.getKPI1Nominator]            // get nominator
-			var _denominator = [meas.getKPI1Denominator]            // get denominator
-			
-			var _nom_def = [meas.heatmap_details_kpi1_nominator_def]            // get the nominator definition
-			var _denom_def = [meas.heatmap_details_kpi1_denominator_def]        // denominator definition
-			
-			var _kpi = FORMAT([meas.getKPI1],"0.00")                   // get the KPI
-			
-			//"[nominator value] nominator def / {denominator value] denominator def = [result]"
-			var res = _nominator & " " & _nom_def & " / " & _denominator & " " & _denom_def &" = " & _kpi
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: fc92f66a-02e9-4c72-a0fa-a8ce03c657c9
-
-	/// Measure meas.how_kpi1_component_considered.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_weight].
-	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_weight].
-	/// Format/Type: Unspecified
-	measure 'meas.how_kpi1_component_considered' =
-			
-			
-			var _weight =MAX(metadata_heatmap_items[heatmap_kpi1_weight])          // get ghe weight
-			
-			var res = "This component is weighted at "&  FORMAT(_weight, "0%") &" of the total score"
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: c51f000c-47cc-4615-9a69-e9727b13e8f5
-
-	/// Measure meas.how_kpi1_score_calculation.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_whats_better].
-	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, SWITCH, ABS.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_whats_better].
-	/// Format/Type: Unspecified
-	measure 'meas.how_kpi1_score_calculation' =
-			
-			
-			var _better = MAX(metadata_heatmap_items[heatmap_kpi1_whats_better])           // get ghe what's better
-			var _kpi = FORMAT([meas.getKPI1],"0.00")                   // get the KPI1
-			var _sd = FORMAT([meas.trueai_kpi1_sd],"0.00")             // standard deviation
-			var _ref_value = FORMAT([meas.trueai_kpi1_ref_value],"0.00")       // reference value
-			var _min = FORMAT([meas.trueai_kpi1_min],"0.00")                 // get the kpi min value
-			var _max = FORMAT([meas.trueai_kpi1_max],"0.00")                   // get the Max value
-			var _kpi_score = FORMAT([meas.getKPI1_score],"0.00")                // get the KPI Score
-			
-			
-			var _higher ="("&_kpi &" – "& _min & " ) /  (" & _max & " -  "& _min &") * 100 = " & _kpi_score
-			var _lower = "("&_kpi & " -" & ""& _max & " ) / ( " & _min & " - "& _max & ") * 100 = "& _kpi_score
-			var _center = "1/(1+ABS("& _kpi &" - "& _ref_value &")/"& _sd &") * 100 = "&_kpi_score
-			
-			var res = SWITCH(
-			    _better,
-			    "Higher", _higher,
-			    "Lower", _lower,
-			    "Center", _center
-			)
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: 31f0e696-1f5f-4297-9a1f-49ad3127f589
-
-	/// Measure meas.how_kpi2_calculated.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.how_kpi2_calculated' =
-			
-			var _nominator = [meas.getKPI2Nominator]            // get nominator
-			var _denominator = [meas.getKPI2Denominator]            // get denominator
-			
-			var _nom_def = [meas.heatmap_details_kpi2_nominator_def]            // get the nominator definition
-			var _denom_def = [meas.heatmap_details_kpi2_denominator_def]        // denominator definition
-			
-			var _kpi = FORMAT([meas.getKPI2],"0.00")                   // get the KPI2
-			
-			//"[nominator value] nominator def / {denominator value] denominator def = [result]"
-			// var res = _nominator & " " & _nom_def & " / " & _denominator & " " & _denom_def & " = " & _kpi
-			var res =IF(
-			    _nominator = BLANK() && _denominator= BLANK(),
-			    "--",
-			    _nominator & " " & _nom_def & " / " & _denominator & " " & _denom_def & " = " & _kpi
-			)
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: e239f32c-ec6c-49e7-8a94-d143371ed4b2
-
-	/// Measure meas.how_kpi2_component_considered.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.how_kpi2_component_considered' = ```
-			
-			var _nominator = [meas.getKPI2Nominator]            // get nominator
-			var _denominator = [meas.getKPI2Denominator]            // get denominator
-			
-			var _wt =[meas.heatmap_details_kpi2_weight_value]          // get ghe weight
-			var _weight = IF(
-			    _nominator=BLANK() && _denominator=BLANK(),
-			    0,
-			    _wt
-			)
-			
-			var res = "This component is weighted at "&  FORMAT(_weight, "0%") &" of the total score"
-			  
-			RETURN
-			res
-			```
-		displayFolder: heatmap_kpis
-		lineageTag: 87c7dedd-91ea-4fac-a6ef-fc084ea8d3bb
-
-	/// Measure meas.how_kpi2_score_calculation.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_whats_better].
-	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, SWITCH, ABS.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_whats_better].
-	/// Format/Type: Unspecified
-	measure 'meas.how_kpi2_score_calculation' =
-			
-			
-			var _better = MAX(metadata_heatmap_items[heatmap_kpi2_whats_better])           // get ghe what's better
-			var _kpi = FORMAT([meas.getKPI2],"0.00")                   // get the KPI2
-			var _sd = format([meas.trueai_kpi2_sd],"0.00")             // standard deviation
-			var _ref_value = format([meas.trueai_kpi2_ref_value],"0.00")       // reference value
-			var _min = format([meas.trueai_kpi2_min],"0.00")                   // get the kpi min value
-			var _max = format([meas.trueai_kpi2_max],"0.00")                   // get the Max value
-			var _kpi_score = format([meas.getKPI2_score],"0.00")                // get the KPI Score
-			
-			
-			var _higher ="("&_kpi &" – "& _min & " ) /  (" & _max & " -  "& _min &") * 100 = " & _kpi_score
-			var _lower = "("&_kpi & " -" & ""& _max & " ) / ( " & _min & " - "& _max & ") * 100 = "& _kpi_score
-			var _center = "1/(1+ABS("& _kpi &" - "& _ref_value &")/"& _sd &") * 100 = "&_kpi_score
-			
-			var res = SWITCH(
-			    _better,
-			    "Higher", _higher,
-			    "Lower", _lower,
-			    "Center", _center
-			)
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: 76422327-e4ca-4141-9c31-7c2f02c60b0b
-
-	/// Measure meas.hypothesis_final_score.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_weight].
-	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_weight].
-	/// Format/Type: Unspecified
-	measure 'meas.hypothesis_final_score' =
-			
-			//(Score 1 x Weighting 1)  + (Score 2 x Weighting 2) / (Score 1 + Score 2) = Final Score
-			
-			var _kpi1_score = [meas.getKPI1_score]           // get the KPI1 Score
-			var _kpi2_score = [meas.getKPI2_score]           // get the KPI2 score
-			
-			var _kpi1_weight = MAX(metadata_heatmap_items[heatmap_kpi1_weight])             // get the kpi1 weight
-			var _kpi2_weight = [meas.heatmap_details_kpi2_weight_value]             // get the kpi2 weigt
-			
-			var score  = ( _kpi1_score * _kpi1_weight ) + ( _kpi2_score  * _kpi2_weight )
-			
-			
-			var res = "("& _kpi1_score &" * " & _kpi1_weight& ")" & "+ (" & _kpi2_score& " * "& _kpi2_weight & ") = " & FORMAT(score,"0")
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: d92599db-4cbe-4973-9a04-9a9748d1ed13
 
 	/// Measure meas.hypothesis_is_confirmed.
 	/// Purpose: Returns the measure value from its DAX expression.
@@ -2875,28 +2303,6 @@ table metadata_heatmap_items
 		lineageTag: 97a5e09a-34cc-450c-bf60-8dbdd581d164
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.kpi1_ai_score_trust.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_ai_score_name].
-	/// Calculation Logic: Uses VAR/RETURN, MAX, IF.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_ai_score_name].
-	/// Format/Type: Unspecified
-	measure 'meas.kpi1_ai_score_trust' =
-			
-			
-			var _score_name = MAX(metadata_heatmap_items[heatmap_kpi1_ai_score_name])            // get the AI Score name
-			var _score = [meas.kpi1_ai_score_trust_value]                  // get the AI score value
-			var _bucket = [meas.KPI1_AI_score_bucket]                         // bucket name
-			var res = IF(
-			    _bucket="-",
-			    _score_name & "(" & _score & " - "& ")",
-			    _score_name & "("  & _score & " - " & _bucket & " )"
-			)
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: 2200dbd9-a4a1-43e7-b931-78e9f303cbb6
 
 	/// Measure meas.kpi1_ai_score_trust_value.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_ai_score_name].
@@ -2972,28 +2378,6 @@ table metadata_heatmap_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.kpi1_score_cy.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, DATE, EDATE, TODAY.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments.
-	/// Format/Type: Unspecified
-	measure 'meas.kpi1_score_cy' = ```
-			
-			
-			var res  = CALCULATE(
-			    [meas.getKPI1_score_cy] ,  
-			    REMOVEFILTERS('cal_end_dates'),  
-			    'cal_end_dates'[Date] >= EDATE(TODAY(), -15)
-			)
-			
-			RETURN
-			res
-			```
-		displayFolder: heatmap_kpis
-		lineageTag: 7fbde2b1-730f-41a7-ab42-57a7ce963ac3
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	/// Measure meas.KPI2_AI_score_bucket.
 	/// Purpose: Returns the measure value from its DAX expression.
 	/// Calculation Logic: Uses VAR/RETURN, SWITCH.
@@ -3017,27 +2401,6 @@ table metadata_heatmap_items
 		lineageTag: 5248f2f7-65f4-4b40-b2d7-284c0fd05fba
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.kpi2_ai_score_trust.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_ai_score_name].
-	/// Calculation Logic: Uses VAR/RETURN, MAX, IF.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_ai_score_name].
-	/// Format/Type: Unspecified
-	measure 'meas.kpi2_ai_score_trust' =
-			
-			var _score_name = MAX(metadata_heatmap_items[heatmap_kpi2_ai_score_name])            // get the AI Score name
-			var _score = [meas.kpi2_ai_score_trust_value]                  // get the AI score value
-			var _bucket = [meas.KPI2_AI_score_bucket]                         // bucket name
-			var res = IF(
-			    _bucket="-",
-			    _score_name & "(" & _score & " - "& ")",
-			    _score_name & "("  & _score & " - " & _bucket & " )"
-			)
-			
-			RETURN
-			res
-		displayFolder: heatmap_kpis
-		lineageTag: 218b2659-eb4c-43fd-b080-5245eeb846bb
 
 	/// Measure meas.kpi2_ai_score_trust_value.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_ai_score_name].
@@ -3109,213 +2472,6 @@ table metadata_heatmap_items
 		formatString: 0
 		displayFolder: heatmap_kpis
 		lineageTag: 9a0c2441-1cdd-4190-a24e-05a59c2ff85b
-
-	/// Measure meas.loading.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses COUNTROWS.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: 0
-	measure 'meas.loading' =
-			
-			COUNTROWS(metadata_heatmap_items)
-		formatString: 0
-		displayFolder: heatmap_kpis
-		lineageTag: 32c9100b-4e13-4ed1-9283-2bfb66f30457
-
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
-	measure Measure_SVGArrow = ```
-			
-			VAR _Value = ROUND([meas.kpi_combined_score]*100,0)          -- Get the value for the arrows to reflect
-			
-			-- Assigning angles based on thresholds
-			VAR Angle =
-			    SWITCH(TRUE(),
-			        _Value <= -50, 270,   
-			        _Value <= -25, 240,   
-			        _Value <= -10, 210,   
-			        _Value < 0, 180,      
-			        _Value <= 1, 0,       
-			        _Value <= 9, 30,      
-			        _Value <= 25, 60,     
-			        _Value <= 60, 90,     
-			        120                   
-			    )
-			
-			-- Assigning colors to each category (Ensuring proper string formatting)
-			VAR Color =
-			    SWITCH(TRUE(),
-			        _Value >= 60, "#336600",   
-			        _Value >= 26, "#71A43D",   
-			        _Value >= 10, "#99CC66",   
-			        _Value >= 1, "#FFC107",    
-			        _Value >= -1, "#6C757D",   
-			        _Value >= -9, "#FF5733",   
-			        _Value >= -24, "#DC3545",  
-			        _Value >= -49, "#8B0000",  
-			        "#4B0000"                  
-			    )
-			
-			-- Ensuring Color Variable is properly enclosed in the SVG string
-			VAR SVG =
-			    "<svg width='20' height='20' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-			        <g transform='rotate(" & FORMAT(Angle, "0") & ",12,12)'>
-			            <polygon points='12,2 22,22 2,22' style='fill:"&Color&";'/>
-			        </g>
-			    </svg>"
-			
-			-- Encode as Image URL
-			
-			VAR EncodedSVG = "data:image/svg+xml;utf8," & SUBSTITUTE(SVG, "#", "%23")
-			RETURN EncodedSVG
-			```
-		displayFolder: heatmap_kpis
-		lineageTag: 8ddfe7c9-1f4c-4a5b-be2b-3085de702e7a
-		dataCategory: ImageUrl
-
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
-	measure Measure_SVGArrow_KPIscore =
-			
-			VAR _Value = ([meas.kpi_combined_score])          -- Get the value for the arrows to reflect
-			
-			-- Assigning angles based on thresholds
-			VAR Angle =
-			    SWITCH(TRUE(),
-			        _Value <= -0.60, 60, --Worsening Significantly
-			        _Value <= -0.25, 30, --Worsening Moderately
-			        _Value <= -0.09, 20, --Worsening Slightly
-			        _Value <= 0.01, 0,    --No Change
-			        _Value <= 0.01, 0,    --No Change
-			        _Value <= 0.09, 350,  -- Improving Slightly
-			        _Value <= 0.25, 330,  --Improving Moderately
-			        _Value <= 0.60, 300,  --Improving Significantly
-			        280
-			    )
-			-- Assigning colors to each category (Ensuring proper string formatting)
-			VAR Color =
-			    SWITCH(TRUE(),
-			        _Value >= 0.60, "#669933", --Improving Significantly
-			        _Value >= 0.26, "#91C159", --Improving Moderately
-			        _Value >= 0.10, "#CBE0AF", --Improving Slightly
-			        _Value >= 0.01, "#CCCCCC", --No Change
-			        _Value >= -0.01, "#CCCCCC",  --No Change
-			        _Value >= -0.09, "#F487A4",  --Worsening Slightly
-			        _Value >= -0.24, "#F21D4B",  --WOrsening Moderately
-			        _Value >= -0.60, "#AA0742",  --Worsening Significantly
-			        "#66052D"
-			    )
-			-- Ensuring Color Variable is properly enclosed in the SVG string
-			-- Arrow SVG (Using `path` for an arrow shape)
-			VAR SVG =
-			    "<svg width='20' height='20' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-			        <g transform='rotate(" & FORMAT(Angle, "0") & ",12,12)'>
-			            <path d='M12 2 L22 12 L12 22 L12 16 L2 16 L2 8 L12 8 Z' fill='" & Color & "' />
-			        </g>
-			    </svg>"
-			-- Encode as Image URL
-			VAR EncodedSVG = "data:image/svg+xml;utf8," & SUBSTITUTE(SVG, "#", "%23")
-			RETURN EncodedSVG
-		displayFolder: heatmap_kpis
-		lineageTag: a5609215-403a-4975-aace-d8ba8ce1029b
-		dataCategory: ImageUrl
-
-	/// Measure meas.combined_score_concatenated.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, SWITCH.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.combined_score_concatenated' = ```
-			
-			
-			var TrendValue = [meas.kpi_combined_score]                     // get the improvemnet compared to cy 
-			var res = 
-			    SWITCH(
-			        TRUE(),
-			        TrendValue < -0.50, "Worsening Drastically",
-			        TrendValue >= -0.50 && TrendValue < -0.25, "Worsening Significantly",
-			        TrendValue >= -0.25 && TrendValue < -0.10, "Worsening Moderately",
-			        TrendValue >= -0.10 && TrendValue < 0.00, "Worsening Slightly",
-			        TrendValue = 0.00, "No Change",
-			        TrendValue > 0.00 && TrendValue <= 0.09, "Improving Slightly",
-			        TrendValue > 0.09 && TrendValue <= 0.25, "Improving Moderately",
-			        TrendValue > 0.25 && TrendValue <= 0.60, "Improving Significantly",
-			        TrendValue > 0.60, "Improving Drastically"
-			
-			    )
-			
-			
-			RETURN
-			res
-			```
-		displayFolder: heatmap_trends
-		lineageTag: ebd32c62-605c-42f8-8017-b9a0abb52860
-
-	/// Measure meas.combined_score_top.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, FORMAT, SWITCH, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.combined_score_top' = ```
-			
-			
-			var TrendValue =[meas.kpi_combined_score]    //IF([meas.kpi_combined_score]=BLANK(), "ND",[meas.kpi_combined_score])                      // get the improvemnet compared to cy 
-			var _conditional_text =
-			    SWITCH(
-			        TRUE(),
-			        TrendValue >= 0 && TrendValue <= 2, "No Change",
-			        TrendValue > 2 && TrendValue <= 5, "Small Increase",
-			        TrendValue > 5 && TrendValue <= 15, "Moderate Increase",
-			        TrendValue > 15, "Significant Increase",
-			        TrendValue < 0 && TrendValue >= -2, "No Change",
-			        TrendValue < -2 && TrendValue >= -5, "Small Decrease",
-			        TrendValue < -5 && TrendValue >= -15, "Moderate Decrease",
-			        TrendValue < -15, "Significant Decrease"
-			    )
-			
-			
-			var _trend_format_score = FORMAT(TrendValue, "+0;-0;0")
-			var res = "Combined KPIs Score: "& _conditional_text & " ( "& _trend_format_score &" )"
-			RETURN
-			res
-			```
-		displayFolder: heatmap_trends
-		lineageTag: a3305cd5-6792-42be-a8a4-5aee98f30e2d
-
-	/// Measure meas.combined_score_top_w_text.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, FORMAT, SWITCH, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.combined_score_top_w_text' = ```
-			
-			
-			var TrendValue =[meas.kpi_combined_score]    //IF([meas.kpi_combined_score]=BLANK(), "ND",[meas.kpi_combined_score])                      // get the improvemnet compared to cy 
-			var _conditional_text =
-			    SWITCH(
-			        TRUE(),
-			        TrendValue >= 0 && TrendValue <= 2, "No Change",
-			        TrendValue > 2 && TrendValue <= 5, "Small Increase",
-			        TrendValue > 5 && TrendValue <= 15, "Moderate Increase",
-			        TrendValue > 15, "Significant Increase",
-			        TrendValue < 0 && TrendValue >= -2, "No Change",
-			        TrendValue < -2 && TrendValue >= -5, "Small Decrease",
-			        TrendValue < -5 && TrendValue >= -15, "Moderate Decrease",
-			        TrendValue < -15, "Significant Decrease"
-			    )
-			
-			
-			var _trend_format_score = FORMAT(TrendValue, "+0;-0;0")
-			var res =  _conditional_text & " ("& _trend_format_score &")"
-			RETURN
-			res
-			```
-		displayFolder: heatmap_trends
-		lineageTag: 3599cd98-ae04-4ff2-9cde-33071e1b56f6
 
 	/// Measure meas.getKPI1_value_cy.
 	/// Purpose: Returns a value derived from cal_end_dates[Date].
@@ -3513,123 +2669,6 @@ table metadata_heatmap_items
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.kpi_combined_score_calculation.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.kpi_combined_score_calculation' =
-			
-			var _trend_value1 = [meas.getKPI1_score_delta]
-			var _trend_value2 = [meas.getKPI2_score_delta]
-			
-			var _weight1 = [meas.heatmap_details_kpi1_weight_value]         // get the weight of kpi1
-			// var _weight2 = IF([meas.heatmap_details_kpi2_weight_value]="-", 0,[meas.heatmap_details_kpi2_weight_value])         // weight of kpi2
-			var _weight2 = [meas.heatmap_details_kpi2_weight_value]         // weight of kpi2
-			
-			var score = (_trend_value1*_weight1)+(_trend_value2*_weight2)         // get the trend score
-			
-			var res =IF(
-			    _trend_value2=BLANK(),
-			    " (" &  FORMAT(_trend_value1, "0") & " * " & _weight1   & ") = " & FORMAT(score,"0.00"),
-			    " (" &  FORMAT(_trend_value1, "0") & " * " & _weight1 & ") + (" &  FORMAT(_trend_value2, "0")  & " * " & _weight2 & ") = " & FORMAT(score,"0")
-			)
-			
-			
-			RETURN
-			res
-		displayFolder: heatmap_trends
-		lineageTag: 75955dc4-4369-4eee-a186-115f6a0636fb
-
-	/// Measure meas.kpi_score_combined_text.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.kpi_score_combined_text' =
-			
-			
-			
-			var _trend_value1 = [meas.getKPI1_score_delta]
-			var _trend_value2 = [meas.getKPI2_score_delta]
-			
-			var _weight1 = [meas.heatmap_details_kpi1_weight_value]         // get the weight of kpi1
-			var _weight2 = IF([meas.heatmap_details_kpi2_weight_value]="-", 0, [meas.heatmap_details_kpi2_weight_value])         // weight of kpi2
-			
-			
-			var score = (_trend_value1*_weight1)+(_trend_value2*_weight2)         // get the trend score
-			
-			
-			var res = IF(
-			                score = BLANK(),
-			                "ND",
-			                FORMAT(score, "+0;-0;0")
-			            )
-			
-			RETURN
-			res
-		displayFolder: heatmap_trends
-		lineageTag: bade9fbf-e307-4f87-99de-a48021ba6da4
-
-	/// Measure meas.kpi1_score_change_text.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, FORMAT, SWITCH.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.kpi1_score_change_text' = ```
-			
-			
-			var TrendValue = [meas.getKPI1_score_delta]                     // get the improvemnet compared to cy 
-			
-			var _txt = SWITCH(
-			        TRUE(),
-			        TrendValue >= 0 && TrendValue <= 2, "No Change",
-			        TrendValue > 2 && TrendValue <= 5, "Small Increase",
-			        TrendValue > 5 && TrendValue <= 15, "Moderate Increase",
-			        TrendValue > 15, "Significant Increase",
-			        TrendValue < 0 && TrendValue >= -2, "No Change",
-			        TrendValue < -2 && TrendValue >= -5, "Small Decrease",
-			        TrendValue < -5 && TrendValue >= -15, "Moderate Decrease",
-			        TrendValue < -15, "Significant Decrease"
-			    )
-			var res = _txt & " (" & FORMAT(TrendValue,"+0;-0;0") &")"
-			
-			
-			RETURN
-			res
-			```
-		displayFolder: heatmap_trends
-		lineageTag: cd7479a8-e3b2-4925-ad74-ca0c38d8a387
-
-	/// Measure meas.kpi1_score_last_3_month.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.kpi1_score_last_3_month' =
-			
-			var _score = [meas.getKPI1_score_cy]
-			var res = "KPI 1 Score for 3 Last Months of Period: "& _score
-			RETURN
-			res
-		displayFolder: heatmap_trends
-		lineageTag: fdea832f-7c4e-40c9-87ef-a377231c364d
-
-	/// Measure meas.kpi1_score_last_3_prior_month.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.kpi1_score_last_3_prior_month' =
-			
-			var _score = [meas.getKPI1_score_sply]       // get the sply kpi score
-			var res = "KPI 1 Score for 3 Months Prior to Period: "&_score
-			
-			RETURN
-			res
-		displayFolder: heatmap_trends
-		lineageTag: 46cd0271-0303-4967-8e15-7ea70985805f
-
 	/// Measure meas.kpi1_value_delta_concatenated.
 	/// Purpose: Returns the measure value from its DAX expression.
 	/// Calculation Logic: Uses VAR/RETURN, SWITCH.
@@ -3685,97 +2724,6 @@ table metadata_heatmap_items
 		displayFolder: heatmap_trends
 		lineageTag: ff61e00f-77b6-4280-bfd9-61062d3b0b81
 
-	/// Measure meas.kpi1_value_delta_top.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.kpi1_value_delta_top' =
-			
-			
-			var _better = [meas.heatmap_details_kpi1_whats_better]          // get the what's better
-			var kpi1_ref_value = [meas.trueai_kpi1_ref_value]              // get the ref value
-			
-			var delta = [meas.getKPI1_value_delta]
-			
-			var center_value = (delta - kpi1_ref_value)
-			var _conditional_text = [meas.kpi1_value_delta_concatenated]            // get the concated text KPI2
-			
-			
-			var _trend_format_score = IF(
-			                                _better = "Center",
-			                                FORMAT(center_value, "+0%;-0%;0%"),
-			                                FORMAT(delta, "+0%;-0%;0%")
-			)
-			var res = "Trend: "& _conditional_text & " ( "& _trend_format_score &" )"
-			RETURN
-			res
-		displayFolder: heatmap_trends
-		lineageTag: 69b45e42-cece-488e-9f78-3305b4e09945
-
-	/// Measure meas.kpi2_score_change_text.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_def_short].
-	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, SWITCH, IF.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_def_short].
-	/// Format/Type: Unspecified
-	measure 'meas.kpi2_score_change_text' = ```
-			
-			var _kpi2_def = MAX(metadata_heatmap_items[heatmap_kpi2_def_short])
-			var TrendValue = [meas.getKPI2_score_delta]                     // get the improvemnet compared to cy 
-			var _txt = SWITCH(
-			        TRUE(),
-			        TrendValue >= 0 && TrendValue <= 2, "No Change",
-			        TrendValue > 2 && TrendValue <= 5, "Small Increase",
-			        TrendValue > 5 && TrendValue <= 15, "Moderate Increase",
-			        TrendValue > 15, "Significant Increase",
-			        TrendValue < 0 && TrendValue >= -2, "No Change",
-			        TrendValue < -2 && TrendValue >= -5, "Small Decrease",
-			        TrendValue < -5 && TrendValue >= -15, "Moderate Decrease",
-			        TrendValue < -15, "Significant Decrease"
-			    )
-			var res = _txt & " (" & FORMAT(TrendValue,"+0;-0;0") &")"
-			
-			var new_res = IF(
-			    _kpi2_def=BLANK(),
-			    "--",
-			    res
-			)
-			
-			RETURN
-			new_res
-			```
-		displayFolder: heatmap_trends
-		lineageTag: 116d096d-daee-464d-b7fc-e9deb322ba5b
-
-	/// Measure meas.kpi2_score_last_3_month.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.kpi2_score_last_3_month' =
-			
-			var _score = [meas.getKPI2_score_cy]
-			var res = "KPI 2 Score for 3 Last Months of Period: "& _score
-			RETURN
-			res
-		displayFolder: heatmap_trends
-		lineageTag: 61bd716e-e0b3-4b6e-a8a8-bdec62433a99
-
-	/// Measure meas.kpi2_score_last_3_prior_month.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.kpi2_score_last_3_prior_month' =
-			
-			var _score = [meas.getKPI2_score_sply]       // get the sply kpi score
-			var res = "KPI 2 Score for 3 Months Prior to Period: "&_score
-			
-			RETURN
-			res
-		displayFolder: heatmap_trends
-		lineageTag: d7f76b54-5b09-4a14-bc15-17fca51741bb
-
 	/// Measure meas.kpi2_value_delta_concatenated.
 	/// Purpose: Returns the measure value from its DAX expression.
 	/// Calculation Logic: Uses VAR/RETURN, SWITCH.
@@ -3830,33 +2778,6 @@ table metadata_heatmap_items
 			```
 		displayFolder: heatmap_trends
 		lineageTag: b34434a0-aacf-41e9-aed9-3cc19f02356a
-
-	/// Measure meas.kpi2_value_delta_top.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.kpi2_value_delta_top' =
-			
-			var _better = [meas.heatmap_details_kpi2_whats_better]          // get the what's better
-			var kpi2_ref_value = [meas.trueai_kpi2_ref_value]              // get the ref value
-			
-			var delta = [meas.getKPI2_value_delta]
-			
-			var center_value = (delta - kpi2_ref_value)
-			var _conditional_text = [meas.kpi2_value_delta_concatenated]            // get the concated text KPI2
-			
-			
-			var _trend_format_score = IF(
-			                                _better = "Center",
-			                                FORMAT(center_value, "+0%;-0%;0%"),
-			                                FORMAT(delta, "+0%;-0%;0%")
-			)
-			var res = "Trend: "& _conditional_text & " ( "& _trend_format_score &" )"
-			RETURN
-			res
-		displayFolder: heatmap_trends
-		lineageTag: 25995e7c-3f62-4905-9909-8c53d7baacc8
 
 	/// Measure meas.calc_hyp1_kpi1_denominator_count.
 	/// Purpose: Returns a value derived from ssr_history[step_name].
@@ -4197,22 +3118,6 @@ table metadata_heatmap_items
 		displayFolder: _record_counts
 		lineageTag: baedc44c-944c-4ab7-8093-a224304ed2bd
 
-	/// Measure meas.calc_hyp2_kpi2_nominator_count.
-	/// Purpose: Returns a value derived from opps row count in current context.
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, COUNTROWS.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: 0
-	measure 'meas.calc_hyp2_kpi2_nominator_count' =
-			
-			var contact_ai = CALCULATETABLE(opps)
-			var res  = COUNTROWS(contact_ai)
-			
-			RETURN
-			res
-		formatString: 0
-		displayFolder: _record_counts
-		lineageTag: b02bd641-139d-4276-adb8-c6c901653894
-
 	/// Measure meas.calc_hyp3_kpi1_nominator_count.
 	/// Purpose: Returns a value derived from cal_end_dates[Date] and ssr_history[step_outcome].
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, CALCULATE, COUNTROWS, DATE.
@@ -4479,19 +3384,6 @@ table metadata_heatmap_items
 		displayFolder: _record_counts
 		lineageTag: 5a80b3e0-7039-4227-856d-7455ff499866
 
-	/// Measure meas.heatmap_kpi1_min_record_factor_name.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_min_factor].
-	/// Calculation Logic: Uses MAX.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_min_factor].
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_kpi1_min_record_factor_name' =
-			
-			MAX(metadata_heatmap_items[heatmap_kpi1_min_factor])
-		displayFolder: _record_counts
-		lineageTag: f83afb88-9cca-4105-b0cf-9488ea325afc
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	/// Measure meas.heatmap_kpi1_record_count.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id].
 	/// Calculation Logic: Uses VAR/RETURN, MAX, SWITCH, COALESCE.
@@ -4581,19 +3473,6 @@ table metadata_heatmap_items
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.heatmap_kpi2_min_record_factor_name.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_min_factor].
-	/// Calculation Logic: Uses MAX.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_min_factor].
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_kpi2_min_record_factor_name' =
-			
-			MAX(metadata_heatmap_items[heatmap_kpi2_min_factor])
-		displayFolder: _record_counts
-		lineageTag: 275a2a40-dbe3-4c51-a8c2-70a04f2c253a
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	/// Measure meas.heatmap_kpi2_record_count.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id].
 	/// Calculation Logic: Uses VAR/RETURN, MAX, SWITCH, COALESCE.
@@ -4649,6 +3528,1507 @@ table metadata_heatmap_items
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		displayFolder: _record_counts
 		lineageTag: fede0149-a27c-4331-9a92-a7fe220056a8
+
+	/// Measure meas.heatmap_details_growth_category.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_growth_category].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_growth_category].
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_details_growth_category' = ```
+			
+			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
+			var _category = CALCULATE(
+			                        MAX(metadata_heatmap_items[heatmap_growth_category]),      // get the growth category name 
+			                        metadata_heatmap_items[_sys_doc_id]=h_id
+			)
+			
+			RETURN
+			_category
+			```
+		displayFolder: _heatmap_details
+		lineageTag: 20148111-0f79-4b3f-a97e-ad59a318d172
+
+	/// Measure meas.heatmap_details_kpi1_denominator_def.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi1_denominator_definition].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi1_denominator_definition].
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_details_kpi1_denominator_def' = ```
+			
+			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
+			var _def = CALCULATE(
+			                        MAX(metadata_heatmap_items[heatmap_kpi1_denominator_definition]),      // get the heatmap kpi1 denominator def 
+			                        metadata_heatmap_items[_sys_doc_id]=h_id
+			)
+			
+			RETURN
+			_def
+			```
+		displayFolder: _heatmap_details
+		lineageTag: fd65597b-475d-4e6e-89e8-0e460f5c2c62
+
+	/// Measure meas.heatmap_details_kpi1_nominator_def.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi1_numerator_definition].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi1_numerator_definition].
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_details_kpi1_nominator_def' =
+			
+			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
+			var _def = CALCULATE(
+			                        MAX(metadata_heatmap_items[heatmap_kpi1_numerator_definition]),      // get the heatmap kpi1 nomination def
+			                        metadata_heatmap_items[_sys_doc_id]=h_id
+			)
+			
+			RETURN
+			_def
+		displayFolder: _heatmap_details
+		lineageTag: 5ac7e9b5-0b9c-4ae9-afe4-0d3229adcf48
+
+	/// Measure meas.heatmap_details_kpi1_weight_value.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi1_weight].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi1_weight].
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_details_kpi1_weight_value' =
+			
+			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
+			var _sd = CALCULATE(
+			                        MAX(metadata_heatmap_items[heatmap_kpi1_weight]),      // get the heatmap kpi1 weight value
+			                        metadata_heatmap_items[_sys_doc_id]=h_id
+			)
+			
+			RETURN
+			_sd
+		displayFolder: _heatmap_details
+		lineageTag: 905281ee-18e5-4e36-9971-5726731b7278
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.heatmap_details_kpi1_whats_better.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi1_whats_better].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi1_whats_better].
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_details_kpi1_whats_better' = ```
+			
+			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
+			var _sd = CALCULATE(
+			                        MAX(metadata_heatmap_items[heatmap_kpi1_whats_better]),      // get the heatmap kpi1 what's better 
+			                        metadata_heatmap_items[_sys_doc_id]=h_id
+			)
+			
+			RETURN
+			_sd
+			```
+		displayFolder: _heatmap_details
+		lineageTag: c0e7dfa8-f958-4410-8581-26d52b5b04a9
+
+	/// Measure meas.heatmap_details_kpi2_denominator_def.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi2_denominator_definition].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi2_denominator_definition].
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_details_kpi2_denominator_def' = ```
+			
+			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
+			var _def = CALCULATE(
+			                        MAX(metadata_heatmap_items[heatmap_kpi2_denominator_definition]),      // get the heatmap kpi2 denominator def 
+			                        metadata_heatmap_items[_sys_doc_id]=h_id
+			)
+			
+			RETURN
+			_def
+			```
+		displayFolder: _heatmap_details
+		lineageTag: c46ef1b6-8631-4ce8-903d-8055c619f9a6
+
+	/// Measure meas.heatmap_details_kpi2_nominator_def.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi2_numerator_definition].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi2_numerator_definition].
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_details_kpi2_nominator_def' =
+			
+			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
+			var _def = CALCULATE(
+			                        MAX(metadata_heatmap_items[heatmap_kpi2_numerator_definition]),      // get the heatmap kpi1 nomination def
+			                    metadata_heatmap_items[_sys_doc_id]=h_id
+			)
+			
+			RETURN
+			_def
+		displayFolder: _heatmap_details
+		lineageTag: 89bee71b-48c2-43ea-a0a2-fff2f2f67a88
+
+	/// Measure meas.heatmap_details_kpi2_weight_value.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_details_kpi2_weight_value' =
+			
+			
+			var _weight = [meas.getKPI2Weight]
+			var res = IF(
+			    _weight=BLANK(),
+			    0,
+			    _weight
+			)
+			RETURN
+			res
+		displayFolder: _heatmap_details
+		lineageTag: 40784f41-380e-443c-a943-aa6ef660716a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.heatmap_details_kpi2_whats_better.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi2_whats_better].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi2_whats_better].
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_details_kpi2_whats_better' = ```
+			
+			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
+			var _sd = CALCULATE(
+			                        MAX(metadata_heatmap_items[heatmap_kpi2_whats_better]),      // get the heatmap kpi2 what's better 
+			                        metadata_heatmap_items[_sys_doc_id]=h_id
+			)
+			
+			RETURN
+			_sd
+			```
+		displayFolder: _heatmap_details
+		lineageTag: 577d42bf-a950-4890-9d5f-6c89af45b21d
+
+	/// Measure meas.heatmap_details_name.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_name].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_name].
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_details_name' = ```
+			
+			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
+			var _name = CALCULATE(
+			                        MAX(metadata_heatmap_items[heatmap_name]),      // get the heatmap name 
+			                        metadata_heatmap_items[_sys_doc_id]=h_id
+			)
+			
+			RETURN
+			_name
+			```
+		displayFolder: _heatmap_details
+		lineageTag: 1cd40324-e502-4c67-8b92-b7fd641664d1
+
+	/// Measure meas.heatmap_details_score_new.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, MAX, SWITCH, IF, ROUND.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: 0
+	measure 'meas.heatmap_details_score_new' = ```
+			
+			VAR _flag = [meas.heatmap_combined_record_count_flag]           // get the flag
+			VAR _ai_score = [meas.getHeatmapKPI_AIScore]            // get the AI Model Score
+			
+			// VAR final_output = 
+			//     IF(
+			//         _ai_score = "Limited", 
+			//         "ND",
+			//         IF(
+			//             _flag="False",
+			//             "N/A",
+			//             ROUND(MAX([meas.getHeatmapRawScore],0)/5, 0)*5
+			//         )
+			//     )
+			
+			var res = SWITCH(
+			    TRUE(),
+			    _ai_score = "Limited", "ND",
+			    _flag="False", "N/A",
+			    ROUND(MAX([meas.getHeatmapRawScore],0)/5, 0)*5
+			)
+			
+			RETURN
+			res
+			```
+		formatString: 0
+		displayFolder: _heatmap_details
+		lineageTag: c89d5a22-85e2-47cc-baa5-1c4e10677a55
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	/// Measure meas.trueai_kpi1_max.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi1_ref_value] and metadata_heatmap_items[col.kpi1_std_value].
+	/// Calculation Logic: Uses VAR/RETURN, MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi1_ref_value], metadata_heatmap_items[col.kpi1_std_value].
+	/// Format/Type: Unspecified
+	measure 'meas.trueai_kpi1_max' = ```
+			
+			var _ref = MAX(metadata_heatmap_items[col.kpi1_ref_value])         // get the ref 
+			var _sd = MAX(metadata_heatmap_items[col.kpi1_std_value])                       // get the SD
+			var res = (_ref + (_sd*2))            // apply the max formula
+			RETURN
+			res
+			```
+		displayFolder: _heatmap_details
+		lineageTag: b1c4db19-9c6d-402b-a739-fc201eeec4f2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.trueai_kpi1_min.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi1_ref_value] and metadata_heatmap_items[col.kpi1_std_value].
+	/// Calculation Logic: Uses VAR/RETURN, MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi1_ref_value], metadata_heatmap_items[col.kpi1_std_value].
+	/// Format/Type: Unspecified
+	measure 'meas.trueai_kpi1_min' = ```
+			
+			var _ref = MAX(metadata_heatmap_items[col.kpi1_ref_value])          // get the ref 
+			var _sd = MAX(metadata_heatmap_items[col.kpi1_std_value])                         // get the SD
+			var res = (_ref - (_sd*2))            // apply the max formula
+			RETURN
+			res
+			```
+		displayFolder: _heatmap_details
+		lineageTag: 83ef0179-26de-4e24-870b-8748502a2e10
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.trueai_kpi1_ref_value.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi1_ref_value].
+	/// Calculation Logic: Uses MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi1_ref_value].
+	/// Format/Type: Unspecified
+	measure 'meas.trueai_kpi1_ref_value' =
+			
+			MAX(metadata_heatmap_items[col.kpi1_ref_value])
+		displayFolder: _heatmap_details
+		lineageTag: 6e3b2d46-495a-4f93-b6aa-f53730470cca
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.trueai_kpi1_sd.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi1_std_value].
+	/// Calculation Logic: Uses MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi1_std_value].
+	/// Format/Type: Unspecified
+	measure 'meas.trueai_kpi1_sd' =
+			
+			MAX(metadata_heatmap_items[col.kpi1_std_value])
+		displayFolder: _heatmap_details
+		lineageTag: 9b583b49-e2fb-4d17-b47c-c0a52e5bb8c6
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.trueai_kpi2_max.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi2_ref_value] and metadata_heatmap_items[col.kpi2_std_value].
+	/// Calculation Logic: Uses VAR/RETURN, MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi2_ref_value], metadata_heatmap_items[col.kpi2_std_value].
+	/// Format/Type: Unspecified
+	measure 'meas.trueai_kpi2_max' = ```
+			
+			var _ref = MAX(metadata_heatmap_items[col.kpi2_ref_value])          // get the ref 
+			var _sd = MAX(metadata_heatmap_items[col.kpi2_std_value])                         // get the SD
+			var res = (_ref + (_sd*2))            // apply the max formula
+			RETURN
+			res
+			```
+		displayFolder: _heatmap_details
+		lineageTag: 1f369401-854a-4ea6-b56e-8755434db79f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.trueai_kpi2_min.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi2_ref_value] and metadata_heatmap_items[col.kpi2_std_value].
+	/// Calculation Logic: Uses VAR/RETURN, MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi2_ref_value], metadata_heatmap_items[col.kpi2_std_value].
+	/// Format/Type: Unspecified
+	measure 'meas.trueai_kpi2_min' = ```
+			
+			var _ref = MAX(metadata_heatmap_items[col.kpi2_ref_value])          // get the ref 
+			var _sd = MAX(metadata_heatmap_items[col.kpi2_std_value])                         // get the SD
+			var res = (_ref - (_sd*2))            // apply the max formula
+			RETURN
+			res
+			```
+		displayFolder: _heatmap_details
+		lineageTag: 355715ff-5fc6-4835-8eba-50cb707003ed
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.trueai_kpi2_ref_value.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi2_ref_value].
+	/// Calculation Logic: Uses MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi2_ref_value].
+	/// Format/Type: Unspecified
+	measure 'meas.trueai_kpi2_ref_value' =
+			
+			MAX(metadata_heatmap_items[col.kpi2_ref_value])
+		displayFolder: _heatmap_details
+		lineageTag: 967dff67-5f68-4ea4-a55b-82e8c570fd23
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.trueai_kpi2_sd.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi2_std_value].
+	/// Calculation Logic: Uses MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi2_std_value].
+	/// Format/Type: Unspecified
+	measure 'meas.trueai_kpi2_sd' =
+			
+			MAX(metadata_heatmap_items[col.kpi2_std_value])
+		displayFolder: _heatmap_details
+		lineageTag: 164e05ce-6bfd-4ea3-b7fd-f5789d75d345
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.get_growth_category.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_growth_category].
+	/// Calculation Logic: Uses CALCULATE, MAX.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[heatmap_growth_category].
+	/// Format/Type: Unspecified
+	measure 'meas.get_growth_category' =
+			
+			CALCULATE(MAX(metadata_heatmap_items[heatmap_growth_category]))
+		lineageTag: 6d1d5b18-060c-4037-a92e-ca0be00f740d
+
+	measure 'meas.stakeholder_num_flag' =
+			
+			
+			var stakeholder_info = CALCULATE(
+			    COUNTROWS(ssr_history),
+			    ssr_history[stkhlds_all_contacts_count]>0
+			)
+			
+			var total_rows =COUNTROWS(ssr_history)
+			
+			var percentage=stakeholder_info/total_rows
+			
+			RETURN
+			IF(percentage>0.30, True, False)
+		lineageTag: 7fb568b1-55dc-41f0-a5ee-222f4411c1f5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.ai_score_kpi1.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_ai_score_name].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, IF.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_ai_score_name].
+	/// Format/Type: Unspecified
+	measure 'meas.ai_score_kpi1' = ```
+			
+			    
+			    VAR _name   = MAX(metadata_heatmap_items[heatmap_kpi1_ai_score_name])
+			    VAR _score  = [meas.kpi1_ai_score_trust_value]
+			    VAR _bucket = [meas.KPI1_AI_score_bucket]
+			    
+			    VAR res =
+			        IF(
+			            ISBLANK(_name),
+			            "--",
+			            FORMAT(_score, "0") & " - " & _bucket
+			        )
+			    
+			    RETURN
+			    res
+			```
+		displayFolder: heatmap_kpis
+		lineageTag: 3b88c8ca-43e4-40ba-8362-3348a24d070e
+
+	/// Measure meas.ai_score_kpi2.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_ai_score_name].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, IF.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_ai_score_name].
+	/// Format/Type: Unspecified
+	measure 'meas.ai_score_kpi2' = ```
+			
+			 VAR _name   = MAX(metadata_heatmap_items[heatmap_kpi2_ai_score_name])
+			    VAR _score  = [meas.kpi2_ai_score_trust_value]
+			    VAR _bucket = [meas.KPI2_AI_score_bucket]
+			    
+			    VAR res =
+			        IF(
+			            ISBLANK(_name),
+			            "--",
+			            FORMAT(_score, "0") & " - " & _bucket
+			        )
+			    
+			    RETURN
+			    res
+			```
+		displayFolder: heatmap_kpis
+		lineageTag: afcfa086-1bb4-48c3-b064-9bd05417b189
+
+	/// Measure meas.check_kpi1_kpi2_weight.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.check_kpi1_kpi2_weight' =
+			
+			var _kpi1 = [meas.getKPI1Weight]
+			var _kpi2 = [meas.getKPI2Weight]
+			var res = IF(
+			    _kpi1+_kpi2 = 1.00,
+			    "ok",
+			    "error"
+			)
+			
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: b82cee2a-7f09-480f-9db9-da6a1fac29ad
+
+	/// Measure meas.getHeatmapConditionalColor.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: 0
+	measure 'meas.getHeatmapConditionalColor' = ```
+			
+			var _ai_score = [meas.getHeatmapKPI_AIScore]        // get the validated and not validated
+			var _heatmapScore = [meas.getHeatmapScore]          // get the heatmap score
+			var res = IF(
+			                _ai_score = "Limited",
+			                1,
+			                IF(
+			                    _ai_score in {"Fair","Good", "Great", "Excellent"} && _heatmapScore >=0 && _heatmapScore < 30, 2,
+			                    IF(
+			                         _ai_score in {"Fair","Good", "Great", "Excellent"} && _heatmapScore >=30 && _heatmapScore < 45, 3,
+			                        IF(
+			                             _ai_score in {"Fair","Good", "Great", "Excellent"} && _heatmapScore >=45 && _heatmapScore < 50, 4,
+			                            IF(
+			                                 _ai_score in {"Fair","Good", "Great", "Excellent"}&& _heatmapScore >=50 && _heatmapScore < 65, 5,
+			                                IF(
+			                                     _ai_score in {"Fair","Good", "Great", "Excellent"} && _heatmapScore >=65 && _heatmapScore < 80, 6,
+			                                    IF(
+			                                         _ai_score in {"Fair","Good", "Great", "Excellent"} && _heatmapScore >=80 && _heatmapScore <= 100, 7
+			                                    )
+			                                )
+			                            )
+			                        )
+			                    )
+			                )
+			)
+			
+			RETURN
+			res
+			
+			```
+		formatString: 0
+		displayFolder: heatmap_kpis
+		lineageTag: ac5452d6-99a7-4005-9ef0-0e28aa4df057
+
+	/// Measure meas.getHeatmapConditionalColor_new.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, SWITCH.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: 0
+	measure 'meas.getHeatmapConditionalColor_new' = ```
+			
+			// var _ai_score = [meas.getHeatmapKPI_AIScore]        // get the validated and not validated
+			var _heatmapScore = [meas.heatmap_details_score_new]          // get the heatmap score
+			var res = SWITCH(
+			    TRUE(),
+			    _heatmapScore="ND",1,
+			    _heatmapScore="N/A",2,
+			    _heatmapScore >=0 && _heatmapScore < 30,3,
+			    _heatmapScore >=30 && _heatmapScore < 45,4,
+			    _heatmapScore >=45 && _heatmapScore < 50,5,
+			    _heatmapScore >=50 && _heatmapScore < 65,6,
+			    _heatmapScore >=65 && _heatmapScore < 80,7,
+			    _heatmapScore >=80 && _heatmapScore <= 100,8
+			)
+			
+			RETURN
+			res
+			
+			```
+		formatString: 0
+		displayFolder: heatmap_kpis
+		lineageTag: beaacaea-29c3-43ad-bfca-8228a3d91f8c
+
+	/// Measure meas.getHeatmapKPI1_formula_used.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_whats_better].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, SWITCH, ABS.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_whats_better].
+	/// Format/Type: Unspecified
+	measure 'meas.getHeatmapKPI1_formula_used' =
+			
+			
+			var _better = MAX(metadata_heatmap_items[heatmap_kpi1_whats_better])           // get ghe what's better
+			var _kpi = FORMAT([meas.getKPI1],"0.00")                   // get the KPI1
+			var _sd = [meas.trueai_kpi1_sd]             // standard deviation
+			var _ref_value = [meas.trueai_kpi1_ref_value]       // reference value
+			var _min = [meas.trueai_kpi1_min]                   // get the kpi min value
+			var _max = [meas.trueai_kpi1_max]                   // get the Max value
+			var _kpi_score = [meas.getKPI1_score]                // get the KPI Score
+			
+			var txt = "Normalizing this value and multiplying by 100 gives us the KPI 1 Score: "
+			
+			var _higher =txt & "(KPI 1 Value "& _kpi &" – Min Value "& _min & " ) /  (Max Value " & _max & " - Min Value "& _min &") * 100 =KPI 1 Score" & _kpi_score
+			var _lower = txt & "(KPI 1 Value "&_kpi & " -" & "Max Value "& _max & " ) / (Min Value " & _min & " - Max Value "& _max & ") * 100 =KPI 1 Score"& _kpi_score
+			var _center = txt &"1/(1+ABS(KPI  1 Value "& _kpi &" - Reference Value"& _ref_value &")/Standard Deviation"& _sd &") * 100 = KPI 1 Score "&_kpi_score
+			
+			var res = SWITCH(
+			    _better,
+			    "Higher", _higher,
+			    "Lower", _lower,
+			    "Center", _center
+			)
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: 8f1c15a2-ad3f-4746-a959-8c3b429b688c
+
+	/// Measure meas.getHeatmapKPI2_formula_used.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_whats_better].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, SWITCH, ABS.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_whats_better].
+	/// Format/Type: Unspecified
+	measure 'meas.getHeatmapKPI2_formula_used' =
+			
+			
+			var _better = MAX(metadata_heatmap_items[heatmap_kpi2_whats_better])           // get ghe what's better
+			var txt = "Normalizing this value and multiplying by 100 gives us the score: "
+			var _higher =txt & "(KPI – Min) /  (Max-Min) * 100 = Score"
+			var _lower = txt & "(KPI1 - Max) / (Min - Max) * 100 = Score"
+			var _center = txt &"1 / ( 1 + ABS(KPI - Reference)/Standard Deviation) * 100 = Score"
+			
+			var res = SWITCH(
+			    _better,
+			    "Higher", _higher,
+			    "Lower", _lower,
+			    "Center", _center
+			)
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: 1d1dc947-d1c0-400f-86a8-0429ae6ab4df
+
+	/// Measure meas.getKP2_Score_chng.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, DIVIDE.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.getKP2_Score_chng' = ```
+			
+			
+			var cy_kpi2 = [meas.getKPI2_score_cy]          // get the current year KPI1
+			var sply_kpi2 = [meas.getKPI2_score_sply]          // get the previous year KPI1
+			
+			var res = DIVIDE(
+			    (cy_kpi2 - sply_kpi2),
+			    sply_kpi2                     // get the improvemnet compared to cy 
+			)
+			
+			RETURN
+			res
+			```
+		displayFolder: heatmap_kpis
+		lineageTag: 391739a4-9509-45be-8f03-0de6addbdffd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.getKPI1_Score_change_pct.
+	/// Purpose: Returns a value derived from cal_end_dates[Date].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, DIVIDE, YEAR.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date].
+	/// Format/Type: Unspecified
+	measure 'meas.getKPI1_Score_change_pct' = ```
+			
+			
+			var cy = [meas.getKPI1_score]            // get the integer KPI 1 score
+			var _sply  = CALCULATE(
+			    [meas.getKPI1_score],              // get the existing measure forKPI 1 score            // get the KPI 1 score same period last year
+			    SAMEPERIODLASTYEAR(cal_end_dates[Date])           
+			)
+			var res = DIVIDE((cy - _sply), _sply)           // get the ratio
+			
+			
+			RETURN
+			res
+			```
+		displayFolder: heatmap_kpis
+		lineageTag: 2ba7d4a8-2640-4a50-b2da-d2d2369e505d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.getKPI1_score_cy_5q.
+	/// Purpose: Returns a value derived from cal_end_dates[Date].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, DATE, EDATE.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date].
+	/// Format/Type: 0
+	measure 'meas.getKPI1_score_cy_5q' =
+			
+			
+			VAR _max_date = [meas.context_date_max] // Get the max date in the dataset
+			var _min_date = EDATE([meas.context_date_min],-3)           // get the 3 months back from the context min date
+			
+			var res = CALCULATE(
+			    [meas.getKPI1_score_cy],
+			    cal_end_dates[Date] >= _min_date && cal_end_dates[Date] <= _max_date
+			)
+			
+			
+			RETURN
+			res
+		formatString: 0
+		displayFolder: heatmap_kpis
+		lineageTag: a15d1bdd-6026-4e65-b838-ead839d1798e
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	/// Measure meas.getKPI2_Score_change_pct.
+	/// Purpose: Returns a value derived from cal_end_dates[Date].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, DIVIDE, YEAR.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date].
+	/// Format/Type: Unspecified
+	measure 'meas.getKPI2_Score_change_pct' = ```
+			
+			var cy = [meas.getKPI2_score]            // get the integer KPI 2 score
+			var _sply  = CALCULATE(
+			    [meas.getKPI2_score],              // get the existing measure forKPI 2 score            // get the KPI 2 score same period last year
+			    SAMEPERIODLASTYEAR(cal_end_dates[Date])           
+			)
+			var res = DIVIDE((cy - _sply), _sply)           // get the ratio
+			
+			
+			RETURN
+			res
+			```
+		displayFolder: heatmap_kpis
+		lineageTag: c07674bd-6dfa-4ade-a107-6543968acf32
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.getKPI2_score_cy_5q.
+	/// Purpose: Returns a value derived from cal_end_dates[Date].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, DATE, EDATE.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date].
+	/// Format/Type: Unspecified
+	measure 'meas.getKPI2_score_cy_5q' =
+			
+			
+			VAR _max_date = [meas.context_date_max] // Get the max date in the dataset
+			var _min_date = EDATE([meas.context_date_min],-3)
+			
+			var res = CALCULATE(
+			    [meas.getKPI2_score_cy],
+			    cal_end_dates[Date] >= _min_date && cal_end_dates[Date] <= _max_date
+			)
+			
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: 40e03981-6b77-412e-9aac-a187087fac4c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.heatmap_booking_growth_rate.
+	/// Purpose: Returns a value derived from cal_end_dates[Date] and ssr_history[step_name].
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, CALCULATE, SUMX, MAX.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on cal_end_dates[Date], ssr_history[step_name].
+	/// Format/Type: 0%;-0%;0%
+	measure 'meas.heatmap_booking_growth_rate' = ```
+			
+			
+			-- get the dates
+			var curr_date = CALCULATE(MAX(cal_end_dates[Date])) // get the mgmt current end date
+			var end_date = curr_date
+			var end_date_sply = date(Year(end_date) -1,Month(end_date),day(end_date)) // get the yoy end date
+			var start_year = Year(curr_date) 
+			var start_qtr_month = (Quarter(curr_date) * 3) - 2  
+			var start_month = Month(curr_date)
+			var start_date_ytd = date(start_year,1,1)  
+			var start_date_ytd_sply = date(start_year-1,1,1)  
+			var start_date_qtd = date(start_year,start_qtr_month ,1)  
+			var start_date_qtd_sply = date(start_year -1,start_qtr_month,1)  
+			var start_date_mtd = date(start_year,start_month,1)  
+			var start_date_mtd_sply = date(start_year -1,start_month,1)  
+			
+			-- get data for overridden date periods but still contextual for current year
+			var dates_tbl_cur =  CALCULATETABLE(ssr_history , cal_end_dates[Date] >=  start_date_ytd &&  cal_end_dates[Date] <= end_date)
+			var cur_tbl = FILTER(
+			    dates_tbl_cur,
+			    ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"} && ssr_history[step_success]=True
+			)
+			var res_cur = SUMX(cur_tbl, ssr_history[opp_won_amt]) + 0
+			
+			-- get data for overridden date periods but still contextual for current year
+			var dates_tbl_sply =  CALCULATETABLE(ssr_history , cal_end_dates[Date] >=  start_date_ytd_sply &&  cal_end_dates[Date] <= end_date_sply)
+			var sply_tbl = FILTER(
+			    dates_tbl_sply,
+			    ssr_history[step_name] in {"New Logo Selling", "Existing Customer Selling"} && ssr_history[step_success]=True
+			)
+			var res_sply = SUMX(sply_tbl, ssr_history[opp_won_amt]) + 0
+			var res = DIVIDE((res_cur-res_sply),res_sply,0)
+			return 
+			res
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: heatmap_kpis
+		lineageTag: 192bf663-1795-4b03-9ced-03ed2f8f2db8
+
+	/// Measure meas.heatmap_trust_data_pi.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_trust_data_pi' = ```
+			
+			// KPI1 Model Score + KPI2 AI Model Score / 2
+			
+			var _kpi1 = [meas.kpi1_ai_score_trust_value]           // get AI score for kpi1
+			var _kpi2 = [meas.kpi2_ai_score_trust_value]           // get AI score for kpi2
+			
+			var res = IF(
+			    _kpi2=BLANK(), 
+			     "(" & _kpi1  & ") / 1 = "& FORMAT((_kpi1 + _kpi2)/1,"0"), 
+			    "(" & _kpi1 & " + " & _kpi2 & ") / 2 = "& FORMAT((_kpi1 + _kpi2)/2,"0")
+			)
+			
+			RETURN
+			res
+			```
+		displayFolder: heatmap_kpis
+		lineageTag: f5eae470-d0e5-43cf-8357-e08d13a73fa1
+
+	/// Measure meas.how_kpi1_calculated.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, FORMAT.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.how_kpi1_calculated' =
+			
+			var _nominator = [meas.getKPI1Nominator]            // get nominator
+			var _denominator = [meas.getKPI1Denominator]            // get denominator
+			
+			var _nom_def = [meas.heatmap_details_kpi1_nominator_def]            // get the nominator definition
+			var _denom_def = [meas.heatmap_details_kpi1_denominator_def]        // denominator definition
+			
+			var _kpi = FORMAT([meas.getKPI1],"0.00")                   // get the KPI
+			
+			//"[nominator value] nominator def / {denominator value] denominator def = [result]"
+			var res = _nominator & " " & _nom_def & " / " & _denominator & " " & _denom_def &" = " & _kpi
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: fc92f66a-02e9-4c72-a0fa-a8ce03c657c9
+
+	/// Measure meas.how_kpi1_component_considered.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_weight].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_weight].
+	/// Format/Type: Unspecified
+	measure 'meas.how_kpi1_component_considered' =
+			
+			
+			var _weight =MAX(metadata_heatmap_items[heatmap_kpi1_weight])          // get ghe weight
+			
+			var res = "This component is weighted at "&  FORMAT(_weight, "0%") &" of the total score"
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: c51f000c-47cc-4615-9a69-e9727b13e8f5
+
+	/// Measure meas.how_kpi1_score_calculation.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_whats_better].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, SWITCH, ABS.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_whats_better].
+	/// Format/Type: Unspecified
+	measure 'meas.how_kpi1_score_calculation' =
+			
+			
+			var _better = MAX(metadata_heatmap_items[heatmap_kpi1_whats_better])           // get ghe what's better
+			var _kpi = FORMAT([meas.getKPI1],"0.00")                   // get the KPI1
+			var _sd = FORMAT([meas.trueai_kpi1_sd],"0.00")             // standard deviation
+			var _ref_value = FORMAT([meas.trueai_kpi1_ref_value],"0.00")       // reference value
+			var _min = FORMAT([meas.trueai_kpi1_min],"0.00")                 // get the kpi min value
+			var _max = FORMAT([meas.trueai_kpi1_max],"0.00")                   // get the Max value
+			var _kpi_score = FORMAT([meas.getKPI1_score],"0.00")                // get the KPI Score
+			
+			
+			var _higher ="("&_kpi &" – "& _min & " ) /  (" & _max & " -  "& _min &") * 100 = " & _kpi_score
+			var _lower = "("&_kpi & " -" & ""& _max & " ) / ( " & _min & " - "& _max & ") * 100 = "& _kpi_score
+			var _center = "1/(1+ABS("& _kpi &" - "& _ref_value &")/"& _sd &") * 100 = "&_kpi_score
+			
+			var res = SWITCH(
+			    _better,
+			    "Higher", _higher,
+			    "Lower", _lower,
+			    "Center", _center
+			)
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: 31f0e696-1f5f-4297-9a1f-49ad3127f589
+
+	/// Measure meas.how_kpi2_calculated.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.how_kpi2_calculated' =
+			
+			var _nominator = [meas.getKPI2Nominator]            // get nominator
+			var _denominator = [meas.getKPI2Denominator]            // get denominator
+			
+			var _nom_def = [meas.heatmap_details_kpi2_nominator_def]            // get the nominator definition
+			var _denom_def = [meas.heatmap_details_kpi2_denominator_def]        // denominator definition
+			
+			var _kpi = FORMAT([meas.getKPI2],"0.00")                   // get the KPI2
+			
+			//"[nominator value] nominator def / {denominator value] denominator def = [result]"
+			// var res = _nominator & " " & _nom_def & " / " & _denominator & " " & _denom_def & " = " & _kpi
+			var res =IF(
+			    _nominator = BLANK() && _denominator= BLANK(),
+			    "--",
+			    _nominator & " " & _nom_def & " / " & _denominator & " " & _denom_def & " = " & _kpi
+			)
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: e239f32c-ec6c-49e7-8a94-d143371ed4b2
+
+	/// Measure meas.how_kpi2_component_considered.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.how_kpi2_component_considered' = ```
+			
+			var _nominator = [meas.getKPI2Nominator]            // get nominator
+			var _denominator = [meas.getKPI2Denominator]            // get denominator
+			
+			var _wt =[meas.heatmap_details_kpi2_weight_value]          // get ghe weight
+			var _weight = IF(
+			    _nominator=BLANK() && _denominator=BLANK(),
+			    0,
+			    _wt
+			)
+			
+			var res = "This component is weighted at "&  FORMAT(_weight, "0%") &" of the total score"
+			  
+			RETURN
+			res
+			```
+		displayFolder: heatmap_kpis
+		lineageTag: 87c7dedd-91ea-4fac-a6ef-fc084ea8d3bb
+
+	/// Measure meas.how_kpi2_score_calculation.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_whats_better].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, SWITCH, ABS.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_whats_better].
+	/// Format/Type: Unspecified
+	measure 'meas.how_kpi2_score_calculation' =
+			
+			
+			var _better = MAX(metadata_heatmap_items[heatmap_kpi2_whats_better])           // get ghe what's better
+			var _kpi = FORMAT([meas.getKPI2],"0.00")                   // get the KPI2
+			var _sd = format([meas.trueai_kpi2_sd],"0.00")             // standard deviation
+			var _ref_value = format([meas.trueai_kpi2_ref_value],"0.00")       // reference value
+			var _min = format([meas.trueai_kpi2_min],"0.00")                   // get the kpi min value
+			var _max = format([meas.trueai_kpi2_max],"0.00")                   // get the Max value
+			var _kpi_score = format([meas.getKPI2_score],"0.00")                // get the KPI Score
+			
+			
+			var _higher ="("&_kpi &" – "& _min & " ) /  (" & _max & " -  "& _min &") * 100 = " & _kpi_score
+			var _lower = "("&_kpi & " -" & ""& _max & " ) / ( " & _min & " - "& _max & ") * 100 = "& _kpi_score
+			var _center = "1/(1+ABS("& _kpi &" - "& _ref_value &")/"& _sd &") * 100 = "&_kpi_score
+			
+			var res = SWITCH(
+			    _better,
+			    "Higher", _higher,
+			    "Lower", _lower,
+			    "Center", _center
+			)
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: 76422327-e4ca-4141-9c31-7c2f02c60b0b
+
+	/// Measure meas.hypothesis_final_score.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_weight].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_weight].
+	/// Format/Type: Unspecified
+	measure 'meas.hypothesis_final_score' =
+			
+			//(Score 1 x Weighting 1)  + (Score 2 x Weighting 2) / (Score 1 + Score 2) = Final Score
+			
+			var _kpi1_score = [meas.getKPI1_score]           // get the KPI1 Score
+			var _kpi2_score = [meas.getKPI2_score]           // get the KPI2 score
+			
+			var _kpi1_weight = MAX(metadata_heatmap_items[heatmap_kpi1_weight])             // get the kpi1 weight
+			var _kpi2_weight = [meas.heatmap_details_kpi2_weight_value]             // get the kpi2 weigt
+			
+			var score  = ( _kpi1_score * _kpi1_weight ) + ( _kpi2_score  * _kpi2_weight )
+			
+			
+			var res = "("& _kpi1_score &" * " & _kpi1_weight& ")" & "+ (" & _kpi2_score& " * "& _kpi2_weight & ") = " & FORMAT(score,"0")
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: d92599db-4cbe-4973-9a04-9a9748d1ed13
+
+	/// Measure meas.kpi1_ai_score_trust.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_ai_score_name].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, IF.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_ai_score_name].
+	/// Format/Type: Unspecified
+	measure 'meas.kpi1_ai_score_trust' =
+			
+			
+			var _score_name = MAX(metadata_heatmap_items[heatmap_kpi1_ai_score_name])            // get the AI Score name
+			var _score = [meas.kpi1_ai_score_trust_value]                  // get the AI score value
+			var _bucket = [meas.KPI1_AI_score_bucket]                         // bucket name
+			var res = IF(
+			    _bucket="-",
+			    _score_name & "(" & _score & " - "& ")",
+			    _score_name & "("  & _score & " - " & _bucket & " )"
+			)
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: 2200dbd9-a4a1-43e7-b931-78e9f303cbb6
+
+	/// Measure meas.kpi1_score_cy.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, DATE, EDATE, TODAY.
+	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments.
+	/// Format/Type: Unspecified
+	measure 'meas.kpi1_score_cy' = ```
+			
+			
+			var res  = CALCULATE(
+			    [meas.getKPI1_score_cy] ,  
+			    REMOVEFILTERS('cal_end_dates'),  
+			    'cal_end_dates'[Date] >= EDATE(TODAY(), -15)
+			)
+			
+			RETURN
+			res
+			```
+		displayFolder: heatmap_kpis
+		lineageTag: 7fbde2b1-730f-41a7-ab42-57a7ce963ac3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.kpi2_ai_score_trust.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_ai_score_name].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, IF.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_ai_score_name].
+	/// Format/Type: Unspecified
+	measure 'meas.kpi2_ai_score_trust' =
+			
+			var _score_name = MAX(metadata_heatmap_items[heatmap_kpi2_ai_score_name])            // get the AI Score name
+			var _score = [meas.kpi2_ai_score_trust_value]                  // get the AI score value
+			var _bucket = [meas.KPI2_AI_score_bucket]                         // bucket name
+			var res = IF(
+			    _bucket="-",
+			    _score_name & "(" & _score & " - "& ")",
+			    _score_name & "("  & _score & " - " & _bucket & " )"
+			)
+			
+			RETURN
+			res
+		displayFolder: heatmap_kpis
+		lineageTag: 218b2659-eb4c-43fd-b080-5245eeb846bb
+
+	/// Measure meas.loading.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses COUNTROWS.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: 0
+	measure 'meas.loading' =
+			
+			COUNTROWS(metadata_heatmap_items)
+		formatString: 0
+		displayFolder: heatmap_kpis
+		lineageTag: 32c9100b-4e13-4ed1-9283-2bfb66f30457
+
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: Unspecified
+	measure Measure_SVGArrow = ```
+			
+			VAR _Value = ROUND([meas.kpi_combined_score]*100,0)          -- Get the value for the arrows to reflect
+			
+			-- Assigning angles based on thresholds
+			VAR Angle =
+			    SWITCH(TRUE(),
+			        _Value <= -50, 270,   
+			        _Value <= -25, 240,   
+			        _Value <= -10, 210,   
+			        _Value < 0, 180,      
+			        _Value <= 1, 0,       
+			        _Value <= 9, 30,      
+			        _Value <= 25, 60,     
+			        _Value <= 60, 90,     
+			        120                   
+			    )
+			
+			-- Assigning colors to each category (Ensuring proper string formatting)
+			VAR Color =
+			    SWITCH(TRUE(),
+			        _Value >= 60, "#336600",   
+			        _Value >= 26, "#71A43D",   
+			        _Value >= 10, "#99CC66",   
+			        _Value >= 1, "#FFC107",    
+			        _Value >= -1, "#6C757D",   
+			        _Value >= -9, "#FF5733",   
+			        _Value >= -24, "#DC3545",  
+			        _Value >= -49, "#8B0000",  
+			        "#4B0000"                  
+			    )
+			
+			-- Ensuring Color Variable is properly enclosed in the SVG string
+			VAR SVG =
+			    "<svg width='20' height='20' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+			        <g transform='rotate(" & FORMAT(Angle, "0") & ",12,12)'>
+			            <polygon points='12,2 22,22 2,22' style='fill:"&Color&";'/>
+			        </g>
+			    </svg>"
+			
+			-- Encode as Image URL
+			
+			VAR EncodedSVG = "data:image/svg+xml;utf8," & SUBSTITUTE(SVG, "#", "%23")
+			RETURN EncodedSVG
+			```
+		displayFolder: heatmap_kpis
+		lineageTag: 8ddfe7c9-1f4c-4a5b-be2b-3085de702e7a
+		dataCategory: ImageUrl
+
+	/// Purpose: Compute the measure result from the DAX expression and current filter context.
+	/// Calculation Logic: See DAX expression.
+	/// Dynamic Behavior: See DAX expression.
+	/// Format/Type: Unspecified
+	measure Measure_SVGArrow_KPIscore =
+			
+			VAR _Value = ([meas.kpi_combined_score])          -- Get the value for the arrows to reflect
+			
+			-- Assigning angles based on thresholds
+			VAR Angle =
+			    SWITCH(TRUE(),
+			        _Value <= -0.60, 60, --Worsening Significantly
+			        _Value <= -0.25, 30, --Worsening Moderately
+			        _Value <= -0.09, 20, --Worsening Slightly
+			        _Value <= 0.01, 0,    --No Change
+			        _Value <= 0.01, 0,    --No Change
+			        _Value <= 0.09, 350,  -- Improving Slightly
+			        _Value <= 0.25, 330,  --Improving Moderately
+			        _Value <= 0.60, 300,  --Improving Significantly
+			        280
+			    )
+			-- Assigning colors to each category (Ensuring proper string formatting)
+			VAR Color =
+			    SWITCH(TRUE(),
+			        _Value >= 0.60, "#669933", --Improving Significantly
+			        _Value >= 0.26, "#91C159", --Improving Moderately
+			        _Value >= 0.10, "#CBE0AF", --Improving Slightly
+			        _Value >= 0.01, "#CCCCCC", --No Change
+			        _Value >= -0.01, "#CCCCCC",  --No Change
+			        _Value >= -0.09, "#F487A4",  --Worsening Slightly
+			        _Value >= -0.24, "#F21D4B",  --WOrsening Moderately
+			        _Value >= -0.60, "#AA0742",  --Worsening Significantly
+			        "#66052D"
+			    )
+			-- Ensuring Color Variable is properly enclosed in the SVG string
+			-- Arrow SVG (Using `path` for an arrow shape)
+			VAR SVG =
+			    "<svg width='20' height='20' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+			        <g transform='rotate(" & FORMAT(Angle, "0") & ",12,12)'>
+			            <path d='M12 2 L22 12 L12 22 L12 16 L2 16 L2 8 L12 8 Z' fill='" & Color & "' />
+			        </g>
+			    </svg>"
+			-- Encode as Image URL
+			VAR EncodedSVG = "data:image/svg+xml;utf8," & SUBSTITUTE(SVG, "#", "%23")
+			RETURN EncodedSVG
+		displayFolder: heatmap_kpis
+		lineageTag: a5609215-403a-4975-aace-d8ba8ce1029b
+		dataCategory: ImageUrl
+
+	/// Measure meas.combined_score_concatenated.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, SWITCH.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.combined_score_concatenated' = ```
+			
+			
+			var TrendValue = [meas.kpi_combined_score]                     // get the improvemnet compared to cy 
+			var res = 
+			    SWITCH(
+			        TRUE(),
+			        TrendValue < -0.50, "Worsening Drastically",
+			        TrendValue >= -0.50 && TrendValue < -0.25, "Worsening Significantly",
+			        TrendValue >= -0.25 && TrendValue < -0.10, "Worsening Moderately",
+			        TrendValue >= -0.10 && TrendValue < 0.00, "Worsening Slightly",
+			        TrendValue = 0.00, "No Change",
+			        TrendValue > 0.00 && TrendValue <= 0.09, "Improving Slightly",
+			        TrendValue > 0.09 && TrendValue <= 0.25, "Improving Moderately",
+			        TrendValue > 0.25 && TrendValue <= 0.60, "Improving Significantly",
+			        TrendValue > 0.60, "Improving Drastically"
+			
+			    )
+			
+			
+			RETURN
+			res
+			```
+		displayFolder: heatmap_trends
+		lineageTag: ebd32c62-605c-42f8-8017-b9a0abb52860
+
+	/// Measure meas.combined_score_top.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, FORMAT, SWITCH, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.combined_score_top' = ```
+			
+			
+			var TrendValue =[meas.kpi_combined_score]    //IF([meas.kpi_combined_score]=BLANK(), "ND",[meas.kpi_combined_score])                      // get the improvemnet compared to cy 
+			var _conditional_text =
+			    SWITCH(
+			        TRUE(),
+			        TrendValue >= 0 && TrendValue <= 2, "No Change",
+			        TrendValue > 2 && TrendValue <= 5, "Small Increase",
+			        TrendValue > 5 && TrendValue <= 15, "Moderate Increase",
+			        TrendValue > 15, "Significant Increase",
+			        TrendValue < 0 && TrendValue >= -2, "No Change",
+			        TrendValue < -2 && TrendValue >= -5, "Small Decrease",
+			        TrendValue < -5 && TrendValue >= -15, "Moderate Decrease",
+			        TrendValue < -15, "Significant Decrease"
+			    )
+			
+			
+			var _trend_format_score = FORMAT(TrendValue, "+0;-0;0")
+			var res = "Combined KPIs Score: "& _conditional_text & " ( "& _trend_format_score &" )"
+			RETURN
+			res
+			```
+		displayFolder: heatmap_trends
+		lineageTag: a3305cd5-6792-42be-a8a4-5aee98f30e2d
+
+	/// Measure meas.combined_score_top_w_text.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, FORMAT, SWITCH, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.combined_score_top_w_text' = ```
+			
+			
+			var TrendValue =[meas.kpi_combined_score]    //IF([meas.kpi_combined_score]=BLANK(), "ND",[meas.kpi_combined_score])                      // get the improvemnet compared to cy 
+			var _conditional_text =
+			    SWITCH(
+			        TRUE(),
+			        TrendValue >= 0 && TrendValue <= 2, "No Change",
+			        TrendValue > 2 && TrendValue <= 5, "Small Increase",
+			        TrendValue > 5 && TrendValue <= 15, "Moderate Increase",
+			        TrendValue > 15, "Significant Increase",
+			        TrendValue < 0 && TrendValue >= -2, "No Change",
+			        TrendValue < -2 && TrendValue >= -5, "Small Decrease",
+			        TrendValue < -5 && TrendValue >= -15, "Moderate Decrease",
+			        TrendValue < -15, "Significant Decrease"
+			    )
+			
+			
+			var _trend_format_score = FORMAT(TrendValue, "+0;-0;0")
+			var res =  _conditional_text & " ("& _trend_format_score &")"
+			RETURN
+			res
+			```
+		displayFolder: heatmap_trends
+		lineageTag: 3599cd98-ae04-4ff2-9cde-33071e1b56f6
+
+	/// Measure meas.kpi_combined_score_calculation.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.kpi_combined_score_calculation' =
+			
+			var _trend_value1 = [meas.getKPI1_score_delta]
+			var _trend_value2 = [meas.getKPI2_score_delta]
+			
+			var _weight1 = [meas.heatmap_details_kpi1_weight_value]         // get the weight of kpi1
+			// var _weight2 = IF([meas.heatmap_details_kpi2_weight_value]="-", 0,[meas.heatmap_details_kpi2_weight_value])         // weight of kpi2
+			var _weight2 = [meas.heatmap_details_kpi2_weight_value]         // weight of kpi2
+			
+			var score = (_trend_value1*_weight1)+(_trend_value2*_weight2)         // get the trend score
+			
+			var res =IF(
+			    _trend_value2=BLANK(),
+			    " (" &  FORMAT(_trend_value1, "0") & " * " & _weight1   & ") = " & FORMAT(score,"0.00"),
+			    " (" &  FORMAT(_trend_value1, "0") & " * " & _weight1 & ") + (" &  FORMAT(_trend_value2, "0")  & " * " & _weight2 & ") = " & FORMAT(score,"0")
+			)
+			
+			
+			RETURN
+			res
+		displayFolder: heatmap_trends
+		lineageTag: 75955dc4-4369-4eee-a186-115f6a0636fb
+
+	/// Measure meas.kpi_score_combined_text.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.kpi_score_combined_text' =
+			
+			
+			
+			var _trend_value1 = [meas.getKPI1_score_delta]
+			var _trend_value2 = [meas.getKPI2_score_delta]
+			
+			var _weight1 = [meas.heatmap_details_kpi1_weight_value]         // get the weight of kpi1
+			var _weight2 = IF([meas.heatmap_details_kpi2_weight_value]="-", 0, [meas.heatmap_details_kpi2_weight_value])         // weight of kpi2
+			
+			
+			var score = (_trend_value1*_weight1)+(_trend_value2*_weight2)         // get the trend score
+			
+			
+			var res = IF(
+			                score = BLANK(),
+			                "ND",
+			                FORMAT(score, "+0;-0;0")
+			            )
+			
+			RETURN
+			res
+		displayFolder: heatmap_trends
+		lineageTag: bade9fbf-e307-4f87-99de-a48021ba6da4
+
+	/// Measure meas.kpi1_score_change_text.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, FORMAT, SWITCH.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.kpi1_score_change_text' = ```
+			
+			
+			var TrendValue = [meas.getKPI1_score_delta]                     // get the improvemnet compared to cy 
+			
+			var _txt = SWITCH(
+			        TRUE(),
+			        TrendValue >= 0 && TrendValue <= 2, "No Change",
+			        TrendValue > 2 && TrendValue <= 5, "Small Increase",
+			        TrendValue > 5 && TrendValue <= 15, "Moderate Increase",
+			        TrendValue > 15, "Significant Increase",
+			        TrendValue < 0 && TrendValue >= -2, "No Change",
+			        TrendValue < -2 && TrendValue >= -5, "Small Decrease",
+			        TrendValue < -5 && TrendValue >= -15, "Moderate Decrease",
+			        TrendValue < -15, "Significant Decrease"
+			    )
+			var res = _txt & " (" & FORMAT(TrendValue,"+0;-0;0") &")"
+			
+			
+			RETURN
+			res
+			```
+		displayFolder: heatmap_trends
+		lineageTag: cd7479a8-e3b2-4925-ad74-ca0c38d8a387
+
+	/// Measure meas.kpi1_score_last_3_month.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.kpi1_score_last_3_month' =
+			
+			var _score = [meas.getKPI1_score_cy]
+			var res = "KPI 1 Score for 3 Last Months of Period: "& _score
+			RETURN
+			res
+		displayFolder: heatmap_trends
+		lineageTag: fdea832f-7c4e-40c9-87ef-a377231c364d
+
+	/// Measure meas.kpi1_score_last_3_prior_month.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.kpi1_score_last_3_prior_month' =
+			
+			var _score = [meas.getKPI1_score_sply]       // get the sply kpi score
+			var res = "KPI 1 Score for 3 Months Prior to Period: "&_score
+			
+			RETURN
+			res
+		displayFolder: heatmap_trends
+		lineageTag: 46cd0271-0303-4967-8e15-7ea70985805f
+
+	/// Measure meas.kpi1_value_delta_top.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.kpi1_value_delta_top' =
+			
+			
+			var _better = [meas.heatmap_details_kpi1_whats_better]          // get the what's better
+			var kpi1_ref_value = [meas.trueai_kpi1_ref_value]              // get the ref value
+			
+			var delta = [meas.getKPI1_value_delta]
+			
+			var center_value = (delta - kpi1_ref_value)
+			var _conditional_text = [meas.kpi1_value_delta_concatenated]            // get the concated text KPI2
+			
+			
+			var _trend_format_score = IF(
+			                                _better = "Center",
+			                                FORMAT(center_value, "+0%;-0%;0%"),
+			                                FORMAT(delta, "+0%;-0%;0%")
+			)
+			var res = "Trend: "& _conditional_text & " ( "& _trend_format_score &" )"
+			RETURN
+			res
+		displayFolder: heatmap_trends
+		lineageTag: 69b45e42-cece-488e-9f78-3305b4e09945
+
+	/// Measure meas.kpi2_score_change_text.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_def_short].
+	/// Calculation Logic: Uses VAR/RETURN, MAX, FORMAT, SWITCH, IF.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_def_short].
+	/// Format/Type: Unspecified
+	measure 'meas.kpi2_score_change_text' = ```
+			
+			var _kpi2_def = MAX(metadata_heatmap_items[heatmap_kpi2_def_short])
+			var TrendValue = [meas.getKPI2_score_delta]                     // get the improvemnet compared to cy 
+			var _txt = SWITCH(
+			        TRUE(),
+			        TrendValue >= 0 && TrendValue <= 2, "No Change",
+			        TrendValue > 2 && TrendValue <= 5, "Small Increase",
+			        TrendValue > 5 && TrendValue <= 15, "Moderate Increase",
+			        TrendValue > 15, "Significant Increase",
+			        TrendValue < 0 && TrendValue >= -2, "No Change",
+			        TrendValue < -2 && TrendValue >= -5, "Small Decrease",
+			        TrendValue < -5 && TrendValue >= -15, "Moderate Decrease",
+			        TrendValue < -15, "Significant Decrease"
+			    )
+			var res = _txt & " (" & FORMAT(TrendValue,"+0;-0;0") &")"
+			
+			var new_res = IF(
+			    _kpi2_def=BLANK(),
+			    "--",
+			    res
+			)
+			
+			RETURN
+			new_res
+			```
+		displayFolder: heatmap_trends
+		lineageTag: 116d096d-daee-464d-b7fc-e9deb322ba5b
+
+	/// Measure meas.kpi2_score_last_3_month.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.kpi2_score_last_3_month' =
+			
+			var _score = [meas.getKPI2_score_cy]
+			var res = "KPI 2 Score for 3 Last Months of Period: "& _score
+			RETURN
+			res
+		displayFolder: heatmap_trends
+		lineageTag: 61bd716e-e0b3-4b6e-a8a8-bdec62433a99
+
+	/// Measure meas.kpi2_score_last_3_prior_month.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.kpi2_score_last_3_prior_month' =
+			
+			var _score = [meas.getKPI2_score_sply]       // get the sply kpi score
+			var res = "KPI 2 Score for 3 Months Prior to Period: "&_score
+			
+			RETURN
+			res
+		displayFolder: heatmap_trends
+		lineageTag: d7f76b54-5b09-4a14-bc15-17fca51741bb
+
+	/// Measure meas.kpi2_value_delta_top.
+	/// Purpose: Returns the measure value from its DAX expression.
+	/// Calculation Logic: Uses VAR/RETURN, FORMAT, IF.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: Unspecified
+	measure 'meas.kpi2_value_delta_top' =
+			
+			var _better = [meas.heatmap_details_kpi2_whats_better]          // get the what's better
+			var kpi2_ref_value = [meas.trueai_kpi2_ref_value]              // get the ref value
+			
+			var delta = [meas.getKPI2_value_delta]
+			
+			var center_value = (delta - kpi2_ref_value)
+			var _conditional_text = [meas.kpi2_value_delta_concatenated]            // get the concated text KPI2
+			
+			
+			var _trend_format_score = IF(
+			                                _better = "Center",
+			                                FORMAT(center_value, "+0%;-0%;0%"),
+			                                FORMAT(delta, "+0%;-0%;0%")
+			)
+			var res = "Trend: "& _conditional_text & " ( "& _trend_format_score &" )"
+			RETURN
+			res
+		displayFolder: heatmap_trends
+		lineageTag: 25995e7c-3f62-4905-9909-8c53d7baacc8
+
+	/// Measure meas.calc_hyp2_kpi2_nominator_count.
+	/// Purpose: Returns a value derived from opps row count in current context.
+	/// Calculation Logic: Uses VAR/RETURN, CALCULATETABLE, COUNTROWS.
+	/// Dynamic Behavior: Respects current filter context.
+	/// Format/Type: 0
+	measure 'meas.calc_hyp2_kpi2_nominator_count' =
+			
+			var contact_ai = CALCULATETABLE(opps)
+			var res  = COUNTROWS(contact_ai)
+			
+			RETURN
+			res
+		formatString: 0
+		displayFolder: _record_counts
+		lineageTag: b02bd641-139d-4276-adb8-c6c901653894
+
+	/// Measure meas.heatmap_kpi1_min_record_factor_name.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi1_min_factor].
+	/// Calculation Logic: Uses MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi1_min_factor].
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_kpi1_min_record_factor_name' =
+			
+			MAX(metadata_heatmap_items[heatmap_kpi1_min_factor])
+		displayFolder: _record_counts
+		lineageTag: f83afb88-9cca-4105-b0cf-9488ea325afc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Measure meas.heatmap_kpi2_min_record_factor_name.
+	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_min_factor].
+	/// Calculation Logic: Uses MAX.
+	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[heatmap_kpi2_min_factor].
+	/// Format/Type: Unspecified
+	measure 'meas.heatmap_kpi2_min_record_factor_name' =
+			
+			MAX(metadata_heatmap_items[heatmap_kpi2_min_factor])
+		displayFolder: _record_counts
+		lineageTag: 275a2a40-dbe3-4c51-a8c2-70a04f2c253a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Measure meas.heatmap_details_ai_model_score_validation.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id].
@@ -4848,25 +5228,6 @@ table metadata_heatmap_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.heatmap_details_growth_category.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_growth_category].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_growth_category].
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_details_growth_category' = ```
-			
-			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
-			var _category = CALCULATE(
-			                        MAX(metadata_heatmap_items[heatmap_growth_category]),      // get the growth category name 
-			                        metadata_heatmap_items[_sys_doc_id]=h_id
-			)
-			
-			RETURN
-			_category
-			```
-		displayFolder: _heatmap_details
-		lineageTag: 20148111-0f79-4b3f-a97e-ad59a318d172
-
 	/// Measure meas.heatmap_details_growth_category_base64.
 	/// Purpose: Returns a value derived from heatmap_graphics[_sys_base64] and heatmap_graphics[category].
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX.
@@ -5043,25 +5404,6 @@ table metadata_heatmap_items
 		displayFolder: _heatmap_details
 		lineageTag: 394ab51d-753b-419b-bcc5-a004a1f8ca86
 
-	/// Measure meas.heatmap_details_kpi1_denominator_def.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi1_denominator_definition].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi1_denominator_definition].
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_details_kpi1_denominator_def' = ```
-			
-			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
-			var _def = CALCULATE(
-			                        MAX(metadata_heatmap_items[heatmap_kpi1_denominator_definition]),      // get the heatmap kpi1 denominator def 
-			                        metadata_heatmap_items[_sys_doc_id]=h_id
-			)
-			
-			RETURN
-			_def
-			```
-		displayFolder: _heatmap_details
-		lineageTag: fd65597b-475d-4e6e-89e8-0e460f5c2c62
-
 	/// Measure meas.heatmap_details_kpi1_long_def.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi1_def_long].
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
@@ -5119,24 +5461,6 @@ table metadata_heatmap_items
 		lineageTag: e23a40eb-96cf-45a0-a014-8c3655371397
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.heatmap_details_kpi1_nominator_def.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi1_numerator_definition].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi1_numerator_definition].
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_details_kpi1_nominator_def' =
-			
-			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
-			var _def = CALCULATE(
-			                        MAX(metadata_heatmap_items[heatmap_kpi1_numerator_definition]),      // get the heatmap kpi1 nomination def
-			                        metadata_heatmap_items[_sys_doc_id]=h_id
-			)
-			
-			RETURN
-			_def
-		displayFolder: _heatmap_details
-		lineageTag: 5ac7e9b5-0b9c-4ae9-afe4-0d3229adcf48
 
 	/// Measure meas.heatmap_details_kpi1_reference_value.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[col.kpi1_ref_value].
@@ -5233,45 +5557,6 @@ table metadata_heatmap_items
 		displayFolder: _heatmap_details
 		lineageTag: 91e5d540-a947-48ea-b746-81ab3348444a
 
-	/// Measure meas.heatmap_details_kpi1_weight_value.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi1_weight].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi1_weight].
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_details_kpi1_weight_value' =
-			
-			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
-			var _sd = CALCULATE(
-			                        MAX(metadata_heatmap_items[heatmap_kpi1_weight]),      // get the heatmap kpi1 weight value
-			                        metadata_heatmap_items[_sys_doc_id]=h_id
-			)
-			
-			RETURN
-			_sd
-		displayFolder: _heatmap_details
-		lineageTag: 905281ee-18e5-4e36-9971-5726731b7278
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.heatmap_details_kpi1_whats_better.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi1_whats_better].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi1_whats_better].
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_details_kpi1_whats_better' = ```
-			
-			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
-			var _sd = CALCULATE(
-			                        MAX(metadata_heatmap_items[heatmap_kpi1_whats_better]),      // get the heatmap kpi1 what's better 
-			                        metadata_heatmap_items[_sys_doc_id]=h_id
-			)
-			
-			RETURN
-			_sd
-			```
-		displayFolder: _heatmap_details
-		lineageTag: c0e7dfa8-f958-4410-8581-26d52b5b04a9
-
 	/// Measure meas.heatmap_details_kpi2_ai_score_name.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_kpi2_ai_score_name].
 	/// Calculation Logic: Uses VAR/RETURN, MAX, IF.
@@ -5334,25 +5619,6 @@ table metadata_heatmap_items
 		displayFolder: _heatmap_details
 		lineageTag: 30d76455-b65c-4a7d-8754-de2a715441fb
 
-	/// Measure meas.heatmap_details_kpi2_denominator_def.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi2_denominator_definition].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi2_denominator_definition].
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_details_kpi2_denominator_def' = ```
-			
-			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
-			var _def = CALCULATE(
-			                        MAX(metadata_heatmap_items[heatmap_kpi2_denominator_definition]),      // get the heatmap kpi2 denominator def 
-			                        metadata_heatmap_items[_sys_doc_id]=h_id
-			)
-			
-			RETURN
-			_def
-			```
-		displayFolder: _heatmap_details
-		lineageTag: c46ef1b6-8631-4ce8-903d-8055c619f9a6
-
 	/// Measure meas.heatmap_details_kpi2_long_def.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi2_def_long].
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
@@ -5410,24 +5676,6 @@ table metadata_heatmap_items
 		lineageTag: e34f49a3-ce4a-4ac8-8db4-95b3d7aa78cd
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.heatmap_details_kpi2_nominator_def.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi2_numerator_definition].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi2_numerator_definition].
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_details_kpi2_nominator_def' =
-			
-			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
-			var _def = CALCULATE(
-			                        MAX(metadata_heatmap_items[heatmap_kpi2_numerator_definition]),      // get the heatmap kpi1 nomination def
-			                    metadata_heatmap_items[_sys_doc_id]=h_id
-			)
-			
-			RETURN
-			_def
-		displayFolder: _heatmap_details
-		lineageTag: 89bee71b-48c2-43ea-a0a2-fff2f2f67a88
 
 	/// Measure meas.heatmap_details_kpi2_reference_value.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[col.kpi2_ref_value].
@@ -5526,65 +5774,6 @@ table metadata_heatmap_items
 		displayFolder: _heatmap_details
 		lineageTag: b158669c-632e-4d76-b203-4a45f2372e98
 
-	/// Measure meas.heatmap_details_kpi2_weight_value.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, IF.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_details_kpi2_weight_value' =
-			
-			
-			var _weight = [meas.getKPI2Weight]
-			var res = IF(
-			    _weight=BLANK(),
-			    0,
-			    _weight
-			)
-			RETURN
-			res
-		displayFolder: _heatmap_details
-		lineageTag: 40784f41-380e-443c-a943-aa6ef660716a
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.heatmap_details_kpi2_whats_better.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_kpi2_whats_better].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_kpi2_whats_better].
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_details_kpi2_whats_better' = ```
-			
-			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
-			var _sd = CALCULATE(
-			                        MAX(metadata_heatmap_items[heatmap_kpi2_whats_better]),      // get the heatmap kpi2 what's better 
-			                        metadata_heatmap_items[_sys_doc_id]=h_id
-			)
-			
-			RETURN
-			_sd
-			```
-		displayFolder: _heatmap_details
-		lineageTag: 577d42bf-a950-4890-9d5f-6c89af45b21d
-
-	/// Measure meas.heatmap_details_name.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id] and metadata_heatmap_items[heatmap_name].
-	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX, SELECTEDVALUE.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[_sys_doc_id], metadata_heatmap_items[heatmap_name].
-	/// Format/Type: Unspecified
-	measure 'meas.heatmap_details_name' = ```
-			
-			var h_id = SELECTEDVALUE(metadata_heatmap_items[_sys_doc_id])            // get the selected  hypothesis id
-			var _name = CALCULATE(
-			                        MAX(metadata_heatmap_items[heatmap_name]),      // get the heatmap name 
-			                        metadata_heatmap_items[_sys_doc_id]=h_id
-			)
-			
-			RETURN
-			_name
-			```
-		displayFolder: _heatmap_details
-		lineageTag: 1cd40324-e502-4c67-8b92-b7fd641664d1
-
 	/// Measure meas.heatmap_details_score.
 	/// Purpose: Returns a value derived from metadata_heatmap_items[_sys_doc_id].
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, SELECTEDVALUE.
@@ -5604,43 +5793,6 @@ table metadata_heatmap_items
 		lineageTag: 45751bd8-38d1-4513-abb8-7e525f8523a8
 
 		annotation PBI_FormatHint = {"isText":true}
-
-	/// Measure meas.heatmap_details_score_new.
-	/// Purpose: Returns the measure value from its DAX expression.
-	/// Calculation Logic: Uses VAR/RETURN, MAX, SWITCH, IF, ROUND.
-	/// Dynamic Behavior: Respects current filter context.
-	/// Format/Type: 0
-	measure 'meas.heatmap_details_score_new' = ```
-			
-			VAR _flag = [meas.heatmap_combined_record_count_flag]           // get the flag
-			VAR _ai_score = [meas.getHeatmapKPI_AIScore]            // get the AI Model Score
-			
-			// VAR final_output = 
-			//     IF(
-			//         _ai_score = "Limited", 
-			//         "ND",
-			//         IF(
-			//             _flag="False",
-			//             "N/A",
-			//             ROUND(MAX([meas.getHeatmapRawScore],0)/5, 0)*5
-			//         )
-			//     )
-			
-			var res = SWITCH(
-			    TRUE(),
-			    _ai_score = "Limited", "ND",
-			    _flag="False", "N/A",
-			    ROUND(MAX([meas.getHeatmapRawScore],0)/5, 0)*5
-			)
-			
-			RETURN
-			res
-			```
-		formatString: 0
-		displayFolder: _heatmap_details
-		lineageTag: c89d5a22-85e2-47cc-baa5-1c4e10677a55
-
-		annotation PBI_FormatHint = {"isDecimal":true}
 
 	/// Measure meas.heatmap_details_score_w_na_nd.
 	/// Purpose: Returns the measure value from its DAX expression.
@@ -5699,130 +5851,6 @@ table metadata_heatmap_items
 		displayFolder: _heatmap_details
 		lineageTag: 32d5ad33-d04f-4627-bf87-c5f1db82716e
 
-	/// Measure meas.trueai_kpi1_max.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi1_ref_value] and metadata_heatmap_items[col.kpi1_std_value].
-	/// Calculation Logic: Uses VAR/RETURN, MAX.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi1_ref_value], metadata_heatmap_items[col.kpi1_std_value].
-	/// Format/Type: Unspecified
-	measure 'meas.trueai_kpi1_max' = ```
-			
-			var _ref = MAX(metadata_heatmap_items[col.kpi1_ref_value])         // get the ref 
-			var _sd = MAX(metadata_heatmap_items[col.kpi1_std_value])                       // get the SD
-			var res = (_ref + (_sd*2))            // apply the max formula
-			RETURN
-			res
-			```
-		displayFolder: _heatmap_details
-		lineageTag: b1c4db19-9c6d-402b-a739-fc201eeec4f2
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.trueai_kpi1_min.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi1_ref_value] and metadata_heatmap_items[col.kpi1_std_value].
-	/// Calculation Logic: Uses VAR/RETURN, MAX.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi1_ref_value], metadata_heatmap_items[col.kpi1_std_value].
-	/// Format/Type: Unspecified
-	measure 'meas.trueai_kpi1_min' = ```
-			
-			var _ref = MAX(metadata_heatmap_items[col.kpi1_ref_value])          // get the ref 
-			var _sd = MAX(metadata_heatmap_items[col.kpi1_std_value])                         // get the SD
-			var res = (_ref - (_sd*2))            // apply the max formula
-			RETURN
-			res
-			```
-		displayFolder: _heatmap_details
-		lineageTag: 83ef0179-26de-4e24-870b-8748502a2e10
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.trueai_kpi1_ref_value.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi1_ref_value].
-	/// Calculation Logic: Uses MAX.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi1_ref_value].
-	/// Format/Type: Unspecified
-	measure 'meas.trueai_kpi1_ref_value' =
-			
-			MAX(metadata_heatmap_items[col.kpi1_ref_value])
-		displayFolder: _heatmap_details
-		lineageTag: 6e3b2d46-495a-4f93-b6aa-f53730470cca
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.trueai_kpi1_sd.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi1_std_value].
-	/// Calculation Logic: Uses MAX.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi1_std_value].
-	/// Format/Type: Unspecified
-	measure 'meas.trueai_kpi1_sd' =
-			
-			MAX(metadata_heatmap_items[col.kpi1_std_value])
-		displayFolder: _heatmap_details
-		lineageTag: 9b583b49-e2fb-4d17-b47c-c0a52e5bb8c6
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.trueai_kpi2_max.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi2_ref_value] and metadata_heatmap_items[col.kpi2_std_value].
-	/// Calculation Logic: Uses VAR/RETURN, MAX.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi2_ref_value], metadata_heatmap_items[col.kpi2_std_value].
-	/// Format/Type: Unspecified
-	measure 'meas.trueai_kpi2_max' = ```
-			
-			var _ref = MAX(metadata_heatmap_items[col.kpi2_ref_value])          // get the ref 
-			var _sd = MAX(metadata_heatmap_items[col.kpi2_std_value])                         // get the SD
-			var res = (_ref + (_sd*2))            // apply the max formula
-			RETURN
-			res
-			```
-		displayFolder: _heatmap_details
-		lineageTag: 1f369401-854a-4ea6-b56e-8755434db79f
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.trueai_kpi2_min.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi2_ref_value] and metadata_heatmap_items[col.kpi2_std_value].
-	/// Calculation Logic: Uses VAR/RETURN, MAX.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi2_ref_value], metadata_heatmap_items[col.kpi2_std_value].
-	/// Format/Type: Unspecified
-	measure 'meas.trueai_kpi2_min' = ```
-			
-			var _ref = MAX(metadata_heatmap_items[col.kpi2_ref_value])          // get the ref 
-			var _sd = MAX(metadata_heatmap_items[col.kpi2_std_value])                         // get the SD
-			var res = (_ref - (_sd*2))            // apply the max formula
-			RETURN
-			res
-			```
-		displayFolder: _heatmap_details
-		lineageTag: 355715ff-5fc6-4835-8eba-50cb707003ed
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.trueai_kpi2_ref_value.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi2_ref_value].
-	/// Calculation Logic: Uses MAX.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi2_ref_value].
-	/// Format/Type: Unspecified
-	measure 'meas.trueai_kpi2_ref_value' =
-			
-			MAX(metadata_heatmap_items[col.kpi2_ref_value])
-		displayFolder: _heatmap_details
-		lineageTag: 967dff67-5f68-4ea4-a55b-82e8c570fd23
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.trueai_kpi2_sd.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[col.kpi2_std_value].
-	/// Calculation Logic: Uses MAX.
-	/// Dynamic Behavior: Respects current filter context. Responds to filters on metadata_heatmap_items[col.kpi2_std_value].
-	/// Format/Type: Unspecified
-	measure 'meas.trueai_kpi2_sd' =
-			
-			MAX(metadata_heatmap_items[col.kpi2_std_value])
-		displayFolder: _heatmap_details
-		lineageTag: 164e05ce-6bfd-4ea3-b7fd-f5789d75d345
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	/// Measure meas.get_category_base64.
 	/// Purpose: Returns a value derived from heatmap_graphics[_sys_base64] and heatmap_graphics[category].
 	/// Calculation Logic: Uses VAR/RETURN, CALCULATE, MAX.
@@ -5841,16 +5869,6 @@ table metadata_heatmap_items
 			res
 		lineageTag: e381f718-dd25-4795-8a73-57885db37678
 		dataCategory: ImageUrl
-
-	/// Measure meas.get_growth_category.
-	/// Purpose: Returns a value derived from metadata_heatmap_items[heatmap_growth_category].
-	/// Calculation Logic: Uses CALCULATE, MAX.
-	/// Dynamic Behavior: Respects current filter context. CALCULATE modifies filter context using its filter arguments. Responds to filters on metadata_heatmap_items[heatmap_growth_category].
-	/// Format/Type: Unspecified
-	measure 'meas.get_growth_category' =
-			
-			CALCULATE(MAX(metadata_heatmap_items[heatmap_growth_category]))
-		lineageTag: 6d1d5b18-060c-4037-a92e-ca0be00f740d
 
 	/// Measure meas.heatmap_details_score_used_analysis.
 	/// Purpose: Returns the measure value from its DAX expression.
@@ -5872,24 +5890,6 @@ table metadata_heatmap_items
 			```
 		displayFolder: _heatmap_details
 		lineageTag: 3f964261-276e-4f11-89e2-1e15ddb0a58a
-
-	measure 'meas.stakeholder_num_flag' =
-			
-			
-			var stakeholder_info = CALCULATE(
-			    COUNTROWS(ssr_history),
-			    ssr_history[stkhlds_all_contacts_count]>0
-			)
-			
-			var total_rows =COUNTROWS(ssr_history)
-			
-			var percentage=stakeholder_info/total_rows
-			
-			RETURN
-			IF(percentage>0.30, True, False)
-		lineageTag: 7fb568b1-55dc-41f0-a5ee-222f4411c1f5
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Unique heatmap item identifier
 	column _sys_doc_id
