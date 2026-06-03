@@ -904,6 +904,54 @@ table ssr_history_stakeholders
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	column 'Stakeholder Segment' =
+			
+			VAR _Title =
+			    LOWER(COALESCE(ssr_history_stakeholders[crm_title], ""))
+			VAR _Seniority =
+			    LOWER(COALESCE(ssr_history_stakeholders[trueai_title_seniority], ""))
+			VAR _SeniorityBucket =
+			    SWITCH(
+			        TRUE(),
+			        CONTAINSSTRING(_Seniority, "executive") ||
+			        CONTAINSSTRING(_Title, "chief") ||
+			        CONTAINSSTRING(_Title, "ceo") ||
+			        CONTAINSSTRING(_Title, "cfo") ||
+			        CONTAINSSTRING(_Title, "cto") ||
+			        CONTAINSSTRING(_Title, "cio") ||
+			        CONTAINSSTRING(_Title, "coo") ||
+			        CONTAINSSTRING(_Title, "cmo") ||
+			        CONTAINSSTRING(_Title, "president") ||
+			        CONTAINSSTRING(_Title, "founder") ||
+			        CONTAINSSTRING(_Title, "owner") ||
+			        CONTAINSSTRING(_Title, "head of") ||
+			        CONTAINSSTRING(_Title, "gm"),
+			            "Executive",
+			
+			        CONTAINSSTRING(_Title, "vice president") ||
+			        CONTAINSSTRING(_Title, " vp") ||
+			        CONTAINSSTRING(_Title, "svp") ||
+			        CONTAINSSTRING(_Title, "evp"),
+			            "VP",
+			
+			        CONTAINSSTRING(_Title, "director"),
+			            "Director",
+			
+			        CONTAINSSTRING(_Title, "manager") ||
+			        CONTAINSSTRING(_Title, "mgr"),
+			            "Manager",
+			
+			        "Other / IC"
+			    )
+			VAR _Department =
+			    COALESCE(ssr_history_stakeholders[trueai_title_department], "NO")
+			RETURN
+			    _SeniorityBucket & " - " & _Department
+		lineageTag: 292e0c5a-0e49-4ee6-a6f0-57f03039ba0b
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
 	partition ssr_history_stakeholders = m
 		mode: import
 		source = ```
