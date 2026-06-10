@@ -2,11 +2,7 @@
 table open_pipeline
 	lineageTag: 63e68162-90ed-40cd-8e52-99f2a6d679a2
 
-	/// Measure meas.open_opps_dur_hrs.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #,##0.0" hrs"
+	/// Shows open opportunities dur hrs for open pipeline analysis.
 	measure 'meas.open_opps_dur_hrs' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -35,11 +31,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_engagement_ratio.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0%;-0%;0%
+	/// Shows elapsed time or cycle duration for open pipeline analysis.
 	measure 'meas.open_opps_engagement_ratio' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -72,11 +64,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: d0568ec4-480e-4596-8dfa-b70cc86cc8a5
 
-	/// Measure meas.open_opps_last_eng_days.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: """+""#"" days"";""-""#"" days"";""-"""
+	/// Shows elapsed time or cycle duration for open pipeline analysis.
 	measure 'meas.open_opps_last_eng_days' =
 			
 			var last_eng = CALCULATE(MAX(opps[crm_last_act_time]))            // get the last eng date
@@ -95,20 +83,13 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #,0
+	/// Counts open opportunities sys doc count for open pipeline analysis.
 	measure open_opps__sys_doc_count = COUNT(open_pipeline[_sys_doc_id])
 		formatString: #,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 28fc3a6b-76c7-4342-90d2-1d1ac2e41b38
 
-	/// Measure meas.open_opps_sel_date_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #,0
+	/// Counts open opportunities sel date count for open pipeline analysis.
 	measure 'meas.open_opps_sel_date_count' = ```
 			
 			
@@ -140,11 +121,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: e9d52ce3-8497-4ab0-94db-791065dcd7bb
 
-	/// Measure meas.open_opp_sel_date_count_rob.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunity sel date count rob for open pipeline analysis.
 	measure 'meas.open_opp_sel_date_count_rob' = ```
 			//*** This is the "earlier" measure sub filtere approach for TS data  - use to get a filter measure and a count only (counts can be used in pie charts etc)
 			
@@ -177,11 +154,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: e2464022-caf0-4ce8-bdf3-5bd3ae240186
 
-	/// Measure meas.open_opps_last_eng_act.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Short Date
+	/// Shows open opportunities last eng act for open pipeline analysis.
 	measure 'meas.open_opps_last_eng_act' =
 			
 			var sel_date = CALCULATE(MAX(cal_start_dates[Date]))
@@ -195,11 +168,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: eb720c10-21e8-4cd2-b827-189df4909e8e
 
-	/// Measure meas.open_opps_stkhlds_involved.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Shows open opportunities stkhlds involved for open pipeline analysis.
 	measure 'meas.open_opps_stkhlds_involved' =
 			
 			MAX(ssr_history[stkhlds_all_contacts_count])
@@ -207,11 +176,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 10044456-c905-4aaf-bb68-c235a7242c78
 
-	/// Measure meas.open_opps_quality_bucket.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows open opportunities propensity bucket for open pipeline analysis.
 	measure 'meas.open_opps_propensity_bucket' =
 			
 			Var res  = MAXX(opps, opps[trueai_propensity] )
@@ -219,11 +184,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: a0f1fe2d-9a8c-4f78-997c-e3802c7c466d
 
-	/// Measure meas.open_opps_pipeline_current_stage.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows stage-related opportunity results for open pipeline analysis.
 	measure 'meas.open_opps_pipeline_current_stage' =
 			
 			Var res  = MAXX(open_pipeline, open_pipeline[trueai_stage] )
@@ -231,11 +192,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 10887f14-fee8-45c1-9ec1-2e1f778a459c
 
-	/// Measure meas.open_opps_tbl_title.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
 	measure 'meas.open_opps_tbl_title' =
 			
 			var _date = FORMAT([meas.sel_date], "MM/dd/yyyy")           // get the formatted date
@@ -248,11 +205,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 3fed2c8f-0873-44c6-8b3f-b26f87d92022
 
-	/// Measure meas.open_opps_expected_value.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+	/// Shows open opportunities expected value for open pipeline analysis.
 	measure 'meas.open_opps_expected_value' =
 			
 			var _pipeline_amt = [meas.open_opps_pipeline_amt]           // get the pipeline amt
@@ -266,11 +219,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.open_opps_total_expected_value.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
+	/// Shows open opportunities total expected value for open pipeline analysis.
 	measure 'meas.open_opps_total_expected_value' = ```
 			
 			var _pipeline_amt = [meas.open_opps_pipeline_amt]           // get the pipeline amt
@@ -286,11 +235,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.open_opps_total_expected_value_sply_diff.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: +0 %;-0 %;"-"
+	/// Shows the difference in open opportunities total expected value same period last year diff compared with the same period last year for open pipeline analysis.
 	measure 'meas.open_opps_total_expected_value_sply_diff' = ```
 			
 			
@@ -311,11 +256,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_avg_win_prob.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0%;-0%;0%
+	/// Shows average open opportunities average win probability for open pipeline analysis.
 	measure 'meas.open_opps_avg_win_prob' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -345,11 +286,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 09563c27-7a16-47f1-b1db-9b88b120a9c1
 
-	/// Measure meas.open_opps_total_expected_value_sply.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
+	/// Shows open opportunities total expected value same period last year for comparison with the same period last year.
 	measure 'meas.open_opps_total_expected_value_sply' =
 			
 			var _pipeline_amt = [meas.open_opps_pipeline_amt_sply]           // get the pipeline amt
@@ -363,11 +300,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.open_opps_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #,0
+	/// Counts open opportunities count for open pipeline analysis.
 	measure 'meas.open_opps_count' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -397,11 +330,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 5887f433-2566-4a32-b1b4-3fce64f6b252
 
-	/// Measure meas.open_opps_count_sply.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #,0
+	/// Shows open opportunities count same period last year for comparison with the same period last year.
 	measure 'meas.open_opps_count_sply' =
 			
 			CALCULATE(
@@ -413,11 +342,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 1364f987-e2fc-4a19-aa1a-6793b825a130
 
-	/// Measure meas.open_opps_count_sply_diff.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: +0 %;-0 %;"-"
+	/// Shows the difference in open opportunities count same period last year diff compared with the same period last year for open pipeline analysis.
 	measure 'meas.open_opps_count_sply_diff' =
 			
 			var _current = CALCULATE([meas.open_opps_count],open_pipeline[trueai_stage] in {"Early", "Mid", "Late"})           // currently open opps count
@@ -436,11 +361,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_avg_win_prob_sply.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0%;-0%;0%
+	/// Shows open opportunities average win probability same period last year for comparison with the same period last year.
 	measure 'meas.open_opps_avg_win_prob_sply' =
 			
 			CALCULATE(
@@ -452,11 +373,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: bec26611-00c2-4632-a584-4ba4e1d29146
 
-	/// Measure meas.open_opps_avg_win_prob_sply_diff.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: +0 %;-0 %;"-"
+	/// Shows the difference in open opportunities average win probability same period last year diff compared with the same period last year for open pipeline analysis.
 	measure 'meas.open_opps_avg_win_prob_sply_diff' =
 			
 			var _current = CALCULATE([meas.open_opps_avg_win_prob],open_pipeline[trueai_stage] in {"Early", "Mid", "Late"})            // get the current prob
@@ -475,11 +392,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_pipeline_amt.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+	/// Shows open pipeline amount for open pipeline analysis.
 	measure 'meas.open_opps_pipeline_amt' = ```
 			
 			
@@ -513,11 +426,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.open_opps_pipeline_amt_sply.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+	/// Shows open opportunities pipeline amount same period last year for comparison with the same period last year.
 	measure 'meas.open_opps_pipeline_amt_sply' =
 			
 			CALCULATE(
@@ -531,11 +440,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.open_opps_pushed_pulled_day.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: """+""#"" days"";""-""#"" days"";""-"""
+	/// Shows open opportunities pushed pulled day for open pipeline analysis.
 	measure 'meas.open_opps_pushed_pulled_day' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -565,11 +470,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_pushed_pulled_day_sply.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: """+""#"" days"";""-""#"" days"";""-"""
+	/// Shows open opportunities pushed pulled day same period last year for comparison with the same period last year.
 	measure 'meas.open_opps_pushed_pulled_day_sply' =
 			
 			CALCULATE(
@@ -582,11 +483,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_pushed_pulled_day_sply_diff.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: +0 %;-0 %;"-"
+	/// Shows the difference in open opportunities pushed pulled day same period last year diff compared with the same period last year for open pipeline analysis.
 	measure 'meas.open_opps_pushed_pulled_day_sply_diff' =
 			
 			var _current = [meas.open_opps_pushed_pulled_day]           // currently open opps pushed pulled day
@@ -605,11 +502,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_avg_pace_score.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows average open opportunities average pace score for open pipeline analysis.
 	measure 'meas.open_opps_avg_pace_score' =
 			
 			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
@@ -632,11 +525,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.open_opps_items_trueai_stage.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows stage-related opportunity results for open pipeline analysis.
 	measure 'meas.open_opps_items_trueai_stage' = ```
 			
 			var opps_latest_row  = CALCULATETABLE(TOPN(1,opps, opps[_sys_as_of], DESC))  // get the most recent entries
@@ -657,11 +546,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 776d0094-a304-43f4-a8d7-79ccd778ca7c
 
-	/// Measure meas.open_opps_list_dur_hrs.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #,##0.0" hrs"
+	/// Shows open opportunities list dur hrs for open pipeline analysis.
 	measure 'meas.open_opps_list_dur_hrs' =
 			
 			var dur = calculate(sum(open_pipeline[trueai_act_dur])) / 3600 // turn to hours
@@ -673,11 +558,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_avg_pace_score_sply.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows open opportunities average pace score same period last year for comparison with the same period last year.
 	measure 'meas.open_opps_avg_pace_score_sply' = ```
 			
 			var _sply = CALCULATE(
@@ -704,11 +585,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.open_opps_avg_pace_score_sply_diff.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: +0 %;-0 %;"0%"
+	/// Shows the difference in open opportunities average pace score same period last year diff compared with the same period last year for open pipeline analysis.
 	measure 'meas.open_opps_avg_pace_score_sply_diff' = ```
 			
 			var _avg = [meas.trueai_pace_score]             /// current
@@ -732,11 +609,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_act_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities act count for open pipeline analysis.
 	measure 'meas.open_opps_act_count' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -766,11 +639,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Measure meas.open_opps_pipeline_amt_sply_diff.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: +0 %;-0 %;"-"
+	/// Shows the difference in open opportunities pipeline amount same period last year diff compared with the same period last year for open pipeline analysis.
 	measure 'meas.open_opps_pipeline_amt_sply_diff' =
 			
 			var _current = CALCULATE([meas.open_opps_pipeline_amt],open_pipeline[trueai_stage] in {"Early", "Mid", "Late"})
@@ -788,11 +657,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_age_days.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #" days"
+	/// Shows elapsed time or cycle duration for open pipeline analysis.
 	measure 'meas.open_opps_age_days' =
 			
 			var res =  CALCULATE(MAX(opps[col.opp_age]))
@@ -805,11 +670,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_age_days_sply.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #" days"
+	/// Shows open opportunities age days same period last year for comparison with the same period last year.
 	measure 'meas.open_opps_age_days_sply' = ```
 			
 			var res = CALCULATE(
@@ -825,11 +686,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_age_days_sply_diff.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: +0 %;-0 %;"-"
+	/// Shows the difference in open opportunities age days same period last year diff compared with the same period last year for open pipeline analysis.
 	measure 'meas.open_opps_age_days_sply_diff' =
 			
 			var _current = [meas.open_opps_age_days]
@@ -848,11 +705,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_initial_close_date.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Short Date
+	/// Shows open opportunities initial close date for open pipeline analysis.
 	measure 'meas.open_opps_initial_close_date' =
 			
 			CALCULATE(MAX(open_pipeline[trueai_init_close_date]))
@@ -860,11 +713,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 666cb7ed-c316-4ced-91d8-b12470cd140d
 
-	/// Measure meas.open_opps_items_all_act_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items all act count for open pipeline analysis.
 	measure 'meas.open_opps_items_all_act_count' =
 			
 			CALCULATE(
@@ -874,11 +723,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 5351b99b-b4f0-4a02-8a1c-1c05896763fb
 
-	/// Measure meas.open_opps_items_all_act_eng_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items all act eng count for open pipeline analysis.
 	measure 'meas.open_opps_items_all_act_eng_count' =
 			
 			CALCULATE(
@@ -888,11 +733,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 562e4c2a-cc4b-490a-a288-8d995335aa69
 
-	/// Measure meas.opps_detail_sale_type.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows detail sale type for open pipeline analysis.
 	measure 'meas.opps_detail_sale_type' =
 			
 			CALCULATE(
@@ -901,11 +742,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 86fe027a-e93e-4386-b548-e6b4c760d472
 
-	/// Measure meas.open_opps_trueai_stage.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows stage-related opportunity results for open pipeline analysis.
 	measure 'meas.open_opps_trueai_stage' =
 			
 			CALCULATE(
@@ -914,11 +751,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: c2aee211-195c-4a6d-a5b3-137bd1443ee5
 
-	/// Measure meas.open_opps_items_meeting_act_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items meeting act count for open pipeline analysis.
 	measure 'meas.open_opps_items_meeting_act_count' =
 			
 			CALCULATE(
@@ -928,11 +761,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: ff73db87-015f-42d0-8c66-7f7b9b86f4cc
 
-	/// Measure meas.open_opps_items_meeting_act_eng_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items meeting act eng count for open pipeline analysis.
 	measure 'meas.open_opps_items_meeting_act_eng_count' =
 			
 			CALCULATE(
@@ -942,11 +771,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: e284c69f-4727-47a1-8c86-d4a75cd2d286
 
-	/// Measure meas.open_opps_items_phone_act_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items phone act count for open pipeline analysis.
 	measure 'meas.open_opps_items_phone_act_count' =
 			
 			CALCULATE(
@@ -956,11 +781,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: ed3ac908-6a96-432a-bc09-6e6cbb6d6bc7
 
-	/// Measure meas.open_opps_items_phone_act_eng_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items phone act eng count for open pipeline analysis.
 	measure 'meas.open_opps_items_phone_act_eng_count' =
 			
 			CALCULATE(
@@ -970,11 +791,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 68a59106-ced4-4531-9692-5b9c2766f25d
 
-	/// Measure meas.open_opps_items_email_act_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items email act count for open pipeline analysis.
 	measure 'meas.open_opps_items_email_act_count' =
 			
 			CALCULATE(
@@ -984,11 +801,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 5b2295a4-b13a-4594-801f-de41eb83f281
 
-	/// Measure meas.open_opps_items_email_act_eng_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items email act eng count for open pipeline analysis.
 	measure 'meas.open_opps_items_email_act_eng_count' =
 			
 			CALCULATE(
@@ -998,11 +811,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 6925d7b9-faf4-4665-89f6-3a97c20739bd
 
-	/// Measure meas.open_opps_items_social_act_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items social act count for open pipeline analysis.
 	measure 'meas.open_opps_items_social_act_count' =
 			
 			CALCULATE(
@@ -1012,11 +821,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: a09784e8-3f24-46db-a1c2-6e5b74ffcc18
 
-	/// Measure meas.open_opps_items_social_act_eng_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items social act eng count for open pipeline analysis.
 	measure 'meas.open_opps_items_social_act_eng_count' =
 			
 			CALCULATE(
@@ -1026,11 +831,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: ba11a93f-9048-4bea-b2f0-6fee3754c1cf
 
-	/// Measure meas.open_opps_items_all_act-non_eng_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items all act-non eng count for open pipeline analysis.
 	measure 'meas.open_opps_items_all_act-non_eng_count' = ```
 			
 			var all_count = [meas.open_opps_items_all_act_count]            // get all the counts 
@@ -1044,11 +845,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 9b8f7cff-0382-4b11-bdf0-7e343e55d69f
 
-	/// Measure meas.open_opps_items_phone_act-non_eng_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items phone act-non eng count for open pipeline analysis.
 	measure 'meas.open_opps_items_phone_act-non_eng_count' = ```
 			
 			var all_count = [meas.open_opps_items_phone_act_count]            // get all the counts 
@@ -1062,11 +859,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 49836b2b-33de-4e7b-9379-d4e695c67745
 
-	/// Measure meas.open_opps_items_email_act-non_eng_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items email act-non eng count for open pipeline analysis.
 	measure 'meas.open_opps_items_email_act-non_eng_count' = ```
 			
 			var all_count = [meas.open_opps_items_email_act_count]            // get all the counts 
@@ -1080,11 +873,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: f393c148-a960-480e-9a2c-393abd7eb640
 
-	/// Measure meas.open_opps_items_meeting_act-non_eng_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items meeting act-non eng count for open pipeline analysis.
 	measure 'meas.open_opps_items_meeting_act-non_eng_count' = ```
 			
 			var all_count = [meas.open_opps_items_meeting_act_count]            // get all the counts 
@@ -1098,11 +887,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 345deff2-6a35-4fa5-b7dc-9672dbd4c758
 
-	/// Measure meas.open_opps_items_social_act-non_eng_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items social act-non eng count for open pipeline analysis.
 	measure 'meas.open_opps_items_social_act-non_eng_count' = ```
 			
 			var all_count = [meas.open_opps_items_social_act_count]            // get all the counts 
@@ -1116,11 +901,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 6bfaea9e-b5e3-430d-9ac4-7824f78d80f6
 
-	/// Measure meas.open_opps_items_act_eng_counts.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items act eng counts for open pipeline analysis.
 	measure 'meas.open_opps_items_act_eng_counts' =
 			
 			
@@ -1135,11 +916,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: cb8a841a-7579-4716-997f-4d32193b4f51
 
-	/// Measure meas.open_opps_items_act_non_eng_counts.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities items act non eng counts for open pipeline analysis.
 	measure 'meas.open_opps_items_act_non_eng_counts' =
 			
 			
@@ -1154,11 +931,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 9b0454a2-e77d-45a6-acf0-2e9e84b9639a
 
-	/// Measure meas.open_opps_items_act_eng_rate.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0%;-0%;0%
+	/// Shows the open opportunities items act eng rate for open pipeline analysis.
 	measure 'meas.open_opps_items_act_eng_rate' =
 			
 			var _all_act = [meas.open_opps_items_all_act_count]         // get the all act count
@@ -1171,11 +944,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: bc15b784-1974-4c5a-a31d-e5c14f89a0ef
 
-	/// Measure meas.closed_opps_age_days.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #" days"
+	/// Shows elapsed time or cycle duration for open pipeline analysis.
 	measure 'meas.closed_opps_age_days' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -1198,20 +967,12 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.step_sub_type.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows step sub type for open pipeline analysis.
 	measure 'meas.step_sub_type' = CALCULATE(MAX(ssr_history[step_sub_type]))
 		displayFolder: _opps_details
 		lineageTag: b47a791b-611d-4c41-bed6-d76b0df5fe8c
 
-	/// Measure meas.opps_details_screen_age.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: #" days"
+	/// Shows elapsed time or cycle duration for open pipeline analysis.
 	measure 'meas.opps_details_screen_age' = ```
 			
 			VAR SelectedDate = MAX('cal_start_dates'[Date])
@@ -1239,11 +1000,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.opps_details_screen_pushed_pulled.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: """+""#"" days"";""-""#"" days"";""-"""
+	/// Shows details screen pushed pulled for open pipeline analysis.
 	measure 'meas.opps_details_screen_pushed_pulled' =
 			
 			
@@ -1267,11 +1024,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.open_opps_last_eng_date_filter.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows open opportunities last eng date filter for open pipeline analysis.
 	measure 'meas.open_opps_last_eng_date_filter' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -1294,11 +1047,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.closed_opps_pushed_pulled_days.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Shows elapsed time or cycle duration for open pipeline analysis.
 	measure 'meas.closed_opps_pushed_pulled_days' = CALCULATE(MAX(ssr_history[step_days_pushed_pulled]))
 		formatString: 0
 		displayFolder: _opps_details
@@ -1306,11 +1055,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.opps_crm_deep_link.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows CRM deep link for open pipeline analysis.
 	measure 'meas.opps_crm_deep_link' =
 			
 			var res = IF(CONTAINSSTRING(MAX(opps[crm_deep_link]), "http"), "#11BDFC", "#11BDFC")
@@ -1320,11 +1065,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 78bf53a1-8293-4c3c-b17b-9476ef792ed5
 
-	/// Measure meas.opp_details_opps_rep_involved.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Shows opportunity details opportunities rep involved for open pipeline analysis.
 	measure 'meas.opp_details_opps_rep_involved' =
 			
 			CALCULATE(
@@ -1335,11 +1076,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 87aae354-3872-4fc5-ba22-bb59bbceb983
 
-	/// Measure meas.open_opps_account_name.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows company or account results for open pipeline analysis.
 	measure 'meas.open_opps_account_name' =
 			
 			CALCULATE(
@@ -1348,11 +1085,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 3398574e-569e-43e9-b8fd-6ace23959662
 
-	/// Measure meas.opp_details_most_recent_step_outcome.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows opportunity details most recent step outcome for open pipeline analysis.
 	measure 'meas.opp_details_most_recent_step_outcome' =
 			
 			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
@@ -1375,11 +1108,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: aa15574a-fd7d-482f-a3cd-7eab0b46de95
 
-	/// Measure meas.opp_details_most_recent_step_sub_type.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows opportunity details most recent step sub type for open pipeline analysis.
 	measure 'meas.opp_details_most_recent_step_sub_type' =
 			
 			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
@@ -1394,11 +1123,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: 1fbb5ddc-25e3-4ee3-ba4c-8c4ff9c461d2
 
-	/// Measure meas.open_opps_count_tbl_filter.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open opportunities count tbl filter for open pipeline analysis.
 	measure 'meas.open_opps_count_tbl_filter' = ```
 			
 			VAR sel_end_date =CALCULATE(MAX(cal_start_dates[Date])) // get the selected max date 
@@ -1434,22 +1159,14 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 2ca20c71-4d42-4429-98e2-916ffaec97bc
 
-	/// Measure meas.open_pipeline_concate_measure.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows concate measure for open pipeline analysis.
 	measure 'meas.open_pipeline_concate_measure' =
 			
 			MAX(open_pipeline[crm_stage_name]) & " (" & MAX(open_pipeline[trueai_stage]) & ") "
 		displayFolder: _open_opps_pipeline
 		lineageTag: 915b5124-4bd9-48e1-8943-5510c93e3cbe
 
-	/// Measure meas.open_opps_age_days_filter.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Shows elapsed time or cycle duration for open pipeline analysis.
 	measure 'meas.open_opps_age_days_filter' = ```
 			
 			VAR sel_date = [meas.sel_date] // get the selected date 
@@ -1474,11 +1191,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 2c01d1ac-22ff-4dae-8709-b616872b9996
 
-	/// Measure Days Difference.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows elapsed time or cycle duration for open pipeline analysis.
 	measure 'Days Difference' = ```
 			
 			VAR SelectedDate = MAX('cal_start_dates'[Date])
@@ -1494,21 +1207,13 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.open_opps_trueai_booking_amt.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
+	/// Shows won or booked amount for open pipeline analysis.
 	measure 'meas.open_opps_trueai_booking_amt' = sum(open_pipeline[trueai_booking_amt])
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 95540529-8f00-4fa5-977f-e450852f352c
 
-	/// Measure meas.opp_details_most_recent_sales_type.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows opportunity details most recent sales type for open pipeline analysis.
 	measure 'meas.opp_details_most_recent_sales_type' =
 			
 			var _max_step_id = MAX(ssr_history[step_sequence])          // get the most recent step sequence number
@@ -1531,11 +1236,7 @@ table open_pipeline
 		displayFolder: _opps_details
 		lineageTag: eef20aec-590d-4d8c-aaea-4ff2369b0fee
 
-	/// Measure meas.trueai_pace_score.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows trueai pace score for open pipeline analysis.
 	measure 'meas.trueai_pace_score' =
 			
 			var _avg =  ROUND(CALCULATE(AVERAGEX(open_pipeline, [trueai_pace_score]*5)),0)      // get the rounded avg of [trueai_pace_score] multply with 5
@@ -1548,11 +1249,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_details_avg_pace_score.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows average details average pace score for open pipeline analysis.
 	measure 'meas.opps_details_avg_pace_score' =
 			
 			
@@ -1575,11 +1272,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.open_opps_items_trueai_booking_amt.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+	/// Shows won or booked amount for open pipeline analysis.
 	measure 'meas.open_opps_items_trueai_booking_amt' = ```
 			
 			var latest_row  = CALCULATETABLE(TOPN(1,open_pipeline, open_pipeline[_sys_as_of], DESC))  // get the most recent entries
@@ -1591,11 +1284,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: f86e3bdf-05a5-4e3a-8fe9-7889136e011e
 
-	/// Measure meas.trueai_pace_score_test.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
 	measure 'meas.trueai_pace_score_test' =
 			
 			
@@ -1618,11 +1307,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.open_pipeline_stage_sort_index.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
 	measure 'meas.open_pipeline_stage_sort_index' = ```
 			
 			var avg_seq = CALCULATE(AVERAGE(open_pipeline[trueai_step_sequence])) // lower avg indidctes earlier stage
@@ -1633,11 +1318,7 @@ table open_pipeline
 		formatString: 0
 		lineageTag: bfe9fd21-6834-4474-b340-ffb9829e416f
 
-	/// Measure meas.open_pipeline_avg_days_in_stage.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows stage-related opportunity results for open pipeline analysis.
 	measure 'meas.open_pipeline_avg_days_in_stage' =
 			
 			var res = CALCULATE(AVERAGE(open_pipeline[trueai_days_in_stage]))
@@ -1646,11 +1327,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.open_pipeline_deals_reached_next_stage_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open pipeline opportunities for open pipeline analysis.
 	measure 'meas.open_pipeline_deals_reached_next_stage_count' =
 			
 			VAR raw_stage = SELECTEDVALUE(open_pipeline[trueai_avg_step_sequence])
@@ -1672,11 +1349,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 45f80dbb-99fb-49e4-a0ca-804b1a6dc6b0
 
-	/// Measure meas.open_pipeline_deals_reached_stage_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open pipeline opportunities for open pipeline analysis.
 	measure 'meas.open_pipeline_deals_reached_stage_count' = ```
 			
 			VAR stage_num =     SELECTEDVALUE(open_pipeline[trueai_avg_step_sequence])   // add one because we want to look at the next stage 
@@ -1688,11 +1361,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 5b76cd85-e359-444f-920b-8bccf3a3081d
 
-	/// Measure meas.open_pipeline_lost_deals_in_stage_tot_pct.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0.00%;-0.00%;0.00%
+	/// Shows stage-related opportunity results for open pipeline analysis.
 	measure 'meas.open_pipeline_lost_deals_in_stage_tot_pct' =
 			
 			DIVIDE( [meas.open_pipeline_lost_deals_in_stage], [meas.open_pipeline_total_deals])
@@ -1700,11 +1369,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 387d7496-7688-434e-930b-dd08ae451126
 
-	/// Measure meas.open_pipeline_lost_deals_in_stage.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Shows stage-related opportunity results for open pipeline analysis.
 	measure 'meas.open_pipeline_lost_deals_in_stage' =
 			
 			var res = [meas.open_pipeline_deals_reached_stage_count] - [meas.open_pipeline_deals_reached_next_stage_count]
@@ -1713,11 +1378,7 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 9ce4e60f-1a95-4b12-aedf-0822ef95bdde
 
-	/// Measure meas.open_pipeline_total_deals.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Shows total deals for open pipeline analysis.
 	measure 'meas.open_pipeline_total_deals' =
 			
 							VAR stage_num = SELECTEDVALUE(open_pipeline[trueai_avg_step_sequence])
@@ -1734,101 +1395,61 @@ table open_pipeline
 		displayFolder: _open_opps_pipeline
 		lineageTag: 6edf0fca-e41a-4470-9a2e-7c396135f38b
 
-	/// Measure meas.open_pipeline_lost_amt.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
+	/// Shows open pipeline amount for open pipeline analysis.
 	measure 'meas.open_pipeline_lost_amt' = CALCULATE(sum(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = false)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: 41ec1f6d-2ebd-499d-b232-7de1b984e328
 
-	/// Measure meas.open_pipeline_won_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open pipeline opportunities for open pipeline analysis.
 	measure 'meas.open_pipeline_won_count' = CALCULATE(count(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = true)
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 8f56ffd7-2b00-478e-98ab-5f9e7bd66765
 
-	/// Measure meas.open_pipeline_lost_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open pipeline opportunities for open pipeline analysis.
 	measure 'meas.open_pipeline_lost_count' = CALCULATE(count(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = false)
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 4a836a7c-fa82-462b-9d0f-4bd5a72bd987
 
-	/// Measure meas.open_pipeline_booking_amt.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
+	/// Shows open pipeline amount for open pipeline analysis.
 	measure 'meas.open_pipeline_booking_amt' = CALCULATE(sum(open_pipeline[trueai_booking_amt]))
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: a852f06f-7ef4-4074-a500-b847c05e29e6
 
-	/// Measure meas.open_pipeline_won_amt.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
+	/// Shows open pipeline amount for open pipeline analysis.
 	measure 'meas.open_pipeline_won_amt' = CALCULATE(sum(open_pipeline[trueai_booking_amt]), open_pipeline[trueai_is_won] = true)
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: 9b11582e-23e3-4c87-b262-f2c6c548bda0
 
-	/// Measure meas.open_pipeline_booking_amt_avg.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
+	/// Shows open pipeline amount for open pipeline analysis.
 	measure 'meas.open_pipeline_booking_amt_avg' = CALCULATE(AVERAGE((open_pipeline[trueai_booking_amt])))
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_pipeline
 		lineageTag: 461b9e80-02df-467a-a442-d4a22edefb0c
 
-	/// Measure meas.open_pipeline_count_id.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open pipeline opportunities for open pipeline analysis.
 	measure 'meas.open_pipeline_count_id' = COUNT(open_pipeline[_sys_doc_id])
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 45a2df27-31e4-4b0f-9e84-bce4843d7a29
 
-	/// Measure meas.open_pipeline_discount_id.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open pipeline opportunities for open pipeline analysis.
 	measure 'meas.open_pipeline_discount_id' = DISTINCTCOUNT(open_pipeline[_sys_doc_id])
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 1b1912dd-eaf7-4d0a-9f3c-e7837c30a89e
 
-	/// Measure meas.open_pipeline_crm_opp_id.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Shows CRM opportunity ID for open pipeline analysis.
 	measure 'meas.open_pipeline_crm_opp_id' = CALCULATE(DISTINCTCOUNT(open_pipeline[crm_opp_id]))
 		formatString: 0
 		displayFolder: _open_pipeline
 		lineageTag: 7b6292df-4f86-40ec-a3a8-8a9126a9c3ee
 
-	/// Measure meas.open_pipeline_deals_reached_stage_count_pct.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0.00%;-0.00%;0.00%
+	/// Counts open pipeline opportunities for open pipeline analysis.
 	measure 'meas.open_pipeline_deals_reached_stage_count_pct' =
 			
 			DIVIDE( [meas.open_pipeline_deals_reached_stage_count], [meas.open_pipeline_total_deals])
@@ -1836,11 +1457,7 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: b1343ea0-8007-4eed-aebf-3aa0716f50fa
 
-	/// Measure meas.open_pipeline_lost_deals_in_stage_pct.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0.00%;-0.00%;0.00%
+	/// Shows stage-related opportunity results for open pipeline analysis.
 	measure 'meas.open_pipeline_lost_deals_in_stage_pct' =
 			
 			DIVIDE( [meas.open_pipeline_lost_deals_in_stage], [meas.open_pipeline_deals_reached_stage_count])
@@ -1848,21 +1465,13 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: 69c96034-6487-4773-aeb2-26c2adbde284
 
-	/// Measure meas.open_pipeline_lost_booking_amt_in_stage.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: \$#,0;(\$#,0);\$#,0
+	/// Shows open pipeline amount for open pipeline analysis.
 	measure 'meas.open_pipeline_lost_booking_amt_in_stage' = [meas.opps_booking_lost_amt] - [meas.opps_booking_amt_reached_next_stage]
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: _open_opps_pipeline
 		lineageTag: 7cfad227-8096-4d3c-867e-ecb6cb164339
 
-	/// Measure meas.open_pipeline_stages_avg.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0.00
+	/// Shows stage-related opportunity results for open pipeline analysis.
 	measure 'meas.open_pipeline_stages_avg' =
 			
 			DIVIDE(
@@ -1873,11 +1482,7 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: 10d10955-21db-49f5-9e8d-c442e26e9976
 
-	/// Measure meas.open_pipeline_deals_skip_count.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open pipeline opportunities for open pipeline analysis.
 	measure 'meas.open_pipeline_deals_skip_count' =
 			
 			CALCULATE (
@@ -1888,21 +1493,13 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: 857f871b-8f2b-4feb-9647-751d2205a62d
 
-	/// Measure meas.open_pipeline_deals_skip_pct.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0.00%;-0.00%;0.00%
+	/// Shows the deals skip percentage for open pipeline analysis.
 	measure 'meas.open_pipeline_deals_skip_pct' = DIVIDE([meas.open_pipeline_deals_skip_count],[meas.open_pipeline_total_deals])
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: _open_pipeline
 		lineageTag: 7f9662b6-0c94-479c-a6be-031d130f7b5e
 
-	/// Measure meas.open_pipeline_win_rate.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0.00%;-0.00%;0.00%
+	/// Shows the opportunity win rate for open pipeline analysis.
 	measure 'meas.open_pipeline_win_rate' =
 			
 			DIVIDE (
@@ -1914,11 +1511,7 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: 331c9e02-103a-4157-8d38-3973872187be
 
-	/// Measure meas.open_pipeline_total_deals_won.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Shows total deals won for open pipeline analysis.
 	measure 'meas.open_pipeline_total_deals_won' =
 			
 			CALCULATE( [meas.open_pipeline_total_deals],
@@ -1927,11 +1520,7 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: d708d33c-4eb9-4961-9c8e-b3a39fd4c457
 
-	/// Measure meas.open_pipeline_deals_stage_count_won.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Counts open pipeline opportunities for open pipeline analysis.
 	measure 'meas.open_pipeline_deals_stage_count_won' = ```
 			
 			var res = CALCULATE( open_pipeline[meas.open_pipeline_deals_reached_stage_count], opps[trueai_is_won] = TRUE()) 
@@ -1941,11 +1530,7 @@ table open_pipeline
 		displayFolder: _open_pipeline
 		lineageTag: b44ee7e1-dd92-49fa-8551-420880d4e58d
 
-	/// Measure meas.ssr_history_duration_hrs_deals_accumulated.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows elapsed time or cycle duration for open pipeline analysis.
 	measure 'meas.ssr_history_duration_hrs_deals_accumulated' = ```
 			
 			VAR CurIdx = MAX ( 'open_pipeline'[trueai_avg_step_sequence] ) RETURN SUMX ( FILTER ( ALL ( 'open_pipeline'[trueai_avg_step_sequence] ), 
@@ -1958,11 +1543,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_histories_crm_stage_names.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows stage-related opportunity results for open pipeline analysis.
 	measure 'meas.opps_histories_crm_stage_names' = ```
 			
 			-- concats all the crm values for trueai value
@@ -1981,11 +1562,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.opps_details_screen_trueai_pushed_pulled.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: Unspecified
+	/// Shows details screen trueai pushed pulled for open pipeline analysis.
 	measure 'meas.opps_details_screen_trueai_pushed_pulled' =
 			
 			VAR _age =
@@ -2009,11 +1586,7 @@ table open_pipeline
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.open_pipeline_sum_days_in_stage.
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: See DAX expression.
-	/// Dynamic Behavior: See DAX expression.
-	/// Format/Type: 0
+	/// Shows stage-related opportunity results for open pipeline analysis.
 	measure 'meas.open_pipeline_sum_days_in_stage' = ```
 			
 			
