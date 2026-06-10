@@ -2,10 +2,7 @@
 table users_history
 	lineageTag: 44776101-2806-4700-a1fe-2ddb9f44c42c
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: ###,###,###  hrs
+	/// Shows the duration hrs for entity analysis.
 	measure 'meas.users_history_duration_hrs' =
 			
 			var dur = CALCULATE(sum(users_history[ci_time_alloc_tot_dur]))
@@ -20,10 +17,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (dur, act, res) used later in the expression. Dependencies: Columns: users_history[ci_time_alloc_tot], users_history[ci_time_alloc_tot_dur].
-	/// Dynamic Behavior: Uses CALCULATE/CALCULATETABLE to modify filter context with its filter arguments.
-	/// Format/Type: ###  min
+	/// Shows the duration per act min for entity analysis.
 	measure 'meas.users_history_duration_per_act_min' = ```
 			
 			var dur = CALCULATE(sum(users_history[ci_time_alloc_tot_dur]))		//get the allocated total duration
@@ -42,10 +36,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: No VAR blocks. Dependencies: No explicit column or measure references detected..
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: ###,###,###  hrs
+	/// Shows the duration adjusted hrs for entity analysis.
 	measure 'meas.users_history_duration_adjusted_hrs' =
 			
 			var dur = CALCULATE(sum(users_history[ci_time_alloc_tot_dur]))
@@ -63,10 +54,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Purpose: Compute the measure result from the DAX expression and current filter context.
-	/// Calculation Logic: VAR blocks define intermediate values (periods_tbl, reps_tbl, periods, reps) used later in the expression. Dependencies: Columns: users_history[_sys_filt_start_date], users_history[_sys_user_id].
-	/// Dynamic Behavior: No explicit conditional branching detected.
-	/// Format/Type: 0.0
+	/// Counts rep count average for entity analysis.
 	measure 'meas.rep_count_avg' = ```
 			
 			var periods_tbl = SUMMARIZE(calculatetable(users_history), users_history[_sys_user_id], users_history[_sys_filt_start_date]) // get the total number of periods in the selection group by rep and month
