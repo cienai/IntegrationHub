@@ -373,7 +373,7 @@ table opps
 		displayFolder: _opps
 		lineageTag: d17e8206-08e5-44bc-bc7a-e2ebbf39d72c
 
-	/// Shows name for opportunity analysis.
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
 	measure 'meas.opps_name' =
 			CALCULATE(
 			    MAX(opps[crm_name])
@@ -396,7 +396,7 @@ table opps
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Counts count of CRM deep link for opportunity analysis.
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
 	measure 'meas.count_of_crm_deep_link' =
 			
 			DISTINCTCOUNT(opps[crm_deep_link])
@@ -567,7 +567,7 @@ table opps
 		displayFolder: _opps
 		lineageTag: 04beffda-c477-4ae0-8bee-c4cf2fa5db12
 
-	/// Shows won or booked amount for opportunity analysis.
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
 	measure 'meas.opps_booking_amt_reached_next_stage' = ```
 			
 			VAR curIdx =
@@ -1366,6 +1366,115 @@ table opps
 			
 			RETURN CALCULATE(count(opps[trueai_booking_amt]))+won_count
 		lineageTag: 74afa31c-9ad8-430d-a307-3d24ebbfa682
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.starting_arr' =
+			
+			VAR TargetDate = MIN(cal_end_dates[Date])
+			RETURN
+			CALCULATE(
+			    SUM(opps[trueai_arr_amt]),
+			    FILTER(
+			        opps,
+			        opps[trueai_is_won] = TRUE()
+			            && opps[_sys_filt_start_date] <= TargetDate
+			            && (
+			                ISBLANK(opps[_sys_filt_end_date])
+			                    || opps[_sys_filt_end_date] >= TargetDate
+			            )
+			    )
+			)
+		lineageTag: 6e9a01a7-c1d1-4b62-8bb4-51f8b23858f2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.ending_arr' =
+			
+			VAR TargetDate = MAX(cal_end_dates[Date])
+			RETURN
+			CALCULATE(
+			    SUM(opps[trueai_arr_amt]),
+			    FILTER(
+			        opps,
+			        opps[trueai_is_won] = TRUE()
+			            && opps[_sys_filt_start_date] <= TargetDate
+			            && (
+			                ISBLANK(opps[_sys_filt_end_date])
+			                    || opps[_sys_filt_end_date] >= TargetDate
+			            )
+			    )
+			)
+		lineageTag: 04a564e4-9bae-4af7-8b8b-58eda717c983
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.retained_arr' =
+			
+			VAR PeriodStart =
+			    MIN ( 'cal_end_dates'[Date] )
+			VAR PeriodEnd =
+			    MAX ( 'cal_end_dates'[Date] )
+			RETURN
+			    CALCULATE (
+			        SUM ( opps[trueai_arr_amt] ),
+			        FILTER (
+			            opps,
+			            opps[trueai_is_won] = TRUE ()
+			                && opps[_sys_filt_start_date] <= PeriodStart
+			                && (
+			                    ISBLANK ( opps[_sys_filt_end_date] )
+			                        || opps[_sys_filt_end_date] >= PeriodEnd
+			                )
+			        )
+			    )
+		lineageTag: 2ec6f0d9-f48e-47b6-87a0-68c0e5073952
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.expansion_arr' =
+			
+			VAR PeriodStart =
+			    MIN ( 'cal_end_dates'[Date] )
+			VAR PeriodEnd =
+			    MAX ( 'cal_end_dates'[Date] )
+			VAR EndingARR =
+			    [meas.ending_arr]
+			VAR RetainedARR =
+			    [meas.retained_arr]
+			VAR NewARR =
+			    CALCULATE (
+			        SUM ( opps[trueai_arr_amt] ),
+			        FILTER (
+			            opps,
+			            opps[trueai_is_won] = TRUE ()
+			                && opps[_sys_filt_start_date] > PeriodStart
+			                && opps[_sys_filt_start_date] <= PeriodEnd
+			        )
+			    )
+			RETURN
+			    EndingARR - RetainedARR - NewARR
+		lineageTag: b1805d0d-2246-436d-9173-f837012d208a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.arr_grr' =
+			
+			DIVIDE (
+			    [meas.retained_arr],
+			    [meas.starting_arr]
+			)
+		lineageTag: d7737152-be60-4abe-ab34-8814be22d9bd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'meas.arr_nrr' =
+			
+			DIVIDE (
+			    [meas.retained_arr] + [meas.expansion_arr],
+			    [meas.starting_arr]
+			)
+		lineageTag: 11b6ef99-2dcc-4ba3-b9c6-7dff0e4c633e
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
