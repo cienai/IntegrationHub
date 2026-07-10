@@ -65,84 +65,21 @@ expression getDBConnection = ```
 
 	annotation PBI_ResultType = Function
 
-expression getDBTable = ```
-		// let
-		//     getDBTable = (tableName as text) =>
-		
-		//     let
-		//         dbTable = 
-		//         if db_type = "SQL Server" then
-		//                 getDBConnection(){[Schema="dbo",Item=tableName]}[Data] // get the right SQL table
-		//         else if db_type = "PostgresSQL" then
-		//                 getDBConnection(){[Schema="public",Item=tableName]}[Data] // get the right Postgres table
-		//         else 
-		//             error "Invalid database type specified"
-		        
-		//     in
-		//         dbTable
-		// in
-		//     getDBTable
-		
-		
-		
+expression getDBTable =
 		let
 		    getDBTable = (tableName as text) =>
-		
 		    let
-		        dbTable = 
-		        if db_type = "SQL Server" then
-		                getDBConnection(){[Schema="dbo",Item=tableName]}[Data] // get the right table
-		        else if db_type = "PostgresSQL" then
-		                getDBConnection(){[Schema="public",Item=tableName]}[Data] // get the right table
-		
-		        else if db_type = "Azure Data Lake" then
-		                let azureTable =
-		                        let Source  = getDBConnection(), // get the folder info
-		                                RenamedColumns = if Table.HasColumns(Source, "Folder Path") then Table.RenameColumns(Source,{{"Folder Path", "FolderPath"}}) else Source, // rename so easier to search for
-		                                folder = try RenamedColumns{0}[FolderPath] otherwise "", // safely handle empty sources
-		                                coid = try Text.BetweenDelimiters(folder, "cien_", "_") otherwise "", // get the coid when present
-		                                fileName = if Text.Length(coid) > 0 then coid & "_" & tableName & "/" else tableName & "/", // fallback if coid cannot be parsed
-		                                FilteredRowsJustCurrentTable = Table.SelectRows(RenamedColumns, each Text.EndsWith([FolderPath],fileName)),  // find all files for that table
-		                                FilteredRowsJustParquet = Table.SelectRows(FilteredRowsJustCurrentTable, each ([Extension] = ".parquet")), // filter out just teh parquet files
-		                                FilteredRpwsMpHiddenFiles = Table.SelectRows(FilteredRowsJustParquet, each [Attributes]?[Hidden]? <> true), // dont include hidden files if there are any
-		                                InvokeTransformParquetFunction1 = Table.AddColumn(FilteredRpwsMpHiddenFiles, "Transform_File", each try transformParquetFile([Content]) otherwise null), // keep refresh alive when a single parquet file is malformed
-		                                RemovedOtherColumns = Table.SelectColumns(InvokeTransformParquetFunction1, {"Transform_File"}), // keep only transformed tables
-		                                ValidTransformedRows = Table.SelectRows(RemovedOtherColumns, each Value.Is([Transform_File], type table)),
-		                                PrimarySchema = try if not Table.IsEmpty(ValidTransformedRows) then ValidTransformedRows{0}[Transform_File] else null otherwise null,
-		                                SecondarySchema = try if not Table.IsEmpty(FilteredRowsJustParquet) then transformParquetFile(FilteredRowsJustParquet{0}[Content]) else null otherwise null,
-		                                FallbackSchemaTable =
-		                                        if Value.Is(PrimarySchema, type table) then
-		                                                PrimarySchema
-		                                        else if Value.Is(SecondarySchema, type table) then
-		                                                SecondarySchema
-		                                        else
-		                                                #table({}, {}),
-		                                ColNames = Table.ColumnNames(FallbackSchemaTable), // avoid failing when filtered rows are empty
-		                                ExpandedBinRowColsIntoTable =
-		                                        if List.IsEmpty(ColNames) then
-		                                                #table({}, {})
-		                                        else if Table.IsEmpty(ValidTransformedRows) then
-		                                                #table(ColNames, {})
-		                                        else
-		                                                Table.ExpandTableColumn(ValidTransformedRows, "Transform_File", ColNames), // combine rows into a single table
-		
-		                                // Check if "_sys_doc_id" column exists
-		                                CheckColumnExists = if List.Contains(ColNames, "_sys_doc_id") then
-		                                        Table.SelectRows(ExpandedBinRowColsIntoTable, each [ _sys_doc_id ] <> null and [ _sys_doc_id ] <> "") // Remove rows where "_sys_doc_id" is blank
-		                                else
-		                                        ExpandedBinRowColsIntoTable // If column doesn't exist, return the table as it is 
-		                        in CheckColumnExists        
-		                in azureTable
-		        
-		        else 
-		            error "Invalid database type specified"
-		        
+		        dbTable = getDBTableCore(tableName),
+		        filteredDBTable =
+		            if tableName = "companies_history" and Table.HasColumns(dbTable, "job_status") then
+		                Table.SelectRows(dbTable, each (try Text.Lower(Text.Trim(Text.From([job_status]))) otherwise "") = "success")
+		            else
+		                dbTable
 		    in
-		        dbTable
+		        filteredDBTable
 		in
 		    getDBTable
-		```
-	lineageTag: e3d7c27c-cd49-482a-ac68-64e3f5c8ffed
+	lineageTag: 384dc5f2-5070-4cab-b6f6-c272c65ad3b3
 
 	annotation PBI_NavigationStepName = Navigation
 
@@ -226,4 +163,86 @@ expression file_folder_data_lake = "aceme24/export/" meta [IsParameterQuery=true
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Text
+
+expression getDBTableCore =
+		// let
+		//     getDBTable = (tableName as text) =>
+		
+		//     let
+		//         dbTable =
+		//         if db_type = "SQL Server" then
+		//                 getDBConnection(){[Schema="dbo",Item=tableName]}[Data] // get the right SQL table
+		//         else if db_type = "PostgresSQL" then
+		//                 getDBConnection(){[Schema="public",Item=tableName]}[Data] // get the right Postgres table
+		//         else
+		//             error "Invalid database type specified"
+		
+		//     in
+		//         dbTable
+		// in
+		//     getDBTable
+		
+		
+		
+		let
+		    getDBTableCore = (tableName as text) =>
+		
+		    let
+		        dbTable =
+		        if db_type = "SQL Server" then
+		                getDBConnection(){[Schema="dbo",Item=tableName]}[Data] // get the right table
+		        else if db_type = "PostgresSQL" then
+		                getDBConnection(){[Schema="public",Item=tableName]}[Data] // get the right table
+		
+		        else if db_type = "Azure Data Lake" then
+		                let azureTable =
+		                        let Source  = getDBConnection(), // get the folder info
+		                                RenamedColumns = if Table.HasColumns(Source, "Folder Path") then Table.RenameColumns(Source,{{"Folder Path", "FolderPath"}}) else Source, // rename so easier to search for
+		                                folder = try RenamedColumns{0}[FolderPath] otherwise "", // safely handle empty sources
+		                                coid = try Text.BetweenDelimiters(folder, "cien_", "_") otherwise "", // get the coid when present
+		                                fileName = if Text.Length(coid) > 0 then coid & "_" & tableName & "/" else tableName & "/", // fallback if coid cannot be parsed
+		                                FilteredRowsJustCurrentTable = Table.SelectRows(RenamedColumns, each Text.EndsWith([FolderPath],fileName)),  // find all files for that table
+		                                FilteredRowsJustParquet = Table.SelectRows(FilteredRowsJustCurrentTable, each ([Extension] = ".parquet")), // filter out just teh parquet files
+		                                FilteredRpwsMpHiddenFiles = Table.SelectRows(FilteredRowsJustParquet, each [Attributes]?[Hidden]? <> true), // dont include hidden files if there are any
+		                                InvokeTransformParquetFunction1 = Table.AddColumn(FilteredRpwsMpHiddenFiles, "Transform_File", each try transformParquetFile([Content]) otherwise null), // keep refresh alive when a single parquet file is malformed
+		                                RemovedOtherColumns = Table.SelectColumns(InvokeTransformParquetFunction1, {"Transform_File"}), // keep only transformed tables
+		                                ValidTransformedRows = Table.SelectRows(RemovedOtherColumns, each Value.Is([Transform_File], type table)),
+		                                PrimarySchema = try if not Table.IsEmpty(ValidTransformedRows) then ValidTransformedRows{0}[Transform_File] else null otherwise null,
+		                                SecondarySchema = try if not Table.IsEmpty(FilteredRowsJustParquet) then transformParquetFile(FilteredRowsJustParquet{0}[Content]) else null otherwise null,
+		                                FallbackSchemaTable =
+		                                        if Value.Is(PrimarySchema, type table) then
+		                                                PrimarySchema
+		                                        else if Value.Is(SecondarySchema, type table) then
+		                                                SecondarySchema
+		                                        else
+		                                                #table({}, {}),
+		                                ColNames = Table.ColumnNames(FallbackSchemaTable), // avoid failing when filtered rows are empty
+		                                ExpandedBinRowColsIntoTable =
+		                                        if List.IsEmpty(ColNames) then
+		                                                #table({}, {})
+		                                        else if Table.IsEmpty(ValidTransformedRows) then
+		                                                #table(ColNames, {})
+		                                        else
+		                                                Table.ExpandTableColumn(ValidTransformedRows, "Transform_File", ColNames), // combine rows into a single table
+		
+		                                // Check if "_sys_doc_id" column exists
+		                                CheckColumnExists = if List.Contains(ColNames, "_sys_doc_id") then
+		                                        Table.SelectRows(ExpandedBinRowColsIntoTable, each [ _sys_doc_id ] <> null and [ _sys_doc_id ] <> "") // Remove rows where "_sys_doc_id" is blank
+		                                else
+		                                        ExpandedBinRowColsIntoTable // If column doesn't exist, return the table as it is
+		                        in CheckColumnExists
+		                in azureTable
+		
+		        else
+		            error "Invalid database type specified"
+		
+		    in
+		        dbTable
+		in
+		    getDBTableCore
+	lineageTag: e3d7c27c-cd49-482a-ac68-64e3f5c8ffed
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
 

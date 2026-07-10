@@ -105,7 +105,13 @@ table LocalDateTable_fb2adcf0-e763-43fc-9f2e-385e78299685
 
 	partition LocalDateTable_fb2adcf0-e763-43fc-9f2e-385e78299685 = calculated
 		mode: import
-		source = Calendar(Date(Year(MIN('users_mgr'[trueai_hire_date])), 1, 1), Date(Year(MAX('users_mgr'[trueai_hire_date])), 12, 31))
+		source =
+				VAR _minDate = MIN('users_mgr'[trueai_hire_date])
+				VAR _maxDate = MAX('users_mgr'[trueai_hire_date])
+				VAR _startDate = IF(ISBLANK(_minDate), Date(2015,1,1), Date(Year(_minDate), 1, 1))
+				VAR _endDate = IF(ISBLANK(_maxDate), Date(2035,12,31), Date(Year(_maxDate), 12, 31))
+				RETURN
+				    Calendar(MIN(_startDate, _endDate), MAX(_startDate, _endDate))
 
 	annotation __PBI_LocalDateTable = true
 
