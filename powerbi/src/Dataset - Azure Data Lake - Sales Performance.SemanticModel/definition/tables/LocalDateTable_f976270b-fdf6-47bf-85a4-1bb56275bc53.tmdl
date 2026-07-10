@@ -105,7 +105,13 @@ table LocalDateTable_f976270b-fdf6-47bf-85a4-1bb56275bc53
 
 	partition LocalDateTable_f976270b-fdf6-47bf-85a4-1bb56275bc53 = calculated
 		mode: import
-		source = Calendar(Date(Year(MIN('users_mgr'[_sys_filt_start_date])), 1, 1), Date(Year(MAX('users_mgr'[_sys_filt_start_date])), 12, 31))
+		source =
+				VAR _minDate = MIN('users_mgr'[_sys_filt_start_date])
+				VAR _maxDate = MAX('users_mgr'[_sys_filt_start_date])
+				VAR _startDate = IF(ISBLANK(_minDate), Date(2015,1,1), Date(Year(_minDate), 1, 1))
+				VAR _endDate = IF(ISBLANK(_maxDate), Date(2035,12,31), Date(Year(_maxDate), 12, 31))
+				RETURN
+				    Calendar(MIN(_startDate, _endDate), MAX(_startDate, _endDate))
 
 	annotation __PBI_LocalDateTable = true
 
