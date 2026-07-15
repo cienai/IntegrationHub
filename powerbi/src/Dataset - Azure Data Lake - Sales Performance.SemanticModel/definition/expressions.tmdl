@@ -98,10 +98,16 @@ expression getDBTable = ```
 		                in azureTable
 		        
 		        else 
-		            error "Invalid database type specifieds"
+		            error "Invalid database type specifieds",
+		
+		        filteredDBTable =
+		            if tableName = "companies_history" and Table.HasColumns(dbTable, "job_status") then
+		                Table.SelectRows(dbTable, each (try Text.Lower(Text.Trim(Text.From([job_status]))) otherwise "") = "success")
+		            else
+		                dbTable
 		        
 		    in
-		        dbTable
+		        filteredDBTable
 		in
 		    getDBTable
 		```
