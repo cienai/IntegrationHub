@@ -1751,8 +1751,8 @@ table metadata_ai_scores
 	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
 	measure 'meas.ai_scores_new_logo_existing_customer_selling' =
 			
-			var _new_logo = [meas.ai_scores_pred_new_logo_selling]      // new logo sellign score
-			var _existing = [meas.ai_scores_pred_existing_customer_selling]         // existing customer selling score
+			var _new_logo = [meas.ai_scores_propensity_new_logo_selling]      // new logo sellign score
+			var _existing = [meas.ai_scores_propensity_existing_customer_selling]         // existing customer selling score
 			var res = (_new_logo+_existing)/2
 			
 			RETURN
@@ -1933,7 +1933,7 @@ table metadata_ai_scores
 		lineageTag: d286bf08-11f1-4d97-b1e2-36dbf861d4a3
 
 	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
-	measure 'meas.ai_scores_pred_existing_customer_selling' = ```
+	measure 'meas.ai_scores_propensity_existing_customer_selling' = ```
 			
 						var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
 						var factor1 = COALESCE(MAXX(latest_row, companies_history[di_pred_existing_customer_selling_auc]), 0)     // get the latest auc for existing customer
@@ -1953,10 +1953,10 @@ table metadata_ai_scores
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
-	measure 'meas.ai_scores_pred_existing_customer_selling_text' = ```
+	measure 'meas.ai_scores_propensity_existing_customer_selling_text' = ```
 			
 			
-			var _conf = [meas.ai_scores_pred_existing_customer_selling] // get the existing customer selling score
+			var _conf = [meas.ai_scores_propensity_existing_customer_selling] // get the existing customer selling score
 			
 			var _status_ = IF(
 			    _conf > 94, "Excellent", 
@@ -1976,7 +1976,7 @@ table metadata_ai_scores
 		lineageTag: 8e71ca17-df28-4dc2-afa6-91f77e929f65
 
 	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
-	measure 'meas.ai_scores_pred_new_logo_selling' = ```
+	measure 'meas.ai_scores_propensity_new_logo_selling' = ```
 			
 			var factor1 = COALESCE([meas.ai_scores_new_logo_selling_factor1_value], 0)
 			var factor2 = COALESCE([meas.ai_scores_new_logo_selling_factor2_value], 0)
@@ -1994,9 +1994,9 @@ table metadata_ai_scores
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
-	measure 'meas.ai_scores_pred_new_logo_selling_text' = ```
+	measure 'meas.ai_scores_propensity_new_logo_selling_text' = ```
 			
-			var _conf = [meas.ai_scores_pred_new_logo_selling] // get the new logo selling score
+			var _conf = [meas.ai_scores_propensity_new_logo_selling] // get the new logo selling score
 			
 			var _status_ = IF(
 			    _conf > 94, "Excellent", 
@@ -2016,7 +2016,7 @@ table metadata_ai_scores
 		lineageTag: 5b99ef74-063c-4fd0-9ed0-c8e12406b3e6
 
 	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
-	measure 'meas.ai_scores_pred_post_sales_support' = ```
+	measure 'meas.ai_scores_propensity_post_sales_support' = ```
 			
 			var factor1 = COALESCE([meas.ai_scores_post_sales_support_factor1_value], 0)
 			var factor2 =  COALESCE([meas.ai_scores_post_sales_support_factor2_value], 0)
@@ -2034,9 +2034,9 @@ table metadata_ai_scores
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
-	measure 'meas.ai_scores_pred_post_sales_support_text' = ```
+	measure 'meas.ai_scores_propensity_post_sales_support_text' = ```
 			
-			var _conf = [meas.ai_scores_pred_post_sales_support]        // get the score 
+			var _conf = [meas.ai_scores_propensity_post_sales_support]        // get the score
 			
 			var _status_ = IF(
 			    _conf > 94, "Excellent", 
@@ -2056,7 +2056,7 @@ table metadata_ai_scores
 		lineageTag: 81fbf8fd-6984-44da-a73a-1b8088c84d53
 
 	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
-	measure 'meas.ai_scores_pred_prospecting' = ```
+	measure 'meas.ai_scores_propensity_prospecting' = ```
 			
 			var factor1 = COALESCE([meas.ai_scores_prospecting_factor1_value], 0)
 			var factor2 =  COALESCE([meas.ai_scores_prospecting_factor2_value], 0)
@@ -2073,9 +2073,9 @@ table metadata_ai_scores
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
-	measure 'meas.ai_scores_pred_prospecting_text' = ```
+	measure 'meas.ai_scores_propensity_prospecting_text' = ```
 			
-			var _conf = [meas.ai_scores_pred_prospecting] // get the prospecting pred score
+			var _conf = [meas.ai_scores_propensity_prospecting] // get the prospecting propensity score
 			
 			var _status_ = IF(
 			    _conf > 94, "Excellent", 
@@ -2502,10 +2502,10 @@ table metadata_ai_scores
 			
 			var res = SWITCH(
 			    score_name,
-			    "Prospecting Success Predictions", "meas.ai_scores_pred_prospecting",   
-			    "New Logo Selling Success Predictions", "meas.ai_scores_pred_new_logo_selling",    // score_id 2
-			    "Post-Sales Support Success Predictions", "meas.ai_scores_pred_post_sales_support",    // score_id 3
-			    "Existing Customer Selling Success Predictions", "meas.ai_scores_pred_existing_customer_selling",    // score_id 4
+			    "Prospecting Propensity", "meas.ai_scores_propensity_prospecting",
+			    "New Logo Selling Propensity", "meas.ai_scores_propensity_new_logo_selling",    // score_id 2
+			    "Post-Sales Support Propensity", "meas.ai_scores_propensity_post_sales_support",    // score_id 3
+			    "Existing Customer Selling Propensity", "meas.ai_scores_propensity_existing_customer_selling",    // score_id 4
 			    "Success Factor Analysis", "meas.ai_scores_factor_analysis",                      // score id 5
 			    "Potential ACV", "meas.ai_scores_potential_acv",                      // score id 6
 			    "List Price", "meas.ai_scores_all_list_price",                      // score id 7
@@ -2564,10 +2564,10 @@ table metadata_ai_scores
 				
 			var res = IFERROR(SWITCH(
 			    score_name,
-			    "Prospecting Success Predictions", IFERROR([meas.ai_scores_prospecting_factor1_value], BLANK()),    // score_id 1
-			    "New Logo Selling Success Predictions", IFERROR([meas.ai_scores_new_logo_selling_factor1_value], BLANK()),    // score_id 2
-			    "Post-Sales Support Success Predictions", IFERROR([meas.ai_scores_post_sales_support_factor1_value], BLANK()),    // score_id 3
-			    "Existing Customer Selling Success Predictions", IFERROR([meas.ai_scores_existing_customer_selling_factor1_value], BLANK()),    // score_id 4
+			    "Prospecting Propensity", IFERROR([meas.ai_scores_prospecting_factor1_value], BLANK()),    // score_id 1
+			    "New Logo Selling Propensity", IFERROR([meas.ai_scores_new_logo_selling_factor1_value], BLANK()),    // score_id 2
+			    "Post-Sales Support Propensity", IFERROR([meas.ai_scores_post_sales_support_factor1_value], BLANK()),    // score_id 3
+			    "Existing Customer Selling Propensity", IFERROR([meas.ai_scores_existing_customer_selling_factor1_value], BLANK()),    // score_id 4
 			    "Success Factor Analysis", IFERROR([meas.ai_scores_success_factor_analysis_factor1_value], BLANK()),                      // score id 5
 			    "Potential ACV", IFERROR([meas.ai_scores_potential_acv_factor1_value], BLANK()),                      // score id 6
 			    "List Price", IFERROR([meas.ai_scores_list_price_items_factor1_value], BLANK()),                      // score id 7
@@ -2630,10 +2630,10 @@ table metadata_ai_scores
 				
 			var res = IFERROR(SWITCH(
 			    score_name,
-			    "Prospecting Success Predictions", IFERROR([meas.ai_scores_prospecting_factor2_value], BLANK()),    // score_id 1
-			    "New Logo Selling Success Predictions", IFERROR([meas.ai_scores_new_logo_selling_factor2_value], BLANK()),    // score_id 2
-			    "Post-Sales Support Success Predictions", IFERROR([meas.ai_scores_post_sales_support_factor2_value], BLANK()),    // score_id 3
-			    "Existing Customer Selling Success Predictions", IFERROR([meas.ai_scores_existing_customer_selling_factor2_value], BLANK()),    // score_id 4
+			    "Prospecting Propensity", IFERROR([meas.ai_scores_prospecting_factor2_value], BLANK()),    // score_id 1
+			    "New Logo Selling Propensity", IFERROR([meas.ai_scores_new_logo_selling_factor2_value], BLANK()),    // score_id 2
+			    "Post-Sales Support Propensity", IFERROR([meas.ai_scores_post_sales_support_factor2_value], BLANK()),    // score_id 3
+			    "Existing Customer Selling Propensity", IFERROR([meas.ai_scores_existing_customer_selling_factor2_value], BLANK()),    // score_id 4
 			    "Success Factor Analysis", IFERROR([meas.ai_scores_success_factor_analysis_factor2_value], BLANK()),                      // score id 5
 			    "List Price", IFERROR([meas.ai_scores_list_price_items_non_default_factor2_value], BLANK()),                      // score id 7
 			    "Line Item Products", IFERROR([meas.ai_scores_line_items_products_factor2_value], BLANK()),                      // score id 8
@@ -3012,16 +3012,16 @@ table metadata_ai_scores
 			VAR raw_val =
 			    SWITCH(
 			        score_name,
-			        "Prospecting Success Predictions", [meas.ai_scores_pred_prospecting],
+			        "Prospecting Propensity", [meas.ai_scores_propensity_prospecting],
 			
-			        "New Logo Selling Success Predictions",
+			        "New Logo Selling Propensity",
 			            (
 			                MAX(COALESCE([meas.ai_scores_new_logo_selling_factor2_value], 0), 0)
 			                + COALESCE([meas.ai_scores_new_logo_selling_factor1_value], 0)
 			            ) / 2,
 			
-			        "Post-Sales Support Success Predictions", [meas.ai_scores_pred_post_sales_support],
-			        "Existing Customer Selling Success Predictions", [meas.ai_scores_pred_existing_customer_selling],
+			        "Post-Sales Support Propensity", [meas.ai_scores_propensity_post_sales_support],
+			        "Existing Customer Selling Propensity", [meas.ai_scores_propensity_existing_customer_selling],
 			        "Success Factor Analysis", [meas.ai_scores_success_factor_analysis],
 			        "Potential ACV", [meas.ai_scores_potential_acv],
 			        "List Price", [meas.ai_scores_list_price],
