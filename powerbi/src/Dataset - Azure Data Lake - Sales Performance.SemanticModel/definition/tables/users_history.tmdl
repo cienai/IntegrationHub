@@ -3012,6 +3012,238 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Calculates annualized average bookings per ramped rep in the current role and date context.
+	measure 'meas.org_capacity_aab_ramped' =
+			
+			CALCULATE (
+			    AVERAGE ( users_history[ci_perf_qtly_bookings_user] ) * 4,
+			    KEEPFILTERS (
+			        users_history[col.ci.perf_ramping_status] = "Ramped"
+			    )
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _org_capacity\Benchmarks
+		lineageTag: ae5fda32-11e8-4056-bea6-9b916349c070
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Calculates annualized average pipeline created per ramped rep in the current role and date context.
+	measure 'meas.org_capacity_aapc_ramped' =
+			
+			CALCULATE (
+			    AVERAGE ( users_history[ci_perf_qtly_pipeline_user] ) * 4,
+			    KEEPFILTERS (
+			        users_history[col.ci.perf_ramping_status] = "Ramped"
+			    )
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _org_capacity\Benchmarks
+		lineageTag: 90e8baae-5ef2-4604-9e67-39ca16873b13
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Returns AAPC for SDR roles and AAB for AE or AM roles. Returns blank for mixed or unsupported roles.
+	measure 'meas.org_capacity_aab_aapc_ramped' =
+			
+			VAR RoleFunction =
+			    SELECTEDVALUE ( users[trueai_user_role_function] )
+			
+			RETURN
+			    SWITCH (
+			        RoleFunction,
+			        "SDR", [meas.org_capacity_aapc_ramped],
+			        "AE",  [meas.org_capacity_aab_ramped],
+			        "AM",  [meas.org_capacity_aab_ramped],
+			        BLANK ()
+			    )
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _org_capacity\Benchmarks
+		lineageTag: 6dfc7fca-bcd2-4973-855d-1eb54baea0dc
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Returns the role-aware ramped AAB or AAPC for the selected date range shifted back 12 months.
+	measure 'meas.org_capacity_aab_aapc_ramped_py' =
+			
+			VAR CurrentStartDate =
+			    MIN ( cal_end_dates[Date] )
+			
+			VAR CurrentEndDate =
+			    MAX ( cal_end_dates[Date] )
+			
+			VAR PriorDateFilter =
+			    FILTER (
+			        ALL ( cal_end_dates[Date] ),
+			        cal_end_dates[Date] >= EDATE ( CurrentStartDate, -12 )
+			            && cal_end_dates[Date] <= EDATE ( CurrentEndDate, -12 )
+			    )
+			
+			RETURN
+			    CALCULATE (
+			        [meas.org_capacity_aab_aapc_ramped],
+			        REMOVEFILTERS ( cal_end_dates[Date] ),
+			        PriorDateFilter
+			    )
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _org_capacity\Prior Period
+		lineageTag: 537f53d4-8481-4ab0-8b57-68c5eb1dfffe
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Calculates year-over-year change in the role-aware ramped AAB or AAPC.
+	measure 'meas.org_capacity_aab_aapc_ramped_yoy_pct' =
+			
+			VAR CurrentValue =
+			    [meas.org_capacity_aab_aapc_ramped]
+			
+			VAR PriorValue =
+			    [meas.org_capacity_aab_aapc_ramped_py]
+			
+			RETURN
+			    DIVIDE (
+			        CurrentValue - PriorValue,
+			        PriorValue
+			    )
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _org_capacity\YoY
+		lineageTag: 4698d889-fa7c-4109-81f1-ffa325262ea0
+
+	/// Returns generated pipeline for SDR roles and won bookings for AE or AM roles.
+	measure 'meas.org_capacity_role_production_volume' =
+			
+			VAR RoleFunction =
+			    SELECTEDVALUE ( users[trueai_user_role_function] )
+			
+			VAR SDRPipeline =
+			    CALCULATE (
+			        ssr_history[meas.ssr_history_generated_pipeline_amt],
+			        KEEPFILTERS (
+			            TREATAS (
+			                {
+			                    "Prospecting",
+			                    "Post-Sales Support"
+			                },
+			                ssr_history[step_name]
+			            )
+			        )
+			    )
+			
+			VAR AEAMBookings =
+			    CALCULATE (
+			        ssr_history[meas.ssr_history_won_amt],
+			        KEEPFILTERS (
+			            TREATAS (
+			                {
+			                    "New Logo Selling",
+			                    "Existing Customer Selling",
+			                    "Existing Cust. Selling"
+			                },
+			                ssr_history[step_name]
+			            )
+			        )
+			    )
+			
+			RETURN
+			    SWITCH (
+			        RoleFunction,
+			        "SDR", SDRPipeline,
+			        "AE",  AEAMBookings,
+			        "AM",  AEAMBookings,
+			        BLANK ()
+			    )
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _org_capacity\Production
+		lineageTag: 0476b08d-bf2e-4932-bd05-9e4ca31d7e34
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Returns role-aware production volume for the selected date range shifted back 12 months.
+	measure 'meas.org_capacity_role_production_volume_py' =
+			
+			VAR CurrentStartDate =
+			    MIN ( cal_end_dates[Date] )
+			
+			VAR CurrentEndDate =
+			    MAX ( cal_end_dates[Date] )
+			
+			VAR PriorDateFilter =
+			    FILTER (
+			        ALL ( cal_end_dates[Date] ),
+			        cal_end_dates[Date] >= EDATE ( CurrentStartDate, -12 )
+			            && cal_end_dates[Date] <= EDATE ( CurrentEndDate, -12 )
+			    )
+			
+			RETURN
+			    CALCULATE (
+			        [meas.org_capacity_role_production_volume],
+			        REMOVEFILTERS ( cal_end_dates[Date] ),
+			        PriorDateFilter
+			    )
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _org_capacity\Prior Period
+		lineageTag: 2cd7cc75-d5a6-4415-b264-4a9baeeac0fa
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Calculates role-aware production volume per end-of-period rep, including ramped and non-ramped reps.
+	measure 'meas.org_capacity_production_per_eop_rep' =
+			
+			DIVIDE (
+			    [meas.org_capacity_role_production_volume],
+			    [meas.data_logs_user_count_rep_eop]
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _org_capacity\Production
+		lineageTag: baba91dc-1334-457a-abeb-74f836be95ec
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Returns production per end-of-period rep for the selected date range shifted back 12 months.
+	measure 'meas.org_capacity_production_per_eop_rep_py' =
+			
+			VAR CurrentStartDate =
+			    MIN ( cal_end_dates[Date] )
+			
+			VAR CurrentEndDate =
+			    MAX ( cal_end_dates[Date] )
+			
+			VAR PriorDateFilter =
+			    FILTER (
+			        ALL ( cal_end_dates[Date] ),
+			        cal_end_dates[Date] >= EDATE ( CurrentStartDate, -12 )
+			            && cal_end_dates[Date] <= EDATE ( CurrentEndDate, -12 )
+			    )
+			
+			RETURN
+			    CALCULATE (
+			        [meas.org_capacity_production_per_eop_rep],
+			        REMOVEFILTERS ( cal_end_dates[Date] ),
+			        PriorDateFilter
+			    )
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _org_capacity\Prior Period
+		lineageTag: 5a28256c-97ae-4fcb-9c0f-4e509544394c
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Calculates year-over-year change in role-aware production per end-of-period rep.
+	measure 'meas.org_capacity_production_per_eop_rep_yoy_pct' =
+			
+			VAR CurrentValue =
+			    [meas.org_capacity_production_per_eop_rep]
+			
+			VAR PriorValue =
+			    [meas.org_capacity_production_per_eop_rep_py]
+			
+			RETURN
+			    DIVIDE (
+			        CurrentValue - PriorValue,
+			        PriorValue
+			    )
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _org_capacity\YoY
+		lineageTag: e608dde9-da16-4da8-900e-3582c2b8dc7b
+
 	/// Column 'col.ci.perf_qtly_bookings_user' = ```.
 	column 'col.ci.perf_qtly_bookings_user' = ```
 			
