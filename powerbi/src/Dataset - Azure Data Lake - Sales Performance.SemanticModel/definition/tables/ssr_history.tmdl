@@ -13260,6 +13260,28 @@ table ssr_history
 		displayFolder: all_activity_opp
 		lineageTag: 7f2d621f-6f24-44c9-bfe2-d85d7ea6a7ff
 
+	/// Counts distinct nonblank opportunities won in the New Logo Selling step.
+	measure 'meas.pricing_won_new_logo_deals' =
+			
+			CALCULATE (
+			    DISTINCTCOUNT ( ssr_history[entity_opp_id] ),
+			    KEEPFILTERS (
+			        ssr_history[step_name] = "New Logo Selling"
+			    ),
+			    KEEPFILTERS (
+			        ssr_history[step_success] = TRUE ()
+			    ),
+			    KEEPFILTERS (
+			        FILTER (
+			            VALUES ( ssr_history[entity_opp_id] ),
+			            NOT ISBLANK ( ssr_history[entity_opp_id] )
+			        )
+			    )
+			)
+		formatString: #,0
+		displayFolder: _pricing_analysis\New Logo
+		lineageTag: 081f544e-bb19-415e-9a94-294ca6aebc41
+
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
 		dataType: string

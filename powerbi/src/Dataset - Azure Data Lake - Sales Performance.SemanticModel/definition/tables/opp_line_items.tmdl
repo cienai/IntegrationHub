@@ -245,6 +245,132 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Calculates total list price before discount for distinct won New Logo opportunities.
+	measure 'meas.pricing_total_list_price_won_new_logo' =
+			
+			VAR WonNewLogoOpportunities =
+			    CALCULATETABLE (
+			        VALUES ( ssr_history[entity_opp_id] ),
+			        KEEPFILTERS (
+			            ssr_history[step_name] = "New Logo Selling"
+			        ),
+			        KEEPFILTERS (
+			            ssr_history[step_success] = TRUE ()
+			        ),
+			        KEEPFILTERS (
+			            FILTER (
+			                VALUES ( ssr_history[entity_opp_id] ),
+			                NOT ISBLANK ( ssr_history[entity_opp_id] )
+			            )
+			        )
+			    )
+			
+			RETURN
+			    CALCULATE (
+			        [meas.opp_line_item_total_price_before_discount],
+			        TREATAS (
+			            WonNewLogoOpportunities,
+			            opp_line_items[crm_opp_id]
+			        )
+			    )
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _pricing_analysis\New Logo
+		lineageTag: 19b8200e-3227-4908-8b4d-4ab938b3701c
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Calculates total final price after discount for distinct won New Logo opportunities.
+	measure 'meas.pricing_total_final_price_won_new_logo' =
+			
+			VAR WonNewLogoOpportunities =
+			    CALCULATETABLE (
+			        VALUES ( ssr_history[entity_opp_id] ),
+			        KEEPFILTERS (
+			            ssr_history[step_name] = "New Logo Selling"
+			        ),
+			        KEEPFILTERS (
+			            ssr_history[step_success] = TRUE ()
+			        ),
+			        KEEPFILTERS (
+			            FILTER (
+			                VALUES ( ssr_history[entity_opp_id] ),
+			                NOT ISBLANK ( ssr_history[entity_opp_id] )
+			            )
+			        )
+			    )
+			
+			RETURN
+			    CALCULATE (
+			        [meas.opp_line_items_trueai_total_price],
+			        TREATAS (
+			            WonNewLogoOpportunities,
+			            opp_line_items[crm_opp_id]
+			        )
+			    )
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _pricing_analysis\New Logo
+		lineageTag: 0d524ccd-c9d7-4754-acf8-76cf7e74606a
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Calculates average list price before discount per distinct won New Logo opportunity.
+	measure 'meas.pricing_avg_list_price_per_won_new_logo_deal' =
+			
+			DIVIDE (
+			    [meas.pricing_total_list_price_won_new_logo],
+			    ssr_history[meas.pricing_won_new_logo_deals]
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _pricing_analysis\New Logo
+		lineageTag: 882dc1c9-084b-4d28-bb8f-4d5834a394dc
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Calculates average final price after discount per distinct won New Logo opportunity.
+	measure 'meas.pricing_avg_final_price_per_won_new_logo_deal' =
+			
+			DIVIDE (
+			    [meas.pricing_total_final_price_won_new_logo],
+			    ssr_history[meas.pricing_won_new_logo_deals]
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _pricing_analysis\New Logo
+		lineageTag: 24eef0a1-f2d8-43b4-b9c2-db8a398ae1ed
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	/// Calculates net discount percentage for distinct won New Logo opportunities.
+	measure 'meas.pricing_net_discount_pct_won_new_logo' =
+			
+			VAR WonNewLogoOpportunities =
+			    CALCULATETABLE (
+			        VALUES ( ssr_history[entity_opp_id] ),
+			        KEEPFILTERS (
+			            ssr_history[step_name] = "New Logo Selling"
+			        ),
+			        KEEPFILTERS (
+			            ssr_history[step_success] = TRUE ()
+			        ),
+			        KEEPFILTERS (
+			            FILTER (
+			                VALUES ( ssr_history[entity_opp_id] ),
+			                NOT ISBLANK ( ssr_history[entity_opp_id] )
+			            )
+			        )
+			    )
+			
+			RETURN
+			    CALCULATE (
+			        [meas.opp_line_item_discount_pct],
+			        TREATAS (
+			            WonNewLogoOpportunities,
+			            opp_line_items[crm_opp_id]
+			        )
+			    )
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _pricing_analysis\New Logo
+		lineageTag: 4a47105c-d2a2-4438-8b85-cc59b6350d39
+
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
 		dataType: string
