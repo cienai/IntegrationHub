@@ -1,0 +1,256 @@
+table opportunity_success_profile_characteristics
+	lineageTag: 5575fd69-a8eb-4b1d-ab7c-ed1109af1179
+
+	measure 'meas.opp_success_profile_successful_new_logo_count' = ```
+
+			var selected_dimension = SELECTEDVALUE(opportunity_success_profile_characteristics[Dimension])
+			var selected_characteristic = SELECTEDVALUE(opportunity_success_profile_characteristics[Characteristic])
+			var res =
+			    SWITCH(
+			        TRUE(),
+			        selected_dimension = "Industry",
+			            CALCULATE(
+			                ssr_history[meas.ssr_history_success_count_new_logo],
+			                KEEPFILTERS(TREATAS({selected_characteristic}, ssr[trueai_industry]))
+			            ),
+			        selected_dimension = "Company Size",
+			            CALCULATE(
+			                ssr_history[meas.ssr_history_success_count_new_logo],
+			                KEEPFILTERS(TREATAS({selected_characteristic}, ssr[trueai_custom_company_size]))
+			            )
+			    )
+			return res
+
+			```
+		formatString: #,0
+		displayFolder: _opportunity_success_profile
+		lineageTag: 7406cf3a-0992-4315-8e23-f4ced61ad910
+
+	measure 'meas.opp_success_profile_all_new_logo_count' = ```
+
+			var selected_dimension = SELECTEDVALUE(opportunity_success_profile_characteristics[Dimension])
+			var selected_characteristic = SELECTEDVALUE(opportunity_success_profile_characteristics[Characteristic])
+			var res =
+			    SWITCH(
+			        TRUE(),
+			        selected_dimension = "Industry",
+			            CALCULATE(
+			                ssr_history[meas.ssr_history_step_count],
+			                ssr_history[step_name] = "New Logo Selling",
+			                KEEPFILTERS(TREATAS({selected_characteristic}, ssr[trueai_industry]))
+			            ),
+			        selected_dimension = "Company Size",
+			            CALCULATE(
+			                ssr_history[meas.ssr_history_step_count],
+			                ssr_history[step_name] = "New Logo Selling",
+			                KEEPFILTERS(TREATAS({selected_characteristic}, ssr[trueai_custom_company_size]))
+			            )
+			    )
+			return res
+
+			```
+		formatString: #,0
+		displayFolder: _opportunity_success_profile
+		lineageTag: defb3c1a-69f4-4991-b032-8968be6a9007
+
+	measure 'meas.opp_success_profile_share_successful_new_logo' = ```
+
+			var successful_count = opportunity_success_profile_characteristics[meas.opp_success_profile_successful_new_logo_count]
+			var total_successful =
+			    CALCULATE(
+			        ssr_history[meas.ssr_history_success_count_new_logo],
+			        REMOVEFILTERS(opportunity_success_profile_characteristics)
+			    )
+			var res = DIVIDE(successful_count, total_successful, BLANK())
+			return res
+
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _opportunity_success_profile
+		lineageTag: c067dd42-b80d-4434-8a4a-f8558ca6f715
+
+	measure 'meas.opp_success_profile_share_all_new_logo' = ```
+
+			var all_count = opportunity_success_profile_characteristics[meas.opp_success_profile_all_new_logo_count]
+			var total_all =
+			    CALCULATE(
+			        ssr_history[meas.ssr_history_step_count],
+			        ssr_history[step_name] = "New Logo Selling",
+			        REMOVEFILTERS(opportunity_success_profile_characteristics)
+			    )
+			var res = DIVIDE(all_count, total_all, BLANK())
+			return res
+
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _opportunity_success_profile
+		lineageTag: 861409e3-f9ec-4c9d-bf02-58a600b354fd
+
+	measure 'meas.opp_success_profile_new_logo_difference_pp' = ```
+
+			var successful_share = opportunity_success_profile_characteristics[meas.opp_success_profile_share_successful_new_logo]
+			var all_share = opportunity_success_profile_characteristics[meas.opp_success_profile_share_all_new_logo]
+			var res = successful_share - all_share
+			return res
+
+			```
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: _opportunity_success_profile
+		lineageTag: 522cb150-1292-415a-bfef-f04b0ab734ec
+
+	measure 'meas.opp_success_profile_new_logo_success_index' = ```
+
+			var successful_share = opportunity_success_profile_characteristics[meas.opp_success_profile_share_successful_new_logo]
+			var all_share = opportunity_success_profile_characteristics[meas.opp_success_profile_share_all_new_logo]
+			var res = DIVIDE(successful_share, all_share, BLANK())
+			return res
+
+			```
+		formatString: 0.00
+		displayFolder: _opportunity_success_profile
+		lineageTag: 3e4b4bfe-8340-43ec-9c40-f4b57694c827
+
+	measure 'meas.opp_success_profile_direction' = ```
+
+			var difference = opportunity_success_profile_characteristics[meas.opp_success_profile_new_logo_difference_pp]
+			var res =
+			    SWITCH(
+			        TRUE(),
+			        difference > 0, "Overrepresented",
+			        difference < 0, "Underrepresented",
+			        "Neutral"
+			    )
+			return res
+
+			```
+		displayFolder: _opportunity_success_profile
+		lineageTag: e5ac2014-4b75-46e3-9ad7-c34936d933f8
+
+	measure 'meas.opp_success_profile_business_impact' = ```
+
+			var successful_count = opportunity_success_profile_characteristics[meas.opp_success_profile_successful_new_logo_count]
+			var res =
+			    SWITCH(
+			        TRUE(),
+			        successful_count >= 1000, "High",
+			        successful_count >= 250, "Medium",
+			        NOT ISBLANK(successful_count), "Low"
+			    )
+			return res
+
+			```
+		displayFolder: _opportunity_success_profile
+		lineageTag: 1314697b-3dc7-4f55-972e-e7f4e58d4191
+
+	measure 'meas.opp_success_profile_business_impact_sort' = ```
+
+			var successful_count = opportunity_success_profile_characteristics[meas.opp_success_profile_successful_new_logo_count]
+			var res =
+			    SWITCH(
+			        TRUE(),
+			        successful_count >= 1000, 1,
+			        successful_count >= 250, 2,
+			        NOT ISBLANK(successful_count), 3
+			    )
+			return res
+
+			```
+		formatString: 0
+		displayFolder: _opportunity_success_profile
+		lineageTag: 5344595f-ca05-4bbf-9a8a-bb5d769f82b6
+
+	measure 'meas.opp_success_profile_include_row' = ```
+
+			var successful_count = opportunity_success_profile_characteristics[meas.opp_success_profile_successful_new_logo_count]
+			var all_count = opportunity_success_profile_characteristics[meas.opp_success_profile_all_new_logo_count]
+			var difference = opportunity_success_profile_characteristics[meas.opp_success_profile_new_logo_difference_pp]
+			var res =
+			    IF(
+			        successful_count >= 25
+			            && all_count >= 100
+			            && ABS(difference) >= 0.02,
+			        1,
+			        0
+			    )
+			return res
+
+			```
+		formatString: 0
+		displayFolder: _opportunity_success_profile
+		lineageTag: 649f9112-deab-4e31-a857-75650cf93f64
+
+	column Dimension
+		dataType: string
+		lineageTag: 58807b9a-010a-4305-9672-9e37ff3b5e52
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Dimension]
+		sortByColumn: 'Dimension Sort'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Characteristic
+		dataType: string
+		lineageTag: ade7bfd3-c565-490b-9e1a-1fb0a57d805f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Characteristic]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dimension Sort'
+		dataType: int64
+		lineageTag: 91724c5e-7c95-4eff-91a8-99f7a38ef7f5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Dimension Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Characteristic Sort'
+		dataType: double
+		lineageTag: b8842555-779a-40f1-8a7c-91a686bb23cc
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Characteristic Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition opportunity_success_profile_characteristics = calculated
+		mode: import
+		source = ```
+
+				VAR IndustryRows =
+				    SELECTCOLUMNS(
+				        FILTER(
+				            SUMMARIZE(ssr, ssr[trueai_industry]),
+				            NOT ISBLANK(ssr[trueai_industry])
+				                && ssr[trueai_industry] <> "ND"
+				        ),
+				        "Dimension", "Industry",
+				        "Characteristic", ssr[trueai_industry],
+				        "Dimension Sort", 1,
+				        "Characteristic Sort", 0
+				    )
+				VAR CompanySizeRows =
+				    SELECTCOLUMNS(
+				        FILTER(
+				            SUMMARIZE(
+				                ssr,
+				                ssr[trueai_custom_company_size],
+				                "__sort", AVERAGE(ssr[col.trueai_company_size_aprox_val])
+				            ),
+				            NOT ISBLANK(ssr[trueai_custom_company_size])
+				                && ssr[trueai_custom_company_size] <> "ND"
+				        ),
+				        "Dimension", "Company Size",
+				        "Characteristic", ssr[trueai_custom_company_size],
+				        "Dimension Sort", 2,
+				        "Characteristic Sort", [__sort]
+				    )
+				RETURN
+				    UNION(IndustryRows, CompanySizeRows)
+
+				```
+
+	annotation PBI_Id = 2d46ef9490964705b3a59c1d9b72279a

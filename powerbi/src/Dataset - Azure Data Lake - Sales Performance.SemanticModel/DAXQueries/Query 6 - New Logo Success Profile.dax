@@ -1,0 +1,55 @@
+// New Logo Success Profile Delta
+//
+// Business question:
+// How do successful New Logo opportunities differ from the overall New Logo opportunity population?
+//
+// Notes:
+// - Findings are independent characteristics, not tested combinations.
+// - The baseline is all New Logo opportunities in the selected context, including won and lost.
+// - Rows are included only when minimum support and minimum percentage-point difference are satisfied.
+// - Success Index describes distribution skew: 1.24 means 24% more common among successful opportunities.
+
+EVALUATE
+VAR ProfileRows =
+    FILTER(
+        SUMMARIZECOLUMNS(
+            opportunity_success_profile_characteristics[Dimension],
+            opportunity_success_profile_characteristics[Characteristic],
+            opportunity_success_profile_characteristics[Dimension Sort],
+            "Direction", opportunity_success_profile_characteristics[meas.opp_success_profile_direction],
+            "Share Of Successful New Logo Opportunities", opportunity_success_profile_characteristics[meas.opp_success_profile_share_successful_new_logo],
+            "Share Of All New Logo Opportunities", opportunity_success_profile_characteristics[meas.opp_success_profile_share_all_new_logo],
+            "New Logo Difference (Percentage Points)", opportunity_success_profile_characteristics[meas.opp_success_profile_new_logo_difference_pp],
+            "New Logo Success Index", opportunity_success_profile_characteristics[meas.opp_success_profile_new_logo_success_index],
+            "Business Impact", opportunity_success_profile_characteristics[meas.opp_success_profile_business_impact],
+            "Business Impact Sort", opportunity_success_profile_characteristics[meas.opp_success_profile_business_impact_sort],
+            "Successful New Logo Count", opportunity_success_profile_characteristics[meas.opp_success_profile_successful_new_logo_count],
+            "All New Logo Count", opportunity_success_profile_characteristics[meas.opp_success_profile_all_new_logo_count],
+            "Include Row", opportunity_success_profile_characteristics[meas.opp_success_profile_include_row],
+            "Abs Difference", ABS(opportunity_success_profile_characteristics[meas.opp_success_profile_new_logo_difference_pp])
+        ),
+        [Include Row] = 1
+    )
+RETURN
+    SELECTCOLUMNS(
+        ProfileRows,
+        "Dimension", opportunity_success_profile_characteristics[Dimension],
+        "Characteristic", opportunity_success_profile_characteristics[Characteristic],
+        "Direction", [Direction],
+        "Share Of Successful New Logo Opportunities", [Share Of Successful New Logo Opportunities],
+        "Share Of All New Logo Opportunities", [Share Of All New Logo Opportunities],
+        "New Logo Difference (Percentage Points)", [New Logo Difference (Percentage Points)],
+        "New Logo Success Index", [New Logo Success Index],
+        "Business Impact", [Business Impact],
+        "Successful New Logo Count", [Successful New Logo Count],
+        "All New Logo Count", [All New Logo Count],
+        "Dimension Sort", opportunity_success_profile_characteristics[Dimension Sort],
+        "Business Impact Sort", [Business Impact Sort],
+        "Abs Difference", [Abs Difference]
+    )
+ORDER BY
+    [Dimension Sort],
+    [Business Impact Sort],
+    [Abs Difference] DESC,
+    [New Logo Success Index] DESC,
+    [Characteristic]
