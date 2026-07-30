@@ -55,7 +55,8 @@ and Power BI report visuals to use the same definition.
 Reusable semantic-model measures support report aggregation: Total Claimed
 Associations, Total Confirmed Opportunities, Overall Confirmed Participation
 Rate, Total Claimed Without Evidence, Total Inactive Contributors, Total
-Unclaimed Contributions, Total Unsupported Pipeline, Selected Average
+Unclaimed Contributions, Total Unsupported Pipeline, Total Claimed Pipeline,
+Selected Average
 Participation Score, and Representative Count.
 
 `Average Contributors per Opportunity` is intentionally omitted. The model
@@ -102,6 +103,11 @@ representative summary table; unsupported-pipeline, team-integrity, and status
 distribution charts; a score-versus-pipeline scatter plot; and explanatory
 assumption/status panels. The existing page navigators discover the page through
 `pages.json`.
+
+Visuals retain the formatting objects from their closest Tactical Report
+prototypes. Prototype field-bound filters and formatting selectors are removed
+before generation so they cannot reference unrelated model tables. Analytical
+chart values, including all scatter axes and bubble size, use explicit measures.
 
 Because the source remains representative-grain, the page does not claim to show
 individual opportunity overlap. True opportunity-overlap analysis still

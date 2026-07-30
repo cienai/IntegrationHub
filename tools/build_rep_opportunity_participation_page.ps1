@@ -90,6 +90,19 @@ function Save-Visual($visual) {
     if ($visual.PSObject.Properties.Name -contains "filterConfig") {
         $visual.PSObject.Properties.Remove("filterConfig")
     }
+    # Keep the Tactical formatting copied from the prototype, but discard only
+    # field-bound formatting selectors that still reference the prototype model.
+    if ($visual.visual.objects) {
+        $legacyPattern = 'cal_end_dates|hat_leads|"opps"|quality_buckets|"ssr"|ssr_history|ssr_history_success_factors|"users"'
+        foreach ($objectProperty in @($visual.visual.objects.PSObject.Properties)) {
+            $cleanEntries = @(
+                $objectProperty.Value | Where-Object {
+                    ($_ | ConvertTo-Json -Depth 100) -notmatch $legacyPattern
+                }
+            )
+            $visual.visual.objects.($objectProperty.Name) = $cleanEntries
+        }
+    }
     $dir = Join-Path $visualsRoot $visual.name
     New-Item -ItemType Directory -Force -Path $dir | Out-Null
     $visual | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath (Join-Path $dir "visual.json") -Encoding utf8
@@ -181,7 +194,6 @@ for ($i=0; $i -lt $cards.Count; $i++) {
 
 $table = Copy-Object (Get-Content -Raw $prototype.Table | ConvertFrom-Json)
 Set-Position $table "representativeSummary" 20 355 1240 620 15000
-$table.visual.objects = [pscustomobject]@{}
 $table.visual.query.queryState.Values.projections = @(
     Column-Projection "Rep Name" "Rep" $true
     Column-Projection "Team" "Team"
@@ -210,7 +222,6 @@ Save-Visual $table
 
 $bar = Copy-Object (Get-Content -Raw $prototype.Bar | ConvertFrom-Json)
 Set-Position $bar "unsupportedByRep" 20 1010 400 420 16000
-$bar.visual.objects = [pscustomobject]@{}
 if ($bar.visual.PSObject.Properties.Name -contains "filterConfig") { $bar.visual.PSObject.Properties.Remove("filterConfig") }
 $bar.visual.query.queryState = [ordered]@{
     Category = [ordered]@{ projections = @(Column-Projection "Rep Name" "Rep" $true) }
@@ -222,7 +233,6 @@ Save-Visual $bar
 
 $column = Copy-Object (Get-Content -Raw $prototype.Column | ConvertFrom-Json)
 Set-Position $column "integrityByTeam" 440 1010 400 420 17000
-$column.visual.objects = [pscustomobject]@{}
 if ($column.visual.PSObject.Properties.Name -contains "filterConfig") { $column.visual.PSObject.Properties.Remove("filterConfig") }
 $column.visual.query.queryState = [ordered]@{
     Category = [ordered]@{ projections = @(Column-Projection "Team" "Team" $true) }
@@ -235,7 +245,6 @@ Save-Visual $column
 
 $donut = Copy-Object (Get-Content -Raw $prototype.Donut | ConvertFrom-Json)
 Set-Position $donut "statusDistribution" 860 1010 400 420 18000
-$donut.visual.objects = [pscustomobject]@{}
 if ($donut.visual.PSObject.Properties.Name -contains "filterConfig") { $donut.visual.PSObject.Properties.Remove("filterConfig") }
 $donut.visual.query.queryState = [ordered]@{
     Category = [ordered]@{ projections = @(Column-Projection "Overall Participation Status" "Status" $true) }
@@ -247,13 +256,12 @@ Save-Visual $donut
 
 $scatter = Copy-Object (Get-Content -Raw $prototype.Scatter | ConvertFrom-Json)
 Set-Position $scatter "scoreVsPipeline" 20 1465 820 520 19000
-$scatter.visual.objects = [pscustomobject]@{}
 if ($scatter.visual.PSObject.Properties.Name -contains "filterConfig") { $scatter.visual.PSObject.Properties.Remove("filterConfig") }
 $scatter.visual.query.queryState = [ordered]@{
     Category = [ordered]@{ projections = @(Column-Projection "Rep Name" "Rep" $true) }
-    X = [ordered]@{ projections = @(Column-Projection "Average Participation Score" "Participation Score" $true) }
-    Y = [ordered]@{ projections = @(Column-Projection "Unsupported Claimed Pipeline" "Unsupported Pipeline") }
-    Size = [ordered]@{ projections = @(Column-Projection "Claimed Pipeline Amount" "Claimed Pipeline") }
+    X = [ordered]@{ projections = @(Measure-Projection "Selected Average Participation Score" "Participation Score" $true) }
+    Y = [ordered]@{ projections = @(Measure-Projection "Total Unsupported Pipeline" "Unsupported Pipeline") }
+    Size = [ordered]@{ projections = @(Measure-Projection "Total Claimed Pipeline" "Claimed Pipeline") }
     Legend = [ordered]@{ projections = @(Column-Projection "Overall Participation Status" "Status") }
 }
 Remove-PrototypeQueryMetadata $scatter
