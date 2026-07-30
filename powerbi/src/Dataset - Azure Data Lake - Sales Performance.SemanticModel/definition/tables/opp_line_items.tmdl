@@ -2,7 +2,7 @@
 table opp_line_items
 	lineageTag: 686ea3a9-2296-4d86-bcfd-80415925b6e8
 
-	/// Shows opportunity line item discount amount for product and opportunity line item analysis.
+	/// Calculates the total opportunity line item discount amount.
 	measure 'meas.opp_line_item_discount_amt' = ```
 			
 			var res = ([meas.opp_line_item_total_price_before_discount]-[meas.opp_line_item_total_price_after_discount])*-1  // use the existing measures and multiply by -1  
@@ -15,7 +15,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Shows the opportunity line item discount percentage for product and opportunity line item analysis.
+	/// Calculates opportunity line item discount as a percentage.
 	measure 'meas.opp_line_item_discount_pct' =
 			
 			
@@ -27,7 +27,7 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: dd1dba57-2410-444e-b287-68ada1efc23c
 
-	/// Counts discount line opportunities for product and opportunity line item analysis.
+	/// Calculates discount line opportunities.
 	measure 'meas.discount_line_opps' =
 			
 			IF([meas.opp_line_item_discount_pct] = 0, 0,BLANK())
@@ -35,7 +35,7 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: 55bd8ea0-eb11-461f-b799-99a4f1e6e0ac
 
-	/// Shows the opportunity line item dis percentage for product and opportunity line item analysis.
+	/// Calculates opportunity line item dis as a percentage.
 	measure 'meas.opp_line_item_dis_pct' =
 			
 			var orig_cost = SUMX(opp_line_items, [trueai_list_price]*[trueai_qty])              // get the original cost
@@ -46,7 +46,7 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: b5f83928-e12e-4884-aa64-e29f8c0e2b70
 
-	/// Counts opportunity line item total price after discount for product and opportunity line item analysis.
+	/// Calculates the total opportunity line item price after discount.
 	measure 'meas.opp_line_item_total_price_after_discount' =
 			
 			
@@ -58,7 +58,7 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: 982b866e-1a68-4089-9f0b-fff63419a571
 
-	/// Shows the opportunity lines item discount percentage for product and opportunity line item analysis.
+	/// Calculates opportunity lines item discount as a percentage.
 	measure 'meas.opp_lines_item_discount_pct' = ```
 			
 			
@@ -72,7 +72,7 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: 92f502aa-be60-41d1-a075-d98ed0682e74
 
-	/// Shows delta expected booking amount for product and opportunity line item analysis.
+	/// Calculates the total delta expected booking amount.
 	measure 'meas.delta_expected_booking_amt' = ```
 			
 			var wonAmt = [meas.ssr_history_won_amt]     // get the won amt 
@@ -87,7 +87,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows the opportunities average discount percentage for product and opportunity line item analysis.
+	/// Calculates opportunities average discount as a percentage This is the opportunities average discount percentage measure Variant 1.
 	measure 'meas.opps_average_discount_pct' =
 			
 			ABS(CALCULATE(AVERAGE(opps[trueai_discount_pct])))     // get the abs of avg discount pct
@@ -96,7 +96,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Shows opportunities average deals amount for product and opportunity line item analysis.
+	/// Calculates opportunities average deals amount as a ratio.
 	measure 'meas.opps_avg_deals_amt' =
 			
 			var Amt = [meas.ssr_history_won_amt] - [meas.opps_deal_discount_amt]        // get the difference amt
@@ -109,7 +109,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows opportunities deal discount amount for product and opportunity line item analysis.
+	/// Calculates the total opportunities deal discount amount.
 	measure 'meas.opps_deal_discount_amt' = ```
 			
 			// var pct = ABS([meas.opps_average_discount_pct])
@@ -127,7 +127,7 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: a7e40876-f224-4016-b137-855d4e4bb99c
 
-	/// Shows the opportunities deals percentage for product and opportunity line item analysis.
+	/// Calculates opportunities deals as a percentage.
 	measure 'meas.opps_deals_pct' =
 			
 			var stepCount = [meas.ssr_history_step_count]       // calculating the step count
@@ -140,7 +140,7 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: c7df8b8f-3864-41d9-94e5-b44b2836158f
 
-	/// Shows the opportunities delta expected percentage for product and opportunity line item analysis.
+	/// Calculates opportunities delta expected as a percentage.
 	measure 'meas.opps_delta_expected_pct' =
 			
 			VAR SuccessRate =
@@ -159,7 +159,7 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: 9d875de2-fc0a-47b4-86e6-f717b75bf26f
 
-	/// Shows opportunities tot deals for product and opportunity line item analysis.
+	/// Counts opportunities tot deals in the current selection.
 	measure 'meas.opps_tot_deals' =
 			
 			CALCULATE(COUNT(opps[_sys_doc_id]), opps[trueai_discount_pct_tier] <> BLANK()) // get the total deals count
@@ -167,7 +167,7 @@ table opp_line_items
 		displayFolder: discount opp
 		lineageTag: ba127637-f77b-4fbe-8646-8ee9fea3c6a3
 
-	/// Shows the average discount percentage for product and opportunity line item analysis.
+	/// Calculates opportunity line items average discount as a percentage.
 	measure 'meas.opp_line_items_avg_discount_pct' =
 			CALCULATE(
 			    AVERAGE(
@@ -179,7 +179,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Counts opportunity line item total price before discount for product and opportunity line item analysis.
+	/// Calculates the total opportunity line item price before discount.
 	measure 'meas.opp_line_item_total_price_before_discount' =
 			
 			var tbl = CALCULATETABLE(opp_line_items)        // get the calculatd table
@@ -203,7 +203,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows the average discount percentage change for product and opportunity line item analysis.
+	/// Calculates average discount change as a percentage.
 	measure 'meas.avg_discount_pct_change' =
 			
 			VAR MinVisibleDate =
@@ -235,7 +235,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Shows trueai total price for product and opportunity line item analysis.
+	/// Calculates the total opportunity line items trueai price.
 	measure 'meas.opp_line_items_trueai_total_price' =
 			
 			CALCULATE(
@@ -245,7 +245,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Calculates total list price before discount for distinct won New Logo opportunities.
+	/// Calculates the total pricing list price won new logo It includes records where step name = "New Logo Selling".
 	measure 'meas.pricing_total_list_price_won_new_logo' =
 			
 			VAR WonNewLogoOpportunities =
@@ -279,7 +279,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Calculates total final price after discount for distinct won New Logo opportunities.
+	/// Calculates the total pricing final price won new logo It includes records where step name = "New Logo Selling".
 	measure 'meas.pricing_total_final_price_won_new_logo' =
 			
 			VAR WonNewLogoOpportunities =
@@ -313,7 +313,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Calculates average list price before discount per distinct won New Logo opportunity.
+	/// Calculates the average pricing average list price per won new logo deal.
 	measure 'meas.pricing_avg_list_price_per_won_new_logo_deal' =
 			
 			DIVIDE (
@@ -326,7 +326,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Calculates average final price after discount per distinct won New Logo opportunity.
+	/// Calculates the average pricing average final price per won new logo deal.
 	measure 'meas.pricing_avg_final_price_per_won_new_logo_deal' =
 			
 			DIVIDE (
@@ -339,7 +339,7 @@ table opp_line_items
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Calculates net discount percentage for distinct won New Logo opportunities.
+	/// Calculates pricing net discount won new logo as a percentage It includes records where step name = "New Logo Selling".
 	measure 'meas.pricing_net_discount_pct_won_new_logo' =
 			
 			VAR WonNewLogoOpportunities =
