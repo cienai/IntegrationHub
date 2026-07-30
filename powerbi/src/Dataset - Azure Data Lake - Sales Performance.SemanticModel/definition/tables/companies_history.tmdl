@@ -2,7 +2,7 @@
 table companies_history
 	lineageTag: 89cc1c9a-fb50-4d65-a2fb-e604245270ae
 
-	/// Shows reference date for company and account history analysis.
+	/// Returns the companies history reference date.
 	measure 'meas.companies_history_reference_date' =
 			
 			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))  // get the latest row
@@ -36,7 +36,7 @@ table companies_history
 		displayFolder: _co_info
 		lineageTag: e479ee03-95cf-4c84-9790-b679aaf58337
 
-	/// Shows partner co ID for company and account history analysis.
+	/// Calculates companies history partner co id.
 	measure 'meas.companies_history_partner_co_id' =
 			
 			var latest_row  = CALCULATETABLE(TOPN(1,companies_history, companies_history[_sys_processed_as_of], DESC))
@@ -67,7 +67,7 @@ table companies_history
 		lineageTag: 8383a8ef-e489-41a3-9d4f-3ac1e1175c9e
 		dataCategory: ImageUrl
 
-	/// Shows copyright msg for company and account history analysis.
+	/// Calculates companies history copyright msg.
 	measure 'meas.companies_history_copyright_msg' =
 			
 			var copyright_msg = "Copyright © " &  year(Now()) & " Cien, Inc."
@@ -79,7 +79,7 @@ table companies_history
 		displayFolder: _co_info
 		lineageTag: 738e41cb-5c3f-445a-b733-361a0cc25703
 
-	/// Shows not init for company and account history analysis.
+	/// Calculates companies history not init.
 	measure 'meas.companies_history_not_init' = ```
 			
 			var co_id = Max(companies_history[_sys_co_id])
@@ -170,7 +170,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Shows metadata config ramp months for company and account history analysis.
+	/// Calculates metadata config ramp months.
 	measure 'meas.metadata_config_ramp_months' =
 			
 			var res = LOOKUPVALUE(metadata_config[value], metadata_config[key], "ramping_months")
@@ -182,7 +182,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Shows metadata config churned years for company and account history analysis.
+	/// Calculates metadata config churned years.
 	measure 'meas.metadata_config_churned_years' =
 			
 			var res  = LOOKUPVALUE(metadata_config[value], metadata_config[key], "churn_years")
@@ -192,7 +192,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isText":true}
 
-	/// Shows metadata config new logo selling def for company and account history analysis.
+	/// Calculates metadata config new logo selling def.
 	measure 'meas.metadata_config_new_logo_selling_def' = ```
 			
 			VAR reset_new_logo = INT(LOOKUPVALUE(metadata_config[value], metadata_config[key], "reset_new_logo")) // get the reset new logo value
@@ -221,7 +221,7 @@ table companies_history
 		displayFolder: _co_info
 		lineageTag: aa504597-52d8-4f4a-9055-fe8f8efe6346
 
-	/// Shows elapsed time or cycle duration for company and account history analysis.
+	/// Calculates metadata config lead abandonment cycle.
 	measure 'meas.metadata_config_lead_abandonment_cycle' =
 			
 			var res  = LOOKUPVALUE(metadata_config[value], metadata_config[key], "lead_abandonment_cycle")
@@ -229,7 +229,7 @@ table companies_history
 		displayFolder: _co_info
 		lineageTag: 839f92c3-669a-41ad-a26d-8ab328fb94e9
 
-	/// Shows getFiscalYearOffset for company and account history analysis.
+	/// Calculates getfiscalyearoffset.
 	measure 'meas.getFiscalYearOffset' =
 			
 			var _offset = LOOKUPVALUE(metadata_config[value], metadata_config[key], "fiscal_year_offset")
@@ -277,11 +277,11 @@ table companies_history
 		displayFolder: _peek_inside
 		lineageTag: d0579711-27f2-4aec-993d-22a6aeae5677
 
-	/// Shows won or booked amount for company and account history analysis.
+	/// Calculates the average pi ae am annual booking.
 	measure 'meas.pi_ae_am_average_annual_booking' =
 			
 			CALCULATE(
-			    [meas.data_logs_ci_perf_annual_avg_bookings],           // get the annual average booking amount filtering with account manager and account executive
+			    [meas.pi_ci_annual_avg_bookings],           // get the annual average booking amount filtering with account manager and account executive
 			    users[trueai_user_role] in {"Account Executive", "Account Manager"}
 			)
 		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
@@ -290,11 +290,11 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows average pi sdr annual average pipeline created for company and account history analysis.
+	/// Calculates the average pi sdr annual pipeline created It includes records where trueai user role = "Sales Development Rep".
 	measure 'meas.pi_sdr_annual_avg_pipeline_created' =
 			
 			CALCULATE(
-			    [meas.data_logs_ci_perf_annual_avg_pipeline_created],    // get the annual average pipline amount filtering with account manager and account executive
+			    [meas.pi_ci_annual_avg_pipeline_created],    // get the annual average pipline amount filtering with account manager and account executive
 			    users[trueai_user_role] = "Sales Development Rep"
 			)
 		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
@@ -303,11 +303,11 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows won or booked amount for company and account history analysis.
+	/// Calculates the average pi ae annual booking It includes records where trueai user role = "Account Executive".
 	measure 'meas.pi_ae_average_annual_booking' =
 			
 			CALCULATE(
-			    [meas.data_logs_ci_perf_annual_avg_bookings],           // get the annual average booking amount filtering with account manager and account executive
+			    [meas.pi_ci_annual_avg_bookings],           // get the annual average booking amount filtering with account manager and account executive
 			    users[trueai_user_role] = "Account Executive"
 			)
 		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
@@ -316,11 +316,11 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows won or booked amount for company and account history analysis.
+	/// Calculates the average pi am annual booking It includes records where trueai user role = "Account Manager".
 	measure 'meas.pi_am_average_annual_booking' =
 			
 			CALCULATE(
-			    [meas.data_logs_ci_perf_annual_avg_bookings],           // get the annual average booking amount filtering with account manager and account executive
+			    [meas.pi_ci_annual_avg_bookings],           // get the annual average booking amount filtering with account manager and account executive
 			    users[trueai_user_role] = "Account Manager"
 			)
 		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
@@ -329,7 +329,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows won or booked amount for company and account history analysis.
+	/// Calculates the average pi ci annual bookings.
 	measure 'meas.pi_ci_annual_avg_bookings' =
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -342,7 +342,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows average pi ci annual average pipeline created for company and account history analysis.
+	/// Calculates the average pi ci annual pipeline created.
 	measure 'meas.pi_ci_annual_avg_pipeline_created' =
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -374,7 +374,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Shows open pipeline amount for company and account history analysis.
+	/// Calculates the total ssr history adjusted pipeline amount.
 	measure 'meas.ssr_history_adj_pipeline_amt' = ```
 			
 			   var _pipeline_amt =
@@ -394,7 +394,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows ssr history vi value created amount for company and account history analysis.
+	/// Calculates the total ssr history vi value created amount.
 	measure 'meas.ssr_history_vi_value_created_amt' =
 			CALCULATE(
 			    SUM(
@@ -407,7 +407,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows ssr history vi value repeat amount for company and account history analysis.
+	/// Calculates the total ssr history vi value repeat amount.
 	measure 'meas.ssr_history_vi_value_repeat_amt' =
 			CALCULATE(
 			    SUM(
@@ -421,7 +421,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows ssr history new logo lead vi value amount for company and account history analysis.
+	/// Calculates the total ssr history new logo lead vi value amount.
 	measure 'meas.ssr_history_new_logo_lead_vi_value_amt' =
 			
 			CALCULATE(
@@ -436,7 +436,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows ssr history existing customer lead vi value amount for company and account history analysis.
+	/// Calculates the total ssr history existing customer lead vi value amount.
 	measure 'meas.ssr_history_existing_customer_lead_vi_value_amt' =
 			CALCULATE(
 			    SUM(
@@ -450,7 +450,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows ssr history new logo pre vi value amount for company and account history analysis.
+	/// Calculates the total ssr history new logo pre vi value amount.
 	measure 'meas.ssr_history_new_logo_pre_vi_value_amt' = ```
 			
 			CALCULATE(
@@ -467,7 +467,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows ssr history existing customer pre vi value amount for company and account history analysis.
+	/// Calculates the total ssr history existing customer pre vi value amount It includes records where step name = "Post-Sales Support".
 	measure 'meas.ssr_history_existing_customer_pre_vi_value_amt' =
 			
 			CALCULATE(
@@ -482,7 +482,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows ssr history new logo sell vi value amount for company and account history analysis.
+	/// Calculates the total ssr history new logo sell vi value amount It includes records where step name = "New Logo Selling".
 	measure 'meas.ssr_history_new_logo_sell_vi_value_amt' =
 			
 			CALCULATE(
@@ -497,7 +497,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows ssr history existing customer sell vi value amount for company and account history analysis.
+	/// Calculates the total ssr history existing customer sell vi value amount It includes records where step name = "Existing Customer Selling".
 	measure 'meas.ssr_history_existing_customer_sell_vi_value_amt' = ```
 			
 			CALCULATE(
@@ -513,7 +513,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows ssr history vi value lead amount for company and account history analysis.
+	/// Calculates the total ssr history vi value lead amount.
 	measure 'meas.ssr_history_vi_value_lead_amt' = ```
 			
 			var _new_logo_amt = [meas.ssr_history_new_logo_lead_vi_value_amt]     // get the new logo vi_value lead amount
@@ -526,7 +526,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: e38f9be6-2984-4a94-9cb6-99bf29558eb5
 
-	/// Shows ssr history vi value pre amount for company and account history analysis.
+	/// Calculates the total ssr history vi value pre amount.
 	measure 'meas.ssr_history_vi_value_pre_amt' = ```
 			
 			var _new_logo_amt = [meas.ssr_history_new_logo_pre_vi_value_amt]     // get the new logo vi_value pre amount
@@ -539,7 +539,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 97840986-9fc5-400e-b874-cffa6f60db1c
 
-	/// Shows ssr history vi value sell amount for company and account history analysis.
+	/// Calculates the total ssr history vi value sell amount.
 	measure 'meas.ssr_history_vi_value_sell_amt' = ```
 			
 			var _new_logo_amt = [meas.ssr_history_new_logo_sell_vi_value_amt]     // get the new logo vi_value sell amount
@@ -552,7 +552,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: a779e6fe-b91a-4171-be94-5bfef63ea30e
 
-	/// Shows ssr history new logo lead pre sell vi value amount for company and account history analysis.
+	/// Calculates the total ssr history new logo lead pre sell vi value amount.
 	measure 'meas.ssr_history_new_logo_lead_pre_sell_vi_value_amt' =
 			
 			var _lead_amt = [meas.ssr_history_new_logo_lead_vi_value_amt]           // get new logo lead vi value amt
@@ -569,7 +569,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows ssr history existing customer lead pre sell vi value amount for company and account history analysis.
+	/// Calculates the total ssr history existing customer lead pre sell vi value amount.
 	measure 'meas.ssr_history_existing_customer_lead_pre_sell_vi_value_amt' =
 			
 			var _lead_amt = [meas.ssr_history_existing_customer_lead_vi_value_amt]           // get the existing customer lead vi value amt
@@ -586,7 +586,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows ssr history total vi value amount for company and account history analysis.
+	/// Calculates the total ssr history vi value amount.
 	measure 'meas.ssr_history_total_vi_value_amt' = ```
 			
 			var _new_logo_amt = [meas.ssr_history_new_logo_lead_pre_sell_vi_value_amt]          // get the total new logo vi value amt
@@ -602,7 +602,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows the ssr history vi value lead actual ratio for company and account history analysis.
+	/// Calculates ssr history vi value lead actual ratio as a ratio.
 	measure 'meas.ssr_history_vi_value_lead_actual_ratio' =
 			
 			var _lead_amt = [meas.ssr_history_vi_value_lead_amt]        // get the total vi value lead amt
@@ -615,7 +615,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 3fe11145-4376-485d-a8a3-d0747ca1d63e
 
-	/// Shows the ssr history vi value pre actual ratio for company and account history analysis.
+	/// Calculates ssr history vi value pre actual ratio as a ratio.
 	measure 'meas.ssr_history_vi_value_pre_actual_ratio' =
 			
 			var _pre_amt = [meas.ssr_history_vi_value_pre_amt]        // get the total vi value pre amt
@@ -628,7 +628,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 93248076-ca86-4b00-b9c2-8d1c2e61f80c
 
-	/// Shows the ssr history vi value sell actual ratio for company and account history analysis.
+	/// Calculates ssr history vi value sell actual ratio as a ratio.
 	measure 'meas.ssr_history_vi_value_sell_actual_ratio' =
 			
 			var _sell_amt = [meas.ssr_history_vi_value_sell_amt]        // get the total vi value sell amt
@@ -641,7 +641,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 335e9d47-cbd4-48f9-8c17-ed6768bfb70a
 
-	/// Shows the ssr history vi value new logo actual ratio for company and account history analysis.
+	/// Calculates ssr history vi value new logo actual ratio as a ratio.
 	measure 'meas.ssr_history_vi_value_new_logo_actual_ratio' =
 			
 			var _new_logo_amt = [meas.ssr_history_new_logo_lead_pre_sell_vi_value_amt]      // get the total amt vi value new logo
@@ -655,7 +655,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: ca2147ac-d74b-430b-9e2b-b52563e1329c
 
-	/// Shows the ssr history vi value existing customer actual ratio for company and account history analysis.
+	/// Calculates ssr history vi value existing customer actual ratio as a ratio.
 	measure 'meas.ssr_history_vi_value_existing_customer_actual_ratio' = ```
 			
 			var _existing_amt = [meas.ssr_history_existing_customer_lead_pre_sell_vi_value_amt]      // get the total amt vi value existing customer 
@@ -670,7 +670,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 15ec82e9-38e9-4014-a314-47c9d0d685c5
 
-	/// Shows the ssr history vi new logo expected ratio for company and account history analysis.
+	/// Calculates ssr history vi new logo expected ratio as a ratio.
 	measure 'meas.ssr_history_vi_new_logo_expected_ratio' =
 			
 			var _new_logo_amt = [meas.ssr_history_won_amt_new_logo]     // get the  new logo won amt
@@ -683,7 +683,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: fbeab2a0-fe5a-4992-8b09-70060daa67ec
 
-	/// Shows the ssr history vi new logo diff ratio for company and account history analysis.
+	/// Calculates ssr history vi new logo diff ratio.
 	measure 'meas.ssr_history_vi_new_logo_diff_ratio' =
 			
 			var _actual_ratio = [meas.ssr_history_vi_value_new_logo_actual_ratio]           // get the new logo actual ratio
@@ -698,7 +698,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Shows the ssr history vi existing customer expected ratio for company and account history analysis.
+	/// Calculates ssr history vi existing customer expected ratio.
 	measure 'meas.ssr_history_vi_existing_customer_expected_ratio' =
 			
 			var _new_logo_ratio = [meas.ssr_history_vi_new_logo_expected_ratio]         // get the new logo expected ratio
@@ -709,7 +709,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 83daa3d4-8802-4e4d-8f9e-e64cf2e27359
 
-	/// Shows the ssr history vi existing customer diff ratio for company and account history analysis.
+	/// Calculates ssr history vi existing customer diff ratio.
 	measure 'meas.ssr_history_vi_existing_customer_diff_ratio' =
 			
 			var _actual_ratio = [meas.ssr_history_vi_value_existing_customer_actual_ratio]      // get the existing customer actual ratio
@@ -724,7 +724,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Shows the vi value Lead expected ratio for company and account history analysis.
+	/// Calculates vi value lead expected ratio It includes records where key = "vi_tuning_shares".
 	measure 'meas.vi_value_Lead_expected_ratio' = ```
 			
 			// VAR _shares = VALUE(LOOKUPVALUE(metadata_config[value], metadata_config[key], "vi_tuning_shares")) // get the vi shares
@@ -759,7 +759,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 1b059077-3cd9-48e5-9e0f-e7d6fc046929
 
-	/// Shows the vi value pre expected ratio for company and account history analysis.
+	/// Calculates vi value pre expected ratio It includes records where key = "vi_tuning_shares".
 	measure 'meas.vi_value_pre_expected_ratio' = ```
 			
 			// VAR _shares = VALUE(LOOKUPVALUE(metadata_config[value], metadata_config[key], "vi_tuning_shares")) // get the vi shares
@@ -793,7 +793,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: b0e86e0f-535d-476c-81f1-7c3ebff56acb
 
-	/// Shows the vi value sell expected ratio for company and account history analysis.
+	/// Calculates vi value sell expected ratio It includes records where key = "vi_tuning_shares".
 	measure 'meas.vi_value_sell_expected_ratio' = ```
 			
 			// VAR _shares = VALUE(LOOKUPVALUE(metadata_config[value], metadata_config[key], "vi_tuning_shares")) // get the vi shares
@@ -830,7 +830,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 8c0d8ad7-c445-4a3d-9f44-c607b260a28e
 
-	/// Shows the ssr history vi lead diff ratio for company and account history analysis.
+	/// Calculates ssr history vi lead diff ratio.
 	measure 'meas.ssr_history_vi_lead_diff_ratio' =
 			
 			var _actual = [meas.ssr_history_vi_value_lead_actual_ratio]     // get lead actual ratio
@@ -846,7 +846,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Shows the ssr history vi pre diff ratio for company and account history analysis.
+	/// Calculates ssr history vi pre diff ratio.
 	measure 'meas.ssr_history_vi_pre_diff_ratio' =
 			
 			var _actual = [meas.ssr_history_vi_value_pre_actual_ratio]     // get pre actual ratio
@@ -862,7 +862,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Shows the ssr history vi sell diff ratio for company and account history analysis.
+	/// Calculates ssr history vi sell diff ratio.
 	measure 'meas.ssr_history_vi_sell_diff_ratio' =
 			
 			var _actual = [meas.ssr_history_vi_value_sell_actual_ratio]     // get sell actual ratio
@@ -878,7 +878,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Shows ssr history step diff for company and account history analysis.
+	/// Calculates ssr history step diff.
 	measure 'meas.ssr_history_step_diff' =
 			
 			var _new_logo = ABS([meas.ssr_history_vi_new_logo_diff_ratio])           // get the new logo diff
@@ -891,7 +891,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 71d0d6df-817f-49a5-92b7-51b8816aef41
 
-	/// Shows ssr history vi tuning shares diff for company and account history analysis.
+	/// Calculates ssr history vi tuning shares diff.
 	measure 'meas.ssr_history_vi_tuning_shares_diff' = ```
 			
 			var _lead = ABS([meas.ssr_history_vi_lead_diff_ratio])           // get the lead diff
@@ -906,7 +906,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: e49610c0-90a4-495c-a74d-4d2bd69ac068
 
-	/// Shows ssr history vi score for company and account history analysis.
+	/// Calculates ssr history vi score.
 	measure 'meas.ssr_history_vi_score' =
 			
 			var diff1 = [meas.ssr_history_step_diff]        // diff 1
@@ -919,7 +919,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 699bf57b-b8a5-4419-864f-e42a7d962253
 
-	/// Shows pi reps w ta for company and account history analysis.
+	/// Calculates pi representatives w ta.
 	measure 'meas.pi_reps_w_ta' =
 			
 			
@@ -934,7 +934,7 @@ table companies_history
 		displayFolder: _peek_inside
 		lineageTag: 7f6062ba-8f86-4325-b101-c45c7f17ccc2
 
-	/// Counts pi reps count w ta for company and account history analysis.
+	/// Counts pi representatives w ta in the current selection It includes records where ci time alloc tot > 0.
 	measure 'meas.pi_reps_count_w_ta' = ```
 			
 			
@@ -950,7 +950,7 @@ table companies_history
 		displayFolder: _peek_inside
 		lineageTag: fb805278-1d85-4217-a272-1873521d3396
 
-	/// Shows vi lead combined matrix amount for company and account history analysis.
+	/// Calculates the total vi lead combined matrix amount It includes records where step name = "Lead Gen".
 	measure 'meas.vi_lead_combined_matrix_amt' = ```
 			
 			VAR _min_date = [meas.context_date_min]     // context min date
@@ -1003,7 +1003,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows vi pre combined matrix amount for company and account history analysis.
+	/// Calculates the total vi pre combined matrix amount.
 	measure 'meas.vi_pre_combined_matrix_amt' = ```
 			
 			var _min_date = [meas.context_date_min]     // context min date
@@ -1057,7 +1057,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows vi sell combined matrix amount for company and account history analysis.
+	/// Calculates the total vi sell combined matrix amount.
 	measure 'meas.vi_sell_combined_matrix_amt' = ```
 			
 			var _min_date = [meas.context_date_min]     // context min date
@@ -1111,7 +1111,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows vi lead pre sell combined matrix amount for company and account history analysis.
+	/// Calculates the total vi lead pre sell combined matrix amount It includes records where step name = "Lead Gen".
 	measure 'meas.vi_lead_pre_sell_combined_matrix_amt' = ```
 			
 			var _min_date = [meas.context_date_min]     // context min date
@@ -1213,7 +1213,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows sh explicit pre vi amount for company and account history analysis.
+	/// Calculates the total sh explicit pre vi amount It includes records where step name = "New Logo Selling".
 	measure 'meas.sh_explicit_pre_vi_amt' = ```
 			
 			VAR _step_name = SELECTEDVALUE(ssr_history[step_name])
@@ -1237,7 +1237,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 6339e467-29ad-4d16-823d-80a6200877c2
 
-	/// Shows untouched prospecting pred vi amount for company and account history analysis.
+	/// Calculates the total untouched prospecting pred vi amount.
 	measure 'meas.untouched_prospecting_pred_vi_amt' =
 			
 			CALCULATE(
@@ -1251,7 +1251,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows post sales pred amount vi amount for company and account history analysis.
+	/// Calculates the total post sales pred amount vi amount It includes records where step name = "Post-Sales Support".
 	measure 'meas.post_sales_pred_amount_vi_amt' =
 			
 			CALCULATE(
@@ -1265,7 +1265,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Shows the sh actual combined ratio for company and account history analysis.
+	/// Calculates sh actual combined ratio.
 	measure 'meas.sh_actual_combined_ratio' = ```
 			
 			VAR _step_name = SELECTEDVALUE(ssr_history[step_name])
@@ -1288,7 +1288,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: db0407c0-4181-4113-b714-b4344409e4c3
 
-	/// Shows the sh expected combined ratio for company and account history analysis.
+	/// Calculates sh expected combined ratio.
 	measure 'meas.sh_expected_combined_ratio' = ```
 			
 			VAR _step_name = SELECTEDVALUE(ssr_history[step_name])
@@ -1311,7 +1311,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 8f1cf203-eaa7-403c-8580-5aab9852041c
 
-	/// Shows the sh diff combined ratio for company and account history analysis.
+	/// Calculates sh diff combined ratio.
 	measure 'meas.sh_diff_combined_ratio' = ```
 			
 			VAR _step_name = SELECTEDVALUE(ssr_history[step_name])
@@ -1334,12 +1334,12 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: fb57f6ae-471e-4fcc-bdf5-4f9193cbef12
 
-	/// Shows sh explicit pre vi amount 1 for company and account history analysis.
+	/// Calculates the total sh explicit pre vi amount 1.
 	measure 'meas.sh_explicit_pre_vi_amt_1' = ```
 			
 			VAR _step_name = SELECTEDVALUE(ssr_history[step_name])
-			VAR _new_amt = [meas.ssr_history_new_logo_pre_vi_value_amt_1]
-			VAR _existing_amt = [meas.ssr_history_existing_customer_pre_vi_value_amt_1]
+			VAR _new_amt = [meas.ssr_history_new_logo_pre_vi_value_amt]
+			VAR _existing_amt = [meas.ssr_history_existing_customer_pre_vi_value_amt]
 			
 			VAR res = 
 			    SWITCH(
@@ -1359,41 +1359,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Shows ssr history new logo pre vi value amount 1 for company and account history analysis.
-	measure 'meas.ssr_history_new_logo_pre_vi_value_amt_1' = ```
-			
-			CALCULATE(
-			    SUM(
-			        ssr_history[vi_value_created]       // get the new logo vi_value_created amt filtred with prospecting and untouched
-			    ),
-			    ssr_history[step_name] in {"Untouched", "Prospecting"}
-			)
-			
-			```
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
-		displayFolder: _vi_score
-		lineageTag: 5407e5b0-e245-42ec-a901-4bc7d2e1663c
-
-		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
-
-	/// Shows ssr history existing customer pre vi value amount 1 for company and account history analysis.
-	measure 'meas.ssr_history_existing_customer_pre_vi_value_amt_1' = ```
-			
-			CALCULATE(
-			    SUM(
-			        ssr_history[vi_value_created]       // get the new logo vi_value_created amt by filtering post sales support sales step
-			    ),
-			    ssr_history[step_name] ="Post-Sales Support"
-			)
-			
-			```
-		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
-		displayFolder: _vi_score
-		lineageTag: 6659ff8c-db31-4f0b-bc2c-2ac8a062d279
-
-		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
-
-	/// Shows the sh total actual ratio for company and account history analysis.
+	/// Calculates the total sh actual ratio.
 	measure 'meas.sh_total_actual_ratio' =
 			
 			var _new_ratio = [meas.ssr_history_vi_value_new_logo_actual_ratio]                  // get the new ratio actual
@@ -1406,7 +1372,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 87e2e241-74cc-4fc1-b2cd-2084f9f4a2ae
 
-	/// Shows the sh total expected ratio for company and account history analysis.
+	/// Calculates the total sh expected ratio.
 	measure 'meas.sh_total_expected_ratio' =
 			
 			var _new_ratio = [meas.ssr_history_vi_new_logo_expected_ratio]                  // get the new ratio actual
@@ -1419,7 +1385,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: 5a75c550-224e-4476-ac31-4830b9fd9b3c
 
-	/// Shows the sh total diff ratio for company and account history analysis.
+	/// Calculates the total sh diff ratio.
 	measure 'meas.sh_total_diff_ratio' =
 			
 			var _new_ratio = [meas.ssr_history_vi_new_logo_diff_ratio]                  // get the new ratio actual
@@ -1434,7 +1400,7 @@ table companies_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Shows the vi lead pre sell total actual ratio for company and account history analysis.
+	/// Calculates the total vi lead pre sell actual ratio.
 	measure 'meas.vi_lead_pre_sell_total_actual_ratio' =
 			
 			var lead_ratio = [meas.ssr_history_vi_value_lead_actual_ratio]              // get the actual ratio
@@ -1449,7 +1415,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: e37f60e6-7236-47cf-9d75-be0192f91445
 
-	/// Shows the vi lead pre sell total expected ratio for company and account history analysis.
+	/// Calculates the total vi lead pre sell expected ratio.
 	measure 'meas.vi_lead_pre_sell_total_expected_ratio' =
 			
 			var lead_ratio = [meas.vi_value_Lead_expected_ratio]              // get the actual ratio
@@ -1464,7 +1430,7 @@ table companies_history
 		displayFolder: _vi_score
 		lineageTag: fecbf128-cf6e-45ad-8c03-5853fbc05486
 
-	/// Shows the vi lead pre sell total diff ratio for company and account history analysis.
+	/// Calculates the total vi lead pre sell diff ratio.
 	measure 'meas.vi_lead_pre_sell_total_diff_ratio' =
 			
 			var lead_ratio = [meas.ssr_history_vi_lead_diff_ratio]              // get the actual ratio

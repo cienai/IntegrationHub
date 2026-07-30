@@ -2,8 +2,7 @@
 table users_history
 	lineageTag: d904fbb9-5121-4eb7-966a-bb236f245cbb
 
-	/// Measure meas.data_logs_user_mgr_count_eop.
-	/// Description: Calculates data logs user manager count end of period. Uses the selected date range context. Uses the latest snapshot date within the current filter context.
+	/// Counts data logs user manager at end of period in the current selection.
 	measure 'meas.data_logs_user_mgr_count_eop' = ```
 			
 			
@@ -22,8 +21,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: b37dd8bf-3abb-4c71-b2b1-02d86db3fea8
 
-	/// Measure meas.data_logs_user_new_hires_reached_performer_within_12_months.
-	/// Description: Calculates data logs user new hires reached performer within 12 months. Uses the selected date range context.
+	/// Counts data logs user new hires reached performer within 12 months in the current selection.
 	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months' = ```
 			
 			
@@ -42,8 +40,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: a2dee853-9dbc-44fa-8056-38f45ee80945
 
-	/// Measure meas.data_logs_user_new_terminations.
-	/// Description: Counts users terminated during the selected period. Uses the selected date range context.
+	/// Counts data logs user new terminations in the current selection.
 	measure 'meas.data_logs_user_new_terminations' = ```
 			
 			
@@ -65,8 +62,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: bde20ead-06ce-47fd-a172-f24a25d9b9c4
 
-	/// Measure meas.data_logs_user_individual_contrib_count_eop.
-	/// Description: Calculates data logs user individual contrib count end of period.
+	/// Counts data logs user individual contrib at end of period in the current selection.
 	measure 'meas.data_logs_user_individual_contrib_count_eop' = ```
 			
 			[meas.data_logs_user_count_eop_for_all_sales_roles]  - [meas.data_logs_user_count_eop_for_mgr] 
@@ -76,8 +72,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 190042ed-5ba8-4940-b3a0-4223f7d6d03b
 
-	/// Measure meas.data_logs_user_rep_mgr_ratio.
-	/// Description: Calculates representative-to-manager ratio in the selected reporting context.
+	/// Calculates data logs user representative manager ratio as a ratio.
 	measure 'meas.data_logs_user_rep_mgr_ratio' =
 			//divide(users_history[meas.data_logs_user_individual_contrib_count_eop] ,users_history[meas.data_logs_user_count_eop_for_mgr])
 			
@@ -101,8 +96,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_user_count_eop.
-	/// Description: Counts users at the end of the selected period. Uses the selected date range context. Uses the latest snapshot date within the current filter context.
+	/// Counts data logs user at end of period in the current selection.
 	measure 'meas.data_logs_user_count_eop' = ```
 			
 			
@@ -121,8 +115,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 0d53230b-70a9-4c33-923e-97f01c07267f
 
-	/// Measure meas.data_logs_user_new_terminations_within_12_months.
-	/// Description: Calculates data logs user new terminations within 12 months. Uses the selected date range context.
+	/// Counts data logs user new terminations within 12 months in the current selection It includes records where trueai tenure < 13.
 	measure 'meas.data_logs_user_new_terminations_within_12_months' = ```
 			
 			
@@ -139,8 +132,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: 1b315d56-3418-4f57-83da-95dd0f39299c
 
-	/// Measure meas.data_logs_ci_perf_tier_count.
-	/// Description: Calculates data logs customer intelligence performance tier count.
+	/// Counts data logs ci performance tier in the current selection It includes records where col ci perf qtly performance tier <> "XX".
 	measure 'meas.data_logs_ci_perf_tier_count' = ```
 			
 			var month_instances = CALCULATE(COUNT(users_history[col.ci.perf_qtly_performance_tier]))  // how many months in this perf cat
@@ -154,8 +146,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: c8771d48-9a93-446a-b576-b1cae3318ddc
 
-	/// Measure meas.data_logs_user_net_new_users.
-	/// Description: Calculates net user change as new hires plus net termination contribution for the selected period. Calculates peer context values using the selected role.
+	/// Calculates data logs user net new users.
 	measure 'meas.data_logs_user_net_new_users' = ```
 			[meas.data_logs_user_new_hires] + [meas.data_logs_user_new_terminations] 
 			```
@@ -163,24 +154,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 1103f6b8-a2c1-47f7-82b8-8f911720ebe9
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_bookings.
-	/// Description: Calculates annual average bookings performance for the selected user scope. Calculates peer context values using the selected role.
-	measure 'meas.data_logs_ci_perf_annual_avg_bookings' = ```
-			
-			var end_date =   [meas.companies_history_reference_date]
-			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
-			var res =  CALCULATE(AVERAGE(users_history[ci_perf_qtly_avg_bookings_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date) // qtly number
-			return res * 4 // annual number
-			
-			```
-		formatString: \$#,0;(\$#,0);\$#,0
-		displayFolder: _perf_analysis
-		lineageTag: e8d0ba55-4ac1-4b2d-9735-21fbf43528cc
-
-		annotation PBI_FormatHint = {"currencyCulture":""}
-
-	/// Measure meas.data_logs_user_count_bop.
-	/// Description: Counts users at the beginning of the selected period. Uses the selected date range context.
+	/// Counts data logs user at beginning of period in the current selection.
 	measure 'meas.data_logs_user_count_bop' = ```
 			
 			
@@ -199,8 +173,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 23c2187f-b803-4f66-a9bb-b218861c778f
 
-	/// Measure meas.data_logs_user_count_change.
-	/// Description: Calculates data logs user count change.
+	/// Calculates data logs user count change as a ratio.
 	measure 'meas.data_logs_user_count_change' = divide([meas.data_logs_user_new_hires] , [meas.data_logs_user_count_bop], BLANK())
 		formatString: +#,##0%;-#,##0%
 		displayFolder: _rep_count_analysis
@@ -208,8 +181,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_user_new_hires.
-	/// Description: Counts users hired during the selected period. Uses the selected date range context.
+	/// Counts data logs user new hires in the current selection.
 	measure 'meas.data_logs_user_new_hires' = ```
 			
 			
@@ -226,8 +198,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 71c8d155-d6fc-42de-b47d-f7c9060e54a1
 
-	/// Measure meas.data_logs_user_new_terminations_within_12_months_avg_tenure.
-	/// Description: Calculates data logs user new terminations within 12 months average tenure. Uses the selected date range context.
+	/// Calculates the average data logs user new terminations within 12 months tenure It includes records where trueai tenure < 13.
 	measure 'meas.data_logs_user_new_terminations_within_12_months_avg_tenure' = ```
 			
 			
@@ -245,8 +216,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: 75d0f25d-3377-4efe-b39e-2e5fcc6393ab
 
-	/// Measure meas.data_logs_user_new_hires_reached_performer_success_rate.
-	/// Description: Calculates data logs user new hires reached performer success rate.
+	/// Calculates data logs user new hires reached performer success rate as a ratio.
 	measure 'meas.data_logs_user_new_hires_reached_performer_success_rate' = ```
 			
 			var tot_new_hires  = [meas.data_logs_user_new_hires]
@@ -269,15 +239,13 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: c9422a55-f07e-46d0-8b7d-e7073208b629
 
-	/// Measure meas.data_logs_user_new_terminations_within_12_months_failure_rate.
-	/// Description: Calculates data logs user new terminations within 12 months failure rate.
+	/// Calculates data logs user new terminations within 12 months failure rate as a ratio.
 	measure 'meas.data_logs_user_new_terminations_within_12_months_failure_rate' = divide( -1 * [meas.data_logs_user_new_terminations_within_12_months],  [meas.data_logs_user_new_hires] , BLANK())
 		formatString: #,0%;-#,0%;#,0%
 		displayFolder: _ramp_analysis
 		lineageTag: 29a4c52e-0ac6-4eb5-8258-ac1cac98ccae
 
-	/// Measure meas.data_logs_user_new_hires_reached_performer_within_12_months_avg_tenure.
-	/// Description: Calculates data logs user new hires reached performer within 12 months average tenure. Uses the selected date range context. Calculates peer context values using the selected role.
+	/// Calculates the average data logs user new hires reached performer within 12 months tenure.
 	measure 'meas.data_logs_user_new_hires_reached_performer_within_12_months_avg_tenure' = ```
 			
 			VAR fromDate = [meas.context_date_min]
@@ -307,26 +275,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_pipeline_created.
-	/// Description: Calculates annual average pipeline-created performance for the selected user scope. Calculates peer context values using the selected role.
-	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created' = ```
-			
-			var end_date =   [meas.companies_history_reference_date]
-			var start_date =  end_date - 365 //dateadd( {end_date},-1, year)
-			var res =  CALCULATE(AVERAGE(users_history[col.ci.perf_qtly_avg_pipeline_peers]), cal_end_dates[Date] >start_date &&  end_date <= end_date) // qtly number
-			return res * 4 // annual number
-			
-			
-			
-			```
-		formatString: \$#,0;(\$#,0);\$#,0
-		displayFolder: _perf_analysis
-		lineageTag: a71bba55-020c-4658-b8f1-53fffc283958
-
-		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
-
-	/// Measure meas.users_history_ramping_reps_count_eop.
-	/// Description: Counts ramping representatives at end of period. Uses the selected date range context. Uses the latest snapshot date within the current filter context. Filters to users marked with ramping status.
+	/// Counts users history ramping representatives at end of period in the current selection It includes records where col ci perf ramping status = "Ramping".
 	measure 'meas.users_history_ramping_reps_count_eop' = ```
 			
 			
@@ -346,8 +295,7 @@ table users_history
 		displayFolder: _skills_analysis
 		lineageTag: 443a145f-8199-4a8d-bba8-a3b1556b6100
 
-	/// Measure meas.user_history_period_count.
-	/// Description: Counts distinct reporting periods in the current filter context.
+	/// Counts user history period in the current selection.
 	measure 'meas.user_history_period_count' = CALCULATE(DISTINCTCOUNT(users_history[_sys_filt_start_date]))
 		formatString: #,0
 		displayFolder: _helper
@@ -368,8 +316,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.user_history_user_new_hires_reached_perf_in_12_month.
-	/// Description: Counts new hires who reached performer status within twelve months. Uses the selected date range context.
+	/// Counts user history user new hires reached performance in 12 month in the current selection.
 	measure 'meas.user_history_user_new_hires_reached_perf_in_12_month' = ```
 			
 			
@@ -388,8 +335,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: d7c2bfef-6936-47f3-b6c3-3453a31b2971
 
-	/// Measure meas.user_history_user_new_hires_didnt_reach_perf_in_12_month.
-	/// Description: Counts new hires who did not reach performer status within twelve months. Uses the selected date range context.
+	/// Counts user history user new hires didnt reach performance in 12 month in the current selection.
 	measure 'meas.user_history_user_new_hires_didnt_reach_perf_in_12_month' = ```
 			
 			
@@ -408,8 +354,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: cbad2d08-9be8-4635-a80e-1fb33bbc5488
 
-	/// Measure meas.user_history_user_new_hires_terminated_in_12_month.
-	/// Description: Counts new hires terminated within twelve months. Uses the selected date range context. Calculates peer context values using the selected role.
+	/// Counts user history user new hires terminated in 12 month in the current selection.
 	measure 'meas.user_history_user_new_hires_terminated_in_12_month' = ```
 			
 			
@@ -426,8 +371,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: 1aea2f21-f4e1-4f4d-bc08-8849f865a4c8
 
-	/// Measure meas.users_history_ci_perf_avg_attainment.
-	/// Description: Calculates average performance attainment across users in the selected context. Calculates peer context values using the selected role.
+	/// Calculates users history ci performance average attainment as a ratio It includes records where ci perf qtly avg bookings peers > 1.
 	measure 'meas.users_history_ci_perf_avg_attainment' =
 			
 			
@@ -441,8 +385,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_ae.
-	/// Description: Counts end-of-period users for Account Executive.
+	/// Counts data logs user at end of period for ae in the current selection It includes records where trueai user role department = "SALES".
 	measure 'meas.data_logs_user_count_eop_for_ae' = ```
 			
 			CALCULATE(
@@ -462,8 +405,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_am.
-	/// Description: Counts end-of-period users for Account Manager.
+	/// Counts data logs user at end of period for am in the current selection It includes records where trueai user role department = "SALES".
 	measure 'meas.data_logs_user_count_eop_for_am' = ```
 			
 			CALCULATE(
@@ -483,8 +425,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_sdr.
-	/// Description: Counts end-of-period users for Sales Development Representative.
+	/// Counts data logs user at end of period for sdr in the current selection It includes records where trueai user role department = "SALES".
 	measure 'meas.data_logs_user_count_eop_for_sdr' = ```
 			
 			CALCULATE(
@@ -504,8 +445,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_all_sales_roles.
-	/// Description: Counts end-of-period users for all sales roles.
+	/// Counts data logs user at end of period for all sales roles in the current selection It includes records where trueai user role department = "SALES".
 	measure 'meas.data_logs_user_count_eop_for_all_sales_roles' = ```
 			
 			CALCULATE(
@@ -525,8 +465,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_mgr.
-	/// Description: Counts end-of-period users for Management.
+	/// Counts data logs user at end of period for manager in the current selection It includes records where trueai user role department = "SALES".
 	measure 'meas.data_logs_user_count_eop_for_mgr' = ```
 			
 			CALCULATE(
@@ -538,8 +477,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 85f4c5b8-e1fe-4183-b591-4ef4151f7ee6
 
-	/// Measure meas.data_logs_user_count_eop_for_other.
-	/// Description: Counts end-of-period users for Other roles.
+	/// Counts data logs user at end of period for other in the current selection It includes records where trueai user role department = "SALES".
 	measure 'meas.data_logs_user_count_eop_for_other' =
 			
 			CALCULATE(
@@ -550,8 +488,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 264b9cb9-f0ce-4764-8abe-39c27f7e8175
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_mkt.
-	/// Description: Counts end-of-period users for department Marketing.
+	/// Counts data logs user at end of period for dept mkt in the current selection.
 	measure 'meas.data_logs_user_count_eop_for_dept_mkt' =
 			
 			CALCULATE(
@@ -570,8 +507,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_sales.
-	/// Description: Counts end-of-period users for department Sales.
+	/// Counts data logs user at end of period for dept sales in the current selection.
 	measure 'meas.data_logs_user_count_eop_for_dept_sales' =
 			
 			CALCULATE(
@@ -590,8 +526,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_other.
-	/// Description: Counts end-of-period users for department Other departments.
+	/// Counts data logs user at end of period for dept other in the current selection.
 	measure 'meas.data_logs_user_count_eop_for_dept_other' =
 			
 			CALCULATE(
@@ -610,8 +545,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_change_perc.
-	/// Description: Calculates data logs user count change perc.
+	/// Calculates data logs user count change perc as a ratio.
 	measure 'meas.data_logs_user_count_change_perc' =
 			
 			VAR __BASELINE_VALUE = [meas.data_logs_user_count_bop]
@@ -630,8 +564,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_user_count_eop_for_nd.
-	/// Description: Counts end-of-period users for Not Defined role.
+	/// Counts data logs user at end of period for nd in the current selection.
 	measure 'meas.data_logs_user_count_eop_for_nd' =
 			
 			CALCULATE(
@@ -643,8 +576,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 7bcb8763-96e0-4db1-b039-349dbd1c0eec
 
-	/// Measure meas.reps_w_actlvl_pct.
-	/// Description: Calculates percentage of representatives with activity capture level data.
+	/// Calculates representatives w actlvl as a percentage.
 	measure 'meas.reps_w_actlvl_pct' = ```
 			
 			var reps_w_acl = [meas.reps_w_actlvl_count]
@@ -661,8 +593,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.reps_w_actlvl_count.
-	/// Description: Counts representatives with activity capture level data.
+	/// Counts representatives w actlvl in the current selection It includes records where ci act capt lvl > 0.
 	measure 'meas.reps_w_actlvl_count' =
 			
 			CALCULATE(DISTINCTCOUNT([_sys_user_id]), (users_history[ci_act_capt_lvl] > 0)
@@ -671,8 +602,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: cb1894d2-ba0e-4792-8b22-f9f580f4b5e6
 
-	/// Measure meas.reps_w_time_allocation_pct.
-	/// Description: Calculates percentage of representatives with time allocation data.
+	/// Calculates representatives w time allocation as a percentage.
 	measure 'meas.reps_w_time_allocation_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_count]
@@ -692,8 +622,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.reps_w_time_allocation_count.
-	/// Description: Counts representatives with time allocation data. Uses the selected date range context. Uses the latest snapshot date within the current filter context.
+	/// Counts representatives w time allocation in the current selection It includes records where ci time alloc tot > 0.
 	measure 'meas.reps_w_time_allocation_count' = ```
 			
 			
@@ -712,14 +641,12 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 390d2dd9-6f68-455a-a819-a36c90a9703c
 
-	/// Measure meas.users_history_row_filler.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler.
 	measure 'meas.users_history_row_filler' = ""
 		displayFolder: _filler
 		lineageTag: 6ddcb848-f676-401c-a8b8-ee85f6065845
 
-	/// Measure meas.sys.user_id_for_am.
-	/// Description: Returns user identifier filtered to role Account Manager.
+	/// Counts sys user id for am in the current selection.
 	measure 'meas.sys.user_id_for_am' =
 			
 			CALCULATE(
@@ -736,8 +663,7 @@ table users_history
 				  "version": 0
 				}
 
-	/// Measure meas.di.trueai_opps_won_amt_am_avg.
-	/// Description: Calculates average won opportunity amount per user for role Account Manager.
+	/// Calculates di trueai opportunities won amount am average as a ratio.
 	measure 'meas.di.trueai_opps_won_amt_am_avg' =
 			
 			DIVIDE(
@@ -756,8 +682,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.sys.user_id_for_ae.
-	/// Description: Returns user identifier filtered to role Account Executive.
+	/// Counts sys user id for ae in the current selection.
 	measure 'meas.sys.user_id_for_ae' =
 			
 			CALCULATE(
@@ -768,8 +693,7 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 443717c6-2617-4712-9ee1-236180210cdb
 
-	/// Measure meas.sys.user_id_for_sdr.
-	/// Description: Returns user identifier filtered to role Sales Development Representative.
+	/// Counts sys user id for sdr in the current selection.
 	measure 'meas.sys.user_id_for_sdr' =
 			
 			CALCULATE(
@@ -780,8 +704,7 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: b95fcde4-0bcd-4deb-8ac0-ef02a18103d6
 
-	/// Measure meas.sys.user_id_for_nd.
-	/// Description: Returns user identifier filtered to role Not Defined role.
+	/// Counts sys user id for nd in the current selection.
 	measure 'meas.sys.user_id_for_nd' =
 			
 			CALCULATE(
@@ -792,8 +715,7 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 60ef9f77-bd16-4f97-a5b9-a3d8fd5f0927
 
-	/// Measure meas.sys.user_id_for_other.
-	/// Description: Returns user identifier filtered to role Other roles.
+	/// Counts sys user id for other in the current selection.
 	measure 'meas.sys.user_id_for_other' =
 			
 			CALCULATE(
@@ -804,8 +726,7 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: a67bea40-cc9d-4b93-b763-4082390316e3
 
-	/// Measure meas.di.trueai_opps_won_amt_ae_avg.
-	/// Description: Calculates average won opportunity amount per user for role Account Executive.
+	/// Calculates di trueai opportunities won amount ae average as a ratio.
 	measure 'meas.di.trueai_opps_won_amt_ae_avg' =
 			
 			DIVIDE(
@@ -818,8 +739,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.di.trueai_opps_won_amt_sdr_avg.
-	/// Description: Calculates average won opportunity amount per user for role Sales Development Representative.
+	/// Calculates di trueai opportunities won amount sdr average as a ratio.
 	measure 'meas.di.trueai_opps_won_amt_sdr_avg' =
 			
 			DIVIDE(
@@ -832,8 +752,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.di.trueai_opps_won_amt_nd_avg.
-	/// Description: Calculates average won opportunity amount per user for role Not Defined role.
+	/// Calculates di trueai opportunities won amount nd average as a ratio.
 	measure 'meas.di.trueai_opps_won_amt_nd_avg' =
 			
 			DIVIDE(
@@ -845,8 +764,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.di.trueai_opps_won_amt_mgr_avg.
-	/// Description: Calculates average won opportunity amount per user for role Management.
+	/// Calculates di trueai opportunities won amount manager average as a ratio.
 	measure 'meas.di.trueai_opps_won_amt_mgr_avg' =
 			
 			DIVIDE(
@@ -858,8 +776,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.sys.user_id_for_mgr.
-	/// Description: Returns user identifier filtered to role Management.
+	/// Counts sys user id for manager in the current selection.
 	measure 'meas.sys.user_id_for_mgr' =
 			
 			CALCULATE(
@@ -870,8 +787,7 @@ table users_history
 		displayFolder: __needs_attention
 		lineageTag: 8421e203-c9d1-468b-affe-165f59ada1ae
 
-	/// Measure meas.di.trueai_opps_won_amt_other_avg.
-	/// Description: Calculates average won opportunity amount per user for role Other roles.
+	/// Calculates di trueai opportunities won amount other average as a ratio.
 	measure 'meas.di.trueai_opps_won_amt_other_avg' =
 			
 			DIVIDE(
@@ -884,8 +800,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.count_trueai_user_role_account_executive.
-	/// Description: Counts users for the specified role in the selected reporting period. Uses the selected date range context.
+	/// Counts trueai user role account executive in the current selection.
 	measure 'meas.count_trueai_user_role_account_executive' = ```
 			
 			var min_date = [meas.context_date_min]
@@ -901,8 +816,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: f9380111-412f-4044-b400-0d2ca99a2968
 
-	/// Measure meas.count_trueai_user_role_account_manager.
-	/// Description: Counts users for the specified role in the selected reporting period. Uses the selected date range context.
+	/// Counts trueai user role account manager in the current selection.
 	measure 'meas.count_trueai_user_role_account_manager' = ```
 			
 			var min_date = [meas.context_date_min]
@@ -918,8 +832,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 5569d550-425e-4fd9-99b5-14bb55a3efff
 
-	/// Measure meas.count_trueai_user_role_sales_manager.
-	/// Description: Counts users for the specified role in the selected reporting period. Uses the selected date range context.
+	/// Counts trueai user role sales manager in the current selection.
 	measure 'meas.count_trueai_user_role_sales_manager' = ```
 			
 			var min_date = [meas.context_date_min] // get the min date of the period
@@ -935,8 +848,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: b6ac59ea-d721-4ef6-8c5b-230bf0de8e09
 
-	/// Measure meas.count_trueai_user_role_nd.
-	/// Description: Counts users for the specified role in the selected reporting period. Uses the selected date range context.
+	/// Counts trueai user role nd in the current selection.
 	measure 'meas.count_trueai_user_role_nd' = ```
 			
 			var min_date = [meas.context_date_min]
@@ -952,8 +864,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 42d75b4a-4848-4708-8151-7a0816e02c31
 
-	/// Measure meas.count_trueai_user_role_sales_development_rep.
-	/// Description: Counts users for the specified role in the selected reporting period. Uses the selected date range context.
+	/// Counts trueai user role sales development representative in the current selection.
 	measure 'meas.count_trueai_user_role_sales_development_rep' = ```
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
@@ -968,8 +879,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: be269a0b-7718-4e82-ac59-c6b6bda76360
 
-	/// Measure meas.user_history_count_dept_sales.
-	/// Description: Counts users in the Sales department in the selected reporting period.
+	/// Counts user history dept sales in the current selection.
 	measure 'meas.user_history_count_dept_sales' =
 			
 			CALCULATE(
@@ -986,8 +896,7 @@ table users_history
 				  "version": 0
 				}
 
-	/// Measure meas.count_trueai_user_role_account_executive_in_group_nd.
-	/// Description: Counts users for the specified role in the selected reporting period.
+	/// Counts trueai user role account executive in group nd in the current selection.
 	measure 'meas.count_trueai_user_role_account_executive_in_group_nd' =
 			
 			CALCULATE(
@@ -1006,8 +915,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.count_trueai_user_role_all_salesteam.
-	/// Description: Counts users for the specified role in the selected reporting period. Uses the selected date range context.
+	/// Counts trueai user role all salesteam in the current selection.
 	measure 'meas.count_trueai_user_role_all_salesteam' = ```
 			var min_date = [meas.context_date_min]
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date)
@@ -1023,8 +931,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 5ba6ff62-c218-4a8c-a401-b26f5bbba04f
 
-	/// Measure meas.count_trueai_user_role_other.
-	/// Description: Counts users for the specified role in the selected reporting period. Uses the selected date range context.
+	/// Counts trueai user role other in the current selection.
 	measure 'meas.count_trueai_user_role_other' = ```
 			var min_date = [meas.context_date_min] // get the min date of the period
 			var user_filt = filter(users, If(IsBlank([trueai_termination_date]), date(2100,01,01), [trueai_termination_date]) > min_date) // filter anyone who was terminated prior to start of period
@@ -1039,8 +946,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 2096bd64-ff8b-4b2f-8629-80b6e89051cb
 
-	/// Measure meas.count_trueai_user_role_sales_executive.
-	/// Description: Counts users for the specified role in the selected reporting period. Uses the selected date range context.
+	/// Counts trueai user role sales executive in the current selection.
 	measure 'meas.count_trueai_user_role_sales_executive' = ```
 			
 			var min_date = [meas.context_date_min] // get the min date of the period
@@ -1056,8 +962,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 32655af9-d185-476f-9a78-27fbb9ffbcb5
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_support.
-	/// Description: Counts end-of-period users for department Support.
+	/// Counts data logs user at end of period for dept support in the current selection.
 	measure 'meas.data_logs_user_count_eop_for_dept_support' =
 			
 			CALCULATE(
@@ -1068,8 +973,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 1e6d0ed8-aaae-4efe-b4d3-51a8c8c2b16c
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_ops.
-	/// Description: Counts end-of-period users for department Operations.
+	/// Counts data logs user at end of period for dept ops in the current selection.
 	measure 'meas.data_logs_user_count_eop_for_dept_ops' =
 			
 			CALCULATE(
@@ -1080,8 +984,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: e9b2eb17-1691-4b12-825c-1f151ac84361
 
-	/// Measure meas.data_logs_user_count_eop_for_dept_nd.
-	/// Description: Counts end-of-period users for department Not Defined department.
+	/// Counts data logs user at end of period for dept nd in the current selection.
 	measure 'meas.data_logs_user_count_eop_for_dept_nd' =
 			
 			CALCULATE(
@@ -1092,8 +995,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: b7c20247-953b-46d0-b3ca-169b075bde67
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg.
-	/// Description: Calculates average won opportunity amount per end-of-period user.
+	/// Calculates data logs won amount user at end of period average as a ratio.
 	measure 'meas.data_logs_won_amt_user_eop_avg' =
 			
 			DIVIDE(
@@ -1112,23 +1014,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_pipeline_amt_user_eop_avg.
-	/// Description: Calculates average pipeline amount per end-of-period user.
-	measure 'meas.data_logs_pipeline_amt_user_eop_avg' =
-			
-			DIVIDE(
-			        SUM('ssr_history'[opp_pipeline_amt]),
-			        [meas.data_logs_user_count_eop]
-			)
-		displayFolder: _results_analysis
-		lineageTag: e3899a10-a1ed-4134-b2f9-aa52c0d6645e
-
-		changedProperty = FormatString
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_new_logo_selling.
-	/// Description: Calculates average won opportunity amount per end-of-period user.
+	/// Calculates data logs won amount user at end of period average for new logo selling as a ratio.
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_logo_selling' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1151,8 +1037,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_existing_acv.
-	/// Description: Calculates average won opportunity amount per end-of-period user.
+	/// Calculates data logs won amount user at end of period average for existing acv as a ratio It includes records where col opp acv classification = "Existing Customer Selling ACV".
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_acv' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1168,8 +1053,7 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_new_acv.
-	/// Description: Calculates average won opportunity amount per end-of-period user.
+	/// Calculates data logs won amount user at end of period average for new acv as a ratio It includes records where col opp acv classification = "New ACV".
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_new_acv' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1193,8 +1077,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.user_history_user_new_hires_terminated_in_12_month_pos.
-	/// Description: Counts new hires terminated within twelve months. Uses the selected date range context.
+	/// Counts user history user new hires terminated in 12 month pos in the current selection.
 	measure 'meas.user_history_user_new_hires_terminated_in_12_month_pos' = ```
 			
 			
@@ -1211,8 +1094,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: 640150f5-397a-4029-bd36-e53852d020d0
 
-	/// Measure meas.data_logs_won_amt_user_eop_avg_for_existing_customer_selling.
-	/// Description: Calculates average won opportunity amount per end-of-period user.
+	/// Calculates data logs won amount user at end of period average for existing customer selling as a ratio.
 	measure 'meas.data_logs_won_amt_user_eop_avg_for_existing_customer_selling' = ```
 			
 			var reps = [meas.data_logs_user_count_eop]
@@ -1227,92 +1109,77 @@ table users_history
 
 		changedProperty = FormatString
 
-	/// Measure meas.users_history_row_filler2.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler2.
 	measure 'meas.users_history_row_filler2' = ""
 		displayFolder: _filler
 		lineageTag: edeb15e2-b186-459d-8646-a21595bab838
 
-	/// Measure meas.users_history_row_filler3.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler3.
 	measure 'meas.users_history_row_filler3' = ""
 		displayFolder: _filler
 		lineageTag: fb5ce7e1-3b57-4caa-b47c-75f38cf431ca
 
-	/// Measure meas.users_history_row_filler4.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler4.
 	measure 'meas.users_history_row_filler4' = ""
 		displayFolder: _filler
 		lineageTag: 8980361f-9d0f-4b4f-a5b9-adfe40234d48
 
-	/// Measure meas.users_history_row_filler5.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler5.
 	measure 'meas.users_history_row_filler5' = ""
 		displayFolder: _filler
 		lineageTag: c1e1b654-df56-4f96-a7f2-b175c3e859ef
 
-	/// Measure meas.users_history_row_filler6.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler6.
 	measure 'meas.users_history_row_filler6' = ""
 		displayFolder: _filler
 		lineageTag: 2f5a5d5a-b880-4048-a7c5-e5d12008ee28
 
-	/// Measure meas.users_history_row_filler7.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler7.
 	measure 'meas.users_history_row_filler7' = ""
 		displayFolder: _filler
 		lineageTag: 3e1bb5f9-21ff-4763-b675-e056bebbc144
 
-	/// Measure meas.users_history_row_filler8.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler8.
 	measure 'meas.users_history_row_filler8' = ""
 		displayFolder: _filler
 		lineageTag: 7aa1bc6d-19ee-4f88-8447-c4ebd53bf512
 
-	/// Measure meas.users_history_row_filler9.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler9.
 	measure 'meas.users_history_row_filler9' = ""
 		displayFolder: _filler
 		lineageTag: 969c4058-2234-4575-ba9f-0cc3d76a47ce
 
-	/// Measure meas.users_history_row_filler10.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler10.
 	measure 'meas.users_history_row_filler10' = ""
 		displayFolder: _filler
 		lineageTag: f362c584-a411-4e49-bbf6-31cb18a66a80
 
-	/// Measure meas.users_history_row_filler11.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler11.
 	measure 'meas.users_history_row_filler11' = ""
 		displayFolder: _filler
 		lineageTag: a6884327-0fed-4df0-8827-faaeeda5986f
 
-	/// Measure meas.users_history_row_filler12.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler12.
 	measure 'meas.users_history_row_filler12' = ""
 		displayFolder: _filler
 		lineageTag: 13189c9e-d0d2-42cd-a41c-e2969b8dab74
 
-	/// Measure meas.users_history_row_filler13.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler13.
 	measure 'meas.users_history_row_filler13' = ""
 		displayFolder: _filler
 		lineageTag: 68cc992c-591e-4f1f-9386-89571ceb05af
 
-	/// Measure meas.users_history_row_filler14.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler14.
 	measure 'meas.users_history_row_filler14' = ""
 		displayFolder: _filler
 		lineageTag: 272625e7-1621-4db5-a38a-56e0f218088a
 
-	/// Measure meas.users_history_row_filler15.
-	/// Description: Helper measure that returns blank text to preserve visual layout spacing.
+	/// Calculates users history row filler15.
 	measure 'meas.users_history_row_filler15' = ""
 		displayFolder: _filler
 		lineageTag: bce5d1d3-b76b-4858-862e-46f081a4d53b
 
-	/// Measure meas.data_logs_user_turnover_pct.
-	/// Description: Calculates overall turnover percentage for the selected period.
+	/// Calculates data logs user turnover as a percentage.
 	measure 'meas.data_logs_user_turnover_pct' =
 			
 			var res =DIVIDE(
@@ -1335,8 +1202,7 @@ table users_history
 				  "version": 0
 				}
 
-	/// Measure meas.time_allocation_total_not_eng.
-	/// Description: Calculates average non-engagement time allocation share.
+	/// Calculates the average time allocation total not engaged.
 	measure 'meas.time_allocation_total_not_eng' =
 			
 			AVERAGE('users_history'[ci_time_alloc_tot]) - AVERAGE('users_history'[ci_time_alloc_tot_eng])
@@ -1353,8 +1219,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ta_potential_vs_actual.
-	/// Description: Calculates comparison between potential and actual time allocation in the selected context.
+	/// Calculates users history ta potential vs actual as a ratio.
 	measure 'meas.users_history_ta_potential_vs_actual' = ```
 			
 			var uh_filt_tbl = CALCULATETABLE(users_history, users_history[ci_time_alloc_tot] <> blank())
@@ -1367,8 +1232,7 @@ table users_history
 		displayFolder: _ta_analysis
 		lineageTag: dd9b7816-b83c-4d60-bfb1-f374cc0531f5
 
-	/// Measure meas.data_logs_user_turnover_pct_regrettable.
-	/// Description: Calculates regrettable turnover percentage for the selected period.
+	/// Calculates data logs user turnover regrettable as a percentage.
 	measure 'meas.data_logs_user_turnover_pct_regrettable' =
 			
 			
@@ -1384,8 +1248,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 36204f55-92aa-45d3-846e-38ef4694b4bb
 
-	/// Measure meas.data_logs_user_new_terminations_regrettable.
-	/// Description: Counts regrettable terminations during the selected period.
+	/// Counts data logs user new terminations regrettable in the current selection.
 	measure 'meas.data_logs_user_new_terminations_regrettable' = ```
 			
 			var tbl_perf_users = SUMMARIZE(users_history , users_history[_sys_user_id], "months", Count(users_history[_sys_doc_id]), "avg_perf_tier_num", AVERAGE(users_history[ci_perf_qtly_performance_tier_num])+ 0)
@@ -1426,8 +1289,7 @@ table users_history
 			```
 		lineageTag: d413b1b6-88bb-4362-ba1f-b09ba6abc6ae
 
-	/// Measure meas.exp_rpts_all_avg_perf_tier.
-	/// Description: Calculates average performance tier across the selected reporting context.
+	/// Calculates the average exp rpts all performance tier.
 	measure 'meas.exp_rpts_all_avg_perf_tier' = ```
 			
 			 var calc = CALCULATE(AVERAGE(users_history[ci_perf_qtly_performance_tier_num]))
@@ -1450,15 +1312,13 @@ table users_history
 		displayFolder: _export_rpts
 		lineageTag: c7aef491-020f-4a36-abf4-ec5b554a1bfa
 
-	/// Measure meas.exp_rpts_current_year_avg_perf_tier.
-	/// Description: Calculates average performance tier for Current Year using time-intelligence filter. Applies the Current Year time-intelligence filter.
+	/// Calculates the average exp rpts current year performance tier It includes records where filt item = "CURRENT_YEAR".
 	measure 'meas.exp_rpts_current_year_avg_perf_tier' = CALCULATE(users_history[meas.exp_rpts_all_avg_perf_tier], time_intelligence[filt_item] = "CURRENT_YEAR")
 		formatString: 0.00
 		displayFolder: _export_rpts
 		lineageTag: db51bd07-3023-4d79-b5df-64359d2834ba
 
-	/// Measure meas.data_logs_user_count_all.
-	/// Description: Calculates data logs user count all.
+	/// Counts data logs user all in the current selection.
 	measure 'meas.data_logs_user_count_all' = [meas.data_logs_user_count_eop_for_dept_mkt]+[meas.data_logs_user_count_eop_for_dept_nd]+[meas.data_logs_user_count_eop_for_dept_ops]+[meas.data_logs_user_count_eop_for_dept_other]+[meas.data_logs_user_count_eop_for_dept_sales]+[meas.data_logs_user_count_eop_for_dept_support]
 		formatString: 0
 		displayFolder: _rep_count_analysis
@@ -1469,8 +1329,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: b46bd447-2ddc-4adc-a282-c0bd8c15171d
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_bookings_account_executive.
-	/// Description: Calculates annual average bookings performance for the selected user scope. Calculates peer context values using the selected role.
+	/// Calculates the average data logs ci performance annual bookings account executive It includes records where trueai user role = "Account Executive".
 	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_executive' = ```
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -1485,8 +1344,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_bookings_account_manager.
-	/// Description: Calculates annual average bookings performance for the selected user scope. Calculates peer context values using the selected role.
+	/// Calculates the average data logs ci performance annual bookings account manager It includes records where trueai user role = "Account Manager".
 	measure 'meas.data_logs_ci_perf_annual_avg_bookings_account_manager' = ```
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -1501,8 +1359,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.data_logs_ci_perf_annual_avg_pipeline_created_sdr.
-	/// Description: Calculates annual average pipeline-created performance for the selected user scope. Calculates peer context values using the selected role.
+	/// Calculates the average data logs ci performance annual pipeline created sdr It includes records where trueai user role = "Sales Development Rep".
 	measure 'meas.data_logs_ci_perf_annual_avg_pipeline_created_sdr' =
 			
 			var end_date =   [meas.companies_history_reference_date]
@@ -1515,8 +1372,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.perf_consider_mrasure.
-	/// Description: Returns explanatory guidance text that defines performer criteria used in this report.
+	/// Calculates performance consider mrasure.
 	measure 'meas.perf_consider_mrasure' = "To be considered a Performer, a rep needs to fall within +/- 35% of AAB / AAPC"
 		displayFolder: _perf_analysis
 		lineageTag: e36df813-494b-4999-a2d5-0c02c594db11
@@ -1531,8 +1387,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: f1b13f39-437e-469b-977e-2ef145c2c495
 
-	/// Measure meas.data_logs_ci_perf_status.
-	/// Description: Returns annual performance status classification for users based on configured thresholds.
+	/// Calculates the average data logs ci performance status.
 	measure 'meas.data_logs_ci_perf_status' = ```
 			
 			
@@ -1560,8 +1415,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: a97b7deb-0320-4928-9344-62e8b0ac287e
 
-	/// Measure meas.data_logs_user_12_Mos_ci_perf_status.
-	/// Description: Returns 12-month performance status classification for users based on configured thresholds.
+	/// Calculates the average data logs user 12 mos ci performance status.
 	measure 'meas.data_logs_user_12_Mos_ci_perf_status' = ```
 			
 			
@@ -1603,8 +1457,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: 7866caef-955b-4d57-9415-64d9df49695c
 
-	/// Measure meas.data_logs_user_count_rep_eop.
-	/// Description: Calculates data logs user count rep end of period. Uses the selected date range context. Uses the latest snapshot date within the current filter context.
+	/// Counts data logs user representative at end of period in the current selection.
 	measure 'meas.data_logs_user_count_rep_eop' = ```
 			
 			
@@ -1631,8 +1484,7 @@ table users_history
 		displayFolder: _ramp_analysis
 		lineageTag: 2ab3c61d-7f9a-43c9-9555-deafb52b42f8
 
-	/// Measure meas.reps_w_time_allocation_prospecting_count.
-	/// Description: Counts representatives with time allocation assigned to Prospecting.
+	/// Counts representatives w time allocation prospecting in the current selection.
 	measure 'meas.reps_w_time_allocation_prospecting_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_prospecting])>0)
@@ -1640,8 +1492,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: b9a4709c-76f5-444a-93e1-043c6fba0ff5
 
-	/// Measure meas.reps_w_time_allocation_prospecting_pct.
-	/// Description: Calculates percentage of representatives with time allocation assigned to Prospecting.
+	/// Calculates representatives w time allocation prospecting as a percentage.
 	measure 'meas.reps_w_time_allocation_prospecting_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_prospecting_count]
@@ -1653,8 +1504,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 95eb85ee-1b16-496a-b04a-aa3042687603
 
-	/// Measure meas.reps_w_time_allocation_new_logo_count.
-	/// Description: Counts representatives with time allocation assigned to new_logo.
+	/// Counts representatives w time allocation new logo in the current selection.
 	measure 'meas.reps_w_time_allocation_new_logo_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]), (users_history[ci_time_alloc_new_logo])>0)
@@ -1662,8 +1512,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: dff9104a-517d-4d51-b63b-64e65bacf531
 
-	/// Measure meas.reps_w_time_allocation_new_logo_pct.
-	/// Description: Calculates percentage of representatives with time allocation assigned to new_logo.
+	/// Calculates representatives w time allocation new logo as a percentage.
 	measure 'meas.reps_w_time_allocation_new_logo_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_new_logo_count]
@@ -1675,8 +1524,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 59a3a1e0-40af-42fd-8513-123844687a12
 
-	/// Measure meas.reps_w_time_allocation_prospect_pct.
-	/// Description: Calculates percentage of representatives with time allocation assigned to prospect.
+	/// Calculates representatives w time allocation prospect as a percentage.
 	measure 'meas.reps_w_time_allocation_prospect_pct' =
 			
 			var reps_w_ta = [meas.reps_w_time_allocation_count]
@@ -1688,8 +1536,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: c95cc6f4-094d-425d-8174-a1e11580c6ff
 
-	/// Measure meas.reps_all_time_allocation_count.
-	/// Description: Counts representatives included in time allocation analysis.
+	/// Counts representatives all time allocation in the current selection.
 	measure 'meas.reps_all_time_allocation_count' =
 			
 			CALCULATE(DISTINCTCOUNT(users_history[_sys_user_id]))
@@ -1697,8 +1544,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: aa4c3717-11a2-45fc-b083-3d1126f1fc90
 
-	/// Measure meas.data_logs_user_rep_mgr_ratio_updated.
-	/// Description: Calculates representative-to-manager ratio in the selected reporting context.
+	/// Calculates data logs user representative manager ratio updated as a ratio.
 	measure 'meas.data_logs_user_rep_mgr_ratio_updated' =
 			
 			VAR _total_role = CALCULATE(
@@ -1717,8 +1563,7 @@ table users_history
 		displayFolder: _rep_count_analysis
 		lineageTag: 12898c88-6b57-432c-b8f8-c7a8c8bbb2c4
 
-	/// Measure meas.data_logs_users_tenure.
-	/// Description: Calculates user tenure in the selected reporting context.
+	/// Calculates data logs users tenure.
 	measure 'meas.data_logs_users_tenure' = ```
 			
 			-- get the dates
@@ -1744,8 +1589,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Measure meas.data_logs_users_ramping_status.
-	/// Description: Returns ramping-status classification for users in the selected reporting context.
+	/// Calculates data logs users ramping status.
 	measure 'meas.data_logs_users_ramping_status' = ```
 			
 			-- get the dates
@@ -1768,8 +1612,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: a73a5ff6-d27e-40cf-b459-57c7e93a4a0e
 
-	/// Measure meas.users_history_ci_time_alloca_avg_existing_cust_selling.
-	/// Description: Calculates average time allocation for Existing Customer Selling.
+	/// Calculates the average users history ci time alloca existing customer selling.
 	measure 'meas.users_history_ci_time_alloca_avg_existing_cust_selling' =
 			
 			CALCULATE(
@@ -1782,8 +1625,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_time_allocation_confidence.
-	/// Description: Returns numeric average confidence score for time allocation quality.
+	/// Calculates the average users history time allocation confidence.
 	measure 'meas.users_history_time_allocation_confidence' =
 			
 			var avg_value = AVERAGE(users_history[ci_time_alloc_conf])    // get the avg of ci time allocation confidence
@@ -1794,8 +1636,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_time_allocation_confidence_status.
-	/// Description: Returns narrative confidence-band text for time allocation quality (Limited, Fair, Good, Great, Excellent) for audience-facing explanation; not intended for numeric calculations.
+	/// Calculates the average users history time allocation confidence status.
 	measure 'meas.users_history_time_allocation_confidence_status' = ```
 			
 			
@@ -1829,8 +1670,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: ebe06221-1ce3-4e18-9db4-d9701923fee8
 
-	/// Measure meas.time_allocation_confidence.
-	/// Description: Returns narrative confidence-band text for time allocation quality (Limited, Fair, Good, Great, Excellent) for audience-facing explanation; not intended for numeric calculations.
+	/// Calculates the average time allocation confidence.
 	measure 'meas.time_allocation_confidence' = ```
 			
 			
@@ -1979,8 +1819,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: ebc1dec3-4c25-49a1-b757-cc84b583ae72
 
-	/// Measure meas.users_history_avg_act_capt_lvl.
-	/// Description: Calculates average activity capture level for users in the selected period. Uses the selected date range context.
+	/// Calculates the average users history activity capture level.
 	measure 'meas.users_history_avg_act_capt_lvl' = ```
 			
 			 var _min_date = [meas.context_date_min]        // get the context min date
@@ -2006,8 +1845,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_prospecting.
-	/// Description: Calculates average time allocation for Prospecting.
+	/// Calculates the average users history ci time alloca prospecting.
 	measure 'meas.users_history_ci_time_alloca_avg_prospecting' =
 			
 			CALCULATE(
@@ -2019,8 +1857,7 @@ table users_history
 		displayFolder: _perf_analysis
 		lineageTag: 363287f9-8e11-4afb-a36a-636b9f8eb0c9
 
-	/// Measure meas.users_history_ci_time_alloca_avg_new_logo_selling.
-	/// Description: Calculates average time allocation for New Logo Selling.
+	/// Calculates the average users history ci time alloca new logo selling.
 	measure 'meas.users_history_ci_time_alloca_avg_new_logo_selling' =
 			
 			CALCULATE(
@@ -2033,8 +1870,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_post_sales_support.
-	/// Description: Calculates average time allocation for Post-Sales Support.
+	/// Calculates the average users history ci time alloca post sales support.
 	measure 'meas.users_history_ci_time_alloca_avg_post_sales_support' =
 			
 			CALCULATE(
@@ -2047,8 +1883,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_internel.
-	/// Description: Calculates average time allocation for Internal.
+	/// Calculates the average users history ci time alloca internel.
 	measure 'meas.users_history_ci_time_alloca_avg_internel' =
 			
 			CALCULATE(
@@ -2061,8 +1896,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.reps_without_act_lvl_count.
-	/// Description: Counts representatives without activity capture level data.
+	/// Counts representatives without activity level in the current selection.
 	measure 'meas.reps_without_act_lvl_count' =
 			
 			var reps_tot = CALCULATE(DISTINCTCOUNT([_sys_user_id]), users_history[ci_act_capt_lvl]=BLANK())
@@ -2072,8 +1906,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: 823b6167-9d31-4002-92a5-8ef055257123
 
-	/// Measure meas.reps_without_act_lvl_pct.
-	/// Description: Calculates percentage of representatives without activity capture level data.
+	/// Calculates representatives without activity level as a percentage.
 	measure 'meas.reps_without_act_lvl_pct' =
 			
 			var reps_w_acl = [meas.reps_without_act_lvl_count]
@@ -2085,8 +1918,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: b4f7597e-76a9-497e-9c04-10bad1c384ba
 
-	/// Measure meas.reps_has_ci_act_capt_lvl.
-	/// Description: Returns flag indicating whether representative has customer-intelligence activity capture level data.
+	/// Calculates representatives has ci activity capture level.
 	measure 'meas.reps_has_ci_act_capt_lvl' =
 			
 			
@@ -2101,8 +1933,7 @@ table users_history
 		displayFolder: _acl_ta_analysis
 		lineageTag: f7c7a23d-abf3-4d19-83f8-b9268e8cd6cb
 
-	/// Measure meas.ci_act_capt_lvl_pi_owner_act.
-	/// Description: Calculates owner-level customer-intelligence activity capture indicator from activity totals.
+	/// Calculates the total ci activity capture level pi owner activity.
 	measure 'meas.ci_act_capt_lvl_pi_owner_act' =
 			
 			var _prospect_count = SUM(users_history[ci_act_capt_lvl_pi_prospecting_owner_act])
@@ -2115,12 +1946,11 @@ table users_history
 		formatString: 0
 		lineageTag: a9dc1dca-80f1-4459-bf59-70b7dc8b07fe
 
-	/// Measure meas.underperformer_annual_avg.
-	/// Description: Calculates annual average metric for users classified as underperformers.
+	/// Calculates the average underperformer annual It includes records where col ci perf annual performance tier = "Underperformer".
 	measure 'meas.underperformer_annual_avg' =
 			
 			CALCULATE(
-			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the under performer annual average
+			    [meas.pi_ci_annual_avg_bookings],   // get the under performer annual average
 			    users_history[col.ci.perf_annual_performance_tier]="Underperformer"
 			)
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -2129,12 +1959,11 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.performer_annual_avg.
-	/// Description: Calculates annual average metric for users classified as performers.
+	/// Calculates the average performer annual It includes records where col ci perf annual performance tier = "Performer".
 	measure 'meas.performer_annual_avg' =
 			
 			CALCULATE(
-			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the performer annual average
+			    [meas.pi_ci_annual_avg_bookings],   // get the performer annual average
 			    users_history[col.ci.perf_annual_performance_tier]="Performer"
 			)
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -2143,12 +1972,11 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.overperformer_annual_avg.
-	/// Description: Calculates annual average metric for users classified as overperformers.
+	/// Calculates the average overperformer annual It includes records where col ci perf annual performance tier = "Overperformer".
 	measure 'meas.overperformer_annual_avg' =
 			
 			CALCULATE(
-			    [meas.data_logs_ci_perf_annual_avg_bookings],   // get the over performer annual average
+			    [meas.pi_ci_annual_avg_bookings],   // get the over performer annual average
 			    users_history[col.ci.perf_annual_performance_tier]="Overperformer"
 			)
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
@@ -2157,8 +1985,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Measure meas.min_user_role_alias.
-	/// Description: Returns the minimum role alias value in the current filter context, used for role label resolution.
+	/// Returns the lowest user role alias.
 	measure 'meas.min_user_role_alias' =
 			
 			MINX(
@@ -2169,8 +1996,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_closing_ability_num.
-	/// Description: Returns numeric customer-intelligence score for closing ability.
+	/// Calculates the average ci sb closing ability number.
 	measure 'meas.ci_sb_closing_ability_num' =
 			
 			VAR score_raw =
@@ -2186,8 +2012,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_work_effort_num.
-	/// Description: Returns numeric customer-intelligence score for work effort.
+	/// Calculates the average ci sb work effort number.
 	measure 'meas.ci_sb_work_effort_num' =
 			
 			VAR score_raw =
@@ -2203,8 +2028,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_discov_skills_num.
-	/// Description: Returns numeric customer-intelligence score for discovery skills.
+	/// Calculates the average ci sb discov skills number.
 	measure 'meas.ci_sb_discov_skills_num' =
 			
 			VAR score_raw =
@@ -2220,8 +2044,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_engmt_ability_num.
-	/// Description: Returns numeric customer-intelligence score for engagement ability.
+	/// Calculates the average ci sb engmt ability number.
 	measure 'meas.ci_sb_engmt_ability_num' =
 			
 			VAR score_raw =
@@ -2237,8 +2060,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_deal_maxing_num.
-	/// Description: Returns numeric customer-intelligence score for deal maximizing.
+	/// Calculates the average ci sb deal maxing number.
 	measure 'meas.ci_sb_deal_maxing_num' =
 			
 			VAR score_raw =
@@ -2254,8 +2076,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_time_management_num.
-	/// Description: Returns numeric customer-intelligence score for time management. Calculates peer context values using the selected role.
+	/// Calculates the average ci sb time management number.
 	measure 'meas.ci_sb_time_management_num' =
 			
 			VAR score_raw =
@@ -2271,8 +2092,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_closing_ability_num_peer.
-	/// Description: Returns numeric customer-intelligence score for closing ability in peer context. Calculates peer context values using the selected role.
+	/// Calculates the average ci sb closing ability number peer.
 	measure 'meas.ci_sb_closing_ability_num_peer' =
 			VAR _selectedRole =
 			    SELECTEDVALUE(users[trueai_user_role_alias])
@@ -2302,8 +2122,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_work_effort_num_peer.
-	/// Description: Returns numeric customer-intelligence score for work effort in peer context. Calculates peer context values using the selected role.
+	/// Calculates the average ci sb work effort number peer.
 	measure 'meas.ci_sb_work_effort_num_peer' =
 			VAR _selectedRole =
 			    SELECTEDVALUE(users[trueai_user_role_alias])
@@ -2333,8 +2152,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_discov_skills_num_peer.
-	/// Description: Returns numeric customer-intelligence score for discovery skills in peer context. Calculates peer context values using the selected role.
+	/// Calculates the average ci sb discov skills number peer.
 	measure 'meas.ci_sb_discov_skills_num_peer' =
 			VAR _selectedRole =
 			    SELECTEDVALUE(users[trueai_user_role_alias])
@@ -2364,8 +2182,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_engmt_ability_num_peer.
-	/// Description: Returns numeric customer-intelligence score for engagement ability in peer context. Calculates peer context values using the selected role.
+	/// Calculates the average ci sb engmt ability number peer.
 	measure 'meas.ci_sb_engmt_ability_num_peer' =
 			VAR _selectedRole =
 			    SELECTEDVALUE(users[trueai_user_role_alias])
@@ -2395,8 +2212,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_deal_maxing_num_peer.
-	/// Description: Returns numeric customer-intelligence score for deal maximizing in peer context. Calculates peer context values using the selected role.
+	/// Calculates the average ci sb deal maxing number peer.
 	measure 'meas.ci_sb_deal_maxing_num_peer' =
 			VAR _selectedRole =
 			    SELECTEDVALUE(users[trueai_user_role_alias])
@@ -2426,8 +2242,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_time_management_num_peer.
-	/// Description: Returns numeric customer-intelligence score for time management in peer context. Calculates peer context values using the selected role.
+	/// Calculates the average ci sb time management number peer.
 	measure 'meas.ci_sb_time_management_num_peer' =
 			VAR _selectedRole =
 			    SELECTEDVALUE(users[trueai_user_role_alias])
@@ -2457,8 +2272,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_closing_ability_num_L12M.
-	/// Description: Returns rolling 12-month numeric customer-intelligence score for closing ability. Anchors calculation to the latest selected reporting date.
+	/// Calculates the average ci sb closing ability number l12m.
 	measure 'meas.ci_sb_closing_ability_num_L12M' =
 			VAR _latestSelectedDate =
 			    // Latest date from report/page/slicer selection (ignores sparkline point date context)
@@ -2490,8 +2304,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_work_effort_num_L12M.
-	/// Description: Returns rolling 12-month numeric customer-intelligence score for work effort. Anchors calculation to the latest selected reporting date.
+	/// Calculates the average ci sb work effort number l12m.
 	measure 'meas.ci_sb_work_effort_num_L12M' =
 			VAR _latestSelectedDate =
 			    // Latest date from report/page/slicer selection (ignores sparkline point date context)
@@ -2523,8 +2336,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_discov_skills_num_L12M.
-	/// Description: Returns rolling 12-month numeric customer-intelligence score for discovery skills. Anchors calculation to the latest selected reporting date.
+	/// Calculates the average ci sb discov skills number l12m.
 	measure 'meas.ci_sb_discov_skills_num_L12M' =
 			VAR _latestSelectedDate =
 			    // Latest date from report/page/slicer selection (ignores sparkline point date context)
@@ -2556,8 +2368,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_engmt_ability_num_L12M.
-	/// Description: Returns rolling 12-month numeric customer-intelligence score for engagement ability. Anchors calculation to the latest selected reporting date.
+	/// Calculates the average ci sb engmt ability number l12m.
 	measure 'meas.ci_sb_engmt_ability_num_L12M' =
 			VAR _latestSelectedDate =
 			    // Latest date from report/page/slicer selection (ignores sparkline point date context)
@@ -2589,8 +2400,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_deal_maxing_num_L12M.
-	/// Description: Returns rolling 12-month numeric customer-intelligence score for deal maximizing. Anchors calculation to the latest selected reporting date.
+	/// Calculates the average ci sb deal maxing number l12m.
 	measure 'meas.ci_sb_deal_maxing_num_L12M' =
 			VAR _latestSelectedDate =
 			    // Latest date from report/page/slicer selection (ignores sparkline point date context)
@@ -2622,8 +2432,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.ci_sb_time_management_num_L12M.
-	/// Description: Returns rolling 12-month numeric customer-intelligence score for time management. Anchors calculation to the latest selected reporting date.
+	/// Calculates the average ci sb time management number l12m.
 	measure 'meas.ci_sb_time_management_num_L12M' =
 			VAR _latestSelectedDate =
 			    // Latest date from report/page/slicer selection (ignores sparkline point date context)
@@ -2674,7 +2483,7 @@ table users_history
 			    MAXX(TopTier, users_history[ci_perf_qtly_performance_tier])
 		lineageTag: ae8170c8-cc59-4874-92df-d1ea0f08d2be
 
-	/// Description: Returns the quarterly performance tier classification for the selected period.
+	/// Calculates quarterly tier.
 	measure 'meas.quarterly_tier' =
 			
 			VAR QuarterStart =
@@ -2753,8 +2562,7 @@ table users_history
 		formatString: 0
 		lineageTag: ebbdeebf-5ed5-4bca-96f7-d7c282e2d5a9
 
-	/// Measure meas.users_history_ci_time_alloca_avg_existing_cust_selling_3mo.
-	/// Description: Calculates average time allocation for Existing Customer Selling for the last three months.
+	/// Calculates the average users history ci time alloca existing customer selling 3mo.
 	measure 'meas.users_history_ci_time_alloca_avg_existing_cust_selling_3mo' =
 			
 			var end_date = [meas.cal_end_sel_date]
@@ -2769,8 +2577,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_internel_3mo.
-	/// Description: Calculates average time allocation for Internal for the last three months.
+	/// Calculates the average users history ci time alloca internel 3mo.
 	measure 'meas.users_history_ci_time_alloca_avg_internel_3mo' =
 			
 			var end_date = [meas.cal_end_sel_date]
@@ -2785,8 +2592,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_new_logo_selling_3mo.
-	/// Description: Calculates average time allocation for New Logo Selling for the last three months.
+	/// Calculates the average users history ci time alloca new logo selling 3mo.
 	measure 'meas.users_history_ci_time_alloca_avg_new_logo_selling_3mo' =
 			
 			var end_date = [meas.cal_end_sel_date]
@@ -2801,8 +2607,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_post_sales_support_3mo.
-	/// Description: Calculates average time allocation for Post-Sales Support for the last three months.
+	/// Calculates the average users history ci time alloca post sales support 3mo.
 	measure 'meas.users_history_ci_time_alloca_avg_post_sales_support_3mo' =
 			
 			var end_date = [meas.cal_end_sel_date]
@@ -2817,8 +2622,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_prospecting_3mo.
-	/// Description: Calculates average time allocation for Prospecting for the last three months. Calculates peer context values using the selected role.
+	/// Calculates the average users history ci time alloca prospecting 3mo.
 	measure 'meas.users_history_ci_time_alloca_avg_prospecting_3mo' =
 			
 			var end_date = [meas.cal_end_sel_date]
@@ -2833,8 +2637,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_existing_cust_selling_3mo_peer.
-	/// Description: Calculates average time allocation for Existing Customer Selling for the last three months in peer context. Calculates peer context values using the selected role.
+	/// Calculates the average users history ci time alloca existing customer selling 3mo peer.
 	measure 'meas.users_history_ci_time_alloca_avg_existing_cust_selling_3mo_peer' =
 			VAR _selectedRole =
 			    SELECTEDVALUE(users[trueai_user_role_alias])
@@ -2861,8 +2664,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_internel_3mo_peer.
-	/// Description: Calculates average time allocation for Internal for the last three months in peer context. Calculates peer context values using the selected role.
+	/// Calculates the average users history ci time alloca internel 3mo peer.
 	measure 'meas.users_history_ci_time_alloca_avg_internel_3mo_peer' =
 			VAR _selectedRole =
 			    SELECTEDVALUE(users[trueai_user_role_alias])
@@ -2889,8 +2691,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_new_logo_selling_3mo_peer.
-	/// Description: Calculates average time allocation for New Logo Selling for the last three months in peer context. Calculates peer context values using the selected role.
+	/// Calculates the average users history ci time alloca new logo selling 3mo peer.
 	measure 'meas.users_history_ci_time_alloca_avg_new_logo_selling_3mo_peer' =
 			VAR _selectedRole =
 			    SELECTEDVALUE(users[trueai_user_role_alias])
@@ -2917,8 +2718,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_post_sales_support_3mo_peer.
-	/// Description: Calculates average time allocation for Post-Sales Support for the last three months in peer context. Calculates peer context values using the selected role.
+	/// Calculates the average users history ci time alloca post sales support 3mo peer.
 	measure 'meas.users_history_ci_time_alloca_avg_post_sales_support_3mo_peer' =
 			VAR _selectedRole =
 			    SELECTEDVALUE(users[trueai_user_role_alias])
@@ -2945,8 +2745,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Measure meas.users_history_ci_time_alloca_avg_prospecting_3mo_peer.
-	/// Description: Calculates average time allocation for Prospecting for the last three months in peer context. Calculates peer context values using the selected role.
+	/// Calculates the average users history ci time alloca prospecting 3mo peer.
 	measure 'meas.users_history_ci_time_alloca_avg_prospecting_3mo_peer' =
 			VAR _selectedRole =
 			    SELECTEDVALUE(users[trueai_user_role_alias])
@@ -2973,7 +2772,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Description: Calculates mean customer-intelligence score by averaging six customer-intelligence score components.
+	/// Calculates ai scores ci sb mean.
 	measure 'meas.ai_scores_ci_sb_mean' = (([meas.ai_scores_ci_discovery_skill]+ [meas.ai_scores_ci_engagement_ability]+[meas.ai_scores_ci_closing_ability]+[meas.ai_scores_ci_deal_maxing]+[meas.ai_scores_ci_work_effort]+[meas.ai_scores_ci_time_management])/6)*100
 		lineageTag: 7c4e923e-d688-44d8-ace0-74c256978f54
 
@@ -3006,13 +2805,13 @@ table users_history
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
-	/// Description: Counts end-of-period users matched to roster mapping rules. Calculates peer context values using the selected role.
+	/// Counts rooster matched user in the current selection It includes records where col is ext match id = "True".
 	measure 'meas.rooster_matched_user_count' = CALCULATE([meas.data_logs_user_count_eop],users[col.is_ext_match_id]="True")
 		lineageTag: c91f9783-d44c-4fb7-8b3c-eb4961fdd3fe
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Calculates annualized average bookings per ramped rep in the current role and date context.
+	/// Calculates the average org capacity aab ramped It includes records where col ci perf ramping status = "Ramped".
 	measure 'meas.org_capacity_aab_ramped' =
 			
 			CALCULATE (
@@ -3027,7 +2826,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Calculates annualized average pipeline created per ramped rep in the current role and date context.
+	/// Calculates the average org capacity aapc ramped It includes records where col ci perf ramping status = "Ramped".
 	measure 'meas.org_capacity_aapc_ramped' =
 			
 			CALCULATE (
@@ -3042,7 +2841,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Returns AAPC for SDR roles and AAB for AE or AM roles. Returns blank for mixed or unsupported roles.
+	/// Calculates org capacity aab aapc ramped.
 	measure 'meas.org_capacity_aab_aapc_ramped' =
 			
 			VAR RoleFunction =
@@ -3062,7 +2861,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Returns the role-aware ramped AAB or AAPC for the selected date range shifted back 12 months.
+	/// Calculates org capacity aab aapc ramped py.
 	measure 'meas.org_capacity_aab_aapc_ramped_py' =
 			
 			VAR CurrentStartDate =
@@ -3090,7 +2889,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Calculates year-over-year change in the role-aware ramped AAB or AAPC.
+	/// Calculates org capacity aab aapc ramped yoy as a percentage.
 	measure 'meas.org_capacity_aab_aapc_ramped_yoy_pct' =
 			
 			VAR CurrentValue =
@@ -3108,7 +2907,7 @@ table users_history
 		displayFolder: _org_capacity\YoY
 		lineageTag: 4698d889-fa7c-4109-81f1-ffa325262ea0
 
-	/// Returns generated pipeline for SDR roles and won bookings for AE or AM roles.
+	/// Calculates org capacity role production volume.
 	measure 'meas.org_capacity_role_production_volume' =
 			
 			VAR RoleFunction =
@@ -3157,7 +2956,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Returns role-aware production volume for the selected date range shifted back 12 months.
+	/// Calculates org capacity role production volume py.
 	measure 'meas.org_capacity_role_production_volume_py' =
 			
 			VAR CurrentStartDate =
@@ -3185,7 +2984,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Calculates role-aware production volume per end-of-period rep, including ramped and non-ramped reps.
+	/// Calculates the average org capacity production per at end of period representative.
 	measure 'meas.org_capacity_production_per_eop_rep' =
 			
 			DIVIDE (
@@ -3198,7 +2997,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Returns production per end-of-period rep for the selected date range shifted back 12 months.
+	/// Calculates org capacity production per at end of period representative py.
 	measure 'meas.org_capacity_production_per_eop_rep_py' =
 			
 			VAR CurrentStartDate =
@@ -3226,7 +3025,7 @@ table users_history
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
-	/// Calculates year-over-year change in role-aware production per end-of-period rep.
+	/// Calculates org capacity production per at end of period representative yoy as a percentage.
 	measure 'meas.org_capacity_production_per_eop_rep_yoy_pct' =
 			
 			VAR CurrentValue =
