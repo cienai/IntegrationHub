@@ -92,7 +92,7 @@ function Save-Visual($visual) {
     }
     # Keep the Tactical formatting copied from the prototype, but discard only
     # field-bound formatting selectors that still reference the prototype model.
-    if ($visual.visual.objects) {
+    if ($visual.visual.objects -and ($visual.visual.objects -isnot [System.Collections.IDictionary])) {
         $legacyPattern = 'cal_end_dates|hat_leads|"opps"|quality_buckets|"ssr"|ssr_history|ssr_history_success_factors|"users"'
         foreach ($objectProperty in @($visual.visual.objects.PSObject.Properties)) {
             $cleanEntries = @(
