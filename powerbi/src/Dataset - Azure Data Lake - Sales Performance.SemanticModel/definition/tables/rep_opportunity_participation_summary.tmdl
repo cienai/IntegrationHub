@@ -1,0 +1,375 @@
+/// Canonical representative-grain opportunity participation summary used by
+/// saved queries and report visuals. Calculated at semantic-model refresh.
+table rep_opportunity_participation_summary
+
+	measure 'Total Claimed Associations' =
+			SUM ( rep_opportunity_participation_summary[Claimed Opportunity Count] )
+		formatString: #,0
+
+	measure 'Total Confirmed Opportunities' =
+			SUM ( rep_opportunity_participation_summary[Confirmed Opportunity Count] )
+		formatString: #,0
+
+	measure 'Overall Confirmed Participation Rate' =
+			DIVIDE (
+			    [Total Confirmed Opportunities],
+			    [Total Claimed Associations]
+			)
+		formatString: 0.0%
+
+	measure 'Total Claimed Without Evidence' =
+			SUM ( rep_opportunity_participation_summary[Claimed - No Evidence Count] )
+		formatString: #,0
+
+	measure 'Total Inactive Contributors' =
+			SUM ( rep_opportunity_participation_summary[Inactive Contributor Count] )
+		formatString: #,0
+
+	measure 'Total Unclaimed Contributions' =
+			SUM ( rep_opportunity_participation_summary[Unclaimed Contribution Count] )
+		formatString: #,0
+
+	measure 'Total Unsupported Pipeline' =
+			SUM ( rep_opportunity_participation_summary[Unsupported Claimed Pipeline] )
+		formatString: \$#,0;(\$#,0);\$#,0
+
+	measure 'Selected Average Participation Score' =
+			AVERAGE ( rep_opportunity_participation_summary[Average Participation Score] )
+		formatString: 0.0
+
+	measure 'Representative Count' =
+			DISTINCTCOUNT ( rep_opportunity_participation_summary[Rep ID] )
+		formatString: #,0
+
+	column 'Rep Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: [Rep Name]
+
+	column 'Rep ID'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: [Rep ID]
+
+	column Team
+		dataType: string
+		summarizeBy: none
+		sourceColumn: [Team]
+
+	column Manager
+		dataType: string
+		summarizeBy: none
+		sourceColumn: [Manager]
+
+	column 'Claimed Opportunity Count'
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: [Claimed Opportunity Count]
+
+	column 'Confirmed Opportunity Count'
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: [Confirmed Opportunity Count]
+
+	column 'Light Participation Count'
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: [Light Participation Count]
+
+	column 'Claimed - No Evidence Count'
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: [Claimed - No Evidence Count]
+
+	column 'Inactive Contributor Count'
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: [Inactive Contributor Count]
+
+	column 'Unclaimed Contribution Count'
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: [Unclaimed Contribution Count]
+
+	column 'Insufficient Data Count'
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: [Insufficient Data Count]
+
+	column 'Confirmed Participation Rate'
+		dataType: double
+		formatString: 0.0%
+		summarizeBy: none
+		sourceColumn: [Confirmed Participation Rate]
+
+	column 'Claimed Pipeline Amount'
+		dataType: double
+		formatString: \$#,0;(\$#,0);\$#,0
+		summarizeBy: sum
+		sourceColumn: [Claimed Pipeline Amount]
+
+	column 'Confirmed Pipeline Amount'
+		dataType: double
+		formatString: \$#,0;(\$#,0);\$#,0
+		summarizeBy: sum
+		sourceColumn: [Confirmed Pipeline Amount]
+
+	column 'Unsupported Claimed Pipeline'
+		dataType: double
+		formatString: \$#,0;(\$#,0);\$#,0
+		summarizeBy: sum
+		sourceColumn: [Unsupported Claimed Pipeline]
+
+	column 'Average Participation Score'
+		dataType: double
+		formatString: 0.0
+		summarizeBy: average
+		sourceColumn: [Average Participation Score]
+
+	column 'Overall Participation Status'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: [Overall Participation Status]
+
+	partition rep_opportunity_participation_summary = calculated
+		mode: import
+		source = ```
+				VAR ReportDate =
+				    MIN (
+				        TODAY (),
+				        CALCULATE (
+				            MAX ( cal_end_dates[Date] ),
+				            cal_end_dates[Date] < DATE ( 2050, 1, 1 )
+				        )
+				    )
+				VAR MasterFilter =
+				    TREATAS ( { TRUE () }, ssr[trueai_ssr_is_master] )
+				VAR Claimed =
+				    SELECTCOLUMNS (
+				        SUMMARIZE (
+				            FILTER (
+				                opps,
+				                opps[_sys_is_active] = TRUE ()
+				                    && NOT ISBLANK ( opps[_sys_doc_id] )
+				                    && NOT ISBLANK ( opps[trueai_owner_id] )
+				            ),
+				            opps[trueai_owner_id],
+				            opps[_sys_doc_id],
+				            "Pipeline Amount", MAX ( opps[trueai_booking_amt] )
+				        ),
+				        "Rep ID", opps[trueai_owner_id] & "",
+				        "Opportunity ID", opps[_sys_doc_id] & "",
+				        "Is Claimed", TRUE (),
+				        "Pipeline Amount", [Pipeline Amount]
+				    )
+				VAR Observed =
+				    SELECTCOLUMNS (
+				        CALCULATETABLE (
+				            SUMMARIZE (
+				                ssr_history,
+				                ssr_history[step_owner_id],
+				                ssr_history[entity_opp_id],
+				                "Observed Activity Count", SUM ( ssr_history[step_owner_act] ),
+				                "Activity Step Count",
+				                    CALCULATE (
+				                        DISTINCTCOUNT ( ssr_history[_sys_doc_id] ),
+				                        ssr_history[step_owner_act] > 0
+				                    ),
+				                "Latest Observed Step End",
+				                    CALCULATE (
+				                        MAX ( ssr_history[step_end_date] ),
+				                        ssr_history[step_owner_act] > 0
+				                    ),
+				                "Activity Capture Level", MAX ( ssr_history[step_owner_act_capt_lvl] )
+				            ),
+				            MasterFilter,
+				            NOT ISBLANK ( ssr_history[step_owner_id] ),
+				            NOT ISBLANK ( ssr_history[entity_opp_id] )
+				        ),
+				        "Rep ID", ssr_history[step_owner_id] & "",
+				        "Opportunity ID", ssr_history[entity_opp_id] & "",
+				        "Observed Activity Count", COALESCE ( [Observed Activity Count], 0 ),
+				        "Activity Step Count", [Activity Step Count],
+				        "Latest Observed Step End", [Latest Observed Step End],
+				        "Activity Capture Level", [Activity Capture Level]
+				    )
+				VAR ObservedContributors =
+				    FILTER ( Observed, [Observed Activity Count] > 0 )
+				VAR Coverage =
+				    SELECTCOLUMNS (
+				        CALCULATETABLE (
+				            SUMMARIZE (
+				                ssr_history,
+				                ssr_history[entity_opp_id],
+				                "Has Opportunity History", COUNTROWS ( ssr_history ) > 0,
+				                "Opportunity Capture Level", MAX ( ssr_history[step_owner_act_capt_lvl] )
+				            ),
+				            MasterFilter,
+				            NOT ISBLANK ( ssr_history[entity_opp_id] )
+				        ),
+				        "Opportunity ID", ssr_history[entity_opp_id] & "",
+				        "Has Opportunity History", [Has Opportunity History],
+				        "Opportunity Capture Level", [Opportunity Capture Level]
+				    )
+				VAR ParticipationKeys =
+				    DISTINCT (
+				        UNION (
+				            SELECTCOLUMNS ( Claimed, "Rep ID", [Rep ID], "Opportunity ID", [Opportunity ID] ),
+				            SELECTCOLUMNS ( ObservedContributors, "Rep ID", [Rep ID], "Opportunity ID", [Opportunity ID] )
+				        )
+				    )
+				VAR ParticipationBase =
+				    NATURALLEFTOUTERJOIN (
+				        NATURALLEFTOUTERJOIN (
+				            NATURALLEFTOUTERJOIN ( ParticipationKeys, Claimed ),
+				            Observed
+				        ),
+				        Coverage
+				    )
+				VAR Scored =
+				    ADDCOLUMNS (
+				        ParticipationBase,
+				        "Participation Score",
+				            VAR ActivityCount = COALESCE ( [Observed Activity Count], 0 )
+				            VAR StepCount = COALESCE ( [Activity Step Count], 0 )
+				            VAR DaysOld =
+				                IF (
+				                    NOT ISBLANK ( [Latest Observed Step End] ),
+				                    DATEDIFF ( [Latest Observed Step End], ReportDate, DAY )
+				                )
+				            VAR CaptureLevel =
+				                COALESCE ( [Activity Capture Level], [Opportunity Capture Level] )
+				            RETURN
+				                IF (
+				                    [Has Opportunity History] <> TRUE () || ISBLANK ( CaptureLevel ),
+				                    BLANK (),
+				                    MIN ( 50, ActivityCount * 10 )
+				                        + MIN ( 20, StepCount * 5 )
+				                        + SWITCH ( TRUE (), ISBLANK ( DaysOld ), 0, DaysOld <= 90, 20, DaysOld <= 180, 10, 0 )
+				                        + IF ( CaptureLevel >= 0.70, 10, 5 )
+				                )
+				    )
+				VAR Categorized =
+				    ADDCOLUMNS (
+				        Scored,
+				        "Participation Category",
+				            VAR IsClaimed = [Is Claimed] = TRUE ()
+				            VAR ActivityCount = COALESCE ( [Observed Activity Count], 0 )
+				            VAR DaysOld =
+				                IF (
+				                    NOT ISBLANK ( [Latest Observed Step End] ),
+				                    DATEDIFF ( [Latest Observed Step End], ReportDate, DAY )
+				                )
+				            RETURN
+				                SWITCH (
+				                    TRUE (),
+				                    NOT IsClaimed && ActivityCount > 0, "Unclaimed Contributor",
+				                    ISBLANK ( [Participation Score] ), "Insufficient Data",
+				                    IsClaimed && ActivityCount > 0 && DaysOld > 90, "Inactive Contributor",
+				                    IsClaimed && ActivityCount > 0 && [Participation Score] >= 60, "Confirmed Contributor",
+				                    IsClaimed && ActivityCount > 0, "Light Contributor",
+				                    IsClaimed, "Claimed - No Evidence",
+				                    "Insufficient Data"
+				                )
+				    )
+				VAR RepDirectory =
+				    SELECTCOLUMNS (
+				        FILTER ( users, NOT ISBLANK ( users[_sys_doc_id] ) ),
+				        "Rep ID", users[_sys_doc_id] & "",
+				        "Rep Name", users[trueai_full_name],
+				        "Team", users[trueai_group],
+				        "Manager", users[col.rep_details_rep_manager_name]
+				    )
+				VAR ParticipationWithRep =
+				    NATURALLEFTOUTERJOIN ( Categorized, RepDirectory )
+				VAR RepGrain =
+				    DISTINCT (
+				        SELECTCOLUMNS (
+				            ParticipationWithRep,
+				            "Rep ID", [Rep ID],
+				            "Rep Name", [Rep Name],
+				            "Team", [Team],
+				            "Manager", [Manager]
+				        )
+				    )
+				VAR RepSummary =
+				    GENERATE (
+				        RepGrain,
+				        VAR CurrentRepID = [Rep ID]
+				        VAR RepRows = FILTER ( ParticipationWithRep, [Rep ID] = CurrentRepID )
+				        RETURN
+				            ROW (
+				                "Claimed Opportunity Count", COUNTROWS ( FILTER ( RepRows, [Is Claimed] = TRUE () ) ),
+				                "Confirmed Opportunity Count", COUNTROWS ( FILTER ( RepRows, [Participation Category] = "Confirmed Contributor" ) ),
+				                "Light Participation Count", COUNTROWS ( FILTER ( RepRows, [Participation Category] = "Light Contributor" ) ),
+				                "Claimed - No Evidence Count", COUNTROWS ( FILTER ( RepRows, [Participation Category] = "Claimed - No Evidence" ) ),
+				                "Inactive Contributor Count", COUNTROWS ( FILTER ( RepRows, [Participation Category] = "Inactive Contributor" ) ),
+				                "Unclaimed Contribution Count", COUNTROWS ( FILTER ( RepRows, [Participation Category] = "Unclaimed Contributor" ) ),
+				                "Insufficient Data Count", COUNTROWS ( FILTER ( RepRows, [Participation Category] = "Insufficient Data" ) ),
+				                "Claimed Pipeline Amount", SUMX ( FILTER ( RepRows, [Is Claimed] = TRUE () ), [Pipeline Amount] ),
+				                "Confirmed Pipeline Amount", SUMX ( FILTER ( RepRows, [Participation Category] = "Confirmed Contributor" ), [Pipeline Amount] ),
+				                "Unsupported Claimed Pipeline",
+				                    SUMX (
+				                        FILTER (
+				                            RepRows,
+				                            [Participation Category] IN { "Claimed - No Evidence", "Inactive Contributor" }
+				                        ),
+				                        [Pipeline Amount]
+				                    ),
+				                "Average Participation Score",
+				                    AVERAGEX (
+				                        FILTER ( RepRows, [Participation Category] <> "Insufficient Data" ),
+				                        [Participation Score]
+				                    )
+				            )
+				    )
+				VAR WithRates =
+				    ADDCOLUMNS (
+				        RepSummary,
+				        "Confirmed Participation Rate",
+				            DIVIDE ( [Confirmed Opportunity Count], [Claimed Opportunity Count] ),
+				        "Overall Participation Status",
+				            VAR ClaimedCount = [Claimed Opportunity Count]
+				            VAR ConfirmedRate = DIVIDE ( [Confirmed Opportunity Count], ClaimedCount )
+				            VAR AvgScore = [Average Participation Score]
+				            VAR UnsupportedPipeline = [Unsupported Claimed Pipeline]
+				            RETURN
+				                SWITCH (
+				                    TRUE (),
+				                    [Insufficient Data Count] > 0 && ClaimedCount = [Insufficient Data Count], "Insufficient Data",
+				                    ConfirmedRate >= 0.70 && AvgScore >= 60 && COALESCE ( UnsupportedPipeline, 0 ) = 0, "Healthy",
+				                    ConfirmedRate < 0.40 || COALESCE ( UnsupportedPipeline, 0 ) > 0, "At Risk",
+				                    "Monitor"
+				                )
+				    )
+				RETURN
+				    SELECTCOLUMNS (
+				        WithRates,
+				        "Rep Name", [Rep Name],
+				        "Rep ID", [Rep ID],
+				        "Team", [Team],
+				        "Manager", [Manager],
+				        "Claimed Opportunity Count", [Claimed Opportunity Count],
+				        "Confirmed Opportunity Count", [Confirmed Opportunity Count],
+				        "Light Participation Count", [Light Participation Count],
+				        "Claimed - No Evidence Count", [Claimed - No Evidence Count],
+				        "Inactive Contributor Count", [Inactive Contributor Count],
+				        "Unclaimed Contribution Count", [Unclaimed Contribution Count],
+				        "Insufficient Data Count", [Insufficient Data Count],
+				        "Confirmed Participation Rate", [Confirmed Participation Rate],
+				        "Claimed Pipeline Amount", [Claimed Pipeline Amount],
+				        "Confirmed Pipeline Amount", [Confirmed Pipeline Amount],
+				        "Unsupported Claimed Pipeline", [Unsupported Claimed Pipeline],
+				        "Average Participation Score", [Average Participation Score],
+				        "Overall Participation Status", [Overall Participation Status]
+				    )
+				```
+
+	annotation PBI_Id = 4b8a7a9f8a4b4e7898a1f48d2649d907
