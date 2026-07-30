@@ -90,3 +90,19 @@ by `GENERATE`; this avoids unsupported filtered `CURRENTGROUP()` expressions.
 Runtime validation should reconcile sampled current owners to `opps`,
 sampled observed contributors to `ssr_history`, all available categories,
 pipeline values, score bounds, and representative uniqueness.
+
+## Tactical Report page
+
+`Tactical Report.Report` includes the visible page **Rep Opportunity
+Participation & Overlap Analysis**. It binds only to the canonical summary table
+and uses the Tactical Report theme and existing visual-container patterns.
+
+The page contains Team, Manager, Status, and Rep slicers; six KPI cards; a
+representative summary table; unsupported-pipeline, team-integrity, and status
+distribution charts; a score-versus-pipeline scatter plot; and explanatory
+assumption/status panels. The existing page navigators discover the page through
+`pages.json`.
+
+Because the source remains representative-grain, the page does not claim to show
+individual opportunity overlap. True opportunity-overlap analysis still
+requires an opportunity-grain supporting query.
