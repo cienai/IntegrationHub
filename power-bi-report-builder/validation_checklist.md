@@ -8,10 +8,19 @@ The page should help someone understand, decide, or act.
 
 - Does the page answer one clear business question?
 - Is the main point visible within 5 seconds?
+- Does the top of the page match the spec's narrative hierarchy?
 - Is the executive insight short and readable?
 - Is every conclusion backed by visible data?
 - Does the page avoid cause-and-effect claims unless they are proven?
 - Does the page avoid combining separate findings into a fake ideal profile?
+
+## Narrative
+
+- Does the page lead with the highest-level answer for the audience?
+- Do KPI cards summarize the main business state instead of isolated outliers?
+- Does the primary chart show the main pattern or comparison?
+- Are individual records, reps, accounts, opportunities, or transactions treated as drill-in evidence unless the question is specifically about them?
+- Is the detail table clearly supporting evidence rather than the main story?
 
 ## Source Of Truth
 

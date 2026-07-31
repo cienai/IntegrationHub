@@ -21,6 +21,8 @@ Use this to check whether the work is useful before handing it to a builder or r
 
 - Does the chosen pattern match the question?
 - Is the most important point easy to find?
+- Does the page lead with the right level of detail for the audience?
+- Are outliers used as supporting evidence instead of the headline, unless the question is explicitly about outliers?
 - Are details available without overwhelming the user?
 - Is the wording clear and plain?
 

@@ -1,0 +1,79 @@
+// Rep Opportunity Overlap v2
+//
+// Business question:
+// How consistently do Account Executives participate in the opportunities assigned to them,
+// and are any participation issues systemic or isolated?
+//
+// Notes:
+// - Population is Account Executives with assigned opportunities in the selected context.
+// - Grain is one row per Account Executive.
+// - Assigned opportunities are opportunities where the AE is the opportunity owner.
+// - Participated opportunities are assigned opportunities where the AE owns at least one sales step.
+// - Rows are included when the AE has at least 10 assigned opportunities.
+// - This is descriptive. Participation does not, by itself, measure sales effectiveness.
+
+EVALUATE
+ROW(
+    "Organizational Health", rep_opportunity_overlap[meas.rep_opp_overlap_org_health_status],
+    "Average Participation %", rep_opportunity_overlap[meas.rep_opp_overlap_overall_avg_participation_pct],
+    "Reps Below 50% Participation", rep_opportunity_overlap[meas.rep_opp_overlap_reps_below_threshold],
+    "Teams Below Average", rep_opportunity_overlap[meas.rep_opp_overlap_teams_below_average],
+    "Reps With Excellent Overlap", rep_opportunity_overlap[meas.rep_opp_overlap_reps_excellent_overlap]
+)
+
+EVALUATE
+SUMMARIZECOLUMNS(
+    rep_opportunity_overlap_participation_buckets[Bucket],
+    rep_opportunity_overlap_participation_buckets[Bucket Sort],
+    "Representative Count", rep_opportunity_overlap_participation_buckets[meas.rep_opp_overlap_bucket_rep_count]
+)
+ORDER BY
+    rep_opportunity_overlap_participation_buckets[Bucket Sort]
+
+EVALUATE
+SUMMARIZECOLUMNS(
+    rep_opportunity_overlap[Team],
+    "Average Participation %", rep_opportunity_overlap[meas.rep_opp_overlap_avg_participation_pct],
+    "Organization Average Participation %", rep_opportunity_overlap[meas.rep_opp_overlap_overall_avg_participation_pct],
+    "Participation Gap (Percentage Points)", rep_opportunity_overlap[meas.rep_opp_overlap_avg_participation_gap_pp],
+    "Assigned Opportunities", rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities],
+    "Participated Opportunities", rep_opportunity_overlap[meas.rep_opp_overlap_participated_opportunities]
+)
+ORDER BY
+    [Participation Gap (Percentage Points)] ASC,
+    [Assigned Opportunities] DESC
+
+EVALUATE
+VAR RepRows =
+    FILTER(
+        SUMMARIZECOLUMNS(
+            rep_opportunity_overlap[Representative],
+            rep_opportunity_overlap[Team],
+            rep_opportunity_overlap[Manager],
+            "Participation Status", rep_opportunity_overlap[meas.rep_opp_overlap_participation_status],
+            "Assigned Opportunities", rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities],
+            "Participated Opportunities", rep_opportunity_overlap[meas.rep_opp_overlap_participated_opportunities],
+            "Participation %", rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct],
+            "Overall Avg Participation %", rep_opportunity_overlap[meas.rep_opp_overlap_overall_avg_participation_pct],
+            "Participation Gap (Percentage Points)", rep_opportunity_overlap[meas.rep_opp_overlap_participation_gap_pp],
+            "Include Row", rep_opportunity_overlap[meas.rep_opp_overlap_include_row]
+        ),
+        [Include Row] = 1
+    )
+RETURN
+    SELECTCOLUMNS(
+        RepRows,
+        "Representative", rep_opportunity_overlap[Representative],
+        "Team", rep_opportunity_overlap[Team],
+        "Manager", rep_opportunity_overlap[Manager],
+        "Participation Status", [Participation Status],
+        "Assigned Opportunities", [Assigned Opportunities],
+        "Participated Opportunities", [Participated Opportunities],
+        "Participation %", [Participation %],
+        "Overall Avg Participation %", [Overall Avg Participation %],
+        "Participation Gap (Percentage Points)", [Participation Gap (Percentage Points)]
+    )
+ORDER BY
+    [Participation Gap (Percentage Points)] ASC,
+    [Assigned Opportunities] DESC,
+    [Representative]

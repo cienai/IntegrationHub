@@ -1,0 +1,81 @@
+table rep_opportunity_overlap_participation_buckets
+	lineageTag: faea2312-02bd-4152-b568-5a7dc462a97a
+
+	/// Number of eligible Account Executives whose participation percentage falls in the selected bucket.
+	measure 'meas.rep_opp_overlap_bucket_rep_count' = ```
+
+			var bucket_min = SELECTEDVALUE(rep_opportunity_overlap_participation_buckets[Bucket Min])
+			var bucket_max = SELECTEDVALUE(rep_opportunity_overlap_participation_buckets[Bucket Max])
+			var eligible_reps =
+			    FILTER(
+			        ALLSELECTED(rep_opportunity_overlap),
+			        rep_opportunity_overlap[meas.rep_opp_overlap_include_row] = 1
+			            && rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct] >= bucket_min
+			            && rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct] < bucket_max
+			    )
+			var res = COUNTROWS(eligible_reps)
+			return res
+
+			```
+		formatString: #,0
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 30b121b1-4803-4cbf-8ae7-73d19fe72cd8
+
+	column Bucket
+		dataType: string
+		lineageTag: f47b8d67-e1a4-4820-8b9f-dc9b43d51188
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Bucket]
+		sortByColumn: 'Bucket Sort'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bucket Sort'
+		dataType: int64
+		lineageTag: 596de76e-f0c2-4fe1-9cfc-2fb03902966d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Bucket Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bucket Min'
+		dataType: double
+		lineageTag: e4134ae9-ced3-4778-bdd4-2b344c11dbfc
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Bucket Min]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bucket Max'
+		dataType: double
+		lineageTag: 9100e492-a75e-4446-b40f-afed435bf43b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Bucket Max]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition rep_opportunity_overlap_participation_buckets = calculated
+		mode: import
+		source = ```
+
+				DATATABLE(
+				    "Bucket", STRING,
+				    "Bucket Sort", INTEGER,
+				    "Bucket Min", DOUBLE,
+				    "Bucket Max", DOUBLE,
+				    {
+				        {"95-100%", 1, 0.95, 1.0000001},
+				        {"90-95%", 2, 0.90, 0.95},
+				        {"80-90%", 3, 0.80, 0.90},
+				        {"70-80%", 4, 0.70, 0.80},
+				        {"<70%", 5, 0.00, 0.70}
+				    }
+				)
+
+				```
+
+	annotation PBI_Id = 913a724532544b7ba21f85b8e072b4a0

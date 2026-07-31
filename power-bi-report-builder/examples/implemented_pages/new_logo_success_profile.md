@@ -48,6 +48,13 @@ How do successful New Logo opportunities differ from the overall New Logo opport
 - Required thresholds: Successful count >= 25, all count >= 100, absolute difference >= 2 percentage points.
 - Known caveats: Rows are independent descriptive differences, not tested combinations.
 
+## Narrative Hierarchy
+
+- Lead with: Which characteristics are meaningfully overrepresented or underrepresented among successful New Logo opportunities.
+- Support with: Difference in successful share versus all-opportunity share.
+- Drill into: Dimension-level rows for Industry and Company Size.
+- Evidence: Detail matrix with shares, success index, counts, and caveats.
+
 ## Visual Plan
 
 - Executive insight: Short context note explaining the business question.

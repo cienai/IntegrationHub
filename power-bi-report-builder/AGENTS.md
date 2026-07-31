@@ -11,6 +11,20 @@ The goal is not to make a page that merely has charts on it. The goal is to make
 3. Inspect the Power BI model objects used by the page.
 4. Confirm the target report, page section, canvas size, and page order.
 5. Map every metric and dimension to its source of truth.
+6. Identify the narrative hierarchy before choosing visuals.
+
+## Narrative Hierarchy
+
+Before building cards, charts, or tables, decide what the page should explain first.
+
+Use the spec's narrative hierarchy:
+
+- Lead with: the highest-level answer for the audience.
+- Support with: the main pattern or comparison.
+- Drill into: lower-level details or outliers.
+- Evidence: the table, notes, or detail view that proves the claim.
+
+Do not promote individual reps, accounts, opportunities, transactions, or other detailed rows into the executive headline unless the business question is explicitly about those details. Outliers usually belong below the organizational or segment-level story.
 
 ## While Building
 

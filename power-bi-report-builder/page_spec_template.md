@@ -1,4 +1,4 @@
-# Power BI Builder Issue Template
+# Power BI Page Spec Template
 
 ## Summary
 
@@ -41,6 +41,29 @@ Examples:
 - Identify the reps requiring coaching.
 - Understand which opportunity characteristics consistently outperform.
 - Prioritize pipeline cleanup efforts.
+
+---
+
+## Narrative Hierarchy
+
+What should the page explain first, second, and third?
+
+Lead with:
+
+Support with:
+
+Drill into:
+
+Evidence:
+
+Use this section to prevent detailed rows or outliers from becoming the executive headline unless the page is explicitly about those details.
+
+Examples:
+
+- Lead with: Overall participation health.
+- Support with: Distribution by participation bucket and team-level comparison.
+- Drill into: Outlier representatives below threshold.
+- Evidence: Detailed representative-level table.
 
 ---
 

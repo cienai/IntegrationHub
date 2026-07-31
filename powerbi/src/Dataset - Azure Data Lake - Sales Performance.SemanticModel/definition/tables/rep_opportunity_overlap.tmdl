@@ -1,0 +1,489 @@
+table rep_opportunity_overlap
+	lineageTag: f8885629-f067-4ee4-912f-3ca89f8ab3e0
+
+	/// Count of opportunities assigned to the selected Account Executive population.
+	measure 'meas.rep_opp_overlap_assigned_opportunities' = ```
+			
+			var selected_rep_ids = VALUES(rep_opportunity_overlap[User Id])
+			var res =
+			    CALCULATE(
+			        DISTINCTCOUNT(opps[_sys_doc_id]),
+			        TREATAS(selected_rep_ids, opps[trueai_owner_id])
+			    )
+			return res
+			
+			```
+		formatString: #,0
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 1dbd0b64-dcfd-4ecd-8dba-73e5fcb387fe
+
+	/// Count of assigned opportunities where the assigned Account Executive also owns at least one sales step.
+	measure 'meas.rep_opp_overlap_participated_opportunities' = ```
+			
+			var selected_rep_ids = VALUES(rep_opportunity_overlap[User Id])
+			var assigned_opportunities =
+			    CALCULATETABLE(
+			        VALUES(opps[_sys_doc_id]),
+			        TREATAS(selected_rep_ids, opps[trueai_owner_id])
+			    )
+			var participated_opportunities =
+			    CALCULATETABLE(
+			        FILTER(
+			            VALUES(ssr_history[col.sales_steps_opp_id]),
+			            NOT ISBLANK(ssr_history[col.sales_steps_opp_id])
+			        ),
+			        TREATAS(selected_rep_ids, ssr_history[step_owner_id]),
+			        TREATAS(assigned_opportunities, ssr_history[col.sales_steps_opp_id])
+			    )
+			var res = COUNTROWS(participated_opportunities)
+			return res
+			
+			```
+		formatString: #,0
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: e8d3b56e-6115-4d6a-bfac-1ca5c2b0a309
+
+	/// Share of assigned opportunities where the assigned Account Executive also owns at least one sales step.
+	measure 'meas.rep_opp_overlap_participation_pct' = ```
+			
+			var res =
+			    DIVIDE(
+			        rep_opportunity_overlap[meas.rep_opp_overlap_participated_opportunities],
+			        rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities],
+			        BLANK()
+			    )
+			return res
+			
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: c3a7a8fb-43a8-4f70-8e3a-7b59f2d2ba1d
+
+	/// Average participation percentage across Account Executives with enough assigned opportunities.
+	measure 'meas.rep_opp_overlap_overall_avg_participation_pct' = ```
+			
+			var eligible_reps =
+			    FILTER(
+			        ALLSELECTED(rep_opportunity_overlap),
+			        rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities] >= 10
+			    )
+			var res =
+			    AVERAGEX(
+			        eligible_reps,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct]
+			    )
+			return res
+			
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 213656cb-fb00-481a-bad6-578b754d61d0
+
+	/// Difference between a representative's participation rate and the eligible-rep average.
+	measure 'meas.rep_opp_overlap_participation_gap_pp' = ```
+			
+			var participation_pct = rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct]
+			var average_pct = rep_opportunity_overlap[meas.rep_opp_overlap_overall_avg_participation_pct]
+			var res = participation_pct - average_pct
+			return res
+			
+			```
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 27c3cece-b09a-4a16-8241-907f845a44fb
+
+	/// Average participation percentage across eligible Account Executives in the current row context.
+	measure 'meas.rep_opp_overlap_avg_participation_pct' = ```
+			
+			var eligible_reps =
+			    FILTER(
+			        VALUES(rep_opportunity_overlap[User Id]),
+			        rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities] >= 10
+			    )
+			var res =
+			    AVERAGEX(
+			        eligible_reps,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct]
+			    )
+			return res
+			
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 63441bb9-3261-4362-9462-2a522271b190
+
+	/// Difference between current-context average participation and the eligible-rep organization average.
+	measure 'meas.rep_opp_overlap_avg_participation_gap_pp' = ```
+			
+			var average_participation = rep_opportunity_overlap[meas.rep_opp_overlap_avg_participation_pct]
+			var organization_average = rep_opportunity_overlap[meas.rep_opp_overlap_overall_avg_participation_pct]
+			var res = average_participation - organization_average
+			return res
+			
+			```
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 95a20d7c-0be2-4ead-93fe-ff7fd46c8100
+
+	/// Includes reps with enough assigned opportunities for a stable read.
+	measure 'meas.rep_opp_overlap_include_row' = ```
+			
+			var assigned_opportunities = rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities]
+			var res = IF(assigned_opportunities >= 10, 1, 0)
+			return res
+			
+			```
+		formatString: 0
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 239b1099-cce8-4568-9724-5d94b477fbe0
+
+	/// Simple review label for participation coverage.
+	measure 'meas.rep_opp_overlap_participation_status' = ```
+			
+			var assigned_opportunities = rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities]
+			var participation_pct = rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct]
+			var participation_gap = rep_opportunity_overlap[meas.rep_opp_overlap_participation_gap_pp]
+			var res =
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(participation_pct), "No assigned opportunities",
+			        assigned_opportunities < 10, "Below sample threshold",
+			        participation_pct < 0.50, "Needs review",
+			        participation_gap <= -0.10, "Below average",
+			        participation_gap >= 0.10, "Above average",
+			        participation_pct >= 0.90, "High participation",
+			        "Typical"
+			    )
+			return res
+			
+			```
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 9a907f85-cc94-4bbd-98e5-36753796e908
+
+	/// Number of eligible Account Executives below 50% participation.
+	measure 'meas.rep_opp_overlap_reps_below_threshold' = ```
+			
+			var eligible_reps =
+			    FILTER(
+			        ALLSELECTED(rep_opportunity_overlap),
+			        rep_opportunity_overlap[meas.rep_opp_overlap_include_row] = 1
+			            && rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct] < 0.50
+			    )
+			var res = COUNTROWS(eligible_reps)
+			return res
+			
+			```
+		formatString: #,0
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 61159841-1f00-490a-9b0d-53af83af368a
+
+	/// Number of eligible Account Executives with participation at or above 90%.
+	measure 'meas.rep_opp_overlap_reps_excellent_overlap' = ```
+			
+			var eligible_reps =
+			    FILTER(
+			        ALLSELECTED(rep_opportunity_overlap),
+			        rep_opportunity_overlap[meas.rep_opp_overlap_include_row] = 1
+			            && rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct] >= 0.90
+			    )
+			var res = COUNTROWS(eligible_reps)
+			return res
+			
+			```
+		formatString: #,0
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 09b86ede-2e51-49c5-a803-d2acfe438d27
+
+	/// Number of teams where average participation is below the eligible-rep organization average.
+	measure 'meas.rep_opp_overlap_teams_below_average' = ```
+			
+			var org_average = rep_opportunity_overlap[meas.rep_opp_overlap_overall_avg_participation_pct]
+			var teams =
+			    FILTER(
+			        SUMMARIZE(
+			            ALLSELECTED(rep_opportunity_overlap),
+			            rep_opportunity_overlap[Team],
+			            "__team_avg", rep_opportunity_overlap[meas.rep_opp_overlap_avg_participation_pct],
+			            "__eligible_reps",
+			                CALCULATE(
+			                    COUNTROWS(rep_opportunity_overlap),
+			                    FILTER(
+			                        rep_opportunity_overlap,
+			                        rep_opportunity_overlap[meas.rep_opp_overlap_include_row] = 1
+			                    )
+			                )
+			        ),
+			        [__eligible_reps] > 0
+			            && [__team_avg] < org_average
+			    )
+			var res = COUNTROWS(teams)
+			return res
+			
+			```
+		formatString: #,0
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 90bda34d-fa84-47d9-88a1-b8ddc46c534a
+
+	/// Plain-English overall participation health label.
+	measure 'meas.rep_opp_overlap_org_health_status' = ```
+			
+			var avg_participation = rep_opportunity_overlap[meas.rep_opp_overlap_overall_avg_participation_pct]
+			var reps_below = rep_opportunity_overlap[meas.rep_opp_overlap_reps_below_threshold]
+			var res =
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(avg_participation), "No eligible reps",
+			        avg_participation >= 0.90 && reps_below = 0, "Healthy",
+			        avg_participation >= 0.80, "Mostly healthy",
+			        avg_participation >= 0.70, "Needs attention",
+			        "At risk"
+			    )
+			return res
+			
+			```
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 4daedd26-87a5-4233-8fa1-8dd1c715be52
+
+	measure 'meas.rep_opp_overlap_lowest_participation_rep' = ```
+			
+			var eligible_reps =
+			    FILTER(
+			        ALLSELECTED(rep_opportunity_overlap),
+			        rep_opportunity_overlap[meas.rep_opp_overlap_include_row] = 1
+			    )
+			var bottom_rep =
+			    TOPN(
+			        1,
+			        eligible_reps,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct],
+			        ASC,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities],
+			        DESC,
+			        rep_opportunity_overlap[Representative],
+			        ASC
+			    )
+			var res = CONCATENATEX(bottom_rep, rep_opportunity_overlap[Representative])
+			return res
+			
+			```
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 4ec4b17b-27ee-43c2-a5df-e7f7df23c048
+
+	measure 'meas.rep_opp_overlap_lowest_participation_detail' = ```
+			
+			var eligible_reps =
+			    FILTER(
+			        ALLSELECTED(rep_opportunity_overlap),
+			        rep_opportunity_overlap[meas.rep_opp_overlap_include_row] = 1
+			    )
+			var bottom_rep =
+			    TOPN(
+			        1,
+			        eligible_reps,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct],
+			        ASC,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities],
+			        DESC,
+			        rep_opportunity_overlap[Representative],
+			        ASC
+			    )
+			var res =
+			    CONCATENATEX(
+			        bottom_rep,
+			        FORMAT(rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct], "0.0%")
+			            & " participation across "
+			            & FORMAT(rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities], "#,0")
+			            & " assigned opps"
+			    )
+			return res
+			
+			```
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 6e479eed-ad83-4234-ab50-035be0c460a8
+
+	measure 'meas.rep_opp_overlap_highest_participation_rep' = ```
+			
+			var eligible_reps =
+			    FILTER(
+			        ALLSELECTED(rep_opportunity_overlap),
+			        rep_opportunity_overlap[meas.rep_opp_overlap_include_row] = 1
+			    )
+			var top_rep =
+			    TOPN(
+			        1,
+			        eligible_reps,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct],
+			        DESC,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities],
+			        DESC,
+			        rep_opportunity_overlap[Representative],
+			        ASC
+			    )
+			var res = CONCATENATEX(top_rep, rep_opportunity_overlap[Representative])
+			return res
+			
+			```
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: d274be2a-3556-4be2-bf2c-591e586e391e
+
+	measure 'meas.rep_opp_overlap_highest_participation_detail' = ```
+			
+			var eligible_reps =
+			    FILTER(
+			        ALLSELECTED(rep_opportunity_overlap),
+			        rep_opportunity_overlap[meas.rep_opp_overlap_include_row] = 1
+			    )
+			var top_rep =
+			    TOPN(
+			        1,
+			        eligible_reps,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct],
+			        DESC,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities],
+			        DESC,
+			        rep_opportunity_overlap[Representative],
+			        ASC
+			    )
+			var res =
+			    CONCATENATEX(
+			        top_rep,
+			        FORMAT(rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct], "0.0%")
+			            & " participation across "
+			            & FORMAT(rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities], "#,0")
+			            & " assigned opps"
+			    )
+			return res
+			
+			```
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 1940ea3e-1842-41e1-b385-8d01ce77245e
+
+	measure 'meas.rep_opp_overlap_largest_negative_gap_rep' = ```
+			
+			var eligible_reps =
+			    FILTER(
+			        ALLSELECTED(rep_opportunity_overlap),
+			        rep_opportunity_overlap[meas.rep_opp_overlap_include_row] = 1
+			    )
+			var bottom_gap_rep =
+			    TOPN(
+			        1,
+			        eligible_reps,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_participation_gap_pp],
+			        ASC,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities],
+			        DESC,
+			        rep_opportunity_overlap[Representative],
+			        ASC
+			    )
+			var res = CONCATENATEX(bottom_gap_rep, rep_opportunity_overlap[Representative])
+			return res
+			
+			```
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: 44ca7bec-f572-4759-8c29-add8f5e00124
+
+	measure 'meas.rep_opp_overlap_largest_negative_gap_detail' = ```
+			
+			var eligible_reps =
+			    FILTER(
+			        ALLSELECTED(rep_opportunity_overlap),
+			        rep_opportunity_overlap[meas.rep_opp_overlap_include_row] = 1
+			    )
+			var bottom_gap_rep =
+			    TOPN(
+			        1,
+			        eligible_reps,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_participation_gap_pp],
+			        ASC,
+			        rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities],
+			        DESC,
+			        rep_opportunity_overlap[Representative],
+			        ASC
+			    )
+			var res =
+			    CONCATENATEX(
+			        bottom_gap_rep,
+			        FORMAT(rep_opportunity_overlap[meas.rep_opp_overlap_participation_gap_pp], "+0.0%;-0.0%;0.0%")
+			            & " vs. eligible-rep average"
+			    )
+			return res
+			
+			```
+		displayFolder: _rep_opportunity_overlap
+		lineageTag: ee5df2de-35da-4edf-90d0-6d8b0782e04b
+
+	column 'User Id'
+		dataType: string
+		lineageTag: fac4647e-d5ad-45d4-b171-86f36c5ad4e1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [User Id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Representative
+		dataType: string
+		lineageTag: 6c806876-92c5-4ed5-8157-86d05e8eee8d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Representative]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Team
+		dataType: string
+		lineageTag: 5d6ea92b-3d57-4a6b-890c-57e90626d54d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Team]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Manager
+		dataType: string
+		lineageTag: 02329a26-a7be-4ac1-bc40-4f8d1b43dfa4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Manager]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Representative Sort'
+		dataType: string
+		lineageTag: dc228519-ca98-4a56-907a-aa0cef35ef05
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Representative Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition rep_opportunity_overlap = calculated
+		mode: import
+		source = ```
+				
+				SELECTCOLUMNS(
+				    FILTER(
+				        SUMMARIZE(
+				            users,
+				            users[_sys_doc_id],
+				            users[trueai_full_name],
+				            users[trueai_group],
+				            users[col.rep_details_rep_manager_name],
+				            users[trueai_user_role]
+				        ),
+				        users[trueai_user_role] = "Account Executive"
+				            && NOT ISBLANK(users[_sys_doc_id])
+				            && NOT ISBLANK(users[trueai_full_name])
+				    ),
+				    "User Id", users[_sys_doc_id],
+				    "Representative", users[trueai_full_name],
+				    "Team", COALESCE(users[trueai_group], "Unassigned"),
+				    "Manager", COALESCE(users[col.rep_details_rep_manager_name], "Unassigned"),
+				    "Representative Sort", users[trueai_full_name]
+				)
+				
+				```
+
+	annotation PBI_Id = c27eb0bb24ed474b87401ac075a3d8a1
+

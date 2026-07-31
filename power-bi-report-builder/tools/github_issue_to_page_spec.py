@@ -23,6 +23,7 @@ REQUIRED_SECTIONS = {
     "audience": "Who is this page for?",
     "decision supported": "What decision should the page support?",
     "expected outcome": "What should the audience understand after reading the page?",
+    "narrative hierarchy": "What should the page lead with, support with, drill into, and use as evidence?",
     "target report": "Report, page name, navigation location, and change type.",
     "data contract": "Population, grain, period, baseline, filters, sample size, and source of truth.",
     "metrics": "Measures or calculations used by the page.",
@@ -130,6 +131,7 @@ Fill this section before changing PBIP files:
 - Business question:
 - Audience:
 - Decision or action:
+- Narrative hierarchy:
 - Data contract:
 - Measures:
 - Dimensions:
@@ -156,12 +158,13 @@ Title: {issue.title}
 
 1. Read `issue_raw.md`.
 2. Complete `page_spec_draft.md`.
-3. Check the spec against `../validation_checklist.md`.
-4. Inspect the target PBIP report and semantic model.
-5. Reuse existing measures and visual patterns.
-6. Make scoped PBIP edits.
-7. Run validation tools.
-8. Open the report in Power BI Desktop for final inspection.
+3. Confirm the narrative hierarchy before choosing visuals.
+4. Check the spec against `../validation_checklist.md`.
+5. Inspect the target PBIP report and semantic model.
+6. Reuse existing measures and visual patterns.
+7. Make scoped PBIP edits.
+8. Run validation tools.
+9. Open the report in Power BI Desktop for final inspection.
 """
 
 
