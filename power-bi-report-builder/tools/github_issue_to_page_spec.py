@@ -67,7 +67,7 @@ def fetch_issue(issue_number: str, repo: str | None) -> IssueContent:
     cmd = ["gh", "issue", "view", issue_number, "--json", "title,body", "--template", "{{.title}}\n---BODY---\n{{.body}}"]
     if repo:
         cmd.extend(["--repo", repo])
-    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+    result = subprocess.run(cmd, check=True, capture_output=True, text=True, encoding="utf-8")
     title, _, body = result.stdout.partition("\n---BODY---\n")
     return IssueContent(source_label=f"github-issue-{issue_number}", title=title.strip(), body=body.strip())
 
