@@ -25,7 +25,8 @@ It turns an approved spec into:
 - `visual_json_patterns/`: reusable Power BI visual patterns.
 - `tools/`: scripts that start builder runs, inspect PBIP files, validate output, and clean up report layout.
 - `examples/implemented_pages/`: specs and notes for real pages we have built.
-- `issue_template.md`: the GitHub issue shape expected by the builder.
+- `page_spec_template.md`: the working contract for a requested Power BI page.
+- `issue_template.md`: a thin GitHub issue wrapper that points to the page spec.
 - `runbook.md`: how to run the builder and cleanup scripts.
 
 ## Build Flow

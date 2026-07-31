@@ -18,14 +18,21 @@ from pathlib import Path
 
 
 REQUIRED_SECTIONS = {
+    "summary": "Briefly describe the page purpose.",
     "business question": "What question should this page answer?",
     "audience": "Who is this page for?",
-    "decision or action": "What decision or action should the page support?",
+    "decision supported": "What decision should the page support?",
+    "expected outcome": "What should the audience understand after reading the page?",
+    "target report": "Report, page name, navigation location, and change type.",
     "data contract": "Population, grain, period, baseline, filters, sample size, and source of truth.",
     "metrics": "Measures or calculations used by the page.",
     "dimensions": "Fields used for grouping, slicing, or detail rows.",
+    "existing assets to reuse": "Reference pages, visuals, footers, saved queries, and AI scores.",
     "interpretation rules": "What the page can and cannot claim.",
+    "information design": "Recommended page structure and visual pattern choices.",
+    "builder constraints": "Implementation rules the builder must follow.",
     "acceptance criteria": "How the reviewer knows the page is ready.",
+    "builder deliverables": "The mini report expected at the end of the build.",
 }
 
 

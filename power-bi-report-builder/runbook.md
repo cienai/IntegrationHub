@@ -35,15 +35,20 @@ python power-bi-report-builder/tools/run_pbi_builder.py --issue-file path/to/iss
 
 ## Before Building
 
-The issue should clearly say:
+The issue should include a completed page spec from `page_spec_template.md`.
+
+The spec should clearly say:
 
 - the business question;
 - the audience;
-- the decision or action;
+- the decision supported;
+- the expected outcome;
 - the target report and page;
 - the data contract;
+- the existing assets to reuse;
 - the required metrics and dimensions;
 - the interpretation rules;
+- the builder deliverables;
 - the acceptance criteria.
 
 If those pieces are missing, stop and clarify the issue before building the PBIP page.
