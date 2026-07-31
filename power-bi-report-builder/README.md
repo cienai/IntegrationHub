@@ -23,8 +23,10 @@ It turns an approved spec into:
 - `semantic_model_rules.md`: how to use measures and model objects.
 - `validation_checklist.md`: what to check before saying the page is ready.
 - `visual_json_patterns/`: reusable Power BI visual patterns.
-- `tools/`: scripts that inspect or validate PBIP files.
+- `tools/`: scripts that start builder runs, inspect PBIP files, validate output, and clean up report layout.
 - `examples/implemented_pages/`: specs and notes for real pages we have built.
+- `issue_template.md`: the GitHub issue shape expected by the builder.
+- `runbook.md`: how to run the builder and cleanup scripts.
 
 ## Build Flow
 
@@ -35,6 +37,12 @@ It turns an approved spec into:
 5. Apply layout, interactions, and theme.
 6. Run automated PBIP checks.
 7. Open the report in Power BI Desktop for final review.
+
+To start from a GitHub issue:
+
+```powershell
+python power-bi-report-builder/tools/run_pbi_builder.py 1234
+```
 
 ## Full Flow
 
