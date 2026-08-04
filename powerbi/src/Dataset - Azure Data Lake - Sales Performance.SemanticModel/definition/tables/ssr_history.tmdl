@@ -13212,6 +13212,148 @@ table ssr_history
 		displayFolder: _pricing_analysis\New Logo
 		lineageTag: 081f544e-bb19-415e-9a94-294ca6aebc41
 
+	/// Earliest successful New Logo win date for the SSR in the selected reporting period.
+	measure 'meas.land_expand_initial_win_date' =
+			CALCULATE (
+			    MIN ( cal_end_dates[Date] ),
+			    TREATAS ( { TRUE () }, ssr[trueai_ssr_is_master] ),
+			    KEEPFILTERS ( cal_end_dates[Date] < DATE ( 2050, 1, 1 ) ),
+			    KEEPFILTERS ( ssr_history[col.canonical_sales_motion] = "New Logo" ),
+			    KEEPFILTERS ( ssr_history[step_success] = TRUE () ),
+			    KEEPFILTERS ( NOT ISBLANK ( ssr_history[_sys_ssr_id] ) )
+			)
+		formatString: Short Date
+		displayFolder: _customer_outcomes\Land and Expand
+		lineageTag: f3eb4c16-7c66-4073-993d-cf95a98ea920
+
+	/// Won amount on the first successful New Logo win date for the SSR in the selected reporting period.
+	measure 'meas.land_expand_initial_deal_amount' =
+			VAR InitialWinDate = [meas.land_expand_initial_win_date]
+			RETURN
+			    IF (
+			        ISBLANK ( InitialWinDate ),
+			        BLANK (),
+			        CALCULATE (
+			            SUM ( ssr_history[opp_won_amt] ),
+			            TREATAS ( { TRUE () }, ssr[trueai_ssr_is_master] ),
+			            TREATAS ( { "auto" }, auto_currency_format[currency_convert] ),
+			            KEEPFILTERS ( ssr_history[col.canonical_sales_motion] = "New Logo" ),
+			            KEEPFILTERS ( ssr_history[step_success] = TRUE () ),
+			            KEEPFILTERS ( cal_end_dates[Date] = InitialWinDate )
+			        )
+			    )
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _customer_outcomes\Land and Expand
+		lineageTag: a8fa970b-acde-45f9-bd9f-b168bd45094b
+
+	/// First successful Existing Customer Expansion date after the selected-period initial New Logo win, searching beyond the selected period.
+	measure 'meas.land_expand_first_expansion_date' =
+			VAR CurrentSsrIds =
+			    FILTER (
+			        VALUES ( ssr_history[_sys_ssr_id] ),
+			        NOT ISBLANK ( ssr_history[_sys_ssr_id] )
+			    )
+			VAR InitialWinDate = [meas.land_expand_initial_win_date]
+			RETURN
+			    IF (
+			        ISBLANK ( InitialWinDate ),
+			        BLANK (),
+			        CALCULATE (
+			            MIN ( cal_end_dates[Date] ),
+			            REMOVEFILTERS ( cal_end_dates ),
+			            cal_end_dates[Date] < DATE ( 2050, 1, 1 ),
+			            TREATAS ( { TRUE () }, ssr[trueai_ssr_is_master] ),
+			            TREATAS ( CurrentSsrIds, ssr_history[_sys_ssr_id] ),
+			            ssr_history[col.canonical_sales_motion] = "Existing Customer Expansion",
+			            ssr_history[step_success] = TRUE (),
+			            cal_end_dates[Date] > InitialWinDate
+			        )
+			    )
+		formatString: Short Date
+		displayFolder: _customer_outcomes\Land and Expand
+		lineageTag: a30b6625-73bd-4547-9e49-cc1abc834a7c
+
+	/// Indicates whether the first successful expansion occurred after the initial win and on or before its 12-month anniversary.
+	measure 'meas.land_expand_expanded_within_12_months_flag' =
+			VAR InitialWinDate = [meas.land_expand_initial_win_date]
+			VAR FirstExpansionDate = [meas.land_expand_first_expansion_date]
+			RETURN
+			    IF (
+			        ISBLANK ( InitialWinDate ),
+			        BLANK (),
+			        INT (
+			            NOT ISBLANK ( FirstExpansionDate )
+			                && FirstExpansionDate > InitialWinDate
+			                && FirstExpansionDate <= EDATE ( InitialWinDate, 12 )
+			        )
+			    )
+		formatString: 0
+		displayFolder: _customer_outcomes\Land and Expand
+		lineageTag: b233e86c-daf2-43ef-8ecb-7eab3f1f91ea
+
+	/// Counts selected-period New Logo cohort customers whose initial deal amount falls in the selected governed band.
+	measure 'meas.land_expand_customer_count' =
+			VAR MinimumAmount = SELECTEDVALUE ( land_expand_deal_size_band[minimum_amount] )
+			VAR MaximumAmount = SELECTEDVALUE ( land_expand_deal_size_band[maximum_amount] )
+			VAR Customers =
+			    FILTER (
+			        VALUES ( ssr_history[_sys_ssr_id] ),
+			        NOT ISBLANK ( ssr_history[_sys_ssr_id] )
+			    )
+			RETURN
+			    SUMX (
+			        Customers,
+			        VAR InitialAmount = CALCULATE ( [meas.land_expand_initial_deal_amount] )
+			        RETURN
+			            INT (
+			                NOT ISBLANK ( InitialAmount )
+			                    && InitialAmount > 0
+			                    && InitialAmount >= MinimumAmount
+			                    && ( ISBLANK ( MaximumAmount ) || InitialAmount < MaximumAmount )
+			            )
+			    )
+		formatString: #,0
+		displayFolder: _customer_outcomes\Land and Expand
+		lineageTag: 74cf6d8f-5a83-4f66-990e-939b61cc0d61
+
+	/// Counts selected-band New Logo cohort customers with a successful expansion within 12 months.
+	measure 'meas.land_expand_customers_expanded_12_months' =
+			VAR MinimumAmount = SELECTEDVALUE ( land_expand_deal_size_band[minimum_amount] )
+			VAR MaximumAmount = SELECTEDVALUE ( land_expand_deal_size_band[maximum_amount] )
+			VAR Customers =
+			    FILTER (
+			        VALUES ( ssr_history[_sys_ssr_id] ),
+			        NOT ISBLANK ( ssr_history[_sys_ssr_id] )
+			    )
+			RETURN
+			    SUMX (
+			        Customers,
+			        VAR InitialAmount = CALCULATE ( [meas.land_expand_initial_deal_amount] )
+			        VAR ExpandedWithin12Months =
+			            CALCULATE ( [meas.land_expand_expanded_within_12_months_flag] )
+			        RETURN
+			            INT (
+			                NOT ISBLANK ( InitialAmount )
+			                    && InitialAmount > 0
+			                    && InitialAmount >= MinimumAmount
+			                    && ( ISBLANK ( MaximumAmount ) || InitialAmount < MaximumAmount )
+			                    && ExpandedWithin12Months = 1
+			            )
+			    )
+		formatString: #,0
+		displayFolder: _customer_outcomes\Land and Expand
+		lineageTag: e46772fe-bc26-45a1-84a6-d40c9f8173c9
+
+	/// Percentage of selected-band New Logo cohort customers that expanded within 12 months.
+	measure 'meas.land_expand_12_month_expansion_rate' =
+			DIVIDE (
+			    [meas.land_expand_customers_expanded_12_months],
+			    [meas.land_expand_customer_count]
+			)
+		formatString: 0.0%
+		displayFolder: _customer_outcomes\Land and Expand
+		lineageTag: eeccebb5-a8c8-4690-a24d-18bb3c241f7c
+
 	/// Id of the SSR document the record belongs to
 	column _sys_ssr_id
 		dataType: string
@@ -15066,6 +15208,21 @@ table ssr_history
 		sourceColumn: step_pred_close_date_if_lost
 
 		annotation SummarizationSetBy = Automatic
+
+	/// Governed sales-motion classification used by reusable New Logo and Existing Customer Expansion logic.
+	column 'col.canonical_sales_motion' =
+			SWITCH (
+			    TRUE (),
+			    ssr_history[step_name] = "New Logo Selling", "New Logo",
+			    ssr_history[step_name]
+			        IN { "Existing Customer Selling", "Existing Cust. Selling" },
+			        "Existing Customer Expansion",
+			    "Other"
+			)
+		lineageTag: 85244b15-5e82-4a27-8667-e02a7c51bb98
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
 
 	partition ssr_history-42b745a5-3afa-43a2-90f2-f7965fced67a = m
 		mode: import
