@@ -55,7 +55,7 @@ The page should help someone understand, decide, or act.
 - Are the header, back button, page title, footer, and platform-version footer present?
 - Are executive cards aligned to the golden card row when used?
 - Are the fixed footer constants present: Peek Inside banner, separator band, colored threshold legend, and version strip?
-- Is the AI score panel present when the spec declares primary/supporting AI scores or when the approved reference footer pattern keeps score context paired with the threshold legend?
+- Are AI score modules present only for the AI scores declared by the spec, or when the approved reference footer pattern keeps score context paired with the threshold legend?
 - Are footer modules limited to those required by the spec?
 - Were footer modules copied from approved modules instead of recreated?
 - Does the configuration module preserve the approved compact table height and narrow/no-extra-padding treatment?
@@ -99,6 +99,7 @@ The page should help someone understand, decide, or act.
 
 ## AI Scores
 
+- Are zero, one, or many AI scores handled according to the page spec without implying one score takes precedence unless the spec says so?
 - Are related AI scores included when useful?
 - Do score labels match official score names?
 - Is score wording clear and caveated?
