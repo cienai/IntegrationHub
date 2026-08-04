@@ -13,15 +13,17 @@ It turns an approved spec into:
 - Power BI visual JSON.
 - Theme-based formatting.
 - Page layout.
-- Validation checks.
+- Closed-loop verification and validation checks.
 
 ## What Goes Where
 
 - `AGENTS.md`: the step-by-step workflow for Codex.
+- `design_system.md`: approved visual implementation rules extracted from canonical pages.
 - `pbip_layout_rules.md`: where things go on the Power BI canvas.
 - `theme_contract.md`: colors, fonts, and theme rules.
 - `semantic_model_rules.md`: how to use measures and model objects.
 - `validation_checklist.md`: what to check before saying the page is ready.
+- `golden_pages/`: canonical page layouts and reusable visual inventories.
 - `visual_json_patterns/`: reusable Power BI visual patterns.
 - `tools/`: scripts that start builder runs, inspect PBIP files, validate output, and clean up report layout.
 - `examples/implemented_pages/`: specs and notes for real pages we have built.
@@ -31,13 +33,18 @@ It turns an approved spec into:
 
 ## Build Flow
 
-1. Start with an approved spec from `../decision-support-framework`.
-2. Inspect the existing PBIP report and Power BI model.
-3. Reuse existing page and visual patterns.
-4. Bind visuals to official Power BI model objects.
-5. Apply layout, interactions, and theme.
-6. Run automated PBIP checks.
-7. Open the report in Power BI Desktop for final review.
+1. Read the GitHub issue or approved page specification.
+2. Inspect the target PBIP report and semantic model.
+3. Load the approved golden-page layout when one applies.
+4. Copy canonical page chrome and required visual patterns.
+5. Replace page-specific content and bindings.
+6. Add only the visuals required by the ticket.
+7. Execute required verification queries.
+8. Compare expected vs. generated output.
+9. Diagnose and correct implementation-level mismatches.
+10. Re-run failed verification checks, up to three correction attempts per failed check.
+11. Validate against the golden layout and standard checklist.
+12. Report intentional deviations, blockers, and the self-correction log.
 
 To start from a GitHub issue:
 
@@ -55,7 +62,11 @@ python power-bi-report-builder/tools/run_pbi_builder.py 1234
 6. Check the spec against Decision Support QA.
 7. Hand the approved spec to this Power BI builder.
 8. Inspect the existing PBIP report and Power BI model.
-9. Reuse approved page and visual patterns.
-10. Build the bindings, layout, interactions, and theme.
-11. Run automated PBIP checks.
-12. Do the final Power BI Desktop inspection.
+9. Load the relevant golden layout from `golden_pages/`.
+10. Copy approved page chrome and visual patterns before adding new visuals.
+11. Build the bindings, layout, interactions, and theme.
+12. Execute verification queries and compare expected vs. generated output.
+13. Correct page bindings, filters, sorting, formatting, or page-local calculations when they are the cause of a failed check.
+14. Re-run failed verification checks, stopping after three correction attempts with a blocker report if still failing.
+15. Run automated PBIP checks, including golden layout validation when applicable.
+16. Do the final Power BI Desktop inspection.

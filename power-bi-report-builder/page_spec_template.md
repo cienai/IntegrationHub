@@ -77,6 +77,10 @@ Navigation Location:
 
 Related Existing Page:
 
+Golden Layout:
+
+Declared Layout Exceptions:
+
 Primary AI Score:
 
 Supporting AI Scores:
@@ -107,6 +111,20 @@ Source of Truth:
 
 ---
 
+## Verification Contract
+
+Required Verification Queries:
+
+Expected Outputs:
+
+Comparison Rules:
+
+Allowed Self-Corrections:
+
+Verification Blockers:
+
+---
+
 ## Metrics
 
 | Metric | Existing Measure | Notes |
@@ -128,6 +146,10 @@ Source of Truth:
 Reference Pages:
 
 Reference Visuals:
+
+Golden Elements To Copy:
+
+Golden Elements To Replace:
 
 Reference Footer:
 
@@ -177,9 +199,11 @@ Reuse existing page patterns where appropriate.
 
 - Reuse governed semantic model measures whenever possible.
 - Do not create page-specific calculated tables without justification.
-- Prefer existing visual patterns before introducing new ones.
+- Copy approved golden visual patterns before introducing new ones.
+- Preserve canonical coordinates, padding, fonts, fills, borders, and alignment unless listed under Declared Layout Exceptions.
+- Do not copy page-specific DAX, measures, thresholds, or business logic from a reference page.
 - Reuse report navigation and page chrome.
-- Follow the report theme and design framework.
+- Follow `design_system.md`, the applicable golden package, and theme boundaries.
 
 ---
 
@@ -190,8 +214,12 @@ The page is ready for review when:
 - [ ] Business question is clearly answered.
 - [ ] Theme applied correctly.
 - [ ] Existing navigation reused.
+- [ ] Applicable golden layout copied or intentional deviations declared.
 - [ ] No unnecessary calculated tables.
 - [ ] Source of Truth documented for every metric.
+- [ ] Required verification queries executed.
+- [ ] Generated output compared against expected output.
+- [ ] Failed checks corrected and re-tested, or blocker documented.
 - [ ] No truncated text.
 - [ ] No unnecessary scrollbars.
 - [ ] Validation checklist passes.
@@ -211,6 +239,8 @@ The completed implementation should include:
 - Existing saved queries reused
 - New calculated tables, with justification
 - Validation checklist results
+- Verification query results
+- Self-correction log, including failed checks, diagnosis, changes made, and final result
 - Manual review items
 
 ---

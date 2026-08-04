@@ -31,8 +31,31 @@ The page should help someone understand, decide, or act.
 - Do report visuals, DAX test queries, Power BI model measures, and page text agree?
 - Did we avoid duplicate definitions?
 
+## Data Verification
+
+- Were all required verification queries executed?
+- Was generated output compared against expected output?
+- Were mismatches diagnosed against page implementation, verification query, filter context, source-of-truth mapping, and governed model logic?
+- Were only implementation-level issues auto-corrected?
+- Were failed checks re-run after each correction?
+- Were correction attempts capped at three per failed check?
+- Does the self-correction log record the failed check, expected output, generated output, diagnosis, correction, and final result?
+- Are unresolved governed-model or source-of-truth issues reported as blockers instead of silently changed?
+
 ## Layout
 
+- If the page is an executive analysis page, was `golden_pages/executive_analysis_v1/` loaded before editing?
+- Did fixed chrome come from the golden page instead of being recreated?
+- Does `validate_layout.py --golden-executive` pass, or are deviations declared in the page spec?
+- Is the canvas `1280 x 1900` when using the executive golden layout?
+- Are the header, back button, page title, footer, and platform-version footer present?
+- Are executive cards aligned to the golden card row when used?
+- Are the fixed footer constants present: Peek Inside banner, separator band, colored threshold legend, and version strip?
+- Is the AI score panel present when the spec declares primary/supporting AI scores or when the approved reference footer pattern keeps score context paired with the threshold legend?
+- Are footer modules limited to those required by the spec?
+- Were footer modules copied from approved modules instead of recreated?
+- Does the configuration module preserve the approved compact table height and narrow/no-extra-padding treatment?
+- Were active footer modules repacked into the approved grid without overlap, truncation, or empty placeholder panels?
 - Are there any overlapping visuals?
 - Are header, footer, navigation, and content positions consistent?
 - Is spacing consistent?
@@ -80,6 +103,8 @@ The page should help someone understand, decide, or act.
 
 ## Theme
 
+- Does the page follow `design_system.md` for approved implementation details?
+- Are differences between imported theme defaults and the golden reference page documented?
 - Are theme colors respected?
 - Are fonts and sizes consistent?
 - Are card, chart, table, matrix, slicer, and footer styles consistent?
@@ -106,6 +131,8 @@ The page should help someone understand, decide, or act.
 
 - The page meets the spec.
 - The page matches the report section.
+- Required verification checks pass, or a real blocker is documented.
+- Self-correction log is complete.
 - PBIP JSON parses.
 - `git diff --check` passes.
 - Any checks we could not run are listed.

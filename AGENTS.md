@@ -53,6 +53,15 @@ Instructions for Codex and other coding agents working in this repository.
 - If a validation script requires credentials, Power BI login, Windows PowerShell, or a configured workspace, say what could not be run and why.
 - Do not invent replacement validation scripts when an existing repo script already covers the check.
 
+## Closed-Loop Data Verification
+
+- After implementing a Power BI page, execute all required verification checks, compare expected vs. generated output, diagnose mismatches, correct implementation-level issues, and re-run the failed checks.
+- Codex may correct page bindings, measure selection, filters, date or quarter sorting, formatting/display units, max/min card logic, chart/table inconsistencies, duplicated filters, and page-local calculations that disagree with governed measures.
+- Codex must not silently change governed business definitions, approved thresholds, canonical measures, the ticket's analytical contract, source data, or production semantic-model logic to force reconciliation.
+- If source of truth and page output disagree, determine whether the issue is page implementation, verification query, filter context, source-of-truth mapping, or governed model logic. Only the first three should normally be auto-corrected.
+- Retry failed checks no more than three correction attempts. After each attempt, record what changed and why. If checks still fail, stop with a blocker report.
+- Do not mark the page complete while required checks are failing unless the blocker is real and documented.
+
 ## Deployment And Workspace Safety
 
 - Treat Power BI deployment scripts as operational tooling. Small config changes can affect customer workspaces.

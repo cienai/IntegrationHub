@@ -24,6 +24,8 @@ Each run includes:
 - a normalized page spec draft;
 - a builder handoff file;
 - a short intake validation report.
+- verification query results when the build reaches implementation;
+- a self-correction log for failed checks, diagnoses, changes, and final results.
 
 ## Offline Or Manual Mode
 
@@ -48,6 +50,7 @@ The spec should clearly say:
 - the existing assets to reuse;
 - the required metrics and dimensions;
 - the interpretation rules;
+- the verification contract;
 - the builder deliverables;
 - the acceptance criteria.
 
