@@ -46,6 +46,8 @@ The page should help someone understand, decide, or act.
 
 - If the page is an executive analysis page, was `golden_pages/executive_analysis_v1/` loaded before editing?
 - Did fixed chrome come from the golden page instead of being recreated?
+- Do the top-right header icons match the page's declared context, such as Coaching Intelligence, New Logo Selling, Existing Customer Selling, or an approved combined treatment?
+- Were header icons copied from an approved reference page instead of recreated or inherited blindly from the golden page?
 - If quick filters are declared, were they copied from an approved Management Report top-page pattern instead of recreated?
 - Are quick filters aligned, styled, sized, and labeled consistently with the approved reference pattern?
 - Does `validate_layout.py --golden-executive` pass, or are deviations declared in the page spec?
