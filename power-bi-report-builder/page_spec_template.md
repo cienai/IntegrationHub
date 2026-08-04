@@ -105,6 +105,12 @@ Comparison Baseline:
 
 Required Filters:
 
+Quick Filters:
+
+| Label | Field | Source Table/Column | Default State | Selection Mode | Scope | Affected Visuals | Sort/Display Notes |
+|-------|-------|---------------------|---------------|----------------|-------|------------------|--------------------|
+| | | | All / specific value | Single / multi / search / date range | Page only / synced | | |
+
 Minimum Sample Size:
 
 Source of Truth:
