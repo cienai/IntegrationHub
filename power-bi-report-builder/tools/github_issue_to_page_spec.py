@@ -136,6 +136,9 @@ Fill this section before changing PBIP files:
 - Measures:
 - Dimensions:
 - Visual patterns:
+- Header context icons:
+- Quick filters:
+- AI scores used on this page:
 - Footer and notes:
 - Acceptance criteria:
 """

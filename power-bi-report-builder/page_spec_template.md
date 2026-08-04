@@ -85,9 +85,11 @@ Approved Icon Reference Page:
 
 Declared Layout Exceptions:
 
-Primary AI Score:
+AI Scores:
 
-Supporting AI Scores:
+| AI Score | Source | Reason Included | Footer/Notes Treatment |
+|----------|--------|-----------------|------------------------|
+| | | | |
 
 Should this be:
 
@@ -167,7 +169,7 @@ Reference Footer:
 
 Reference Saved Queries:
 
-Reference AI Score:
+Reference AI Scores:
 
 ---
 
