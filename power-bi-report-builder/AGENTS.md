@@ -10,7 +10,7 @@ The goal is not to make a page that merely has charts on it. The goal is to make
 2. Inspect the target PBIP report.
 3. Inspect the Power BI semantic model objects used by the page.
 4. Load the approved golden-page layout when one applies. For executive analysis pages, use `golden_pages/executive_analysis_v1/`.
-5. Confirm the target report, page section, canvas size, page order, and any declared layout exceptions.
+5. Confirm the target report, page section, canvas size, page order, quick-filter requirements, and any declared layout exceptions.
 6. Map every metric and dimension to its source of truth.
 7. Identify the narrative hierarchy before choosing visuals.
 
@@ -35,9 +35,24 @@ Do not promote individual reps, accounts, opportunities, transactions, or other 
 4. Replace only page-specific titles, labels, bindings, filters, sort order, and narrative text in copied visuals.
 5. Do not copy page-specific DAX, thresholds, or business logic from the golden reference page.
 6. Assemble footers from approved modules only. Keep the RepOverlap Peek Inside banner, separator, colored thresholds, and version strip as constants; module count may vary for score/configuration/footnotes, but do not leave empty placeholder panels.
-7. Use `design_system.md` for approved implementation rules and `theme_contract.md` for theme boundaries.
-8. Use `visual_json_patterns/` only when the golden layout does not already contain the needed pattern.
-9. Keep Power BI visual JSON edits small and focused.
+7. Add quick filters only when the spec declares them. Treat Management Report top-of-page "page only" filter rows as the approved reference pattern; copy the slicer module styling, labels, sizing, and placement before changing bindings.
+8. Use `design_system.md` for approved implementation rules and `theme_contract.md` for theme boundaries.
+9. Use `visual_json_patterns/` only when the golden layout does not already contain the needed pattern.
+10. Keep Power BI visual JSON edits small and focused.
+
+## Quick Filters
+
+Quick filters are optional page-scoped slicer modules, not a default part of every golden page.
+
+- Use them only when the ticket or page specification says the page needs quick user filtering.
+- Treat these as canvas visuals in the top page area, distinct from hidden report/page filters.
+- Reuse an approved Management Report page with comparable quick-filter behavior as the reference. Examples include top slicer rows on `Open Pipeline Overview`, `Open Pipeline List`, `Users Overview`, and similar Management Report pages.
+- Preserve the approved quick-filter geometry, typography, fills, borders, dropdown/list style, selection behavior, and row alignment. Resize only enough to fit the declared fields without overlap or truncation.
+- Bind quick filters only to governed model fields or approved dimensions. Do not create local calculated tables or duplicate fields just to drive a slicer.
+- Scope quick filters to the current page unless the spec explicitly declares a synced/global filter. Verify that they do not accidentally alter other pages.
+- Do not duplicate the same filter context in both quick filters and hidden visual/page filters unless the spec requires it and the duplication is documented.
+- Document each quick filter's field, default state, selection mode, affected visuals, and sort behavior in the page spec.
+- Verification queries must include the quick-filter context. Validate the default state and at least one meaningful changed selection when credentials/data access are available.
 
 ## Source Of Truth
 

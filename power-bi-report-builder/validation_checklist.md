@@ -46,6 +46,8 @@ The page should help someone understand, decide, or act.
 
 - If the page is an executive analysis page, was `golden_pages/executive_analysis_v1/` loaded before editing?
 - Did fixed chrome come from the golden page instead of being recreated?
+- If quick filters are declared, were they copied from an approved Management Report top-page pattern instead of recreated?
+- Are quick filters aligned, styled, sized, and labeled consistently with the approved reference pattern?
 - Does `validate_layout.py --golden-executive` pass, or are deviations declared in the page spec?
 - Is the canvas `1280 x 1900` when using the executive golden layout?
 - Are the header, back button, page title, footer, and platform-version footer present?
@@ -113,6 +115,10 @@ The page should help someone understand, decide, or act.
 
 ## Interactions
 
+- Are quick filters scoped to the current page unless the spec explicitly declares a synced/global filter?
+- Is each quick filter's default state, selection mode, target field, sort behavior, and affected visuals documented?
+- Were quick-filter contexts included in verification queries for default and changed selections where possible?
+- Did we avoid accidental duplicated filters between quick slicers, visual filters, and page/report filters?
 - Do slicers affect the right visuals?
 - Is cross-filtering intentional?
 - Do navigation buttons go to the right places?
