@@ -79,6 +79,10 @@ Related Existing Page:
 
 Golden Layout:
 
+Header Context Icons:
+
+Approved Icon Reference Page:
+
 Declared Layout Exceptions:
 
 Primary AI Score:
@@ -157,6 +161,8 @@ Golden Elements To Copy:
 
 Golden Elements To Replace:
 
+Reference Header Icons:
+
 Reference Footer:
 
 Reference Saved Queries:
@@ -206,6 +212,7 @@ Reuse existing page patterns where appropriate.
 - Reuse governed semantic model measures whenever possible.
 - Do not create page-specific calculated tables without justification.
 - Copy approved golden visual patterns before introducing new ones.
+- Match top-right header icons to the declared page context and copy them from an approved reference page.
 - Preserve canonical coordinates, padding, fonts, fills, borders, and alignment unless listed under Declared Layout Exceptions.
 - Do not copy page-specific DAX, measures, thresholds, or business logic from a reference page.
 - Reuse report navigation and page chrome.
@@ -220,6 +227,7 @@ The page is ready for review when:
 - [ ] Business question is clearly answered.
 - [ ] Theme applied correctly.
 - [ ] Existing navigation reused.
+- [ ] Top-right header icons match the declared page context.
 - [ ] Applicable golden layout copied or intentional deviations declared.
 - [ ] No unnecessary calculated tables.
 - [ ] Source of Truth documented for every metric.

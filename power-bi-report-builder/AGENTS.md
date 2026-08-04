@@ -10,7 +10,7 @@ The goal is not to make a page that merely has charts on it. The goal is to make
 2. Inspect the target PBIP report.
 3. Inspect the Power BI semantic model objects used by the page.
 4. Load the approved golden-page layout when one applies. For executive analysis pages, use `golden_pages/executive_analysis_v1/`.
-5. Confirm the target report, page section, canvas size, page order, quick-filter requirements, and any declared layout exceptions.
+5. Confirm the target report, page section, canvas size, page order, quick-filter requirements, header context icons, and any declared layout exceptions.
 6. Map every metric and dimension to its source of truth.
 7. Identify the narrative hierarchy before choosing visuals.
 
@@ -36,9 +36,21 @@ Do not promote individual reps, accounts, opportunities, transactions, or other 
 5. Do not copy page-specific DAX, thresholds, or business logic from the golden reference page.
 6. Assemble footers from approved modules only. Keep the RepOverlap Peek Inside banner, separator, colored thresholds, and version strip as constants; module count may vary for score/configuration/footnotes, but do not leave empty placeholder panels.
 7. Add quick filters only when the spec declares them. Treat Management Report top-of-page "page only" filter rows as the approved reference pattern; copy the slicer module styling, labels, sizing, and placement before changing bindings.
-8. Use `design_system.md` for approved implementation rules and `theme_contract.md` for theme boundaries.
-9. Use `visual_json_patterns/` only when the golden layout does not already contain the needed pattern.
-10. Keep Power BI visual JSON edits small and focused.
+8. Set top-right header icons from the page's declared context. Copy approved icons from a page with the same context instead of treating the golden page's icon set as fixed.
+9. Use `design_system.md` for approved implementation rules and `theme_contract.md` for theme boundaries.
+10. Use `visual_json_patterns/` only when the golden layout does not already contain the needed pattern.
+11. Keep Power BI visual JSON edits small and focused.
+
+## Header Context Icons
+
+The top-right page icons are contextual navigation/status signals. They must match what the page is analyzing.
+
+- Do not assume the golden page's top-right icon set applies to every page.
+- The page spec must declare the applicable context, such as `Coaching Intelligence`, `New Logo Selling`, `Existing Customer Selling`, or combined `New Logo Selling + Existing Customer Selling`.
+- Reuse approved icon visuals/assets from existing report pages with the same context. Do not recreate icon artwork or invent a new icon combination.
+- Preserve the approved icon size, placement, spacing, image asset, action behavior, and layering relative to the header chrome.
+- If a page spans multiple contexts, include only the approved combined icon treatment or the exact set declared by the spec.
+- If no matching approved icon pattern exists, stop and document the missing header-context asset as a manual review item.
 
 ## Quick Filters
 
