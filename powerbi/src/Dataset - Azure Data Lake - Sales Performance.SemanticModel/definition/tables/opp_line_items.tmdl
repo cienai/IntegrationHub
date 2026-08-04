@@ -371,6 +371,82 @@ table opp_line_items
 		displayFolder: _pricing_analysis\New Logo
 		lineageTag: 4a47105c-d2a2-4438-8b85-cc59b6350d39
 
+	/// Total Renewal line-item revenue for successful Existing Customer Selling opportunities in the current SSR and date context.
+	measure 'meas.existing_customer_won_renewal_revenue' =
+			VAR ExistingCustomerWonOpportunities =
+			    CALCULATETABLE (
+			        VALUES ( ssr_history[entity_opp_id] ),
+			        TREATAS ( { TRUE () }, ssr[trueai_ssr_is_master] ),
+			        KEEPFILTERS ( 'cal_end_dates'[Date] < DATE ( 2050, 1, 1 ) ),
+			        KEEPFILTERS (
+			            ssr_history[col.canonical_sales_motion] = "Existing Customer Expansion"
+			        ),
+			        KEEPFILTERS ( ssr_history[step_success] = TRUE () ),
+			        KEEPFILTERS (
+			            FILTER (
+			                VALUES ( ssr_history[entity_opp_id] ),
+			                NOT ISBLANK ( ssr_history[entity_opp_id] )
+			            )
+			        )
+			    )
+			RETURN
+			    CALCULATE (
+			        [meas.opp_line_items_trueai_total_price],
+			        TREATAS ( { "auto" }, auto_currency_format[currency_convert] ),
+			        TREATAS (
+			            ExistingCustomerWonOpportunities,
+			            opp_line_items[crm_opp_id]
+			        ),
+			        KEEPFILTERS ( opp_line_items[trueai_revenue_type] = "Renewal" )
+			    )
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _customer_outcomes\Renewal and Expansion
+		lineageTag: f5da2307-58af-46f5-8ed8-f966e318bd7f
+
+	/// Indicates whether Renewal revenue from successful Existing Customer Selling opportunities is positive in the current context.
+	measure 'meas.customer_renewal_flag' = INT ( COALESCE ( [meas.existing_customer_won_renewal_revenue], 0 ) > 0 )
+		formatString: 0
+		displayFolder: _customer_outcomes\Renewal and Expansion
+		lineageTag: ffd0f28f-6f2d-44cc-a178-4dfa3ee61e97
+
+	/// Total Expansion line-item revenue for successful Existing Customer Selling opportunities in the current SSR and date context.
+	measure 'meas.existing_customer_won_expansion_revenue' =
+			VAR ExistingCustomerWonOpportunities =
+			    CALCULATETABLE (
+			        VALUES ( ssr_history[entity_opp_id] ),
+			        TREATAS ( { TRUE () }, ssr[trueai_ssr_is_master] ),
+			        KEEPFILTERS ( 'cal_end_dates'[Date] < DATE ( 2050, 1, 1 ) ),
+			        KEEPFILTERS (
+			            ssr_history[col.canonical_sales_motion] = "Existing Customer Expansion"
+			        ),
+			        KEEPFILTERS ( ssr_history[step_success] = TRUE () ),
+			        KEEPFILTERS (
+			            FILTER (
+			                VALUES ( ssr_history[entity_opp_id] ),
+			                NOT ISBLANK ( ssr_history[entity_opp_id] )
+			            )
+			        )
+			    )
+			RETURN
+			    CALCULATE (
+			        [meas.opp_line_items_trueai_total_price],
+			        TREATAS ( { "auto" }, auto_currency_format[currency_convert] ),
+			        TREATAS (
+			            ExistingCustomerWonOpportunities,
+			            opp_line_items[crm_opp_id]
+			        ),
+			        KEEPFILTERS ( opp_line_items[trueai_revenue_type] = "Expansion" )
+			    )
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: _customer_outcomes\Renewal and Expansion
+		lineageTag: c84e22a0-d81c-40a7-aa90-8494cfc55b88
+
+	/// Indicates whether Expansion revenue from successful Existing Customer Selling opportunities is positive in the current context.
+	measure 'meas.customer_expansion_flag' = INT ( COALESCE ( [meas.existing_customer_won_expansion_revenue], 0 ) > 0 )
+		formatString: 0
+		displayFolder: _customer_outcomes\Renewal and Expansion
+		lineageTag: 21e31d23-d898-458a-8566-b01a7253514b
+
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
 		dataType: string

@@ -259,6 +259,45 @@ table ssr_history_stakeholders
 		displayFolder: champion_stkhld
 		lineageTag: a8feef57-bffd-4dc2-89b1-966bcb2c913e
 
+	/// Counts Executive and VP stakeholder rows for the SSRs in the current filter context, preserving the saved-query definition.
+	measure 'meas.executive_or_vp_stakeholder_count' =
+			VAR CurrentSsrIds =
+			    FILTER (
+			        VALUES ( ssr_history[_sys_ssr_id] ),
+			        NOT ISBLANK ( ssr_history[_sys_ssr_id] )
+			    )
+			RETURN
+			    CALCULATE (
+			        COUNTROWS ( ssr_history_stakeholders ),
+			        TREATAS (
+			            CurrentSsrIds,
+			            ssr_history_stakeholders[_sys_ssr_id]
+			        ),
+			        KEEPFILTERS (
+			            FILTER (
+			                ssr_history_stakeholders,
+			                LEFT ( ssr_history_stakeholders[Stakeholder Segment], 11 ) = "Executive -"
+			                    || LEFT ( ssr_history_stakeholders[Stakeholder Segment], 4 ) = "VP -"
+			            )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: _customer_outcomes\Executive Presence
+		lineageTag: 201d5197-4442-4c4f-97dc-89f40e04772c
+
+	/// Classifies Executive/VP stakeholder row presence as High (2+), Medium (1), or Low (0) in the current SSR context.
+	measure 'meas.executive_stakeholder_presence_level' =
+			VAR ExecutiveOrVpCount = [meas.executive_or_vp_stakeholder_count]
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ExecutiveOrVpCount >= 2, "1. High",
+			        ExecutiveOrVpCount = 1, "2. Medium",
+			        "3. Low"
+			    )
+		displayFolder: _customer_outcomes\Executive Presence
+		lineageTag: 9d9851ab-736e-4ac9-9236-e22259a64bf6
+
 	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
 	column _sys_doc_id
 		dataType: string

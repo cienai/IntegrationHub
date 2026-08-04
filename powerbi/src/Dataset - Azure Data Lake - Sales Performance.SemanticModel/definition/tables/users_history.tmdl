@@ -3043,6 +3043,61 @@ table users_history
 		displayFolder: _org_capacity\YoY
 		lineageTag: e608dde9-da16-4da8-900e-3582c2b8dc7b
 
+	/// Tier-independent Average Annual Bookings reference for ramped Account Executives in the current reporting period.
+	measure 'meas.ae_expected_actual_aab_reference' =
+			CALCULATE (
+			    [meas.data_logs_ci_perf_annual_avg_bookings_account_executive],
+			    REMOVEFILTERS ( users_history[col.ci.perf_annual_performance_tier] ),
+			    REMOVEFILTERS ( users_history[col.ci.perf_annual_performance_tier_num] ),
+			    KEEPFILTERS ( users[trueai_user_role] = "Account Executive" ),
+			    KEEPFILTERS ( users_history[col.ci.perf_ramping_status] = "Ramped" )
+			)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: _perf_analysis\AE Expected vs Actual
+		lineageTag: f253ae3f-c75c-4cd4-8f7b-928f0eff00d8
+
+	/// Lower booking boundary for the selected annual performance tier: Performer includes 65%; Overperformer includes 135%.
+	measure 'meas.ae_performance_tier_min_booking_amount' =
+			VAR AabReference = [meas.ae_expected_actual_aab_reference]
+			VAR PerformanceTier =
+			    SELECTEDVALUE ( users_history[col.ci.perf_annual_performance_tier] )
+			RETURN
+			    SWITCH (
+			        PerformanceTier,
+			        "Overperformer", AabReference * 1.35,
+			        "Performer", AabReference * 0.65,
+			        BLANK ()
+			    )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: _perf_analysis\AE Expected vs Actual
+		lineageTag: cd5b1646-2d95-4e42-94db-2a92fa13f803
+
+	/// Exclusive upper booking boundary for the selected annual tier: Underperformer ends below 65%; Performer ends below 135%.
+	measure 'meas.ae_performance_tier_max_booking_amount' =
+			VAR AabReference = [meas.ae_expected_actual_aab_reference]
+			VAR PerformanceTier =
+			    SELECTEDVALUE ( users_history[col.ci.perf_annual_performance_tier] )
+			RETURN
+			    SWITCH (
+			        PerformanceTier,
+			        "Underperformer", AabReference * 0.65,
+			        "Performer", AabReference * 1.35,
+			        BLANK ()
+			    )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: _perf_analysis\AE Expected vs Actual
+		lineageTag: fe55f680-a400-4a74-b2fe-105eef538cb6
+
+	/// Average won amount per end-of-period ramped AE divided by the same tier-independent AAB reference used by the boundary measures.
+	measure 'meas.ae_expected_actual_pct_of_aab' =
+			DIVIDE (
+			    [meas.data_logs_won_amt_user_eop_avg],
+			    [meas.ae_expected_actual_aab_reference]
+			)
+		formatString: 0.00%
+		displayFolder: _perf_analysis\AE Expected vs Actual
+		lineageTag: d3167054-b4ac-4640-a98d-03d378f4b069
+
 	/// Column 'col.ci.perf_qtly_bookings_user' = ```.
 	column 'col.ci.perf_qtly_bookings_user' = ```
 			
