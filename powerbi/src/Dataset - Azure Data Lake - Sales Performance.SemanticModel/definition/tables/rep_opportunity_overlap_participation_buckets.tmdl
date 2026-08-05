@@ -1,19 +1,43 @@
 table rep_opportunity_overlap_participation_buckets
 	lineageTag: faea2312-02bd-4152-b568-5a7dc462a97a
 
-	/// Number of eligible Account Executives whose participation percentage falls in the selected bucket.
+	/// Number of credited opportunities whose recorded activity evidence shows the selected number of involved reps.
 	measure 'meas.rep_opp_overlap_bucket_rep_count' = ```
 
 			var bucket_min = SELECTEDVALUE(rep_opportunity_overlap_participation_buckets[Bucket Min])
 			var bucket_max = SELECTEDVALUE(rep_opportunity_overlap_participation_buckets[Bucket Max])
-			var eligible_reps =
-			    FILTER(
-			        ALLSELECTED(rep_opportunity_overlap),
-			        rep_opportunity_overlap[meas.rep_opp_overlap_include_row] = 1
-			            && rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct] >= bucket_min
-			            && rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct] < bucket_max
+			var credited_opportunities =
+			    CALCULATETABLE(
+			        VALUES(opps[_sys_doc_id]),
+			        TREATAS(VALUES(rep_opportunity_overlap[User Id]), opps[trueai_owner_id])
 			    )
-			var res = COUNTROWS(eligible_reps)
+			var opportunity_reps =
+			    ADDCOLUMNS(
+			        credited_opportunities,
+			        "__meaningfully_involved_reps",
+			            var current_opp_id = opps[_sys_doc_id]
+			            return
+			                CALCULATE(
+			                    DISTINCTCOUNT(ssr_history[step_owner_id]),
+			                    ssr_history[col.sales_steps_opp_id] = current_opp_id,
+			                    FILTER(
+			                        ssr_history,
+			                        ssr_history[step_name] IN {"New Logo Selling", "Existing Customer Selling"}
+			                            && (
+			                                COALESCE(ssr_history[step_owner_act], 0) > 0
+			                                    || COALESCE(ssr_history[step_owner_dur], 0) > 0
+			                            )
+			                    )
+			                )
+			    )
+			var res =
+			    COUNTROWS(
+			        FILTER(
+			            opportunity_reps,
+			            [__meaningfully_involved_reps] >= bucket_min
+			                && [__meaningfully_involved_reps] < bucket_max
+			        )
+			    )
 			return res
 
 			```
@@ -68,11 +92,10 @@ table rep_opportunity_overlap_participation_buckets
 				    "Bucket Min", DOUBLE,
 				    "Bucket Max", DOUBLE,
 				    {
-				        {"95-100%", 1, 0.95, 1.0000001},
-				        {"90-95%", 2, 0.90, 0.95},
-				        {"80-90%", 3, 0.80, 0.90},
-				        {"70-80%", 4, 0.70, 0.80},
-				        {"<70%", 5, 0.00, 0.70}
+				        {"No rep participation recorded", 1, 0.00, 1.00},
+				        {"1 rep involved", 2, 1.00, 2.00},
+				        {"2 reps involved", 3, 2.00, 3.00},
+				        {"3+ reps involved", 4, 3.00, 999999.00}
 				    }
 				)
 
