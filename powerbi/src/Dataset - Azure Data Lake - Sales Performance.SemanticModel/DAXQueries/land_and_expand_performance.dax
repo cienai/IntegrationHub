@@ -1,0 +1,39 @@
+// Land-and-Expand Performance
+// Canonical model measures provide cohort, expansion-window, and band logic.
+
+DEFINE
+	VAR __DateFilter =
+		FILTER (
+			VALUES ( 'cal_end_dates'[Date] ),
+			'cal_end_dates'[Date] < DATE ( 2050, 1, 1 )
+		)
+	VAR __CurrencyFilter =
+		TREATAS ( { "auto" }, 'auto_currency_format'[currency_convert] )
+	VAR __MasterFilter =
+		TREATAS ( { TRUE () }, 'ssr'[trueai_ssr_is_master] )
+	VAR __Result =
+		SUMMARIZECOLUMNS (
+			land_expand_deal_size_band[deal_size_band_label],
+			land_expand_deal_size_band[sort_order],
+			__DateFilter,
+			__CurrencyFilter,
+			__MasterFilter,
+			"Number of Customers", ssr_history[meas.land_expand_customer_count],
+			"Customers Expanded", ssr_history[meas.land_expand_customers_expanded_12_months],
+			"12-Month Expansion Rate", ssr_history[meas.land_expand_12_month_expansion_rate]
+		)
+
+EVALUATE
+	SELECTCOLUMNS (
+		TOPN ( 501, __Result, land_expand_deal_size_band[sort_order], ASC ),
+		"Initial Deal Size Band", land_expand_deal_size_band[deal_size_band_label],
+		"Number of Customers", [Number of Customers],
+		"Number of Customers FormatString", "#,0",
+		"Customers Expanded", [Customers Expanded],
+		"Customers Expanded FormatString", "#,0",
+		"12-Month Expansion Rate", [12-Month Expansion Rate],
+		"12-Month Expansion Rate FormatString", "0.0%"
+	)
+
+ORDER BY
+	[Initial Deal Size Band] ASC
