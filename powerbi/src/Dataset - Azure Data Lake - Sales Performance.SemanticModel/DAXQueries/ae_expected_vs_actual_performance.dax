@@ -1,0 +1,62 @@
+// AE Expected vs. Actual Performance
+// Annual booking performance for ramped Account Executives by performance tier.
+
+DEFINE
+	VAR __DateFilter =
+		FILTER (
+			VALUES ( 'cal_end_dates'[Date] ),
+			'cal_end_dates'[Date] < DATE ( 2050, 1, 1 )
+		)
+	VAR __CurrencyFilter =
+		TREATAS ( { "auto" }, 'auto_currency_format'[currency_convert] )
+	VAR __MasterFilter =
+		TREATAS ( { TRUE () }, 'ssr'[trueai_ssr_is_master] )
+	VAR __RoleFilter =
+		TREATAS ( { "Account Executive" }, 'users'[trueai_user_role] )
+	VAR __RampedFilter =
+		TREATAS ( { "Ramped" }, 'users_history'[col.ci.perf_ramping_status] )
+	VAR __PerformanceTierFilter =
+		FILTER (
+			VALUES ( 'users_history'[col.ci.perf_annual_performance_tier] ),
+			NOT ISBLANK ( 'users_history'[col.ci.perf_annual_performance_tier] )
+		)
+	VAR __Result =
+		SUMMARIZECOLUMNS (
+			'users_history'[col.ci.perf_annual_performance_tier],
+			'users_history'[col.ci.perf_annual_performance_tier_num],
+			__DateFilter,
+			__CurrencyFilter,
+			__MasterFilter,
+			KEEPFILTERS ( __RoleFilter ),
+			KEEPFILTERS ( __RampedFilter ),
+			KEEPFILTERS ( __PerformanceTierFilter ),
+			"Rep Count", 'users_history'[meas.data_logs_user_count_eop],
+			"Avg Won Amount per EOP User", 'users_history'[meas.data_logs_won_amt_user_eop_avg],
+			"Tier Minimum Booking Amount", 'users_history'[meas.ae_performance_tier_min_booking_amount],
+			"Tier Maximum Booking Amount", 'users_history'[meas.ae_performance_tier_max_booking_amount],
+			"% of AAB", 'users_history'[meas.ae_expected_actual_pct_of_aab]
+		)
+
+EVALUATE
+	SELECTCOLUMNS (
+		TOPN (
+			501,
+			__Result,
+			'users_history'[col.ci.perf_annual_performance_tier_num], DESC
+		),
+		"Tier Sort", 'users_history'[col.ci.perf_annual_performance_tier_num],
+		"Performance Tier", 'users_history'[col.ci.perf_annual_performance_tier],
+		"Rep Count", [Rep Count],
+		"v_Rep Count_FormatString", "#,0",
+		"Avg Won Amount per EOP User", [Avg Won Amount per EOP User],
+		"v_Avg Won Amount per EOP User_FormatString", "$#,0.00",
+		"Tier Minimum Booking Amount", [Tier Minimum Booking Amount],
+		"v_Tier Minimum Booking Amount_FormatString", "$#,0.00",
+		"Tier Maximum Booking Amount", [Tier Maximum Booking Amount],
+		"v_Tier Maximum Booking Amount_FormatString", "$#,0.00",
+		"% of AAB", [% of AAB],
+		"v_% of AAB_FormatString", "0.00%"
+	)
+
+ORDER BY
+	[Tier Sort] DESC

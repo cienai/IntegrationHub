@@ -1,0 +1,138 @@
+table 'Stakeholder Segments'
+	lineageTag: f817c3fa-ec94-40a2-bbd8-d50a69d2e6f3
+
+	column 'Stakeholder Segment'
+		lineageTag: 28964e9b-5bae-430a-8979-ddc8fb804aa1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: ssr_history_stakeholders[Stakeholder Segment]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Present in Won Deals'
+		lineageTag: 51a67023-889f-4c07-b446-44dde97089b3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Present in Won Deals]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Won Presence Rank'
+		formatString: 0
+		lineageTag: aacba29f-a389-4953-a9d0-2be24faaf43f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Won Presence Rank]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Stakeholder Segment Bucket'
+		lineageTag: 96ce3749-81cd-4300-9f81-4082b536beb6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Stakeholder Segment Bucket]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Stakeholder Segments' = calculated
+		mode: import
+		source =
+				
+				VAR __DS0FilterMaster =
+				    TREATAS({ TRUE }, ssr[trueai_ssr_is_master])
+				
+				VAR __DS0FilterStep =
+				    TREATAS({ "New Logo Selling" }, ssr_history[step_name])
+				
+				VAR __NewLogoOpps =
+				    CALCULATETABLE(
+				        SUMMARIZE(
+				            ssr_history,
+				            ssr_history[entity_opp_id],
+				            ssr_history[_sys_ssr_id],
+				            ssr_history[step_success]
+				        ),
+				        __DS0FilterMaster,
+				        __DS0FilterStep,
+				        NOT(ISBLANK(ssr_history[entity_opp_id])),
+				        NOT(ISBLANK(ssr_history[_sys_ssr_id]))
+				    )
+				
+				VAR __OppsWithStakeholderCoverage =
+				    FILTER(
+				        __NewLogoOpps,
+				        VAR _SsrId = ssr_history[_sys_ssr_id]
+				        RETURN
+				            CALCULATE(
+				                COUNTROWS(ssr_history_stakeholders),
+				                TREATAS({ _SsrId }, ssr_history_stakeholders[_sys_ssr_id])
+				            ) > 0
+				    )
+				
+				VAR __WonOpps =
+				    FILTER(
+				        __OppsWithStakeholderCoverage,
+				        ssr_history[step_success] = TRUE()
+				    )
+				
+				VAR __WonOppTotal =
+				    COUNTROWS(__WonOpps)
+				
+				VAR __Base =
+				    FILTER(
+				        VALUES(ssr_history_stakeholders[Stakeholder Segment]),
+				        NOT(ISBLANK(ssr_history_stakeholders[Stakeholder Segment]))
+				    )
+				
+				VAR __WithPresence =
+				    ADDCOLUMNS(
+				        __Base,
+				        "Present in Won Deals",
+				            VAR _Segment = ssr_history_stakeholders[Stakeholder Segment]
+				            VAR _WonDealsForSegment =
+				                COUNTROWS(
+				                    FILTER(
+				                        __WonOpps,
+				                        VAR _SsrId = ssr_history[_sys_ssr_id]
+				                        RETURN
+				                            CALCULATE(
+				                                COUNTROWS(ssr_history_stakeholders),
+				                                TREATAS({ _SsrId }, ssr_history_stakeholders[_sys_ssr_id]),
+				                                ssr_history_stakeholders[Stakeholder Segment] = _Segment
+				                            ) > 0
+				                    )
+				                )
+				            RETURN
+				                DIVIDE(_WonDealsForSegment, __WonOppTotal)
+				    )
+				
+				VAR __Ranked =
+				    ADDCOLUMNS(
+				        __WithPresence,
+				        "Won Presence Rank",
+				            VAR _CurrentPresence = [Present in Won Deals]
+				            RETURN
+				                RANKX(
+				                    __WithPresence,
+				                    [Present in Won Deals],
+				                    _CurrentPresence,
+				                    DESC,
+				                    DENSE
+				                )
+				    )
+				
+				RETURN
+				    ADDCOLUMNS(
+				        __Ranked,
+				        "Stakeholder Segment Bucket",
+				            IF(
+				                [Won Presence Rank] <= 4,
+				                ssr_history_stakeholders[Stakeholder Segment],
+				                "Other"
+				            )
+				    )
+
+	annotation PBI_Id = e7ba1a6a435f4472a58b693d669ede24
+

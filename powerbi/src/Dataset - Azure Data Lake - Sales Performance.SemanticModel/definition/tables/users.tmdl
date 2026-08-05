@@ -72,13 +72,13 @@ table users
 		displayFolder: user_role_concats
 		lineageTag: cf2e5ac8-6558-41ec-8060-fff13bff2cbd
 
-	/// Shows representative or user results for user and representative analysis.
+	/// Calculates the total users representative stats bookings.
 	measure 'meas.users_rep_stats_bookings' = CALCULATE(SUM(ssr_history[opp_won_amt]), ssr_history[step_name] in {"New Logo Selling" , "Existing Customer Selling"})
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: rep_stats
 		lineageTag: 98abfde2-24b2-45d4-bff2-09d94f91f1aa
 
-	/// Shows representative or user results for user and representative analysis.
+	/// Calculates users representative stats bookings 1.
 	measure 'meas.users_rep_stats_bookings 1' =
 			var start_date = date(2020,1,1)
 			var end_date = date(2021,1,1)
@@ -88,14 +88,14 @@ table users
 		displayFolder: rep_stats
 		lineageTag: 8359b751-d9bd-4138-80cc-d97135f2e6c8
 
-	/// Shows representative or user results for user and representative analysis.
+	/// Counts users table row in the current selection.
 	measure 'meas.users_table_row_count' =
 			
 			COUNTROWS(Users)
 		formatString: 0
 		lineageTag: 59d6070a-cbdb-4359-9c06-41be235e091e
 
-	/// Shows representative or user results for user and representative analysis.
+	/// Calculates users is active.
 	measure 'meas.users_is_active' =
 			
 			// var curr_date = CALCULATE(MAX(cal_end_dates[Date]))  // get  the current maximum date
@@ -738,7 +738,7 @@ table users
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	/// Shows won opportunity results for user and representative analysis.
+	/// Calculates ssr history actual win rate as a ratio It includes records where step success = true.
 	measure 'meas.ssr_history_actual_win_rate' = ```
 			
 			
@@ -811,13 +811,13 @@ table users
 		formatString: 0
 		lineageTag: 550088a4-2ca6-4565-8d5b-a9bcee1e2a0d
 
-	/// Shows representative or user results for user and representative analysis.
+	/// Calculates the total direct reports amount.
 	measure 'meas.direct_reports_amt' = SUM(users[trueai_direct_reports])
 		lineageTag: 0551da29-4829-4d52-9762-2d0e3ff2abee
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Shows representative or user results for user and representative analysis.
+	/// Calculates the total reports amount.
 	measure 'meas.total_reports_amt' = SUM(users[trueai_tot_reports])
 		lineageTag: 8ec55328-c440-474b-bf8d-89287171010e
 
@@ -840,7 +840,7 @@ table users
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Shows representative or user results for user and representative analysis.
+	/// Calculates direct reports.
 	measure 'Direct Reports' =
 			
 			VAR SelectedManagerID =
@@ -860,7 +860,7 @@ table users
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Shows representative or user results for user and representative analysis.
+	/// Calculates the total reports.
 	measure 'Total Reports' = ```
 			
 			VAR SelectedManagerIDs =
@@ -893,7 +893,7 @@ table users
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	/// Shows representative or user results for user and representative analysis.
+	/// Calculates show user.
 	measure 'Show User' =
 			
 			VAR ViewType =
@@ -1543,24 +1543,6 @@ table users
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.trueai_group_sort' =.
-	column 'col.trueai_group_sort' =
-			
-			VAR _group = CALCULATE(MAX(users_history[trueai_group]))
-			
-			VAR res = IF(
-			    _group="ND",
-			    1,
-			    0
-			)
-			RETURN
-			res
-		formatString: 0
-		lineageTag: 54c56aac-2a6c-444e-8449-a065682002fb
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
 	/// User's standardized and combined role aliased
 	column trueai_user_role_alias
 		dataType: string
@@ -1894,6 +1876,16 @@ table users
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_group_sort' =.
+	column 'col.trueai_group_sort'
+		dataType: int64
+		formatString: 0
+		lineageTag: 54c56aac-2a6c-444e-8449-a065682002fb
+		summarizeBy: sum
+		sourceColumn: col.trueai_group_sort
+
+		annotation SummarizationSetBy = Automatic
+
 	partition users-325b18c0-2983-4ccf-ad12-2466298e6bdc = m
 		mode: import
 		source =
@@ -1991,7 +1983,8 @@ table users
 				    addedUserRoleAliasedSort = Table.AddColumn(dbTableTyped, "trueai_user_role_sort", each if [trueai_user_role] = "ND" then 99 else 1),
 				    UserRoleFunctionSort = Table.AddColumn(addedUserRoleAliasedSort, "trueai_user_role_function_sort", each if [trueai_user_role_function] = "ND" then 99 else 1),
 				    UserRoleDeptSort = Table.AddColumn(UserRoleFunctionSort, "trueai_user_role_department_sort", each if [trueai_user_role_department] = "ND" then 99 else 1),
-				    DataTyped = Table.TransformColumnTypes(UserRoleDeptSort,{{"trueai_user_role_sort", Int64.Type}, {"trueai_user_role_function_sort", Int64.Type}, {"trueai_user_role_department_sort", Int64.Type}}),
+				    GroupSort = Table.AddColumn(UserRoleDeptSort, "col.trueai_group_sort", each if [trueai_group] = "ND" then 1 else 0),
+				    DataTyped = Table.TransformColumnTypes(GroupSort,{{"trueai_user_role_sort", Int64.Type}, {"trueai_user_role_function_sort", Int64.Type}, {"trueai_user_role_department_sort", Int64.Type}, {"col.trueai_group_sort", Int64.Type}}),
 				AllowedModelColumns = {
 				        "crm_division",
 				        "crm_username",

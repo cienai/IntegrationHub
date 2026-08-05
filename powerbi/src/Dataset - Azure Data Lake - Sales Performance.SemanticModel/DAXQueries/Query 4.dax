@@ -1,24 +1,101 @@
-EVALUATE
-VAR __Result =
-    SUMMARIZECOLUMNS(
-        'Stakeholder Segments'[Stakeholder Segment Bucket],
-        "Present in Won Deals",
-            SUM('Stakeholder Segments'[Present in Won Deals])
+// ==========================================
+// AE Expected vs. Actual Performance
+// Annual booking performance by tier.
+// Only ramped Account Executives.
+// ==========================================
+
+DEFINE
+// Limit the reporting period to valid dates
+VAR DateFilter =
+    FILTER (
+        VALUES ( 'cal_end_dates'[Date] ),
+        'cal_end_dates'[Date] < DATE ( 2050, 1, 1 )
     )
 
-RETURN
-    SELECTCOLUMNS(
-        TOPN(
-            501,
-            __Result,
-            [Present in Won Deals], DESC,
-            'Stakeholder Segments'[Stakeholder Segment Bucket], ASC
+// Restrict analysis to master SSR records
+VAR MasterFilter =
+    TREATAS (
+        { TRUE () },
+        'ssr'[trueai_ssr_is_master]
+    )
+
+// Restrict the cohort to Account Executives
+VAR RoleFilter =
+    TREATAS (
+        { "Account Executive" },
+        'users'[trueai_user_role]
+    )
+
+// Include only fully ramped Account Executives
+VAR RampedFilter =
+    TREATAS (
+        { "Ramped" },
+        'users_history'[col.ci.perf_ramping_status]
+    )
+
+// Exclude records without a performance tier
+VAR PerformanceTierFilter =
+    FILTER (
+        VALUES (
+            'users_history'[col.ci.perf_annual_performance_tier]
         ),
-        "Stakeholder Segment", 'Stakeholder Segments'[Stakeholder Segment Bucket],
-        "Present in Won Deals", [Present in Won Deals],
-        "v_Present in Won Deals_FormatString", "0.00%"
+        NOT ISBLANK (
+            'users_history'[col.ci.perf_annual_performance_tier]
+        )
+    )
+
+// Aggregate performance measures by annual performance tier
+VAR Result =
+    SUMMARIZECOLUMNS (
+        'users_history'[col.ci.perf_annual_performance_tier],
+        'users_history'[col.ci.perf_annual_performance_tier_num],
+        DateFilter,
+        MasterFilter,
+        RoleFilter,
+        RampedFilter,
+        PerformanceTierFilter,
+
+        "Rep Count",
+            'users_history'[meas.data_logs_user_count_eop],
+
+        "Avg Won Amount per EOP User",
+            'users_history'[meas.data_logs_won_amt_user_eop_avg],
+
+        "AAB Reference Amount",
+            'users_history'[meas.ae_expected_actual_aab_reference],
+
+        "Tier Minimum Booking Amount",
+            'users_history'[meas.ae_performance_tier_min_booking_amount],
+
+        "Tier Maximum Booking Amount",
+            'users_history'[meas.ae_performance_tier_max_booking_amount],
+
+        "% of AAB",
+            'users_history'[meas.ae_expected_actual_pct_of_aab]
+    )
+
+EVALUATE
+    SELECTCOLUMNS (
+        TOPN (
+            501,
+            Result,
+            'users_history'[col.ci.perf_annual_performance_tier_num], DESC
+        ),
+        "Tier Sort",
+            'users_history'[col.ci.perf_annual_performance_tier_num],
+        "Performance Tier",
+            'users_history'[col.ci.perf_annual_performance_tier],
+        "Rep Count",
+            [Rep Count],
+        "Avg Won Amount per EOP User",
+            [Avg Won Amount per EOP User],
+        "Tier Minimum Booking Amount",
+            [Tier Minimum Booking Amount],
+        "Tier Maximum Booking Amount",
+            [Tier Maximum Booking Amount],
+        "% of AAB",
+            [% of AAB]
     )
 
 ORDER BY
-    [Present in Won Deals] DESC,
-    [Stakeholder Segment] ASC
+    [Tier Sort] DESC

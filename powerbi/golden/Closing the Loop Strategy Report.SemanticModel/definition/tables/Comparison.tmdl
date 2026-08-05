@@ -1,0 +1,170 @@
+table Comparison
+	lineageTag: 40e6fd54-8d93-47fd-b764-8d3aa2889cad
+
+	calculationGroup
+		precedence: 22
+
+		calculationItem Selected =
+				VAR SelectedUser =
+				    SELECTEDVALUE ( users[trueai_full_name] )
+				
+				RETURN
+				IF (
+				    NOT ISBLANK ( SelectedUser ),
+				    CALCULATE (
+				        SELECTEDMEASURE (),
+				        KEEPFILTERS ( users[trueai_full_name] = SelectedUser )
+				    )
+				)
+
+			formatStringDefinition = SELECTEDMEASUREFORMATSTRING()
+
+		calculationItem 'Peer Avg' =
+				VAR SelectedUser =
+				    SELECTEDVALUE ( users[trueai_full_name] )
+				
+				VAR SelectedRole =
+				    SELECTEDVALUE ( users[trueai_user_role_alias] )
+				
+				VAR SelectedGroup =
+				    SELECTEDVALUE ( users[trueai_group] )
+				
+				VAR _AvgResult =
+				    AVERAGEX (
+				        FILTER (
+				            ALL ( users ),
+				            users[trueai_user_role_alias] = SelectedRole
+				                && users[trueai_group] = SelectedGroup
+				        ),
+				        CALCULATE ( SELECTEDMEASURE () )
+				    )
+				
+				RETURN
+				IF (
+				    NOT ISBLANK ( SelectedUser ),
+				
+				    SWITCH (
+				        TRUE (),
+				
+				        ISSELECTEDMEASURE (
+				            [meas.ci_sb_work_effort_num],
+				            [meas.ci_sb_discov_skills_num],
+				            [meas.ci_sb_engmt_ability_num],
+				            [meas.ci_sb_deal_maxing_num],
+				            [meas.ci_sb_time_management_num],
+				            [meas.ci_sb_closing_ability_num]
+				        ),
+				            MROUND ( _AvgResult, 5 ),
+				
+				        _AvgResult
+				    ),
+				
+				    BLANK ()
+				)
+
+			formatStringDefinition = SELECTEDMEASUREFORMATSTRING()
+
+		calculationItem Delta =
+				VAR SelectedUser =
+				    SELECTEDVALUE ( users[trueai_full_name] )
+				
+				VAR SelectedRole =
+				    SELECTEDVALUE ( users[trueai_user_role_alias] )
+				
+				VAR SelectedGroup =
+				    SELECTEDVALUE ( users[trueai_group] )
+				
+				VAR UserValue =
+				    SELECTEDMEASURE ()
+				
+				VAR PeerAvgRaw =
+				    AVERAGEX (
+				        FILTER (
+				            ALL ( users ),
+				            users[trueai_user_role_alias] = SelectedRole
+				                && users[trueai_group] = SelectedGroup
+				        ),
+				        CALCULATE ( SELECTEDMEASURE () )
+				    )
+				
+				VAR PeerAvg =
+				    IF (
+				        ISSELECTEDMEASURE (
+				            [meas.ci_sb_work_effort_num],
+				            [meas.ci_sb_discov_skills_num],
+				            [meas.ci_sb_engmt_ability_num],
+				            [meas.ci_sb_deal_maxing_num],
+				            [meas.ci_sb_time_management_num],
+				            [meas.ci_sb_closing_ability_num]
+				        ),
+				        MROUND ( PeerAvgRaw, 5 ),
+				        PeerAvgRaw
+				    )
+				
+				RETURN
+				IF (
+				    NOT ISBLANK ( SelectedUser ),
+				    UserValue - PeerAvg,
+				    BLANK ()
+				)
+
+			formatStringDefinition = SELECTEDMEASUREFORMATSTRING()
+
+		calculationItem '% vs Peers' =
+				VAR SelectedUser =
+				    SELECTEDVALUE ( users[trueai_full_name] )
+				
+				VAR SelectedRole =
+				    SELECTEDVALUE ( users[trueai_user_role_alias] )
+				
+				VAR SelectedGroup =
+				    SELECTEDVALUE ( users[trueai_group] )
+				
+				VAR UserValue =
+				    SELECTEDMEASURE ()
+				
+				VAR PeerAvgRaw =
+				    AVERAGEX (
+				        FILTER (
+				            ALL ( users ),
+				            users[trueai_user_role_alias] = SelectedRole
+				                && users[trueai_group] = SelectedGroup
+				        ),
+				        CALCULATE ( SELECTEDMEASURE () )
+				    )
+				
+				VAR PeerAvg =
+				    IF (
+				        ISSELECTEDMEASURE (
+				            [meas.ci_sb_work_effort_num],
+				            [meas.ci_sb_discov_skills_num],
+				            [meas.ci_sb_engmt_ability_num],
+				            [meas.ci_sb_deal_maxing_num],
+				            [meas.ci_sb_time_management_num],
+				            [meas.ci_sb_closing_ability_num]
+				        ),
+				        MROUND ( PeerAvgRaw, 5 ),
+				        PeerAvgRaw
+				    )
+				
+				RETURN
+				IF (
+				    NOT ISBLANK ( SelectedUser ),
+				    DIVIDE ( UserValue, PeerAvg ),
+				    BLANK ()
+				)
+
+			formatStringDefinition = "0.0%"
+
+	column Name
+		dataType: string
+		lineageTag: efd7506b-7b80-4967-b060-ab735aff9185
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 16441f86-f6b2-4e09-b2f4-e76a898cee59
+		sourceColumn: Ordinal
+

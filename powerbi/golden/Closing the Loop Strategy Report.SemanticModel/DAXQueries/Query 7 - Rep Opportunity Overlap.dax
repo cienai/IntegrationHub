@@ -1,0 +1,93 @@
+// Rep Opportunity Overlap v3 - Plain-language validation
+//
+// Business question:
+// Are reps actually involved in the opportunities they are credited with?
+//
+// Analytical contract:
+// - Credited opportunity: opps row where opps[trueai_owner_id] is the Account Executive.
+// - Recorded participation: same AE owns a New Logo Selling or Existing Customer Selling
+//   ssr_history step for the opportunity and that step has step_owner_act > 0 or step_owner_dur > 0.
+// - Needs review: credited opportunity without recorded participation.
+//
+// Known limitation:
+// The current governed model does not expose atomic activity owner + opportunity records.
+// The strongest reusable evidence here is SSR selling-step owner activity/duration.
+
+EVALUATE
+ROW(
+    "Page subtitle", rep_opportunity_overlap[meas.rep_opp_overlap_page_subtitle],
+    "Page caveat", rep_opportunity_overlap[meas.rep_opp_overlap_page_caveat],
+    "Executive insight", rep_opportunity_overlap[Rep Opportunity Overlap executive insight],
+    "Footer definition", rep_opportunity_overlap[Rep Opportunity Overlap footer definition],
+    "Recorded participation definition", rep_opportunity_overlap[meas.rep_opp_overlap_org_health_status],
+    "Current review rule", rep_opportunity_overlap[meas.rep_opp_overlap_current_review_rule],
+    "Card - Recorded participation coverage", rep_opportunity_overlap[Card - Recorded participation coverage],
+    "Card - Reps needing review", rep_opportunity_overlap[Card - Reps needing review],
+    "Card - Complete recorded participation", rep_opportunity_overlap[Card - Complete recorded participation],
+    "Credited opportunities with recorded rep involvement", rep_opportunity_overlap[Credited opportunities with recorded rep involvement],
+    "Credited opportunities needing review", rep_opportunity_overlap[Credited opportunities needing review],
+    "Reps below the current review rule", rep_opportunity_overlap[Reps below the current review rule],
+    "Reps with complete recorded participation", rep_opportunity_overlap[Reps with complete recorded participation],
+    "Teams with credited opportunities needing review", rep_opportunity_overlap[meas.rep_opp_overlap_teams_below_average],
+    "Average reps with recorded involvement per credited opportunity", rep_opportunity_overlap[meas.rep_opp_overlap_avg_meaningfully_involved_reps_per_opp]
+)
+
+EVALUATE
+SUMMARIZECOLUMNS(
+    rep_opportunity_overlap_participation_buckets[Bucket],
+    rep_opportunity_overlap_participation_buckets[Bucket Sort],
+    "Opportunity count", rep_opportunity_overlap_participation_buckets[meas.rep_opp_overlap_bucket_rep_count]
+)
+ORDER BY
+    rep_opportunity_overlap_participation_buckets[Bucket Sort]
+
+EVALUATE
+SUMMARIZECOLUMNS(
+    rep_opportunity_overlap[Team],
+    "Credited opportunities with recorded involvement", rep_opportunity_overlap[meas.rep_opp_overlap_avg_participation_pct],
+    "Credited opportunities needing review", rep_opportunity_overlap[meas.rep_opp_overlap_potential_credit_mismatch_count],
+    "Share of credited opportunities needing review", rep_opportunity_overlap[meas.rep_opp_overlap_potential_credit_mismatch_pct],
+    "Credited opportunities", rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities],
+    "Opportunities with recorded involvement", rep_opportunity_overlap[meas.rep_opp_overlap_participated_opportunities],
+    "Opportunities with no recorded involvement", rep_opportunity_overlap[meas.rep_opp_overlap_no_meaningful_participation_opportunities]
+)
+ORDER BY
+    [Share of credited opportunities needing review] DESC,
+    [Credited opportunities] DESC
+
+EVALUATE
+VAR RepRows =
+    FILTER(
+        SUMMARIZECOLUMNS(
+            rep_opportunity_overlap[Representative],
+            rep_opportunity_overlap[Team],
+            rep_opportunity_overlap[Manager],
+            "Review status", rep_opportunity_overlap[meas.rep_opp_overlap_participation_status],
+            "Credited opportunities", rep_opportunity_overlap[meas.rep_opp_overlap_assigned_opportunities],
+            "Opportunities with recorded involvement", rep_opportunity_overlap[meas.rep_opp_overlap_participated_opportunities],
+            "Opportunities with no recorded involvement", rep_opportunity_overlap[meas.rep_opp_overlap_no_meaningful_participation_opportunities],
+            "Credited opportunities with recorded involvement", rep_opportunity_overlap[meas.rep_opp_overlap_participation_pct],
+            "Share of credited opportunities needing review", rep_opportunity_overlap[meas.rep_opp_overlap_potential_credit_mismatch_pct],
+            "Difference from company average", rep_opportunity_overlap[meas.rep_opp_overlap_participation_gap_pp],
+            "Include Row", rep_opportunity_overlap[meas.rep_opp_overlap_include_row]
+        ),
+        [Include Row] = 1
+    )
+RETURN
+    SELECTCOLUMNS(
+        RepRows,
+        "Representative", rep_opportunity_overlap[Representative],
+        "Team", rep_opportunity_overlap[Team],
+        "Manager", rep_opportunity_overlap[Manager],
+        "Review status", [Review status],
+        "Credited opportunities", [Credited opportunities],
+        "Opportunities with recorded involvement", [Opportunities with recorded involvement],
+        "Opportunities with no recorded involvement", [Opportunities with no recorded involvement],
+        "Credited opportunities with recorded involvement", [Credited opportunities with recorded involvement],
+        "Share of credited opportunities needing review", [Share of credited opportunities needing review],
+        "Difference from company average", [Difference from company average]
+    )
+ORDER BY
+    [Share of credited opportunities needing review] DESC,
+    [Credited opportunities] DESC,
+    [Representative]

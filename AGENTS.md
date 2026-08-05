@@ -14,6 +14,7 @@ Instructions for Codex and other coding agents working in this repository.
 
 - `powerbi/` contains the shipped `.pbix` report and dataset files.
 - `powerbi/src/` contains the editable Power BI Project (`.pbip`) sources.
+- `powerbi/golden/` contains isolated golden reference Power BI Project sources, including `Closing the Loop Strategy Report.pbip`, that should not be mixed into the standard report set under `powerbi/src/`.
 - `scripts/` contains Power BI query, validation, deployment, and Salesforce file-sync tooling.
 - `scripts/pbi_deploy/` contains Power BI workspace deployment scripts and configuration examples.
 - `ETL/` contains upstream integration and transformation assets.
@@ -21,7 +22,7 @@ Instructions for Codex and other coding agents working in this repository.
 
 ## Power BI Source Of Truth
 
-- Prefer editing `.pbip` project sources under `powerbi/src/` when making report or semantic model changes.
+- Prefer editing `.pbip` project sources under `powerbi/src/` when making report or semantic model changes, except isolated golden reference reports under `powerbi/golden/`.
 - Do not manually edit generated or extracted Power BI internals unless the repo already treats that file as editable source.
 - Keep `.pbix` files as build or release artifacts unless the user explicitly asks for direct PBIX replacement.
 - When changing a measure, calculated column, relationship, display folder, table, or report visual, identify the owning dataset/report first.
@@ -52,6 +53,15 @@ Instructions for Codex and other coding agents working in this repository.
 - For Power BI query investigation, prefer existing scripts such as `scripts/pbi_query.ps1` and the review scripts under `scripts/`.
 - If a validation script requires credentials, Power BI login, Windows PowerShell, or a configured workspace, say what could not be run and why.
 - Do not invent replacement validation scripts when an existing repo script already covers the check.
+
+## Closed-Loop Data Verification
+
+- After implementing a Power BI page, execute all required verification checks, compare expected vs. generated output, diagnose mismatches, correct implementation-level issues, and re-run the failed checks.
+- Codex may correct page bindings, measure selection, filters, date or quarter sorting, formatting/display units, max/min card logic, chart/table inconsistencies, duplicated filters, and page-local calculations that disagree with governed measures.
+- Codex must not silently change governed business definitions, approved thresholds, canonical measures, the ticket's analytical contract, source data, or production semantic-model logic to force reconciliation.
+- If source of truth and page output disagree, determine whether the issue is page implementation, verification query, filter context, source-of-truth mapping, or governed model logic. Only the first three should normally be auto-corrected.
+- Retry failed checks no more than three correction attempts. After each attempt, record what changed and why. If checks still fail, stop with a blocker report.
+- Do not mark the page complete while required checks are failing unless the blocker is real and documented.
 
 ## Deployment And Workspace Safety
 
@@ -86,5 +96,6 @@ Instructions for Codex and other coding agents working in this repository.
 ## Collaboration
 
 - When the user points out a recurring workflow mistake, consider whether it should become a durable rule in this file.
+- When creating GitHub issues for this repo, assign them to `mrandersssson` and add them to the `Cien Engineering` project unless the user says otherwise.
 - Keep explanations tied to the repository's actual Power BI, ETL, and deployment surfaces.
 - Prefer concise implementation notes over broad AI or analytics theory in this repo.

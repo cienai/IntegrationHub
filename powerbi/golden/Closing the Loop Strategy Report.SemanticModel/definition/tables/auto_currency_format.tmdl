@@ -1,0 +1,76 @@
+/// Table auto_currency_format.
+table auto_currency_format
+	lineageTag: 1b540da5-c49c-4b9a-997f-0bf1b84a7541
+
+	calculationGroup
+		precedence: 20
+
+		calculationItem auto = SELECTEDMEASURE() // pass// pass through the value
+
+			formatStringDefinition =
+					VAR curr = [meas.companies_history_currency]  // Currency code from data
+					VAR replace_str =
+					    SWITCH(
+					        curr,
+					        "USD", "$",
+					        "EUR", "€",
+					        "GBP", "£",
+					        "CHF", "CHF",
+					        "CAD", "C$",
+					        "AUD", "A$",
+					        "JPY", "¥",
+					        "INR", "₹",
+					        "CNY", "¥",
+					        "BRL", "R$",
+					        "$"
+					    )
+					
+					VAR fmt_str = SELECTEDMEASUREFORMATSTRING()          // Current format string
+					VAR res      = SUBSTITUTE(fmt_str, "$", replace_str) // Swap $ with localized symbol
+					
+					-------------------------------------------
+					// DO NOT override formats already decided
+					-------------------------------------------
+					VAR _alreadyFinal =
+					    CONTAINSSTRING(fmt_str, ",,M") ||
+					    CONTAINSSTRING(fmt_str, "hrs") ||
+					    CONTAINSSTRING(fmt_str, "Days")
+					
+					-------------------------------------------
+					// Only change strings that contain "$"
+					-------------------------------------------
+					VAR _shouldChangeSymbol =
+					    NOT ISBLANK(fmt_str) &&
+					    CONTAINSSTRING(fmt_str, "$")
+					
+					RETURN
+					IF(
+					    _alreadyFinal,
+					        fmt_str,               // leave it untouched
+					    IF(
+					        _shouldChangeSymbol,
+					            res,               // Swap symbol only
+					            fmt_str            // Otherwise do NOTHING
+					    )
+					)
+
+	/// Column currency_convert.
+	column currency_convert
+		dataType: string
+		lineageTag: 8f33e2ff-9afc-4981-bcb9-595f0b6db1b1
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Column Ordinal.
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 9e22a7e5-3b4b-4611-b691-a5c57ef4dff7
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+

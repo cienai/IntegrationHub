@@ -1,0 +1,58 @@
+/// Governed initial New Logo deal-size bands for Land-and-Expand cohort analysis.
+table land_expand_deal_size_band
+	lineageTag: 1fd6b119-1088-45c5-868d-c208da43fc7a
+
+	column deal_size_band_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 07393906-8290-41e7-9685-f4543712ed25
+		summarizeBy: none
+		sourceColumn: [deal_size_band_key]
+
+	column deal_size_band_label
+		dataType: string
+		lineageTag: c9bb53b5-d13c-4529-bf07-f790972f12bf
+		summarizeBy: none
+		sourceColumn: [deal_size_band_label]
+		sortByColumn: sort_order
+
+	column minimum_amount
+		dataType: double
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 2d4dd1f2-046b-4d7a-93cc-71516484488d
+		summarizeBy: none
+		sourceColumn: [minimum_amount]
+
+	column maximum_amount
+		dataType: double
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 100ea73d-53f7-440a-ab88-f815398a7df9
+		summarizeBy: none
+		sourceColumn: [maximum_amount]
+
+	column sort_order
+		dataType: int64
+		formatString: 0
+		lineageTag: 28a0c850-cc76-4841-b84b-0f32fa895049
+		summarizeBy: none
+		sourceColumn: [sort_order]
+
+	partition land_expand_deal_size_band = calculated
+		mode: import
+		source =
+				DATATABLE (
+				    "deal_size_band_key", INTEGER,
+				    "deal_size_band_label", STRING,
+				    "minimum_amount", DOUBLE,
+				    "maximum_amount", DOUBLE,
+				    "sort_order", INTEGER,
+				    {
+				        { 1, "1. <$25K", 0.0, 25000.0, 1 },
+				        { 2, "2. $25K-$75K", 25000.0, 75000.0, 2 },
+				        { 3, "3. $75K-$150K", 75000.0, 150000.0, 3 },
+				        { 4, "4. $150K+", 150000.0, BLANK (), 4 }
+				    }
+				)
+
+	annotation PBI_Id = 2c38d6e780a442ac939b234436f8b249
+

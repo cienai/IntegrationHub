@@ -1,0 +1,42 @@
+table Selector_Users
+	lineageTag: b337654b-dca2-4e55-9a1d-ced8ce1758af
+
+	column trueai_full_name
+		lineageTag: 6be37dc5-e876-4adc-bce4-56a1fc414376
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [trueai_full_name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_user_role_alias
+		lineageTag: cbc4f9f6-6428-4aed-9df0-ae24379da7c4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [trueai_user_role_alias]
+
+		annotation SummarizationSetBy = Automatic
+
+	column trueai_group
+		lineageTag: 85485ccf-dcfe-4975-9f1e-3dca68b7a89e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [trueai_group]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Selector_Users = calculated
+		mode: import
+		source =
+				
+				DISTINCT(
+				    SELECTCOLUMNS(
+				        users,
+				        "trueai_full_name", users[trueai_full_name],
+				        "trueai_user_role_alias", users[trueai_user_role_alias],
+				        "trueai_group", users[trueai_group]
+				    )
+				)
+
+	annotation PBI_Id = 1bf5010bb0804fb7864389269e2357ec
+

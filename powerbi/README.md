@@ -1,7 +1,5 @@
 # **GTM Suite - Getting GTM Suite Reports & Datasets on to, and running on, your PBI Staging Workspace.**
 
-#   
-
 # **Step-by-step instructions:** 
 
 **Step 1: GitHub Integration Hub**
@@ -18,6 +16,8 @@ to a Windows computer:
 - GTM Suite - Strategy Report.pbix
 - GTM Suite - Tactical Report.pbix
 - GTM Suite - Utility Box Report.pbix
+
+Editable Power BI Project sources for the standard report set live under **/powerbi/src**. The golden reference Closing the Loop Strategy Report is intentionally isolated under **/powerbi/golden/Closing the Loop Strategy Report.pbip** and is not part of the standard report set in **/powerbi/src**.
 
 **/scripts**
 /pbi_deploy
