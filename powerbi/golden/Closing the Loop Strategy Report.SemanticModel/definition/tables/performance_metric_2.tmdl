@@ -1,0 +1,807 @@
+/// Table performance_metric_2.
+table performance_metric_2
+	lineageTag: 515c2a53-2fdd-414c-b72b-b0bcac860d6a
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas.selected_string_full_metrics' =
+			
+			VAR metric1 = SELECTEDVALUE(performance_metric_1[name])
+			VAR metric2 = SELECTEDVALUE(performance_metric_2[name])
+			RETURN
+			    metric1 & " - " & metric2
+		lineageTag: dc518dce-23d0-4315-8ef1-5b7e6e9bac60
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas.selected_string_metric_2' =
+			
+			VAR metric2 = SELECTEDVALUE(performance_metric_2[name])
+			RETURN
+			    metric2
+		lineageTag: 399952ea-05a0-4d8b-911b-5399adb8cb65
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas.sort_performace_metric' =
+			
+			VAR _choice = SELECTEDVALUE ( all_act_support[SortMetric], "User Name" )
+			
+			/* Alphabetical ranking by name (numeric and stable)*/
+			VAR _nameRank =
+			    RANKX (
+			        ALL ( users[trueai_full_name] ),
+			        SELECTEDVALUE ( users[trueai_full_name] ),
+			        ,
+			        ASC,
+			        DENSE
+			    )
+			
+			/* Metrics with BLANK management and tie resolution by name */
+			VAR _a = COALESCE ( [meas.rep_overview_metric_1], 0 ) + _nameRank / 1000000
+			VAR _b = COALESCE ( [meas.rep_overview_metric_2], 0 ) + _nameRank / 1000000
+			
+			RETURN
+			SWITCH (
+			    _choice,
+			    "User Name", _nameRank,
+			    "Metric 1", _a,
+			    "Metric 2", _b
+			)
+		lineageTag: e47cc42e-d96d-45ab-b091-83831774407e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas.selected_metric_1_value' =
+			
+			SELECTEDVALUE(performance_metric_1[name])  // get the selected value from metric_1
+		lineageTag: f31dac9b-9b1e-4c47-9b38-09a4e976325e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas.selected_metric_2_value' =
+			
+			SELECTEDVALUE(performance_metric_2[name])  // get the selected value from metric_2
+		lineageTag: ffcfbd5a-a671-404c-bd44-2bcfdf5f053e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas.selected_string_metric_1' =
+			
+			VAR metric1 = SELECTEDVALUE(performance_metric_1[name])
+			RETURN
+			    metric1
+		lineageTag: 78528a99-9cda-49a2-acc7-0f74bbf73c02
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_avg' = ```
+			
+			  
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value_secondary]
+						
+			)
+			var perf_metric_average_per_rep = AVERAGEX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+			
+			RETURN perf_metric_average_per_rep
+			
+			```
+		lineageTag: cdb4ea0c-3075-4dac-96cb-ece8e07648d3
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_sum' = ```
+			
+			
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value_secondary]
+						
+			)
+			var perf_metric_average_per_rep = SUMX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+			
+			RETURN perf_metric_average_per_rep
+			```
+		lineageTag: 950ff1b5-8c2d-4687-860a-375a40ff9be1
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_min' = ```
+			
+			
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+						users[trueai_full_name],
+						"Perf_Metric_Pre_Agg", [meas.performance_metric_value_secondary]
+						
+			)
+			var perf_metric_average_per_rep = MINX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+			
+			RETURN perf_metric_average_per_rep
+			```
+		lineageTag: 34d83961-544e-412e-be8c-c9395d4aa77d
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_max' = ```
+			
+			
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+									users[trueai_full_name],
+									"Perf_Metric_Pre_Agg", [meas.performance_metric_value_secondary]
+									
+						)
+						var perf_metric_average_per_rep = MAXX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+						
+						RETURN perf_metric_average_per_rep
+			```
+		lineageTag: 0be383e4-533d-4470-af71-1c5083100cd1
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_count' = ```
+			
+			
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+									users[trueai_full_name],
+									"Perf_Metric_Pre_Agg", [meas.performance_metric_value_secondary]
+									
+						)
+						var perf_metric_average_per_rep = COUNTROWS(pre_agg_tbl_by_rep)
+						
+						RETURN perf_metric_average_per_rep
+			```
+		lineageTag: f4977a8c-d096-4d98-9c5d-8c41fad1c792
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_median' = ```
+			
+			
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+									users[trueai_full_name],
+									"Perf_Metric_Pre_Agg", [meas.performance_metric_value_secondary]
+									
+						)
+						var perf_metric_average_per_rep = MEDIANX( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+						
+						RETURN perf_metric_average_per_rep
+			```
+		lineageTag: 31c06472-5fe4-41fb-ac2a-12a3b48cecdc
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_std_deviation' = ```
+			
+			
+			var pre_agg_tbl_by_rep = SUMMARIZECOLUMNS(
+									users[trueai_full_name],
+									"Perf_Metric_Pre_Agg", [meas.performance_metric_value_secondary]
+									
+						)
+						var perf_metric_average_per_rep = STDEVX.P( pre_agg_tbl_by_rep , [Perf_Metric_Pre_Agg] )
+						
+						RETURN perf_metric_average_per_rep
+			```
+		lineageTag: 3b1b8cd0-2374-4a50-b64c-e654c08beab7
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas.performance_metric_secondary_name' =
+			
+			SELECTEDVALUE(metadata_performance_metrics_secondary[metric_name], "Multiple Selected Metrics for Metric2")
+		lineageTag: b2cc8052-29dc-43dd-a789-8986c9d2279e
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas.concat_selected_perf_metric1_and_metric2_names' =
+			
+			VAR _valid1 =
+			    HASONEVALUE(metadata_performance_metrics[sys_doc_id])
+			
+			VAR _valid2 =
+			    HASONEVALUE(metadata_performance_metrics_secondary[sys_doc_id])
+			
+			RETURN
+			IF(
+			    _valid1 && _valid2,
+			    [meas.performance_metric_name] & " vs " & [meas.performance_metric_secondary_name],
+			    "Select one metric to render graph"
+			)
+		lineageTag: 7147359b-ba6f-4f9e-9d05-8114cb4716d9
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas.performance_metric_sort_select_dynamic_slicer_label' =
+			
+			-- We look at the 'Parameter Fields' column to identify the button
+			VAR _CurrentField = SELECTEDVALUE('field_param_perf_metric_sort_selection_slicer'[Parameter Fields])
+			
+			RETURN
+			SWITCH(
+			    _CurrentField,
+			    NAMEOF('performance_metric_1'[meas.performance_metric_name]), [meas.performance_metric_name],
+			    NAMEOF('performance_metric_2'[meas.performance_metric_secondary_name]), [meas.performance_metric_secondary_name],
+			    "Select Metric" -- Fallback text
+			)
+		lineageTag: bbcf69ec-f473-4b69-a5f8-37b37473c7dc
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_avg_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
+			        )
+			        RETURN AVERAGEX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			
+			```
+		lineageTag: 09a66bc0-4343-41c5-8db0-15036c77ca6b
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_count_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
+			        )
+			        RETURN COUNTROWS( tbl ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: 174ccbee-dd5d-466d-8997-cb21c56591a6
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_max_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
+			        )
+			        RETURN MAXX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: f4edecda-db6a-44bf-8661-1bd97f613522
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_median_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
+			        )
+			        RETURN MEDIANX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: 942d3f9b-4b44-4ce5-b768-5d868641fccb
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_min_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
+			        )
+			        RETURN MINX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: a754c1d1-7d08-406d-9e1f-394f152d4bb2
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_std_dev_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
+			        )
+			        RETURN STDEVX.P( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: 1a18f0ce-899f-497e-8b64-b06366ab6ae1
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary_sum_peer' = ```
+			
+			    CALCULATE(
+			        VAR tbl = SUMMARIZECOLUMNS(
+			            users[trueai_full_name],
+			            "Measure_Pre_AGG",[meas.performance_metric_value_secondary]
+			        )
+			        RETURN SUMX( tbl , [Measure_Pre_AGG] ),
+			        REMOVEFILTERS(users[trueai_full_name]) 
+			    )
+			```
+		lineageTag: ef0385c9-a10c-4817-b0d9-07b6ef3ff713
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_axisB_max' =
+			
+			VAR _format =
+			    SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format], "")
+			
+			VAR base =
+			    [meas.performance_metric_value_secondary_max]
+			
+			VAR raw =
+			    base + base * 0.05
+			
+			VAR roundedRaw =
+			    IF(
+			        _format = "#,0.0"" %""" && raw <= 1,
+			        raw,
+			        CEILING(raw, 5)
+			    )
+			
+			RETURN
+			IF(
+			    ISBLANK(base) || base = 0,
+			    BLANK(),
+			    SWITCH(
+			        TRUE(),
+			        _format = "#,0.0"" %""" && roundedRaw <= 1, roundedRaw,
+			        roundedRaw >= 1000000, roundedRaw / 1000000,
+			        roundedRaw >= 1000, roundedRaw / 1000,
+			        roundedRaw
+			    )
+			)
+		lineageTag: 30fd1ece-c84e-4e40-8a04-4344da62586a
+
+		formatStringDefinition =
+				VAR _format =
+				    SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format], "")
+				
+				VAR rawBase =
+				    [meas.performance_metric_value_secondary_max]
+				
+				VAR raw =
+				    rawBase + rawBase * 0.05
+				
+				VAR roundedRaw =
+				    IF(
+				        _format = "#,0.0"" %""" && raw <= 1,
+				        raw,
+				        CEILING(raw, 5)
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				    ISBLANK(rawBase) || rawBase = 0, "",
+				
+				    _format = "#,0.0"" %""" && roundedRaw <= 1,
+				        "0.0%",
+				
+				    _format = "#,0.0"" %""",
+				        "0.0%",
+				
+				    _format = "#,0"" days""",
+				        "0"" days""",
+				
+				    _format = "#,0.0"" hrs""",
+				        "0.0"" hrs""",
+				
+				    roundedRaw >= 1000000,
+				        "0.0\M",
+				
+				    roundedRaw >= 1000,
+				        "0.0\K",
+				
+				    _format = "#,0",
+				        "0",
+				
+				    "0.0"
+				)
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_axisB_max_half' =
+			
+			VAR _format =
+			    SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format], "")
+			
+			VAR base =
+			    [meas.performance_metric_value_secondary_max]
+			
+			VAR raw =
+			    base / 2
+			
+			VAR roundedRaw =
+			    IF(
+			        _format = "#,0.0"" %""" && raw <= 1,
+			        raw,
+			        CEILING(raw, 5)
+			    )
+			
+			RETURN
+			IF(
+			    ISBLANK(base) || base = 0,
+			    BLANK(),
+			    SWITCH(
+			        TRUE(),
+			        _format = "#,0.0"" %""" && roundedRaw <= 1, roundedRaw,
+			        roundedRaw >= 1000000, roundedRaw / 1000000,
+			        roundedRaw >= 1000, roundedRaw / 1000,
+			        roundedRaw
+			    )
+			)
+		lineageTag: 9c913338-3f1e-4c24-96dd-17eeeaf438ea
+
+		formatStringDefinition =
+				VAR _format =
+				    SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format], "")
+				
+				VAR rawBase =
+				    [meas.performance_metric_value_secondary_max]
+				
+				VAR raw =
+				    rawBase / 2
+				
+				VAR roundedRaw =
+				    IF(
+				        _format = "#,0.0"" %""" && raw <= 1,
+				        raw,
+				        CEILING(raw, 5)
+				    )
+				
+				RETURN
+				SWITCH(
+				    TRUE(),
+				    ISBLANK(rawBase) || rawBase = 0, "",
+				
+				    /* Percent */
+				    _format = "#,0.0"" %""" && roundedRaw <= 1,
+				        "0.0%",
+				
+				    _format = "#,0.0"" %""",
+				        "0.0%",
+				
+				    /* Days / Hours */
+				    _format = "#,0"" days""",
+				        "0"" days""",
+				
+				    _format = "#,0.0"" hrs""",
+				        "0.0"" hrs""",
+				
+				    /* Millions */
+				    roundedRaw >= 1000000,
+				        "0.0\M",
+				
+				    /* Thousands */
+				    roundedRaw >= 1000,
+				        "0.0\K",
+				
+				    /* Default */
+				    "0"
+				)
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas.performance_metric_value_secondary_formatted' =
+			
+			VAR _valid1 =
+			    HASONEVALUE(metadata_performance_metrics[sys_doc_id])
+			
+			VAR _valid2 =
+			    HASONEVALUE(metadata_performance_metrics_secondary[sys_doc_id])
+			
+			VAR _id =
+			    SELECTEDVALUE(metadata_performance_metrics_secondary[sys_doc_id])
+			
+			VAR _measureToReturn =
+			    SWITCH(
+			        TRUE(),
+			
+			        -- Sales
+			        _id = "sal01", [meas.ssr_history_won_amt],
+			        _id = "sal02", [meas.ssr_history_won_count],
+			        _id = "sal03", [meas.trueai_potential_acv],
+			        _id = "sal04", [meas.ssr_history_win_rate],
+			        _id = "sal05", [meas.total_opp_count],
+			        _id = "sal06", [meas.ssr_history_won_amt_new_logo],
+			        _id = "sal07", [meas.ssr_history_amt_new_logo_win_rate],
+			        _id = "sal08", [meas.exp_rpts_all_new_logo_won_deals],
+			        _id = "sal09", [meas.ssr_history_won_amt_existing_customer_selling],
+			        _id = "sal10", [meas.ssr_history_win_rate_existing_customer],
+			        _id = "sal11", [meas.exp_rpts_existing_customer_won_deals],
+			        _id = "sal12", [meas.selected_period_performance_tier_num],
+			
+			        -- Pipeline
+			        _id = "pip01", [meas.ssr_history_pipeline_amt],
+			        _id = "pip02", [meas.ssr_history_open_pipeline_success_rate],
+			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			        _id = "pip05", [meas.ssr_history_generated_pipeline_amt],
+			        _id = "pip06", [meas.ssr_history_pipeline_amt_avg],
+			        _id = "pip07", [meas.open_pipeline_booking_amt],
+			        _id = "pip08", [meas.ssr_history_adj_pipeline_amt],
+			        _id = "pip09", [meas.ssr_history_open_pipeline_success_rate],
+			        _id = "pip10", [meas.open_pipeline_count_id],
+			        _id = "pip11", [meas.ssr_history_mgmt_leads_gen_count],
+			
+			        -- Activity
+			        _id = "act01", [meas.stkhlds_all_act_count],
+			        _id = "act02", [meas.stkhlds_all_act_email_count],
+			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			        _id = "act04", [meas.ssr_history_duration_hrs],
+			        _id = "act05", [meas.users_history_avg_ci_act_capt_lvl],
+			        _id = "act06", [meas.ssr_history_duration_hrs],
+			        _id = "act07", [meas.ssr_history_all_eng_duration_hrs],
+			        _id = "act08", [meas.stkhlds_all_act_email_count],
+			        _id = "act09", [meas.stkhlds_all_act_phone_calls],
+			        _id = "act10", [meas.stkhlds_all_act_meeting_count],
+			        _id = "act12", [meas.stkhlds_all_act_social_media_count],
+			        _id = "act13", [meas.stkhlds_all_act_nd_count],
+			        _id = "act14", [meas.users_activities_prospecting_count],
+			        _id = "act15", [meas.users_activities_new_logo_count],
+			        _id = "act16", [meas.users_activities_post_sales_count],
+			        _id = "act17", [meas.users_activities_existing_customer_count],
+			        _id = "act18", [meas.users_activities_internal_count],
+			        _id = "act19", [meas.ssr_history_duration_hrs_prospecting],
+			        _id = "act20", [meas.ssr_history_duration_hrs_new_logo],
+			        _id = "act21", [meas.ssr_history_duration_hrs_post_sales],
+			        _id = "act22", [meas.ssr_history_duration_hrs_existing_customer_selling],
+			
+			        -- Revenue
+			        _id = "rev01", [meas.opp_nnb_amt],
+			        _id = "rev02", [meas.opp_cross_sale_amt],
+			        _id = "rev03", [meas.opp_downgrade_amt],
+			        _id = "rev04", [meas.opp_renewal_amt],
+			        _id = "rev05", [meas.opp_arr_amt],
+			        _id = "rev06", [meas.opp_nd_amt],
+			        _id = "rev07", [meas.opp_one_time_amt],
+			        _id = "rev08", [meas.opp_expansion_amt],
+			        _id = "rev09", [meas.opp_mrr_amt],
+			        _id = "rev10", [meas.opps_non_nnb_amt],
+			
+			        -- Scorecard
+			        _id = "sb01", [meas.ai_scores_ci_discovery_skill],
+			        _id = "sb02", [meas.ai_scores_ci_engagement_ability],
+			        _id = "sb03", [meas.ai_scores_ci_closing_ability],
+			        _id = "sb04", [meas.ai_scores_ci_deal_maxing],
+			        _id = "sb05", [meas.ai_scores_ci_work_effort],
+			        _id = "sb06", [meas.ai_scores_ci_time_management],
+			
+			        _id = "vi02", [meas.ssr_history_vi_value_created],
+			        _id = "vi03", [meas.ssr_history_vi_value_delivered],
+			        _id = "Comb02", [meas.ai_scores_ci_sb_mean],
+			        _id = "misc01", [meas.data_logs_users_tenure],
+			
+			
+			        BLANK()
+			    )
+			
+			RETURN
+			IF(
+			    NOT (_valid1 && _valid2),
+			    BLANK(),
+			    COALESCE(_measureToReturn, 0)
+			)
+		lineageTag: 9ec5b0fd-cde1-4d9d-94c6-94fd2616d352
+
+		formatStringDefinition =
+				VAR _format =
+				    SELECTEDVALUE(metadata_performance_metrics_secondary[metric_format], "")
+				
+				VAR v =
+				    ABS(SELECTEDMEASURE())
+				
+				VAR _txt =
+				    SWITCH(
+				        TRUE(),
+				        ISBLANK(SELECTEDMEASURE()), "",
+				        v = 0, "",
+				
+				        /* Percent stored as 0–1 */
+				        _format = "#,0.0"" %""" && v <= 1,
+				            FORMAT(v * 100, IF(MOD(v * 100, 1) = 0, "0", "0.0")) & "%",
+				
+				        /* Percent stored as 0–100 */
+				        _format = "#,0.0"" %""",
+				            FORMAT(v, IF(MOD(v, 1) = 0, "0", "0.0")) & "%",
+				
+				        /* Days */
+				        _format = "#,0"" days""",
+				            FORMAT(v, "0") & " days",
+				
+				        /* Hours */
+				        _format = "#,0.0"" hrs""",
+				            FORMAT(v, "0.0") & " hrs",
+				
+				        /* Currency */
+				        _format = "Currency" && v >= 1000000,
+				            FORMAT(v / 1000000, IF(MOD(v / 1000000, 1) = 0, "0", "0.0")) & "M",
+				
+				        _format = "Currency" && v >= 1000,
+				            FORMAT(v / 1000, IF(MOD(v / 1000, 1) = 0, "0", "0.0")) & "K",
+				
+				        _format = "Currency",
+				            FORMAT(v, "#,##0"),
+				
+				        /* Counts / integers */
+				        _format = "#,0" && v >= 1000000,
+				            FORMAT(v / 1000000, IF(MOD(v / 1000000, 1) = 0, "0", "0.0")) & "M",
+				
+				        _format = "#,0" && v >= 1000,
+				            FORMAT(v / 1000, IF(MOD(v / 1000, 1) = 0, "0", "0.0")) & "K",
+				
+				        _format = "#,0",
+				            FORMAT(v, "#,##0"),
+				
+				        /* Fallback */
+				        FORMAT(v, "#,##0.0")
+				    )
+				
+				RETURN
+				"'" & _txt & "'"
+
+	/// Shows the performance metric result for performance metric analysis.
+	measure 'meas.performance_metric_value_secondary' =
+			
+			VAR _valid1 =
+			    HASONEVALUE(metadata_performance_metrics[sys_doc_id])
+			
+			VAR _valid2 =
+			    HASONEVALUE(metadata_performance_metrics_secondary[sys_doc_id])
+			
+			VAR _id =
+			    SELECTEDVALUE(metadata_performance_metrics_secondary[sys_doc_id])
+			
+			VAR _measureToReturn =
+			    SWITCH(
+			        TRUE(),
+			
+			        -- Sales
+			        _id = "sal01", [meas.ssr_history_won_amt],
+			        _id = "sal02", [meas.ssr_history_won_count],
+			        _id = "sal03", [meas.trueai_potential_acv],
+			        _id = "sal04", [meas.ssr_history_win_rate],
+			        _id = "sal05", [meas.total_opp_count],
+			        _id = "sal06", [meas.ssr_history_won_amt_new_logo],
+			        _id = "sal07", [meas.ssr_history_amt_new_logo_win_rate],
+			        _id = "sal08", [meas.exp_rpts_all_new_logo_won_deals],
+			        _id = "sal09", [meas.ssr_history_won_amt_existing_customer_selling],
+			        _id = "sal10", [meas.ssr_history_win_rate_existing_customer],
+			        _id = "sal11", [meas.exp_rpts_existing_customer_won_deals],
+			        _id = "sal12", [meas.selected_period_performance_tier_num],
+			
+			        -- Pipeline
+			        _id = "pip01", [meas.ssr_history_pipeline_amt],
+			        _id = "pip02", [meas.ssr_history_open_pipeline_success_rate],
+			        _id = "pip03", [meas.ssr_history_mgmt_pipeline_count],
+			        _id = "pip04", [meas.open_pipeline_avg_days_in_stage],
+			        _id = "pip05", [meas.ssr_history_generated_pipeline_amt],
+			        _id = "pip06", [meas.ssr_history_pipeline_amt_avg],
+			        _id = "pip07", [meas.open_pipeline_booking_amt],
+			        _id = "pip08", [meas.ssr_history_adj_pipeline_amt],
+			        _id = "pip09", [meas.ssr_history_open_pipeline_success_rate],
+			        _id = "pip10", [meas.open_pipeline_count_id],
+			        _id = "pip11", [meas.ssr_history_mgmt_leads_gen_count],
+			
+			        -- Activity
+			        _id = "act01", [meas.stkhlds_all_act_count],
+			        _id = "act02", [meas.stkhlds_all_act_email_count],
+			        _id = "act03", [meas.stkhlds_all_act_meeting_count],
+			        _id = "act04", [meas.ssr_history_duration_hrs],
+			        _id = "act05", [meas.users_history_avg_ci_act_capt_lvl],
+			        _id = "act06", [meas.ssr_history_duration_hrs],
+			        _id = "act07", [meas.ssr_history_all_eng_duration_hrs],
+			        _id = "act08", [meas.stkhlds_all_act_email_count],
+			        _id = "act09", [meas.stkhlds_all_act_phone_calls],
+			        _id = "act10", [meas.stkhlds_all_act_meeting_count],
+			        _id = "act12", [meas.stkhlds_all_act_social_media_count],
+			        _id = "act13", [meas.stkhlds_all_act_nd_count],
+			        _id = "act14", [meas.users_activities_prospecting_count],
+			        _id = "act15", [meas.users_activities_new_logo_count],
+			        _id = "act16", [meas.users_activities_post_sales_count],
+			        _id = "act17", [meas.users_activities_existing_customer_count],
+			        _id = "act18", [meas.users_activities_internal_count],
+			        _id = "act19", [meas.ssr_history_duration_hrs_prospecting],
+			        _id = "act20", [meas.ssr_history_duration_hrs_new_logo],
+			        _id = "act21", [meas.ssr_history_duration_hrs_post_sales],
+			        _id = "act22", [meas.ssr_history_duration_hrs_existing_customer_selling],
+			
+			        -- Revenue
+			        _id = "rev01", [meas.opp_nnb_amt],
+			        _id = "rev02", [meas.opp_cross_sale_amt],
+			        _id = "rev03", [meas.opp_downgrade_amt],
+			        _id = "rev04", [meas.opp_renewal_amt],
+			        _id = "rev05", [meas.opp_arr_amt],
+			        _id = "rev06", [meas.opp_nd_amt],
+			        _id = "rev07", [meas.opp_one_time_amt],
+			        _id = "rev08", [meas.opp_expansion_amt],
+			        _id = "rev09", [meas.opp_mrr_amt],
+			        _id = "rev10", [meas.opps_non_nnb_amt],
+			
+			        -- Scorecard
+			        _id = "sb01", [meas.ai_scores_ci_discovery_skill],
+			        _id = "sb02", [meas.ai_scores_ci_engagement_ability],
+			        _id = "sb03", [meas.ai_scores_ci_closing_ability],
+			        _id = "sb04", [meas.ai_scores_ci_deal_maxing],
+			        _id = "sb05", [meas.ai_scores_ci_work_effort],
+			        _id = "sb06", [meas.ai_scores_ci_time_management],
+			
+			        _id = "vi02", [meas.ssr_history_vi_value_created],
+			        _id = "vi03", [meas.ssr_history_vi_value_delivered],
+			        _id = "Comb02", [meas.ai_scores_ci_sb_mean],
+			        _id = "misc01", [meas.data_logs_users_tenure],
+			
+			
+			        BLANK()
+			    )
+			
+			RETURN
+			IF(
+			    NOT (_valid1 && _valid2),
+			    BLANK(),
+			    _measureToReturn
+			)
+		lineageTag: c453710f-4a24-41a3-a56a-5af756a2cf7d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Column _sys_doc_id.
+	column _sys_doc_id
+		dataType: string
+		lineageTag: 7d60f453-d69e-4cec-9cb5-0dec964a7942
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Column sort_order.
+	column sort_order
+		dataType: string
+		lineageTag: 685c2215-3371-4b08-85fd-5dc3b7921d65
+		summarizeBy: none
+		sourceColumn: sort_order
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Column pbi_measure.
+	column pbi_measure
+		dataType: string
+		lineageTag: 82c9742c-8521-485e-b5dd-6198e8a74f0d
+		summarizeBy: none
+		sourceColumn: pbi_measure
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Column name.
+	column name
+		dataType: string
+		lineageTag: ff89a37c-ea77-4576-b928-5ab3feaf9304
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition performance_metric_2 = m
+		mode: import
+		source =
+				let
+				    Source = "[#(cr)#(lf)  { ""_sys_doc_id"": ""sal1"",  ""name"": ""Won Booking Amt."",                ""sort_order"": ""SR2"",  ""pbi_measure"": ""meas.ssr_history_won_amt"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal2"",  ""name"": ""Won Bookings %"",                  ""sort_order"": ""SR3"",  ""pbi_measure"": ""meas.ssr_history_win_rate"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal3"",  ""name"": ""Won Deals"",                       ""sort_order"": ""SR4"",  ""pbi_measure"": ""meas.exp_rpts_all_won_deals"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal4"",  ""name"": ""New Logo Bookings Amt."",          ""sort_order"": ""SR5"",  ""pbi_measure"": ""meas.ssr_history_won_amt_new_logo"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal5"",  ""name"": ""New Logo Bookings %"",             ""sort_order"": ""SR6"",  ""pbi_measure"": ""meas.ssr_history_amt_new_logo_win_rate"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal6"",  ""name"": ""Won New Logo Deals Amt."",         ""sort_order"": ""SR7"",  ""pbi_measure"": ""meas.opps_won_deals_new_logo_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal7"",  ""name"": ""Won Existing Customer Deals"",     ""sort_order"": ""SR8"",  ""pbi_measure"": ""meas.ssr_history_won_amt_existing_customer_selling"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal8"",  ""name"": ""Won Existing Customer %"",         ""sort_order"": ""SR9"",  ""pbi_measure"": ""meas.ssr_history_win_rate_existing_customer"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal9"",  ""name"": ""Won Existing Customer Deals"",     ""sort_order"": ""SR10"", ""pbi_measure"": ""meas.opps_won_deals_existing_customer_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""sal10"", ""name"": ""Performance Tier (1=UP, 2=P, 3=OP)"", ""sort_order"": ""SR11"", ""pbi_measure"": ""meas.performance_metric_rep"" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb1"",  ""name"": ""Discovery Skill"",                 ""sort_order"": ""SR13"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb2"",  ""name"": ""Engagement Ability"",              ""sort_order"": ""SR14"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb3"",  ""name"": ""Closing Ability"",                 ""sort_order"": ""SR15"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb4"",  ""name"": ""Deal Maximizing"",                 ""sort_order"": ""SR16"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb5"",  ""name"": ""Work Effort"",                     ""sort_order"": ""SR17"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb6"",  ""name"": ""Time Management"",                 ""sort_order"": ""SR18"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""skb7"",  ""name"": ""Value Received Score"",            ""sort_order"": ""SR19"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip1"",  ""name"": ""Pipeline Gen. Amt"",               ""sort_order"": ""SR21"", ""pbi_measure"": ""[meas.ssr_history_generated_pipeline_amt]/1000"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip2"",  ""name"": ""Pipeline Amt."",                   ""sort_order"": ""SR22"", ""pbi_measure"": ""meas.ssr_history_pipeline_amt"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip3"",  ""name"": ""Pipeline Amt.Avg"",                ""sort_order"": ""SR23"", ""pbi_measure"": ""meas.ssr_history_pipeline_amt_avg"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip4"",  ""name"": ""Open Pipeline Amt"",               ""sort_order"": ""SR24"", ""pbi_measure"": ""meas.open_pipeline_booking_amt"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip5"",  ""name"": ""Adjusted Open Pipeline"",          ""sort_order"": ""SR25"", ""pbi_measure"": ""meas.ssr_history_adj_pipeline_amt"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip6"",  ""name"": ""Avg. Expected Win rate"",          ""sort_order"": ""SR26"", ""pbi_measure"": ""meas.ssr_history_open_pipeline_success_rate"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip7"",  ""name"": ""Open Pipeline"",                   ""sort_order"": ""SR27"", ""pbi_measure"": ""meas.open_pipeline_count_id"" },#(cr)#(lf)  { ""_sys_doc_id"": ""pip8"",  ""name"": ""Generated Leads"",                 ""sort_order"": ""SR28"", ""pbi_measure"": ""meas.ssr_history_mgmt_leads_gen_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars1"",  ""name"": ""Territory Account"",               ""sort_order"": ""SR30"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars2"",  ""name"": ""Leads Received"",                  ""sort_order"": ""SR31"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars3"",  ""name"": ""Accounts Received"",               ""sort_order"": ""SR32"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars4"",  ""name"": ""Opps Received"",                   ""sort_order"": ""SR33"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars5"",  ""name"": ""Open Pipeline"",                   ""sort_order"": ""SR34"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""ars6"",  ""name"": ""Quality Adjusted Pipeline"",       ""sort_order"": ""SR35"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""act1"",  ""name"": ""Activity Capture Level (ACL)"",    ""sort_order"": ""SR37"", ""pbi_measure"": ""meas.users_history_avg_ci_act_capt_lvl"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act2"",  ""name"": ""Activity Count"",                  ""sort_order"": ""SR38"", ""pbi_measure"": ""meas.stkhlds_all_act_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act3"",  ""name"": ""Adj. Duration"",                   ""sort_order"": ""SR39"", ""pbi_measure"": ""meas.ssr_history_duration_hrs"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act4"",  ""name"": ""Engaged Duration"",                ""sort_order"": ""SR40"", ""pbi_measure"": ""meas.ssr_history_all_eng_duration_hrs"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act5"",  ""name"": ""# of Emails"",                     ""sort_order"": ""SR41"", ""pbi_measure"": ""meas.stkhlds_all_act_email_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act6"",  ""name"": ""# of Phone Calls"",                ""sort_order"": ""SR42"", ""pbi_measure"": ""meas.stkhlds_all_act_phone_calls"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act7"",  ""name"": ""# of Meetings"",                   ""sort_order"": ""SR43"", ""pbi_measure"": ""meas.stkhlds_all_act_meeting_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act8"",  ""name"": ""# of Other"",                      ""sort_order"": ""SR44"", ""pbi_measure"": ""meas.stkhlds_all_act_other_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act9"",  ""name"": ""# of Social Media"",               ""sort_order"": ""SR45"", ""pbi_measure"": ""meas.stkhlds_all_act_social_media_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act10"", ""name"": ""# of ND"",                         ""sort_order"": ""SR46"", ""pbi_measure"": ""meas.stkhlds_all_act_nd_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act11"", ""name"": ""# of Prospecting Act."",           ""sort_order"": ""SR47"", ""pbi_measure"": ""meas.users_activities_prospecting_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act12"", ""name"": ""# of New Logo Selling Act."",      ""sort_order"": ""SR48"", ""pbi_measure"": ""meas.users_activities_new_logo_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act13"", ""name"": ""# of Post-Sales Support Act."",    ""sort_order"": ""SR49"", ""pbi_measure"": ""meas.users_activities_post_sales_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act14"", ""name"": ""# of Existing Customer Selling Act."", ""sort_order"": ""SR50"", ""pbi_measure"": ""meas.users_activities_existing_customer_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act15"", ""name"": ""# of Internal Act."",              ""sort_order"": ""SR51"", ""pbi_measure"": ""meas.users_activities_internal_count"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act16"", ""name"": ""Adj. Duration Prospecting"",       ""sort_order"": ""SR52"", ""pbi_measure"": ""meas.ssr_history_duration_hrs_prospecting"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act17"", ""name"": ""Adj. Duration New Logo"",          ""sort_order"": ""SR53"", ""pbi_measure"": ""meas.ssr_history_duration_hrs_new_logo"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act18"", ""name"": ""Adj. Duration Post-Sales"",        ""sort_order"": ""SR54"", ""pbi_measure"": ""meas.ssr_history_duration_hrs_post_sales"" },#(cr)#(lf)  { ""_sys_doc_id"": ""act19"", ""name"": ""Adj. Duration Existing Customers"",""sort_order"": ""SR55"", ""pbi_measure"": ""meas.ssr_history_duration_hrs_existing_customer_selling"" },#(cr)#(lf)  { ""_sys_doc_id"": ""val1"",  ""name"": ""Value Received"",                  ""sort_order"": ""SR57"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""val2"",  ""name"": ""Value Created"",                   ""sort_order"": ""SR58"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""val3"",  ""name"": ""Value Delivered"",                 ""sort_order"": ""SR59"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""com1"",  ""name"": ""Avg Skills & Behavior Score"",     ""sort_order"": ""SR61"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""com2"",  ""name"": ""Geometric Mean – S&B Scores"",     ""sort_order"": ""SR62"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""com3"",  ""name"": ""Geometric Score"",                 ""sort_order"": ""SR63"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""msc1"",  ""name"": ""Tenure in Months"",                ""sort_order"": ""SR65"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""msc2"",  ""name"": ""User’s Favorite Number"",          ""sort_order"": ""SR66"", ""pbi_measure"": """" },#(cr)#(lf)  { ""_sys_doc_id"": ""msc3"",  ""name"": ""Length of Name"",                  ""sort_order"": ""SR67"", ""pbi_measure"": """" }#(cr)#(lf)]#(cr)#(lf)",
+				    ParsedJson = Json.Document(Source),
+				    ParsedJson1 = Table.FromList(ParsedJson, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+				    Column1 = Table.ExpandRecordColumn(ParsedJson1, "Column1", {
+				        "_sys_doc_id", "name", "sort_order", "pbi_measure"
+				    }),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Column1, {
+				    {"_sys_doc_id", type text},
+				    {"name", type text},
+				    {"sort_order", type text},
+				    {"pbi_measure", type text}
+				})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,112 @@
+/// Table performance_metric_format.
+table performance_metric_format
+	lineageTag: 534838ad-0dca-4363-b3fc-987b1bffd9ef
+
+	calculationGroup
+
+		calculationItem 'calc.apply_format' = SELECTEDMEASURE()
+
+			formatStringDefinition =
+					VAR _prefix =
+					    SELECTEDVALUE('metadata_performance_metrics'[metric_prefix])
+					
+					VAR _fmtMeta =
+					    SELECTEDVALUE('metadata_performance_metrics'[metric_format])
+					
+					VAR _fmtLower =
+					    LOWER(COALESCE(_fmtMeta, ""))
+					
+					VAR _isRevenue =
+					    CONTAINSSTRING(_fmtLower, "currency")
+					
+					VAR _isPercent =
+					    CONTAINSSTRING(COALESCE(_fmtMeta, ""), "%")
+					
+					VAR _isDuration =
+					    CONTAINSSTRING(_fmtLower, "hrs")
+					
+					VAR _isDays =
+					    CONTAINSSTRING(_fmtLower, "days")
+					
+					VAR _isInteger =
+					    CONTAINSSTRING(_fmtLower, "integer")
+					
+					VAR _isDecimal =
+					    CONTAINSSTRING(_fmtLower, "decimal")
+					
+					VAR _p =
+					    IF(NOT ISBLANK(_prefix), _prefix & " ", "")
+					
+					RETURN
+					SWITCH(
+					    TRUE(),
+					    _isRevenue, _p & "$#,0;-" & _p & "$#,0;" & _p & "$0",
+					    _isPercent, _p & "0.0%",
+					    _isDuration, _p & COALESCE(_fmtMeta, "#,0.0 ""hrs"""),
+					    _isDays, _p & COALESCE(_fmtMeta, "#,0 ""Days"""),
+					    _isInteger, _p & "#,0",
+					    _isDecimal, _p & "#,0.0",
+					    NOT ISBLANK(_fmtMeta), _p & _fmtMeta,
+					    "#,0"
+					)
+
+		calculationItem 'calc.apply_format_secondary' = SELECTEDMEASURE()
+
+			formatStringDefinition =
+					VAR _prefix =
+					    SELECTEDVALUE('metadata_performance_metrics_secondary'[metric_prefix])
+					
+					VAR _fmtMeta =
+					    SELECTEDVALUE('metadata_performance_metrics_secondary'[metric_format])
+					
+					VAR _fmtLower =
+					    LOWER(COALESCE(_fmtMeta, ""))
+					
+					VAR _isRevenue =
+					    CONTAINSSTRING(_fmtLower, "currency")
+					
+					VAR _isPercent =
+					    CONTAINSSTRING(COALESCE(_fmtMeta, ""), "%")
+					
+					VAR _isDuration =
+					    CONTAINSSTRING(_fmtLower, "hrs")
+					
+					VAR _isDays =
+					    CONTAINSSTRING(_fmtLower, "days")
+					
+					VAR _isInteger =
+					    CONTAINSSTRING(_fmtLower, "integer")
+					
+					VAR _isDecimal =
+					    CONTAINSSTRING(_fmtLower, "decimal")
+					
+					VAR _p =
+					    IF(NOT ISBLANK(_prefix), _prefix & " ", "")
+					
+					RETURN
+					SWITCH(
+					    TRUE(),
+					    _isRevenue, _p & "$#,0;-" & _p & "$#,0;" & _p & "$0",
+					    _isPercent, _p & "0.0%",
+					    _isDuration, _p & COALESCE(_fmtMeta, "#,0.0 ""hrs"""),
+					    _isDays, _p & COALESCE(_fmtMeta, "#,0 ""Days"""),
+					    _isInteger, _p & "#,0",
+					    _isDecimal, _p & "#,0.0",
+					    NOT ISBLANK(_fmtMeta), _p & _fmtMeta,
+					    "#,0"
+					)
+
+	/// Column Name.
+	column Name
+		dataType: string
+		lineageTag: 20122f4c-86d5-431f-b4d6-c7b65b022f38
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	/// Column Ordinal.
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 29f3be15-a5d6-4b49-90fc-c0012173c217
+		sourceColumn: Ordinal
+

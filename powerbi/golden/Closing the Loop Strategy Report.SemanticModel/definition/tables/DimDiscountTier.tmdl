@@ -1,0 +1,242 @@
+/// Table DimDiscountTier.
+table DimDiscountTier
+	lineageTag: d1e7c278-7137-41ac-bc16-0582c183411d
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas._test_number' = 1234567
+		lineageTag: 20d49b41-72fd-47ec-bc75-85d87b5589f9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure kpi1_record_count_color_checker =
+			
+			VAR RecordCount = [meas.heatmap_kpi1_record_count]
+			VAR MinCount = [meas.heatmap_kpi1_min_record_count]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        RecordCount = 0, "Blank",
+			        ISBLANK(MinCount), "Blank",
+			        RecordCount >= MinCount, "True",
+			        "False"
+			    )
+		lineageTag: 20692211-c076-4ff0-9a93-60a00b899589
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure kpi2_record_count_color_checker =
+			
+			VAR RecordCount = [meas.heatmap_kpi2_record_count]
+			VAR MinCount = [meas.heatmap_kpi2_min_record_count]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        RecordCount = 0, "Blank",
+			        ISBLANK(MinCount), "Blank",
+			        RecordCount >= MinCount, "True",
+			        "False"
+			    )
+		lineageTag: 1c9a3d4e-ff78-41f5-ab71-fd05678efd2a
+
+	/// Shows the meas max conversion probability for business analysis.
+	measure meas_max_conversion_probability =
+			
+			VAR original= MAXX(
+			    VALUES(cal_end_dates[Fiscal Date]),
+			    [meas.ssr_history_leads_probability_of_conversion_w_thresh]
+			)
+			
+			VAR Res= original+0.15
+			
+			RETURN MIN(1, Res)
+		lineageTag: de320dfe-fb39-4203-966d-685e958d687e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Shows the meas max conversion probability no tresh for business analysis.
+	measure meas_max_conversion_probability_no_tresh =
+			
+			VAR original= MAXX(
+			    VALUES(cal_end_dates[Fiscal Date]),
+			    [meas.ssr_history_leads_probability_of_conversion]
+			)
+			
+			VAR Res= original+0.15
+			
+			RETURN MIN(1, Res)
+		lineageTag: 820c30dd-4598-490e-ba9d-12737583f0a7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Counts age of account for business analysis.
+	measure age_of_account =
+			
+			VAR StartDate = MIN('ssr'[trueai_first_purchase])
+			VAR EndDate = MIN('ssr'[trueai_churned_on])
+			VAR AgeYears =
+			    IF(
+			        ISBLANK(StartDate) || ISBLANK(EndDate),
+			        BLANK(),
+			        DATEDIFF(StartDate, EndDate, YEAR)
+			    )
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    ISBLANK(AgeYears), BLANK(),
+			    AgeYears < 1, "Less than 1 year",
+			    AgeYears = 1, "1 year",
+			    AgeYears = 2, "2 years",
+			    AgeYears = 3, "3 years",
+			    AgeYears = 4, "4 years",
+			    AgeYears = 5, "5 years",
+			    "6 or more years"
+			)
+		formatString: @
+		lineageTag: 53d68558-65ad-49aa-b892-f54d49ed1463
+
+	/// Counts Accounts (Distinct) for business analysis.
+	measure 'Accounts (Distinct)' =
+			
+			DISTINCTCOUNT(ssr[_sys_doc_id])
+		formatString: 0
+		lineageTag: 8ea1cb19-7694-4ae4-90a9-272e257fa6f7
+
+	/// Column trueai_discount_pct_tier.
+	column trueai_discount_pct_tier
+		lineageTag: 3880bd55-15c2-4d7d-ba2f-271e04aaaefc
+		isDefaultLabel
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: opps[trueai_discount_pct_tier]
+		sortByColumn: SortKey
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Column CleanLabel.
+	column CleanLabel
+		lineageTag: 692944ff-0505-4c76-8019-6108e675f9f8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [CleanLabel]
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Column TierStart.
+	column TierStart
+		lineageTag: a9f87cc7-c69c-4c28-9a42-93699b4c91c0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [TierStart]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Column TierEnd.
+	column TierEnd
+		lineageTag: 8942837c-7e67-448d-98cb-ac33466db44a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [TierEnd]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Column SortKey.
+	column SortKey
+		lineageTag: 5b27784c-bb4f-4cee-8b23-f71530ccddfc
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [SortKey]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition DimDiscountTier = calculated
+		mode: import
+		source =
+				
+				VAR Tiers =
+				    DISTINCT ( opps[trueai_discount_pct_tier] )
+				RETURN
+				ADDCOLUMNS (
+				    Tiers,
+				
+				    -- Clean label (remove special chars)
+				    "CleanLabel",
+				        VAR Raw = opps[trueai_discount_pct_tier]
+				        VAR Step1 = SUBSTITUTE ( Raw, "%", "" )
+				        VAR Step2 = SUBSTITUTE ( Step1, "+", "" )
+				        VAR Step3 = SUBSTITUTE ( Step2, "<", "" )
+				        VAR Step4 = SUBSTITUTE ( Step3, ">", "" )
+				        VAR Clean = SUBSTITUTE ( Step4, " ", "" )
+				        RETURN Clean,
+				
+				    -- TierStart
+				    "TierStart",
+				        VAR Raw = opps[trueai_discount_pct_tier]
+				        VAR Step1 = SUBSTITUTE ( Raw, "%", "" )
+				        VAR Step2 = SUBSTITUTE ( Step1, "+", "" )
+				        VAR Step3 = SUBSTITUTE ( Step2, "<", "" )
+				        VAR Step4 = SUBSTITUTE ( Step3, ">", "" )
+				        VAR Clean = SUBSTITUTE ( Step4, " ", "" )
+				        VAR Dash = FIND ( "-", Clean, 1, 0 )
+				        RETURN VALUE (
+				            IF ( Dash > 0,
+				                LEFT ( Clean, Dash - 1 ),
+				                Clean
+				            )
+				        ),
+				
+				    -- TierEnd
+				    "TierEnd",
+				        VAR Raw = opps[trueai_discount_pct_tier]
+				        VAR Step1 = SUBSTITUTE ( Raw, "%", "" )
+				        VAR Step2 = SUBSTITUTE ( Step1, "+", "" )
+				        VAR Step3 = SUBSTITUTE ( Step2, "<", "" )
+				        VAR Step4 = SUBSTITUTE ( Step3, ">", "" )
+				        VAR Clean = SUBSTITUTE ( Step4, " ", "" )
+				        VAR Dash = FIND ( "-", Clean, 1, 0 )
+				        RETURN
+				            IF (
+				                Dash > 0,
+				                VALUE ( RIGHT ( Clean, LEN ( Clean ) - Dash ) ),
+				                IF ( RIGHT ( Raw, 1 ) = "+",
+				                    1000000,
+				                    VALUE ( Clean )
+				                )
+				            ),
+				
+				    -- SortKey (local recalculation)
+				    "SortKey",
+				        VAR Raw = opps[trueai_discount_pct_tier]
+				        VAR Step1 = SUBSTITUTE ( Raw, "%", "" )
+				        VAR Step2 = SUBSTITUTE ( Step1, "+", "" )
+				        VAR Step3 = SUBSTITUTE ( Step2, "<", "" )
+				        VAR Step4 = SUBSTITUTE ( Step3, ">", "" )
+				        VAR Clean = SUBSTITUTE ( Step4, " ", "" )
+				        VAR Dash = FIND ( "-", Clean, 1, 0 )
+				        VAR StartVal =
+				            VALUE (
+				                IF (
+				                    Dash > 0,
+				                    LEFT ( Clean, Dash - 1 ),
+				                    Clean
+				                )
+				            )
+				        VAR EndVal =
+				            IF (
+				                Dash > 0,
+				                VALUE ( RIGHT ( Clean, LEN ( Clean ) - Dash ) ),
+				                IF ( RIGHT ( Raw, 1 ) = "+",
+				                    1000000,
+				                    VALUE ( Clean )
+				                )
+				            )
+				        RETURN StartVal * 1000 + EndVal
+				)
+
+	annotation PBI_Id = 1477bee9ac284f8a920b7c8d0ee3d5e9
+

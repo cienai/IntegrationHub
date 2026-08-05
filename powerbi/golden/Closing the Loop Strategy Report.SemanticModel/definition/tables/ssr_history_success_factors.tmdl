@@ -1,0 +1,291 @@
+/// Derived entity for key drivers impacting the success probability of a specific SSR history step.
+table ssr_history_success_factors
+	lineageTag: 6d0d1645-2b04-4700-87d8-13fed799fb4d
+
+	/// Shows the sales process history success prob impact for business analysis.
+	measure 'meas.ssr_history_success_prob_impact' =
+			
+			var _prob = CALCULATE(
+			    AVERAGE(
+			        ssr_history_success_factors[trueai_value_impact]        // get the average prob
+			    )
+			)
+			
+			var res = ROUND(_prob, 2)
+			
+			RETURN
+			res
+		formatString: +0%;-0%;0%
+		displayFolder: success_prob_factors
+		lineageTag: 8c898ccc-8056-4912-ac3e-ce6afbb43143
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	/// Shows the sales process history success prob impact positive for business analysis.
+	measure 'meas.ssr_history_success_prob_impact_positive' =
+			
+			var positiveVal = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
+			RETURN
+			IF(positiveVal > 0, positiveVal,BLANK())
+		formatString: 0%;-0%;0%
+		displayFolder: success_prob_factors
+		lineageTag: 565e0f38-f6ce-4548-a88e-9b6de987e2fa
+
+	/// Shows the sales process history success prob impact negative for business analysis.
+	measure 'meas.ssr_history_success_prob_impact_negative' =
+			
+			var Val = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
+			RETURN
+			IF(Val < 0, Val,BLANK())
+		formatString: 0%;-0%;0%
+		displayFolder: success_prob_factors
+		lineageTag: 9148a5ce-e1ea-4877-a07c-e9990c3e02af
+
+	/// Shows the sales process history success prob impact neutral for business analysis.
+	measure 'meas.ssr_history_success_prob_impact_neutral' =
+			
+			var positiveVal = CALCULATE(MAX(ssr_history_success_factors[trueai_value_impact]))
+			RETURN
+			IF(positiveVal = 0, positiveVal,BLANK())
+		formatString: 0%;-0%;0%
+		displayFolder: success_prob_factors
+		lineageTag: be309515-4d9a-4856-ad6a-8d0c3dad396e
+
+	/// Shows the sales process history success prob factors count for business analysis.
+	measure 'meas.ssr_history_success_prob_factors_count' = ```
+			
+			var res = CALCULATE(count(ssr_history_success_factors[_sys_doc_id]))
+			RETURN res
+			
+			```
+		formatString: #,0
+		displayFolder: success_prob_factors
+		lineageTag: ffbf4531-12c0-4a82-889e-ed353a5a1a5e
+
+	/// Shows the sales process history success prob factors all count for business analysis.
+	measure 'meas.ssr_history_success_prob_factors_all_count' = ```
+			
+			var res = CALCULATE(count(ssr_history_success_factors[_sys_ssr_history_id]), ssr_history_success_factors[trueai_factor_name] <> "aaa" &&  ssr_history_success_factors[trueai_value] <> "aaa" ) // get the count of all outside the filter
+			RETURN res
+			
+			```
+		formatString: 0
+		displayFolder: success_prob_factors
+		lineageTag: bb952828-5ff6-4ce1-8186-7124fb7627ac
+
+	/// Shows the sales process history success prob factors percentage for business analysis.
+	measure 'meas.ssr_history_success_prob_factors_pct' = ```
+			
+			
+			// this is our old measure
+			var res = DIVIDE([meas.ssr_history_success_prob_factors_count], [meas.ssr_history_success_prob_factors_all_count])  // ratio of the factors count
+			RETURN res
+			
+			```
+		formatString: #%
+		displayFolder: success_prob_factors
+		lineageTag: fbebdf1c-4075-4d59-9b9d-7cae7d96dee0
+
+	/// AI_EXCLUDE: Helper, redundant, or field-pass-through measure used for internal reuse only.
+	measure 'meas.success_prob_factors_most_impact_str' = BLANK()
+		formatString: 0
+		displayFolder: success_prob_factors
+		lineageTag: d3d03bb1-d585-4650-afcf-21178f54a977
+
+	/// Shows the sales process history success prob feature impact for business analysis.
+	measure 'meas.ssr_history_success_prob_feature_impact' = ```
+			
+			CALCULATE(
+			    AVERAGEX(
+			        ssr_history_success_factors, 
+			        ssr_history_success_factors[trueai_factor_impact]        // get the average feature impact
+			    )
+			)
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: success_prob_factors
+		lineageTag: ca2857e0-3196-408f-8103-8b2b7f7460ba
+
+	/// Shows the sales process history success prob factors percentage how many for business analysis.
+	measure 'meas.ssr_history_success_prob_factors_pct_how_many' =
+			
+			
+			var step_count = [meas.ssr_history_step_count]           // get the converted leads count from ssr_history table
+			
+			var _success_prob_count = [meas.ssr_history_success_prob_factors_count]         // get the success prob count from ssr_history success prob table
+			
+			
+			var res = DIVIDE(_success_prob_count, step_count,0)     // get the ratio
+			RETURN
+			res
+		formatString: 0%;-0%;0%
+		displayFolder: success_prob_factors
+		lineageTag: 0162ca58-4bf0-4d0b-8b9b-11e1cccf55ea
+
+	/// Shows top factor name by impact for business analysis.
+	measure 'meas.top_factor_name_by_impact' = ```
+			
+			VAR MaxImpact = 
+			    MAXX(
+			        'ssr_history_success_factors', 
+			        'ssr_history_success_factors'[trueai_value_impact]
+			    )
+			-- Now find the corresponding name with that max impact
+			RETURN
+			CALCULATE(
+			    MAX('ssr_history_success_factors'[trueai_factor_name]),
+			    'ssr_history_success_factors'[trueai_value_impact] = MaxImpact
+			)
+			
+			```
+		displayFolder: success_prob_factors
+		lineageTag: f24a5b64-818e-42df-920a-3a818a663c56
+
+	/// Unique record identifier, based on the ID of the document in the remote system (such as Salesforce ID)
+	column _sys_doc_id
+		dataType: string
+		lineageTag: 9cb59373-1b86-4c62-88de-26ae0e1a56f7
+		summarizeBy: none
+		sourceColumn: _sys_doc_id
+
+		annotation SummarizationSetBy = Automatic
+
+	/// The link to a specific ssr history id
+	column _sys_ssr_history_id
+		dataType: string
+		lineageTag: c60453b3-97d7-45b1-ade6-aaacedf30c77
+		summarizeBy: none
+		sourceColumn: _sys_ssr_history_id
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Name of the ssr history step
+	column trueai_ssr_history_name
+		dataType: string
+		lineageTag: 0a5aa9a4-f9e9-4e91-b840-87ef01567824
+		summarizeBy: none
+		sourceColumn: trueai_ssr_history_name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// The model used to generate the success factor
+	column trueai_model_name
+		dataType: string
+		lineageTag: 79f09f95-7f97-4047-a5ac-b15a8f77e0bf
+		summarizeBy: none
+		sourceColumn: trueai_model_name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// The value of the success factor
+	column trueai_value
+		dataType: string
+		lineageTag: 54056493-5086-4eed-8225-4c96c25cdfda
+		summarizeBy: none
+		sourceColumn: trueai_value
+
+		annotation SummarizationSetBy = Automatic
+
+	/// The sign (direction) of the success factor: positive, negative or neutral
+	column trueai_value_impact_sign
+		dataType: string
+		lineageTag: 70f041a1-2749-4523-866e-3393830dd2ed
+		summarizeBy: none
+		sourceColumn: trueai_value_impact_sign
+
+		annotation SummarizationSetBy = Automatic
+
+	/// The name of the success factor
+	column trueai_factor_name
+		dataType: string
+		lineageTag: b1957e1b-78c4-4fc3-a1bf-d5bf4fa364b8
+		summarizeBy: none
+		sourceColumn: trueai_factor_name
+
+		annotation SummarizationSetBy = Automatic
+
+	/// The impact of the value of the success factor
+	column trueai_value_impact
+		dataType: double
+		lineageTag: 7eb9e59b-0ac2-4acd-87b2-e2dde8374099
+		summarizeBy: sum
+		sourceColumn: trueai_value_impact
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// The sort order of the value within its success factor
+	column trueai_sort
+		dataType: double
+		lineageTag: 6c8fbedc-c97c-480d-9c39-a7d2864e6aa6
+		summarizeBy: sum
+		sourceColumn: trueai_sort
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// The impact of the success factor
+	column trueai_factor_impact
+		dataType: double
+		lineageTag: 8a7fb210-55ef-4152-9627-767e12a7e82c
+		summarizeBy: sum
+		sourceColumn: trueai_factor_impact
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// The ordering factor of the value within its success factor
+	column trueai_ordering_factor
+		dataType: double
+		lineageTag: ac867424-720b-4775-802f-be1578d81508
+		summarizeBy: sum
+		sourceColumn: trueai_ordering_factor
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Boolean flag indicating if the value is significant
+	column trueai_is_significant
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 37b1f614-1a72-45e8-aa6b-fa0a617884fb
+		summarizeBy: none
+		sourceColumn: trueai_is_significant
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ssr_history_success_factors = m
+		mode: import
+		source =
+				let
+				  dbTable = getDBTable("ssr_history_success_factors"), // get the right table
+				
+				
+				  dbTableTyped = Table.TransformColumnTypes(dbTable,{ // change types to what we're expecting
+				        {"_sys_doc_id", type text},
+				        {"_sys_ssr_history_id", type text},
+				        {"trueai_factor_impact", type number},
+				        {"trueai_factor_name", type text},
+				        {"trueai_is_significant", type logical},
+				        {"trueai_model_name", type text},
+				        {"trueai_ordering_factor", type number},
+				        {"trueai_sort", type number},
+				        {"trueai_ssr_history_name", type text},
+				        {"trueai_value", type text},
+				        {"trueai_value_impact", type number},
+				        {"trueai_value_impact_sign", type text}
+				
+				
+				
+				  })
+				in
+				    dbTableTyped
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,194 @@
+/// abc
+expression db_name = "cien_cmirthhguabxxs2rt_db" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 8b6cfed5-886b-475d-993c-da391b7f61bd
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression db_server_sql = "cien_dghyzcwxdptrmpqqt_db" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 3540c0d1-9224-45b5-b0d7-10b971d389f1
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression db_type = "Azure Data Lake" meta [IsParameterQuery=true, List={"PostgresSQL", "SQL Server", "Azure Data Lake"}, DefaultValue="Azure Data Lake", Type="Text", IsParameterQueryRequired=true]
+	lineageTag: b4ad5e7b-61f6-4a45-b4f0-69e705528de8
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression getDBConnection = ```
+		let
+		    getDBConnection = () =>
+		
+		    let
+		        dbConn = 
+		    //    if db_type = "SQL Server" then  //SQL 
+		    //            Sql.Database(db_server_sql, db_name)
+		        //else 
+		        // if db_type = "PostgresSQL" then // Postgres
+		          //    PostgreSQL.Database(db_server_postgres, db_name) // get the param connection
+		        // //else 
+		        if db_type = "Azure Data Lake" then // Azure Data Lake
+		                AzureStorage.DataLake(file_server_data_lake & file_folder_data_lake) // get the param connection
+		        else 
+		            error "Invalid database type specified"
+		    in
+		        dbConn
+		in
+		    getDBConnection
+		```
+	lineageTag: 6cba268f-2ed0-4a50-97d8-493330d0b0a3
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression getDBTable = ```
+		let
+		    getDBTable = (tableName as text) =>
+		
+		    let
+		        dbTable = 
+		        if db_type = "SQL Server" then
+		                getDBConnection(){[Schema="dbo",Item=tableName]}[Data] // get the right table
+		        else if db_type = "PostgresSQL" then
+		                getDBConnection(){[Schema="public",Item=tableName]}[Data] // get the right table
+		
+		        else if db_type = "Azure Data Lake" then
+		                let azureTable =
+		                        let Source  = getDBConnection(), // get the folder info
+		                                RenamedColumns = if Table.HasColumns(Source, "Folder Path") then Table.RenameColumns(Source,{{"Folder Path", "FolderPath"}}) else Source, // rename so easier to search for
+		                                folder = try RenamedColumns{0}[FolderPath] otherwise "", // safely handle empty sources
+		                                coid = try Text.BetweenDelimiters(folder, "cien_", "_") otherwise "", // get the coid when present
+		                                fileName = if Text.Length(coid) > 0 then coid & "_" & tableName & "/" else tableName & "/", // fallback if coid cannot be parsed
+		                                FilteredRowsJustCurrentTable = Table.SelectRows(RenamedColumns, each Text.EndsWith([FolderPath],fileName)),  // find all files for that table
+		                                FilteredRowsJustParquet = Table.SelectRows(FilteredRowsJustCurrentTable, each ([Extension] = ".parquet")), // filter out just teh parquet files
+		                                FilteredRpwsMpHiddenFiles = Table.SelectRows(FilteredRowsJustParquet, each [Attributes]?[Hidden]? <> true), // dont include hidden files if there are any
+		                                InvokeTransformParquetFunction1 = Table.AddColumn(FilteredRpwsMpHiddenFiles, "Transform_File", each try transformParquetFile([Content]) otherwise null), // keep refresh alive when a single parquet file is malformed
+		                                RemovedOtherColumns = Table.SelectColumns(InvokeTransformParquetFunction1, {"Transform_File"}), // keep only transformed tables
+		                                ValidTransformedRows = Table.SelectRows(RemovedOtherColumns, each Value.Is([Transform_File], type table)),
+		                                PrimarySchema = try if not Table.IsEmpty(ValidTransformedRows) then ValidTransformedRows{0}[Transform_File] else null otherwise null,
+		                                SecondarySchema = try if not Table.IsEmpty(FilteredRowsJustParquet) then transformParquetFile(FilteredRowsJustParquet{0}[Content]) else null otherwise null,
+		                                FallbackSchemaTable =
+		                                        if Value.Is(PrimarySchema, type table) then
+		                                                PrimarySchema
+		                                        else if Value.Is(SecondarySchema, type table) then
+		                                                SecondarySchema
+		                                        else
+		                                                #table({}, {}),
+		                                ColNames = Table.ColumnNames(FallbackSchemaTable), // avoid failing when filtered rows are empty
+		                                ExpandedBinRowColsIntoTable =
+		                                        if List.IsEmpty(ColNames) then
+		                                                #table({}, {})
+		                                        else if Table.IsEmpty(ValidTransformedRows) then
+		                                                #table(ColNames, {})
+		                                        else
+		                                                Table.ExpandTableColumn(ValidTransformedRows, "Transform_File", ColNames), // combine rows into a single table
+		
+		                                // Check if "_sys_doc_id" column exists
+		                                CheckColumnExists = if List.Contains(ColNames, "_sys_doc_id") then
+		                                        Table.SelectRows(ExpandedBinRowColsIntoTable, each [ _sys_doc_id ] <> null and [ _sys_doc_id ] <> "") // Remove rows where "_sys_doc_id" is blank
+		                                else
+		                                        ExpandedBinRowColsIntoTable // If column doesn't exist, return the table as it is 
+		                        in CheckColumnExists   
+		                in azureTable
+		        
+		        else 
+		            error "Invalid database type specifieds",
+		
+		        filteredDBTable =
+		            if tableName = "companies_history" and Table.HasColumns(dbTable, "job_status") then
+		                Table.SelectRows(dbTable, each (try Text.Lower(Text.Trim(Text.From([job_status]))) otherwise "") = "success")
+		            else
+		                dbTable
+		        
+		    in
+		        filteredDBTable
+		in
+		    getDBTable
+		```
+	lineageTag: a6cb1606-1005-479d-bdb8-a8db811f3738
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression db_server_postgres = "INVALID_HOST" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 8706c9f4-fc4d-4040-8c59-5a10ac9c7fcd
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+
+expression getDBQuery = ```
+		let
+		    getDBQuery= (sql as text) =>
+		
+		    let
+		        dbQuery = 
+		        if db_type = "SQL Server" then
+		                getDBConnection(){[Schema="dbo",Item=sql]}[Data] // get the right table
+		        else if db_type = "PostgresSQL" then
+		                Value.NativeQuery(PostgreSQL.Database(db_server_postgres, db_name, [CommandTimeout=#duration(0, 0, 1, 0)]), sql, null, [EnableFolding=true])
+		        
+		        else 
+		            error "Invalid database type specified"
+		        
+		    in
+		        dbQuery
+		in
+		    getDBQuery
+		```
+	lineageTag: 62dc5c01-0c3a-48cf-8b75-848bdc3378e3
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression transformParquetFile =
+		let
+		    Source = (Parameter1 as binary) => let
+		        Source = Parquet.Document(Parameter1, [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+		    in
+		        Source
+		in
+		    Source
+	lineageTag: 08fcdffb-b65f-4ecf-b4a9-25181304b30b
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression file_server_data_lake = "https://cientmpus.dfs.core.windows.net/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 498c4c3f-5afe-497c-8c76-265407d76ee3
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+expression file_folder_data_lake = "aceme24/export/" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: e977d287-1584-4a28-82e5-55b0c8094f2a
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+expression 'Errors in users' =
+		let
+		Source = users,
+		  #"Added Index" = Table.AddIndexColumn(Source, "Row Number" ,1),
+		  #"Kept Errors" = Table.SelectRowsWithErrors(#"Added Index", {"_sys_as_of", "_sys_filt_end_date", "_sys_filt_start_date", "_sys_co_id", "_sys_doc_id", "_sys_last_modified_on", "crm_addr_city", "crm_addr_country", "crm_addr_postal_code", "crm_addr_state", "crm_addr_street", "crm_created_on", "crm_creator_id", "crm_department", "crm_division", "crm_deep_link", "crm_email", "crm_first_name", "crm_language_locale", "crm_last_login_time", "crm_last_name", "crm_locale", "crm_mgr_id", "crm_profile_url", "crm_role", "crm_time_zone", "crm_title", "crm_user_type", "crm_username", "trueai_full_name", "trueai_test", "trueai_test_conf", "trueai_test_rule", "trueai_test_debug", "trueai_addr_city", "trueai_addr_country", "trueai_addr_lat", "trueai_addr_long", "trueai_addr_postal_code", "trueai_addr_state", "trueai_addr_street", "trueai_billable", "trueai_direct_reports", "trueai_ext_match_id", "trueai_ext_match_rule", "trueai_group", "trueai_group_conf", "trueai_group_rule", "trueai_hire_date", "trueai_is_mgr", "trueai_mgr_id", "trueai_mgr_id_conf", "trueai_mgr_id_rule", "trueai_mgr_ids", "trueai_performance_lvl_reached_on", "trueai_role", "trueai_role_conf", "trueai_tenure", "trueai_ramping_status", "trueai_termination_date", "trueai_title", "trueai_title_conf", "trueai_tot_reports", "trueai_user_behavior", "trueai_user_behavior_conf", "trueai_user_role", "trueai_user_role_alias", "trueai_user_role_department", "trueai_user_role_function", "trueai_is_dummy", "cust_text1", "cust_text2", "cust_text3", "cust_text4", "cust_text5", "cust_num1", "cust_num2", "cust_num3", "cust_num4", "cust_num5", "cust_num6", "cust_num7", "cust_bool1", "cust_bool2", "trueai_user_role_sort", "trueai_user_role_function_sort", "trueai_user_role_department_sort"}),
+		  #"Reordered Columns" = Table.ReorderColumns(#"Kept Errors", {"Row Number", "_sys_as_of", "_sys_filt_end_date", "_sys_filt_start_date", "_sys_co_id", "_sys_doc_id", "_sys_last_modified_on", "crm_addr_city", "crm_addr_country", "crm_addr_postal_code", "crm_addr_state", "crm_addr_street", "crm_created_on", "crm_creator_id", "crm_department", "crm_division", "crm_deep_link", "crm_email", "crm_first_name", "crm_language_locale", "crm_last_login_time", "crm_last_name", "crm_locale", "crm_mgr_id", "crm_profile_url", "crm_role", "crm_time_zone", "crm_title", "crm_user_type", "crm_username", "trueai_full_name", "trueai_test", "trueai_test_conf", "trueai_test_rule", "trueai_test_debug", "trueai_addr_city", "trueai_addr_country", "trueai_addr_lat", "trueai_addr_long", "trueai_addr_postal_code", "trueai_addr_state", "trueai_addr_street", "trueai_billable", "trueai_direct_reports", "trueai_ext_match_id", "trueai_ext_match_rule", "trueai_group", "trueai_group_conf", "trueai_group_rule", "trueai_hire_date", "trueai_is_mgr", "trueai_mgr_id", "trueai_mgr_id_conf", "trueai_mgr_id_rule", "trueai_mgr_ids", "trueai_performance_lvl_reached_on", "trueai_role", "trueai_role_conf", "trueai_tenure", "trueai_ramping_status", "trueai_termination_date", "trueai_title", "trueai_title_conf", "trueai_tot_reports", "trueai_user_behavior", "trueai_user_behavior_conf", "trueai_user_role", "trueai_user_role_alias", "trueai_user_role_department", "trueai_user_role_function", "trueai_is_dummy", "cust_text1", "cust_text2", "cust_text3", "cust_text4", "cust_text5", "cust_num1", "cust_num2", "cust_num3", "cust_num4", "cust_num5", "cust_num6", "cust_num7", "cust_bool1", "cust_bool2", "trueai_user_role_sort", "trueai_user_role_function_sort", "trueai_user_role_department_sort"})
+		in
+		  #"Reordered Columns"
+	lineageTag: 02f314c8-8aae-4886-9d17-c83410df5db3
+	queryGroup: 'Query Errors - 2/6/2026 2:23:23 PM'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
