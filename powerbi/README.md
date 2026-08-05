@@ -19,6 +19,8 @@ to a Windows computer:
 - GTM Suite - Tactical Report.pbix
 - GTM Suite - Utility Box Report.pbix
 
+Editable Power BI Project sources for the standard report set live under **/powerbi/src**. The golden reference Closing the Loop Strategy Report is intentionally isolated under **/powerbi/golden/Closing the Loop Strategy Report.pbip** and is not part of the standard report set in **/powerbi/src**.
+
 **/scripts**
 /pbi_deploy
 - README.md
