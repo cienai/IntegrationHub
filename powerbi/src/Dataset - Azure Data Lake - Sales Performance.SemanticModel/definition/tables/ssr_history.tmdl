@@ -8404,7 +8404,7 @@ table ssr_history
 
 	/// Counts opportunities deals won in the current selection It includes records where step outcome = "Closed Won".
 	measure 'meas.opps_deals_won_count' = CALCULATE(COUNT(ssr_history[_sys_doc_id]), ssr_history[step_outcome]="Closed Won")
-		formatString: 0
+		formatString: #,##0
 		displayFolder: all_activity_opp
 		lineageTag: fe8c317a-57f5-4273-9aee-59c14a9b605a
 
@@ -13042,9 +13042,8 @@ table ssr_history
 
 	/// Counts exp rpts existing customer won deals in the current selection It includes records where step success = True.
 	measure 'meas.exp_rpts_existing_customer_won_deals' = CALCULATE(Count(ssr_history[_sys_doc_id]), ssr_history[step_name] IN {"Existing Customer Selling"} && ssr_history[step_success] = True)       // new logo won deals count
+		formatString: #,##0
 		lineageTag: 455b2983-a61c-4667-9aa4-1176bcc96d6f
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	/// Counts exp rpts existing customer all deals in the current selection.
 	measure 'meas.exp_rpts_existing_customer_all_deals' = CALCULATE(Count(ssr_history[_sys_doc_id]), ssr_history[step_name] IN {"Existing Customer Selling"})       // new logo won deals count
@@ -14719,25 +14718,24 @@ table ssr_history
 
 		annotation SummarizationSetBy = Automatic
 
-	/// DO NOT TOUCH. Sort-by for col.step_outcome.
+	/// Deterministic sort-by key for col.step_outcome. Each displayed outcome must map to one sort value.
 	column 'col.step_outcome_sort' = ```
 			
-			var _outcome = IF(
-			    ISBLANK(ssr_history[step_outcome]),
-			    "Currently " & ssr_history[step_name],
-			    ssr_history[step_outcome]
-			)
+			VAR _outcome =
+			    IF(
+			        ISBLANK(ssr_history[step_outcome]),
+			        ssr_history[step_name],
+			        ssr_history[step_outcome]
+			    )
 			RETURN
 			SWITCH(
 			    _outcome,
-			    "Untouched",1,
-			    "Currently Untouched",2,
-			    "Prospecting",3,
-			    "Currently Prospecting",4,          // set the number to sort the col. step outcome
-			    "Abandoned",5,
-			    "Currently New Logo Selling",6,
-			    "Currently Post-Sales Support",7,
-			    "Currently Existing Customer Selling",8,
+			    "Untouched", 2,
+			    "Prospecting", 4,
+			    "Abandoned", 5,
+			    "New Logo Selling", 6,
+			    "Post-Sales Support", 7,
+			    "Existing Customer Selling", 8,
 			    9
 			)
 			
