@@ -1543,24 +1543,6 @@ table users
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Column 'col.trueai_group_sort' =.
-	column 'col.trueai_group_sort' =
-			
-			VAR _group = CALCULATE(MAX(users_history[trueai_group]))
-			
-			VAR res = IF(
-			    _group="ND",
-			    1,
-			    0
-			)
-			RETURN
-			res
-		formatString: 0
-		lineageTag: 54c56aac-2a6c-444e-8449-a065682002fb
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
 	/// User's standardized and combined role aliased
 	column trueai_user_role_alias
 		dataType: string
@@ -1894,6 +1876,16 @@ table users
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Column 'col.trueai_group_sort' =.
+	column 'col.trueai_group_sort'
+		dataType: int64
+		formatString: 0
+		lineageTag: 54c56aac-2a6c-444e-8449-a065682002fb
+		summarizeBy: sum
+		sourceColumn: col.trueai_group_sort
+
+		annotation SummarizationSetBy = Automatic
+
 	partition users-325b18c0-2983-4ccf-ad12-2466298e6bdc = m
 		mode: import
 		source =
@@ -1991,7 +1983,8 @@ table users
 				    addedUserRoleAliasedSort = Table.AddColumn(dbTableTyped, "trueai_user_role_sort", each if [trueai_user_role] = "ND" then 99 else 1),
 				    UserRoleFunctionSort = Table.AddColumn(addedUserRoleAliasedSort, "trueai_user_role_function_sort", each if [trueai_user_role_function] = "ND" then 99 else 1),
 				    UserRoleDeptSort = Table.AddColumn(UserRoleFunctionSort, "trueai_user_role_department_sort", each if [trueai_user_role_department] = "ND" then 99 else 1),
-				    DataTyped = Table.TransformColumnTypes(UserRoleDeptSort,{{"trueai_user_role_sort", Int64.Type}, {"trueai_user_role_function_sort", Int64.Type}, {"trueai_user_role_department_sort", Int64.Type}}),
+				    GroupSort = Table.AddColumn(UserRoleDeptSort, "col.trueai_group_sort", each if [trueai_group] = "ND" then 1 else 0),
+				    DataTyped = Table.TransformColumnTypes(GroupSort,{{"trueai_user_role_sort", Int64.Type}, {"trueai_user_role_function_sort", Int64.Type}, {"trueai_user_role_department_sort", Int64.Type}, {"col.trueai_group_sort", Int64.Type}}),
 				AllowedModelColumns = {
 				        "crm_division",
 				        "crm_username",

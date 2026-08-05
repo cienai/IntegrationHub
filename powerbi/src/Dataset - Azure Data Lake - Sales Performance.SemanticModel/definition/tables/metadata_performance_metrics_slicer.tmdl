@@ -62,7 +62,17 @@ table metadata_performance_metrics_slicer
 			)
 		lineageTag: 66efbbe1-b1df-4b81-acf6-bbf48d985018
 		summarizeBy: none
-		sortByColumn: sort
+		sortByColumn: display_sort
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Canonical source sort key. Identical visible labels receive an identical key even when source rows have different sort values.
+	column display_sort
+		dataType: string
+		lineageTag: eef821f7-705f-4469-a84e-492162004cc8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [display_sort]
 
 		annotation SummarizationSetBy = Automatic
 
@@ -90,8 +100,15 @@ table metadata_performance_metrics_slicer
 				        )
 				    )
 				
-				RETURN
+				VAR BaseRows =
 				    UNION(T, Categories)
+				
+				RETURN
+				    ADDCOLUMNS(
+				        BaseRows,
+				        "display_sort",
+				        [label]
+				    )
 				```
 
 	annotation PBI_Id = 752aca69a3224dc398585a872c69bccc
