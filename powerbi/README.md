@@ -1,7 +1,5 @@
 # **GTM Suite - Getting GTM Suite Reports & Datasets on to, and running on, your PBI Staging Workspace.**
 
-#   
-
 # **Step-by-step instructions:** 
 
 **Step 1: GitHub Integration Hub**
