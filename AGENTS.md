@@ -96,5 +96,6 @@ Instructions for Codex and other coding agents working in this repository.
 ## Collaboration
 
 - When the user points out a recurring workflow mistake, consider whether it should become a durable rule in this file.
+- When creating GitHub issues for this repo, assign them to `mrandersssson` and add them to the `Cien Engineering` project unless the user says otherwise.
 - Keep explanations tied to the repository's actual Power BI, ETL, and deployment surfaces.
 - Prefer concise implementation notes over broad AI or analytics theory in this repo.
